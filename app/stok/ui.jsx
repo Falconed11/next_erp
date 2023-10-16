@@ -26,10 +26,10 @@ import {
 import { Input } from "@nextui-org/react";
 import { Textarea } from "@nextui-org/react";
 
-import { EditIcon, DeleteIcon, EyeIcon } from "../components/icon";
+import { AddIcon, EditIcon, DeleteIcon, EyeIcon } from "../components/icon";
 
 const apiPath = getApiPath();
-export default function App() {
+export default function App({ id_proyek }) {
   const stok = useClientFetch("stok");
   const produk = useClientFetch("produk");
   const [method, setMethod] = useState("POST");
@@ -87,6 +87,7 @@ export default function App() {
       case "aksi":
         return (
           <div className="relative flex items-center gap-2">
+            <TambahButton id_proyek={id_proyek} />
             <Tooltip content="Details">
               <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
                 <EyeIcon />
@@ -273,4 +274,18 @@ export default function App() {
       </Table>
     </div>
   );
+}
+
+function TambahButton({ id_proyek }) {
+  if (id_proyek)
+    return (
+      <>
+        <Tooltip content="Tambah ke Proyek">
+          <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+            <AddIcon />
+          </span>
+        </Tooltip>
+      </>
+    );
+  return;
 }

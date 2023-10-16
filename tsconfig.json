@@ -22,6 +22,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/produk/ui.jsx", "app/components/icon.jsx", "app/components/nav.jsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/produk/ui.jsx", "app/components/icon.jsx", "app/components/nav.jsx", "app/proyek/detail/page.jsx"],
   "exclude": ["node_modules"]
 }

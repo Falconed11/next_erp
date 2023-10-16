@@ -5,11 +5,12 @@ import Link from "next/link";
 
 export default function Navigation({ navLinks }) {
   const pathname = usePathname();
-
   return (
     <nav className="mx-3 flex flex-col rounded-lg columns-10 bg-background">
       {navLinks.map((link) => {
-        const isActive = pathname == link.href;
+        const isActive =
+          (pathname == "/" && pathname == link.href) ||
+          (pathname.includes(link.href) && link.href != "/");
 
         return (
           <div
