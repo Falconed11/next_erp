@@ -11,7 +11,7 @@ export default async function app({ searchParams }: {
     const proyek = await getProyek(id)
     const keranjangproyek = await getKeranjangProyek(id)
     return <>
-        <UI proyek={proyek[0]} keranjangproyek={keranjangproyek} />
+        <UI proyek={proyek[0]} id={id} />
     </>
 }
 

@@ -25,10 +25,11 @@ import {
 } from "@nextui-org/react";
 import { Input } from "@nextui-org/react";
 import { Textarea } from "@nextui-org/react";
-
+import Link from "next/link";
 import { AddIcon, EditIcon, DeleteIcon, EyeIcon } from "../components/icon";
 
 const apiPath = getApiPath();
+
 export default function App({ id_proyek }) {
   const stok = useClientFetch("stok");
   const produk = useClientFetch("produk");
@@ -87,7 +88,7 @@ export default function App({ id_proyek }) {
       case "aksi":
         return (
           <div className="relative flex items-center gap-2">
-            <TambahButton id_proyek={id_proyek} />
+            <TambahButton id_proyek={id_proyek} id_stok={data.id} />
             <Tooltip content="Details">
               <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
                 <EyeIcon />
@@ -272,19 +273,51 @@ export default function App({ id_proyek }) {
           )}
         </TableBody>
       </Table>
+      <div>
+        <div className="mt-3">
+          <KembaliButton id_proyek={id_proyek} />
+        </div>
+      </div>
     </div>
   );
 }
 
-function TambahButton({ id_proyek }) {
+function TambahButton({ id_proyek, id_stok }) {
+  const tambahButtonPress = async () => {
+    const res = await fetch(`${apiPath}keranjangproyek`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        // 'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: JSON.stringify({ id_proyek, id_stok }),
+    });
+    const json = await res.json();
+    return alert(json.message);
+  };
   if (id_proyek)
     return (
       <>
         <Tooltip content="Tambah ke Proyek">
-          <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+          <span
+            onClick={tambahButtonPress}
+            className="text-lg text-default-400 cursor-pointer active:opacity-50"
+          >
             <AddIcon />
           </span>
         </Tooltip>
+      </>
+    );
+  return;
+}
+
+function KembaliButton({ id_proyek }) {
+  if (id_proyek)
+    return (
+      <>
+        <Link href={`/proyek/detail?id=${id_proyek}`}>
+          <Button color="primary">Kembalik ke Proyek {"==>"}</Button>
+        </Link>
       </>
     );
   return;
