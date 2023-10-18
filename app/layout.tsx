@@ -38,6 +38,25 @@ export default function RootLayout({
                 { href: "/produk", name: "Produk" },
                 { href: "/stok", name: "Stok" },
                 { href: "/proyek", name: "Proyek" },
+                {
+                  href: "/karyawan", name: "Karyawan", dropdown: [
+                    {
+                      key: "data",
+                      name: "Data",
+                      href: "/karyawan"
+                    },
+                    {
+                      key: "pengeluaran",
+                      name: "Pengeluaran",
+                      href: "/karyawan/pengeluaran"
+                    },
+                    {
+                      key: "lembur",
+                      name: "Lembur",
+                      href: "/karyawan/lembur"
+                    },
+                  ]
+                },
               ]}></Nav>
             </div>
             {children}

@@ -28,12 +28,12 @@ import {
   ModalFooter,
   useDisclosure,
 } from "@nextui-org/react";
+import { getApiPath, useClientFetch } from "../../utils/apiconfig";
 import { Button } from "@nextui-org/react";
 import { Input } from "@nextui-org/react";
 import { Divider } from "@nextui-org/react";
 import Link from "next/link";
 import Image from "next/image";
-import { getApiPath, useClientFetch } from "../../utils/apiconfig";
 import logo from "../../../public/logofinal.jpg";
 
 const api_path = getApiPath();
