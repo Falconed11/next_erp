@@ -57,6 +57,32 @@ export default function RootLayout({
                     },
                   ]
                 },
+                {
+                  href: "/perusahaan", name: "Perusahaan", dropdown: [
+                    {
+                      key: "pengeluaran",
+                      name: "Pengeluaran",
+                      href: "/perusahaan/pengeluaran"
+                    },
+                    {
+                      key: "pemasukan",
+                      name: "Pemasukan",
+                      href: "/perusahaan/pemasukan"
+                    },
+                  ]
+                },
+                { href: "/distributor", name: "Distributor" },
+                { href: "/klien", name: "Klien" },
+                { href: "/gudang", name: "Gudang" },
+                {
+                  href: "/laporan", name: "Laporan", dropdown: [
+                    {
+                      key: "labarugi",
+                      name: "Laba Rugi",
+                      href: "/labarugi"
+                    },
+                  ]
+                },
               ]}></Nav>
             </div>
             {children}

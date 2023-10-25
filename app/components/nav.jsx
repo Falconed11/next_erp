@@ -38,7 +38,8 @@ export default function Navigation({ navLinks }) {
                         if (key == "data") {
                           return router.push("/karyawan");
                         }
-                        return router.push(`/karyawan/${key}`);
+                        // return router.push(`/karyawan/${key}`);
+                        return router.push(`${link.href}/${key}`);
                       }}
                     >
                       {dropdown.map((item) => (
