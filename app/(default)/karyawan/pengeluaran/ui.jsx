@@ -19,7 +19,7 @@ import {
   DeleteIcon,
   EyeIcon,
   UserIcon,
-} from "../../components/icon";
+} from "../../../components/icon";
 import {
   Modal,
   ModalContent,
@@ -32,50 +32,53 @@ import { Select, SelectItem } from "@nextui-org/react";
 import { Textarea } from "@nextui-org/react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { getApiPath, useClientFetch } from "../../utils/apiconfig";
-import { getDate } from "../../utils/date";
+import { getApiPath, useClientFetch } from "../../../utils/apiconfig";
+import { getDate } from "../../../utils/date";
 import { Button } from "@nextui-org/react";
 import { Input } from "@nextui-org/react";
 
 const api_path = getApiPath();
 
 export default function app() {
-  const pengeluaranperusahaan = useClientFetch(`pengeluaranperusahaan`);
-  const distributor = useClientFetch(`distributor`);
+  const pengeluaran = useClientFetch(`pengeluaran`);
+  const karyawan = useClientFetch(`karyawan`);
+  const proyek = useClientFetch(`proyek`);
   const [form, setForm] = useState({});
   const [method, setMethod] = useState();
   const tambahButtonPress = () => {
     setForm({
-      modalmode: "Tambah",
       id: "",
-      id_distributor: "",
+      id_karyawan: "",
+      id_proyek: "",
       id_kategori: "",
       tanggal: "",
       startDate: "",
-      nominal: "",
+      harga: "",
       keterangan: "",
-      select_distributor: new Set([]),
-      select_kategori: new Set([]),
+      select_karyawan: new Set([]),
+      select_proyek: new Set([]),
     });
     setMethod("POST");
-    modal.pengeluaranperusahaan.onOpen();
+    modal.pengeluaran.onOpen();
   };
   const editButtonPress = (data) => {
     const date = new Date(data.tanggal);
     setForm({
       ...data,
-      modalmode: "Edit",
-      select_distributor: new Set([String(data.id_distributor)]),
-      select_kategori: new Set([String(data.id_kategori)]),
+      select_karyawan: new Set([
+        String(data.id_karyawan),
+        String(data.id_karyawan),
+      ]),
+      select_proyek: new Set([String(data.id_proyek), String(data.id_proyek)]),
       startDate: date,
       tanggal: getDate(date),
     });
     setMethod("PUT");
-    modal.pengeluaranperusahaan.onOpen();
+    modal.pengeluaran.onOpen();
   };
   const deleteButtonPress = async (id) => {
     if (confirm("Hapus produk?")) {
-      const res = await fetch(`${api_path}pengeluaranperusahaan`, {
+      const res = await fetch(`${api_path}pengeluaran`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -88,7 +91,7 @@ export default function app() {
     }
   };
   const simpanButtonPress = async (data) => {
-    const res = await fetch(`${api_path}pengeluaranperusahaan`, {
+    const res = await fetch(`${api_path}pengeluaran`, {
       method,
       headers: {
         "Content-Type": "application/json",
@@ -100,7 +103,7 @@ export default function app() {
     return alert(json.message);
   };
   const renderCell = {
-    pengeluaranperusahaan: React.useCallback((data, columnKey) => {
+    pengeluaran: React.useCallback((data, columnKey) => {
       const cellValue = data[columnKey];
       const date = new Date(data.tanggal);
       switch (columnKey) {
@@ -133,22 +136,30 @@ export default function app() {
     }, []),
   };
   const col = {
-    pengeluaranperusahaan: [
+    pengeluaran: [
       {
-        key: "id_distributor",
-        label: "Id Distributor",
+        key: "id_karyawan",
+        label: "Id Karyawan",
       },
       {
-        key: "id_kategori",
-        label: "Id Kategori",
+        key: "namakaryawan",
+        label: "Nama Karyawan",
+      },
+      {
+        key: "id_proyek",
+        label: "Id Proyek",
+      },
+      {
+        key: "namaproyek",
+        label: "Nama Proyek",
       },
       {
         key: "tanggal",
         label: "Tanggal",
       },
       {
-        key: "nominal",
-        label: "nominal",
+        key: "harga",
+        label: "Harga",
       },
       {
         key: "keterangan",
@@ -160,26 +171,18 @@ export default function app() {
       },
     ],
   };
-  const select = {
-    kategori: [
-      {
-        key: 1,
-        label: 1,
-      },
-      {
-        key: 2,
-        label: 2,
-      },
-    ],
-  };
   const modal = {
-    pengeluaranperusahaan: useDisclosure(),
+    pengeluaran: useDisclosure(),
   };
 
-  if (pengeluaranperusahaan.error) return <div>failed to load</div>;
-  if (pengeluaranperusahaan.isLoading) return <div>loading...</div>;
-  if (distributor.error) return <div>failed to load</div>;
-  if (distributor.isLoading) return <div>loading...</div>;
+  if (pengeluaran.error) return <div>failed to load</div>;
+  if (pengeluaran.isLoading) return <div>loading...</div>;
+  if (karyawan.error) return <div>failed to load</div>;
+  if (karyawan.isLoading) return <div>loading...</div>;
+  if (proyek.error) return <div>failed to load</div>;
+  if (proyek.isLoading) return <div>loading...</div>;
+
+  console.log(form);
 
   return (
     <div>
@@ -187,7 +190,7 @@ export default function app() {
         Tambah
       </Button>
       <Table className="pt-3" aria-label="Example table with custom cells">
-        <TableHeader columns={col.pengeluaranperusahaan}>
+        <TableHeader columns={col.pengeluaran}>
           {(column) => (
             <TableColumn
               key={column.key}
@@ -197,13 +200,11 @@ export default function app() {
             </TableColumn>
           )}
         </TableHeader>
-        <TableBody items={pengeluaranperusahaan.data}>
+        <TableBody items={pengeluaran.data}>
           {(item) => (
             <TableRow key={item.id}>
               {(columnKey) => (
-                <TableCell>
-                  {renderCell.pengeluaranperusahaan(item, columnKey)}
-                </TableCell>
+                <TableCell>{renderCell.pengeluaran(item, columnKey)}</TableCell>
               )}
             </TableRow>
           )}
@@ -211,51 +212,70 @@ export default function app() {
       </Table>
       <Modal
         scrollBehavior="inside"
-        isOpen={modal.pengeluaranperusahaan.isOpen}
-        onOpenChange={modal.pengeluaranperusahaan.onOpenChange}
+        isOpen={modal.pengeluaran.isOpen}
+        onOpenChange={modal.pengeluaran.onOpenChange}
       >
         <ModalContent>
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                {form.modalmode} Pengeluaran
+                Edit Pengeluaran
               </ModalHeader>
               <ModalBody>
                 <Select
-                  label="Id Distributor"
-                  placeholder="Pilih distributor"
+                  label="Nama Karyawan"
+                  placeholder="Pilih karyawan"
                   className="max-w-xs"
-                  selectedKeys={form.select_distributor}
+                  selectedKeys={form.select_karyawan}
                   onChange={(e) =>
                     setForm({
                       ...form,
-                      id_distributor: e.target.value,
-                      select_distributor: new Set([e.target.value]),
+                      id_karyawan: e.target.value,
+                      select_karyawan: new Set([e.target.value]),
                     })
                   }
                 >
-                  {distributor.data.map((item) => (
+                  {karyawan.data.map((item) => (
                     <SelectItem key={item.id} value={item.id}>
                       {item.nama}
                     </SelectItem>
                   ))}
                 </Select>
                 <Select
-                  label="Id Kategori"
-                  placeholder="Pilih kategori"
+                  label="Id Proyek"
+                  placeholder="Pilih proyek"
                   className="max-w-xs"
-                  selectedKeys={form.select_kategori}
+                  selectedKeys={form.select_proyek}
                   onChange={(e) =>
                     setForm({
                       ...form,
-                      id_kategori: e.target.value,
-                      select_kategori: new Set([e.target.value]),
+                      id_proyek: e.target.value,
+                      select_proyek: new Set([e.target.value]),
                     })
                   }
                 >
-                  {select.kategori.map((item) => (
-                    <SelectItem key={item.key} value={item.key}>
-                      {String(item.label)}
+                  {proyek.data.map((item) => (
+                    <SelectItem key={item.id} value={item.id}>
+                      {String(item.id)}
+                    </SelectItem>
+                  ))}
+                </Select>
+                <Select
+                  label="Nama Proyek"
+                  placeholder="Pilih proyek"
+                  className="max-w-xs"
+                  selectedKeys={form.select_proyek}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      id_proyek: e.target.value,
+                      select_proyek: new Set([e.target.value]),
+                    })
+                  }
+                >
+                  {proyek.data.map((item) => (
+                    <SelectItem key={item.id} value={item.id}>
+                      {item.nama}
                     </SelectItem>
                   ))}
                 </Select>
@@ -273,10 +293,10 @@ export default function app() {
                 </div>
                 <Input
                   type="number"
-                  label="Nominal"
-                  placeholder="Masukkan nominal"
-                  value={form.nominal}
-                  onValueChange={(v) => setForm({ ...form, nominal: v })}
+                  label="Harga"
+                  placeholder="Masukkan harga"
+                  value={form.harga}
+                  onValueChange={(v) => setForm({ ...form, harga: v })}
                 />
                 <Textarea
                   label="Keterangan"

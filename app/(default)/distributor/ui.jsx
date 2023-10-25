@@ -19,7 +19,7 @@ import {
   DeleteIcon,
   EyeIcon,
   UserIcon,
-} from "../components/icon";
+} from "../../components/icon";
 import {
   Modal,
   ModalContent,
@@ -29,14 +29,14 @@ import {
   useDisclosure,
 } from "@nextui-org/react";
 import "react-datepicker/dist/react-datepicker.css";
-import { getApiPath, useClientFetch } from "../utils/apiconfig";
+import { getApiPath, useClientFetch } from "../../utils/apiconfig";
 import { Button } from "@nextui-org/react";
 import { Input } from "@nextui-org/react";
 
 const api_path = getApiPath();
 
 export default function app() {
-  const gudang = useClientFetch(`gudang`);
+  const distributor = useClientFetch(`distributor`);
   const [form, setForm] = useState({});
   const [method, setMethod] = useState();
   const tambahButtonPress = () => {
@@ -47,7 +47,7 @@ export default function app() {
       modalmode: "Tambah",
     });
     setMethod("POST");
-    modal.gudang.onOpen();
+    modal.distributor.onOpen();
   };
   const editButtonPress = (data) => {
     const date = new Date(data.tanggal);
@@ -56,11 +56,11 @@ export default function app() {
       modalmode: "Edit",
     });
     setMethod("PUT");
-    modal.gudang.onOpen();
+    modal.distributor.onOpen();
   };
   const deleteButtonPress = async (id) => {
-    if (confirm("Hapus gudang?")) {
-      const res = await fetch(`${api_path}gudang`, {
+    if (confirm("Hapus distributor?")) {
+      const res = await fetch(`${api_path}distributor`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -73,7 +73,7 @@ export default function app() {
     }
   };
   const simpanButtonPress = async (data) => {
-    const res = await fetch(`${api_path}gudang`, {
+    const res = await fetch(`${api_path}distributor`, {
       method,
       headers: {
         "Content-Type": "application/json",
@@ -85,7 +85,7 @@ export default function app() {
     return alert(json.message);
   };
   const renderCell = {
-    gudang: React.useCallback((data, columnKey) => {
+    distributor: React.useCallback((data, columnKey) => {
       const cellValue = data[columnKey];
       const date = new Date(data.tanggal);
       switch (columnKey) {
@@ -116,7 +116,7 @@ export default function app() {
     }, []),
   };
   const col = {
-    gudang: [
+    distributor: [
       {
         key: "nama",
         label: "Nama",
@@ -132,11 +132,11 @@ export default function app() {
     ],
   };
   const modal = {
-    gudang: useDisclosure(),
+    distributor: useDisclosure(),
   };
 
-  if (gudang.error) return <div>failed to load</div>;
-  if (gudang.isLoading) return <div>loading...</div>;
+  if (distributor.error) return <div>failed to load</div>;
+  if (distributor.isLoading) return <div>loading...</div>;
 
   return (
     <div>
@@ -144,7 +144,7 @@ export default function app() {
         Tambah
       </Button>
       <Table className="pt-3" aria-label="Example table with custom cells">
-        <TableHeader columns={col.gudang}>
+        <TableHeader columns={col.distributor}>
           {(column) => (
             <TableColumn
               key={column.key}
@@ -154,11 +154,11 @@ export default function app() {
             </TableColumn>
           )}
         </TableHeader>
-        <TableBody items={gudang.data}>
+        <TableBody items={distributor.data}>
           {(item) => (
             <TableRow key={item.id}>
               {(columnKey) => (
-                <TableCell>{renderCell.gudang(item, columnKey)}</TableCell>
+                <TableCell>{renderCell.distributor(item, columnKey)}</TableCell>
               )}
             </TableRow>
           )}
@@ -166,8 +166,8 @@ export default function app() {
       </Table>
       <Modal
         scrollBehavior="inside"
-        isOpen={modal.gudang.isOpen}
-        onOpenChange={modal.gudang.onOpenChange}
+        isOpen={modal.distributor.isOpen}
+        onOpenChange={modal.distributor.onOpenChange}
       >
         <ModalContent>
           {(onClose) => (

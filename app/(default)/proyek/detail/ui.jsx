@@ -19,7 +19,7 @@ import {
   DeleteIcon,
   EyeIcon,
   UserIcon,
-} from "../../components/icon";
+} from "../../../components/icon";
 import {
   Modal,
   ModalContent,
@@ -34,7 +34,7 @@ import { Input } from "@nextui-org/react";
 import { Divider } from "@nextui-org/react";
 import Link from "next/link";
 import Image from "next/image";
-import logo from "../../../public/logofinal.jpg";
+import logo from "../../../../public/logofinal.jpg";
 
 const api_path = getApiPath();
 

@@ -19,7 +19,7 @@ import {
   DeleteIcon,
   EyeIcon,
   UserIcon,
-} from "../components/icon";
+} from "../../components/icon";
 import {
   Modal,
   ModalContent,
@@ -28,39 +28,29 @@ import {
   ModalFooter,
   useDisclosure,
 } from "@nextui-org/react";
-import "react-datepicker/dist/react-datepicker.css";
-import { getApiPath, useClientFetch } from "../utils/apiconfig";
+import { getApiPath, useClientFetch } from "../../utils/apiconfig";
 import { Button } from "@nextui-org/react";
 import { Input } from "@nextui-org/react";
 
 const api_path = getApiPath();
 
 export default function app() {
-  const distributor = useClientFetch(`distributor`);
+  const karyawan = useClientFetch(`karyawan`);
   const [form, setForm] = useState({});
   const [method, setMethod] = useState();
   const tambahButtonPress = () => {
-    setForm({
-      id: "",
-      nama: "",
-      alamat: "",
-      modalmode: "Tambah",
-    });
+    setForm({ id: "", nama: "" });
     setMethod("POST");
-    modal.distributor.onOpen();
+    modal.karyawan.onOpen();
   };
   const editButtonPress = (data) => {
-    const date = new Date(data.tanggal);
-    setForm({
-      ...data,
-      modalmode: "Edit",
-    });
+    setForm(data);
     setMethod("PUT");
-    modal.distributor.onOpen();
+    modal.karyawan.onOpen();
   };
   const deleteButtonPress = async (id) => {
-    if (confirm("Hapus distributor?")) {
-      const res = await fetch(`${api_path}distributor`, {
+    if (confirm("Hapus produk?")) {
+      const res = await fetch(`${api_path}karyawan`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -73,7 +63,7 @@ export default function app() {
     }
   };
   const simpanButtonPress = async (data) => {
-    const res = await fetch(`${api_path}distributor`, {
+    const res = await fetch(`${api_path}karyawan`, {
       method,
       headers: {
         "Content-Type": "application/json",
@@ -85,10 +75,11 @@ export default function app() {
     return alert(json.message);
   };
   const renderCell = {
-    distributor: React.useCallback((data, columnKey) => {
+    karyawan: React.useCallback((data, columnKey) => {
       const cellValue = data[columnKey];
-      const date = new Date(data.tanggal);
       switch (columnKey) {
+        case "totalharga-beli":
+          return data.jumlah * data.harga;
         case "aksi":
           return (
             <div className="relative flex items-center gap-2">
@@ -114,16 +105,21 @@ export default function app() {
           return cellValue;
       }
     }, []),
+    invoice: React.useCallback((data, columnKey) => {
+      const cellValue = data[columnKey];
+      switch (columnKey) {
+        case "total":
+          return data.jumlah * data.harga;
+        default:
+          return cellValue;
+      }
+    }, []),
   };
   const col = {
-    distributor: [
+    karyawan: [
       {
         key: "nama",
         label: "Nama",
-      },
-      {
-        key: "alamat",
-        label: "Alamat",
       },
       {
         key: "aksi",
@@ -132,11 +128,11 @@ export default function app() {
     ],
   };
   const modal = {
-    distributor: useDisclosure(),
+    karyawan: useDisclosure(),
   };
 
-  if (distributor.error) return <div>failed to load</div>;
-  if (distributor.isLoading) return <div>loading...</div>;
+  if (karyawan.error) return <div>failed to load</div>;
+  if (karyawan.isLoading) return <div>loading...</div>;
 
   return (
     <div>
@@ -144,7 +140,7 @@ export default function app() {
         Tambah
       </Button>
       <Table className="pt-3" aria-label="Example table with custom cells">
-        <TableHeader columns={col.distributor}>
+        <TableHeader columns={col.karyawan}>
           {(column) => (
             <TableColumn
               key={column.key}
@@ -154,11 +150,11 @@ export default function app() {
             </TableColumn>
           )}
         </TableHeader>
-        <TableBody items={distributor.data}>
+        <TableBody items={karyawan.data}>
           {(item) => (
             <TableRow key={item.id}>
               {(columnKey) => (
-                <TableCell>{renderCell.distributor(item, columnKey)}</TableCell>
+                <TableCell>{renderCell.karyawan(item, columnKey)}</TableCell>
               )}
             </TableRow>
           )}
@@ -166,29 +162,22 @@ export default function app() {
       </Table>
       <Modal
         scrollBehavior="inside"
-        isOpen={modal.distributor.isOpen}
-        onOpenChange={modal.distributor.onOpenChange}
+        isOpen={modal.karyawan.isOpen}
+        onOpenChange={modal.karyawan.onOpenChange}
       >
         <ModalContent>
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                {form.modalmode} Distributor
+                Edit Produk
               </ModalHeader>
               <ModalBody>
                 <Input
                   type="text"
                   label="Nama"
-                  placeholder="Masukkan nama"
+                  placeholder="Masukkan nama!"
                   value={form.nama}
-                  onValueChange={(v) => setForm({ ...form, nama: v })}
-                />
-                <Input
-                  type="text"
-                  label="Alamat"
-                  placeholder="Masukkan alamat"
-                  value={form.alamat}
-                  onValueChange={(v) => setForm({ ...form, alamat: v })}
+                  onValueChange={(val) => setForm({ ...form, nama: val })}
                 />
               </ModalBody>
               <ModalFooter>

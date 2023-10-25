@@ -19,7 +19,7 @@ import {
   DeleteIcon,
   EyeIcon,
   UserIcon,
-} from "../components/icon";
+} from "../../components/icon";
 import {
   Modal,
   ModalContent,
@@ -29,7 +29,7 @@ import {
   useDisclosure,
 } from "@nextui-org/react";
 import "react-datepicker/dist/react-datepicker.css";
-import { getApiPath, useClientFetch } from "../utils/apiconfig";
+import { getApiPath, useClientFetch } from "../../utils/apiconfig";
 import { Button } from "@nextui-org/react";
 import { Input } from "@nextui-org/react";
 

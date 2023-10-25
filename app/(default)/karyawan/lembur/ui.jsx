@@ -19,7 +19,7 @@ import {
   DeleteIcon,
   EyeIcon,
   UserIcon,
-} from "../../components/icon";
+} from "../../../components/icon";
 import {
   Modal,
   ModalContent,
@@ -32,15 +32,15 @@ import { Select, SelectItem } from "@nextui-org/react";
 import { Textarea } from "@nextui-org/react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { getApiPath, useClientFetch } from "../../utils/apiconfig";
-import { getDate } from "../../utils/date";
+import { getApiPath, useClientFetch } from "../../../utils/apiconfig";
+import { getDate } from "../../../utils/date";
 import { Button } from "@nextui-org/react";
 import { Input } from "@nextui-org/react";
 
 const api_path = getApiPath();
 
 export default function app() {
-  const pengeluaran = useClientFetch(`pengeluaran`);
+  const lembur = useClientFetch(`lembur`);
   const karyawan = useClientFetch(`karyawan`);
   const proyek = useClientFetch(`proyek`);
   const [form, setForm] = useState({});
@@ -50,35 +50,32 @@ export default function app() {
       id: "",
       id_karyawan: "",
       id_proyek: "",
-      id_kategori: "",
-      tanggal: "",
+      durasi: "",
       startDate: "",
       harga: "",
       keterangan: "",
+      tanggal: "",
       select_karyawan: new Set([]),
       select_proyek: new Set([]),
     });
     setMethod("POST");
-    modal.pengeluaran.onOpen();
+    modal.lembur.onOpen();
   };
   const editButtonPress = (data) => {
     const date = new Date(data.tanggal);
     setForm({
       ...data,
-      select_karyawan: new Set([
-        String(data.id_karyawan),
-        String(data.id_karyawan),
-      ]),
-      select_proyek: new Set([String(data.id_proyek), String(data.id_proyek)]),
+      select_karyawan: new Set([String(data.id_karyawan)]),
+      select_proyek: new Set([String(data.id_proyek)]),
       startDate: date,
       tanggal: getDate(date),
     });
     setMethod("PUT");
-    modal.pengeluaran.onOpen();
+    modal.lembur.onOpen();
   };
   const deleteButtonPress = async (id) => {
-    if (confirm("Hapus produk?")) {
-      const res = await fetch(`${api_path}pengeluaran`, {
+    if (confirm("Hapus lembur?")) {
+      const res = await fetch(`${api_path}lembur`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -91,7 +88,7 @@ export default function app() {
     }
   };
   const simpanButtonPress = async (data) => {
-    const res = await fetch(`${api_path}pengeluaran`, {
+    const res = await fetch(`${api_path}lembur`, {
       method,
       headers: {
         "Content-Type": "application/json",
@@ -103,7 +100,7 @@ export default function app() {
     return alert(json.message);
   };
   const renderCell = {
-    pengeluaran: React.useCallback((data, columnKey) => {
+    lembur: React.useCallback((data, columnKey) => {
       const cellValue = data[columnKey];
       const date = new Date(data.tanggal);
       switch (columnKey) {
@@ -136,7 +133,7 @@ export default function app() {
     }, []),
   };
   const col = {
-    pengeluaran: [
+    lembur: [
       {
         key: "id_karyawan",
         label: "Id Karyawan",
@@ -152,6 +149,10 @@ export default function app() {
       {
         key: "namaproyek",
         label: "Nama Proyek",
+      },
+      {
+        key: "durasi",
+        label: "Durasi",
       },
       {
         key: "tanggal",
@@ -172,11 +173,11 @@ export default function app() {
     ],
   };
   const modal = {
-    pengeluaran: useDisclosure(),
+    lembur: useDisclosure(),
   };
 
-  if (pengeluaran.error) return <div>failed to load</div>;
-  if (pengeluaran.isLoading) return <div>loading...</div>;
+  if (lembur.error) return <div>failed to load</div>;
+  if (lembur.isLoading) return <div>loading...</div>;
   if (karyawan.error) return <div>failed to load</div>;
   if (karyawan.isLoading) return <div>loading...</div>;
   if (proyek.error) return <div>failed to load</div>;
@@ -190,7 +191,7 @@ export default function app() {
         Tambah
       </Button>
       <Table className="pt-3" aria-label="Example table with custom cells">
-        <TableHeader columns={col.pengeluaran}>
+        <TableHeader columns={col.lembur}>
           {(column) => (
             <TableColumn
               key={column.key}
@@ -200,11 +201,11 @@ export default function app() {
             </TableColumn>
           )}
         </TableHeader>
-        <TableBody items={pengeluaran.data}>
+        <TableBody items={lembur.data}>
           {(item) => (
             <TableRow key={item.id}>
               {(columnKey) => (
-                <TableCell>{renderCell.pengeluaran(item, columnKey)}</TableCell>
+                <TableCell>{renderCell.lembur(item, columnKey)}</TableCell>
               )}
             </TableRow>
           )}
@@ -212,14 +213,14 @@ export default function app() {
       </Table>
       <Modal
         scrollBehavior="inside"
-        isOpen={modal.pengeluaran.isOpen}
-        onOpenChange={modal.pengeluaran.onOpenChange}
+        isOpen={modal.lembur.isOpen}
+        onOpenChange={modal.lembur.onOpenChange}
       >
         <ModalContent>
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                Edit Pengeluaran
+                Edit Lembur
               </ModalHeader>
               <ModalBody>
                 <Select
@@ -293,8 +294,15 @@ export default function app() {
                 </div>
                 <Input
                   type="number"
+                  label="Durasi"
+                  placeholder="Masukkan durasi (jam)"
+                  value={form.durasi}
+                  onValueChange={(v) => setForm({ ...form, durasi: v })}
+                />
+                <Input
+                  type="number"
                   label="Harga"
-                  placeholder="Masukkan harga"
+                  placeholder="Masukkan harga (/jam)"
                   value={form.harga}
                   onValueChange={(v) => setForm({ ...form, harga: v })}
                 />

@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { useClientFetch, getApiPath } from "../utils/apiconfig";
+import { useClientFetch, getApiPath } from "../../utils/apiconfig";
 import {
   Table,
   TableHeader,
@@ -33,7 +33,7 @@ import {
   DeleteIcon,
   EyeIcon,
   UserIcon,
-} from "../components/icon";
+} from "../../components/icon";
 
 const apiPath = getApiPath();
 export default function App() {
