@@ -1,8 +1,9 @@
-"use client";
-import { User } from "@nextui-org/react";
 import { UserIcon, DeleteIcon } from "./icon";
 
-export default function App() {
+export default function App(user) {
+  const status = user.user.status;
+  if (status == "loading") return <>Loading...</>;
+  const data = user.user.data.user;
   return (
     <div className="flex flex-row">
       <div>
@@ -11,8 +12,8 @@ export default function App() {
         </div>
       </div>
       <div>
-        <div>David Almacesar</div>
-        <div className="text-gray-400">Admin</div>
+        <div>{data.nama}</div>
+        <div className="text-gray-400">{data.peran}</div>
       </div>
     </div>
   );

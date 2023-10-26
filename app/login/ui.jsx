@@ -4,7 +4,7 @@ import { Input, Button } from "@nextui-org/react";
 import Link from "next/link";
 import { EyeFilledIcon, EyeSlashFilledIcon } from "../components/icon";
 
-export default function () {
+export default function App() {
   const [isVisible, setIsVisible] = React.useState(false);
 
   const toggleVisibility = () => setIsVisible(!isVisible);

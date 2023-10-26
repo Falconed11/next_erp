@@ -1,7 +1,10 @@
+"use client"
+import { useSession } from 'next-auth/react'
 import Nav from '../components/nav'
 import User from '../components/user'
 
 export default function RootLayout({ children, }: { children: React.ReactNode }) {
+    const session = useSession()
     return (
         <section>
             <div className='pb-3'></div>
@@ -11,7 +14,7 @@ export default function RootLayout({ children, }: { children: React.ReactNode })
                 </div>
                 <div className='basis-1/4 flex flex-row-reverse '>
                     <div className='px-3'>
-                        <User />
+                        <User user={session} />
                     </div>
                 </div>
             </div>
@@ -67,6 +70,7 @@ export default function RootLayout({ children, }: { children: React.ReactNode })
                                 },
                             ]
                         },
+                        { href: "/api/auth/signout", name: "Signout" },
                     ]}></Nav>
                 </div>
                 {children}
