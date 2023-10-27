@@ -1,5 +1,5 @@
 import { type NextRequest } from 'next/server'
-import { getApiPath } from "../../utils/apiconfig"
+import { getApiPath } from "../../../utils/apiconfig"
 import UI from "./ui"
 
 const api_path = getApiPath()

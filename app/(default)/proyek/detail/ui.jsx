@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   Table,
   TableHeader,
@@ -28,7 +28,8 @@ import {
   ModalFooter,
   useDisclosure,
 } from "@nextui-org/react";
-import { getApiPath, useClientFetch } from "../../utils/apiconfig";
+import { useReactToPrint } from "react-to-print";
+import { getApiPath, useClientFetch } from "../../../utils/apiconfig";
 import { Button } from "@nextui-org/react";
 import { Input } from "@nextui-org/react";
 import { Divider } from "@nextui-org/react";
@@ -38,7 +39,13 @@ import logo from "../../../../public/logofinal.jpg";
 
 const api_path = getApiPath();
 
-export default function app({ proyek, id }) {
+export default function App({ proyek, id }) {
+  const componentRef = useRef();
+  const handlePrint = useReactToPrint({
+    content: () => componentRef.current,
+    bodyClass: "m-10",
+  });
+
   const keranjangProyek = useClientFetch(`keranjangproyek?id_proyek=${id}`);
   const [tempProyek, setTempProyek] = useState(proyek);
   const [hargaJual, setHargaJual] = useState(0);
@@ -362,7 +369,7 @@ export default function app({ proyek, id }) {
             <>
               <ModalHeader className="flex flex-col gap-1">Invoice</ModalHeader>
               <ModalBody>
-                <div>
+                <div ref={componentRef} className="bg-white text-black">
                   <div className="flex flex-row items-center">
                     <Image
                       src={logo}
@@ -459,6 +466,9 @@ export default function app({ proyek, id }) {
                   Batal
                 </Button>
                 <Button color="primary">Cetak</Button>
+                <Button onClick={handlePrint} color="primary">
+                  React to Print
+                </Button>
               </ModalFooter>
             </>
           )}

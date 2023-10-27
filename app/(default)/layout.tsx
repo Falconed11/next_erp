@@ -5,6 +5,60 @@ import User from '../components/user'
 
 export default function RootLayout({ children, }: { children: React.ReactNode }) {
     const session = useSession()
+    const user = session.data?.user
+    const links = [
+        { href: "/", name: "Dashboard" },
+        { href: "/produk", name: "Produk" },
+        { href: "/stok", name: "Stok" },
+        { href: "/proyek", name: "Proyek" },
+        {
+            href: "/karyawan", name: "Karyawan", dropdown: [
+                {
+                    key: "data",
+                    name: "Data",
+                    href: "/karyawan"
+                },
+                {
+                    key: "pengeluaran",
+                    name: "Pengeluaran",
+                    href: "/karyawan/pengeluaran"
+                },
+                {
+                    key: "lembur",
+                    name: "Lembur",
+                    href: "/karyawan/lembur"
+                },
+            ]
+        },
+        {
+            href: "/perusahaan", name: "Perusahaan", dropdown: [
+                {
+                    key: "pengeluaran",
+                    name: "Pengeluaran",
+                    href: "/perusahaan/pengeluaran"
+                },
+                {
+                    key: "pemasukan",
+                    name: "Pemasukan",
+                    href: "/perusahaan/pemasukan"
+                },
+            ]
+        },
+        { href: "/distributor", name: "Distributor" },
+        { href: "/klien", name: "Klien" },
+        { href: "/gudang", name: "Gudang" },
+        {
+            href: "/laporan", name: "Laporan", dropdown: [
+                {
+                    key: "labarugi",
+                    name: "Laba Rugi",
+                    href: "/labarugi"
+                },
+            ]
+        },
+    ]
+    if (user?.peran == "admin") links.push({ href: "/user", name: "User" },)
+    links.push({ href: "/api/auth/signout", name: "Signout" },)
     return (
         <section>
             <div className='pb-3'></div>
@@ -20,58 +74,7 @@ export default function RootLayout({ children, }: { children: React.ReactNode })
             </div>
             <div className='flex flex-row'>
                 <div>
-                    <Nav navLinks={[
-                        { href: "/", name: "Dashboard" },
-                        { href: "/produk", name: "Produk" },
-                        { href: "/stok", name: "Stok" },
-                        { href: "/proyek", name: "Proyek" },
-                        {
-                            href: "/karyawan", name: "Karyawan", dropdown: [
-                                {
-                                    key: "data",
-                                    name: "Data",
-                                    href: "/karyawan"
-                                },
-                                {
-                                    key: "pengeluaran",
-                                    name: "Pengeluaran",
-                                    href: "/karyawan/pengeluaran"
-                                },
-                                {
-                                    key: "lembur",
-                                    name: "Lembur",
-                                    href: "/karyawan/lembur"
-                                },
-                            ]
-                        },
-                        {
-                            href: "/perusahaan", name: "Perusahaan", dropdown: [
-                                {
-                                    key: "pengeluaran",
-                                    name: "Pengeluaran",
-                                    href: "/perusahaan/pengeluaran"
-                                },
-                                {
-                                    key: "pemasukan",
-                                    name: "Pemasukan",
-                                    href: "/perusahaan/pemasukan"
-                                },
-                            ]
-                        },
-                        { href: "/distributor", name: "Distributor" },
-                        { href: "/klien", name: "Klien" },
-                        { href: "/gudang", name: "Gudang" },
-                        {
-                            href: "/laporan", name: "Laporan", dropdown: [
-                                {
-                                    key: "labarugi",
-                                    name: "Laba Rugi",
-                                    href: "/labarugi"
-                                },
-                            ]
-                        },
-                        { href: "/api/auth/signout", name: "Signout" },
-                    ]}></Nav>
+                    <Nav navLinks={links}></Nav>
                 </div>
                 {children}
             </div>
