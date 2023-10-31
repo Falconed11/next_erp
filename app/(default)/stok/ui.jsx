@@ -139,6 +139,10 @@ export default function App({ id_proyek }) {
       label: "Nama",
     },
     {
+      key: "kategori",
+      label: "Kategori",
+    },
+    {
       key: "merek",
       label: "Merek",
     },

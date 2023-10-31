@@ -123,6 +123,10 @@ export default function App() {
       label: "Kategori",
     },
     {
+      key: "tipe",
+      label: "Tipe",
+    },
+    {
       key: "keterangan",
       label: "Keterangan",
     },

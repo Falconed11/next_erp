@@ -36,7 +36,7 @@ export default function Navigation({ navLinks }) {
                       aria-label="Static Actions"
                       onAction={(key) => {
                         if (key == "data") {
-                          return router.push("/karyawan");
+                          return router.push(link.href);
                         }
                         // return router.push(`/karyawan/${key}`);
                         return router.push(`${link.href}/${key}`);
