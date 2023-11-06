@@ -29,11 +29,8 @@ import {
   useDisclosure,
 } from "@nextui-org/react";
 import { Select, SelectItem } from "@nextui-org/react";
-import { Textarea } from "@nextui-org/react";
-import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { getApiPath, useClientFetch } from "../../../utils/apiconfig";
-import { getDate } from "../../../utils/date";
 import { Button } from "@nextui-org/react";
 import { Input } from "@nextui-org/react";
 
@@ -60,9 +57,7 @@ export default function app() {
     setForm({
       ...data,
       modalmode: "Edit",
-      select_karyawan: new Set([String(data.id_kategoriproduk)]),
-      startDate: date,
-      tanggal: getDate(date),
+      select_kategoriproduk: new Set([String(data.id_kategoriproduk)]),
     });
     setMethod("PUT");
     modal.subkategoriproduk.onOpen();

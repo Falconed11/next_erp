@@ -23,7 +23,7 @@ import {
   Button,
   useDisclosure,
 } from "@nextui-org/react";
-import { Input } from "@nextui-org/react";
+import { Input, Select, SelectItem } from "@nextui-org/react";
 import { Textarea } from "@nextui-org/react";
 import Link from "next/link";
 import { AddIcon, EditIcon, DeleteIcon, EyeIcon } from "../../components/icon";
@@ -34,6 +34,7 @@ export default function App({ id_proyek }) {
   const stok = useClientFetch("stok");
   const produk = useClientFetch("produk");
   const [method, setMethod] = useState("POST");
+  const [form, setForm] = useState({});
   const saveButtonPress = async () => {
     // if (form.nama == "" || form.kategori == "")
     //   return alert("Nama, dan Kategori harus diisi!");
@@ -50,6 +51,7 @@ export default function App({ id_proyek }) {
   };
   const tambahButtonPress = () => {
     setForm({
+      modalmode: "Tambah",
       id: "",
       nama: "",
       merek: "",
@@ -57,13 +59,19 @@ export default function App({ id_proyek }) {
       satuan: "",
       harga: "",
       jumlah: "",
+      id_produk: "",
+      id_gudang: "",
+      id_distributor: "",
+      tanggal: "",
+      jatuhtempo: "",
       keterangan: "",
+      select_produk: new Set([]),
     });
     setMethod("POST");
     onOpen();
   };
-  const editButtonPress = (selecteddata) => {
-    setForm(selecteddata);
+  const editButtonPress = (data) => {
+    setForm({ ...data, modalmode: "Edit" });
     setMethod("PUT");
     onOpen();
   };
@@ -117,16 +125,6 @@ export default function App({ id_proyek }) {
     }
   }, []);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const [form, setForm] = useState({
-    id: "",
-    nama: "",
-    merek: "",
-    tipe: "",
-    satuan: "",
-    harga: "",
-    jumlah: "",
-    keterangan: "",
-  });
 
   if (stok.error) return <div>failed to load</div>;
   if (stok.isLoading) return <div>loading...</div>;
@@ -135,12 +133,12 @@ export default function App({ id_proyek }) {
 
   const columns = [
     {
-      key: "nama",
-      label: "Nama",
-    },
-    {
       key: "kategori",
       label: "Kategori",
+    },
+    {
+      key: "subkategori",
+      label: "Subkategori",
     },
     {
       key: "merek",
@@ -151,10 +149,6 @@ export default function App({ id_proyek }) {
       label: "Tipe",
     },
     {
-      key: "satuan",
-      label: "Satuan",
-    },
-    {
       key: "harga",
       label: "Harga",
     },
@@ -163,16 +157,32 @@ export default function App({ id_proyek }) {
       label: "Jumlah",
     },
     {
+      key: "satuan",
+      label: "Satuan",
+    },
+    {
       key: "totalharga",
       label: "Total Harga",
     },
-    // {
-    //   key: "tanggalbeli",
-    //   label: "Tanggal Beli",
-    // },
     {
-      key: "keterangan",
-      label: "Keterangan",
+      key: "terbayar",
+      label: "Terbayar",
+    },
+    {
+      key: "tanggalbeli",
+      label: "Tanggal Beli",
+    },
+    {
+      key: "jatuhtempo",
+      label: "Jatuh Tempo",
+    },
+    {
+      key: "distributor",
+      label: "Distributor",
+    },
+    {
+      key: "gudang",
+      label: "Gudang",
     },
     {
       key: "aksi",
@@ -186,55 +196,93 @@ export default function App({ id_proyek }) {
       <Button className="bg-background" onPress={tambahButtonPress}>
         Tambah
       </Button>
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+      <Modal
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        scrollBehavior="inside"
+      >
         <ModalContent>
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                {modaltitle}
+                {form.modalmode} Stok
               </ModalHeader>
               <ModalBody>
+                <Select
+                  label="Produk"
+                  placeholder="Pilih produk"
+                  className="max-w-xs"
+                  selectedKeys={form.select_produk}
+                  onChange={(e) => {
+                    let selectedproduk = {
+                      kategori: 0,
+                      subkategori: 0,
+                      merek: 0,
+                      tipe: "",
+                      satuan: "",
+                      jumlah: "",
+                    };
+                    if (e.target.value) {
+                      selectedproduk = produk.data.filter((item) => {
+                        if (item.id == e.target.value) return item;
+                      })[0];
+                    }
+                    console.log(selectedproduk);
+                    return setForm({
+                      ...form,
+                      id_produk: e.target.value,
+                      select_produk: new Set([e.target.value]),
+                      kategori: selectedproduk.id_kategori,
+                      subkategori: selectedproduk.id_subkategori,
+                      merek: selectedproduk.id_merek,
+                      tipe: selectedproduk.tipe,
+                      satuan: selectedproduk.satuan,
+                      jumlah: selectedproduk.jumlah,
+                    });
+                  }}
+                >
+                  {produk.data.map((item) => (
+                    <SelectItem
+                      key={item.id}
+                      value={item.id}
+                      textValue={item.nama}
+                    >
+                      {item.nama} | {String(item.id_kategori)} |{" "}
+                      {String(item.id_subkategori)} | {String(item.id_merek)} |{" "}
+                      {item.satuan} | Stok: {item.jumlah}
+                    </SelectItem>
+                  ))}
+                </Select>
                 <Input
+                  isReadOnly
                   type="text"
-                  label="Nama"
-                  placeholder="Masukkan nama!"
-                  value={form.nama}
-                  onValueChange={(val) => setForm({ ...form, nama: val })}
+                  label="Kategori"
+                  value={form.kategori}
                 />
                 <Input
+                  isReadOnly
+                  type="text"
+                  label="Subkategori"
+                  value={form.subkategori}
+                />
+                <Input
+                  isReadOnly
                   type="text"
                   label="Merek"
-                  placeholder="Masukkan merek!"
                   value={form.merek}
-                  onValueChange={(val) => setForm({ ...form, merek: val })}
                 />
+                <Input isReadOnly type="text" label="Tipe" value={form.tipe} />
                 <Input
+                  isReadOnly
                   type="text"
-                  label="tipe"
-                  placeholder="Masukkan tipe!"
-                  value={form.tipe}
-                  onValueChange={(val) => setForm({ ...form, tipe: val })}
-                />
-                <Input
-                  type="text"
-                  label="satuan"
-                  placeholder="Masukkan satuan!"
+                  label="Satuan"
                   value={form.satuan}
-                  onValueChange={(val) => setForm({ ...form, satuan: val })}
                 />
                 <Input
+                  isReadOnly
                   type="number"
-                  label="Harga"
-                  placeholder="Masukkan harga!"
-                  value={form.harga}
-                  onValueChange={(val) => setForm({ ...form, harga: val })}
-                />
-                <Input
-                  type="number"
-                  label="Jumlah"
-                  placeholder="Masukkan jumlah!"
+                  label="Stok"
                   value={form.jumlah}
-                  onValueChange={(val) => setForm({ ...form, jumlah: val })}
                 />
                 <Textarea
                   label="Keterangan"
