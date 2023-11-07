@@ -121,8 +121,8 @@ export default function app() {
   const col = {
     subkategoriproduk: [
       {
-        key: "id_kategoriproduk",
-        label: "Id Kategori Produk",
+        key: "kategori",
+        label: "Kategori",
       },
       {
         key: "nama",

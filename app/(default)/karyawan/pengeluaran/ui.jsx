@@ -65,11 +65,8 @@ export default function app() {
     const date = new Date(data.tanggal);
     setForm({
       ...data,
-      select_karyawan: new Set([
-        String(data.id_karyawan),
-        String(data.id_karyawan),
-      ]),
-      select_proyek: new Set([String(data.id_proyek), String(data.id_proyek)]),
+      select_karyawan: new Set([String(data.id_karyawan)]),
+      select_proyek: new Set([String(data.id_proyek)]),
       startDate: date,
       tanggal: getDate(date),
     });

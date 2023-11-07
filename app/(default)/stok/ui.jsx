@@ -27,12 +27,17 @@ import { Input, Select, SelectItem } from "@nextui-org/react";
 import { Textarea } from "@nextui-org/react";
 import Link from "next/link";
 import { AddIcon, EditIcon, DeleteIcon, EyeIcon } from "../../components/icon";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { getDate, getDateF } from "../../utils/date";
 
 const apiPath = getApiPath();
 
 export default function App({ id_proyek }) {
   const stok = useClientFetch("stok");
   const produk = useClientFetch("produk");
+  const distributor = useClientFetch("distributor");
+  const gudang = useClientFetch("gudang");
   const [method, setMethod] = useState("POST");
   const [form, setForm] = useState({});
   const saveButtonPress = async () => {
@@ -66,12 +71,28 @@ export default function App({ id_proyek }) {
       jatuhtempo: "",
       keterangan: "",
       select_produk: new Set([]),
+      select_distributor: new Set([]),
+      select_gudang: new Set([]),
+      startdate: "",
+      startdatejatuhtempo: "",
     });
     setMethod("POST");
     onOpen();
   };
   const editButtonPress = (data) => {
-    setForm({ ...data, modalmode: "Edit" });
+    const startdate = new Date(data.tanggal);
+    const startdatejatuhtempo = new Date(data.jatuhtempo);
+    setForm({
+      ...data,
+      modalmode: "Edit",
+      tanggal: getDate(startdate),
+      jatuhtempo: getDate(startdatejatuhtempo),
+      select_produk: new Set([String(data.id_produk)]),
+      select_distributor: new Set([String(data.id_distributor)]),
+      select_gudang: new Set([String(data.id_gudang)]),
+      startdate,
+      startdatejatuhtempo,
+    });
     setMethod("PUT");
     onOpen();
   };
@@ -93,6 +114,10 @@ export default function App({ id_proyek }) {
     switch (columnKey) {
       case "totalharga":
         return data.jumlah * data.harga;
+      case "tanggal":
+        return getDateF(new Date(cellValue));
+      case "jatuhtempo":
+        return getDateF(new Date(cellValue));
       case "aksi":
         return (
           <div className="relative flex items-center gap-2">
@@ -130,6 +155,10 @@ export default function App({ id_proyek }) {
   if (stok.isLoading) return <div>loading...</div>;
   if (produk.error) return <div>failed to load</div>;
   if (produk.isLoading) return <div>loading...</div>;
+  if (distributor.error) return <div>failed to load</div>;
+  if (distributor.isLoading) return <div>loading...</div>;
+  if (gudang.error) return <div>failed to load</div>;
+  if (gudang.isLoading) return <div>loading...</div>;
 
   const columns = [
     {
@@ -169,7 +198,7 @@ export default function App({ id_proyek }) {
       label: "Terbayar",
     },
     {
-      key: "tanggalbeli",
+      key: "tanggal",
       label: "Tanggal Beli",
     },
     {
@@ -183,6 +212,10 @@ export default function App({ id_proyek }) {
     {
       key: "gudang",
       label: "Gudang",
+    },
+    {
+      key: "keterangan",
+      label: "Keterangan",
     },
     {
       key: "aksi",
@@ -200,6 +233,7 @@ export default function App({ id_proyek }) {
         isOpen={isOpen}
         onOpenChange={onOpenChange}
         scrollBehavior="inside"
+        size="2xl"
       >
         <ModalContent>
           {(onClose) => (
@@ -211,7 +245,7 @@ export default function App({ id_proyek }) {
                 <Select
                   label="Produk"
                   placeholder="Pilih produk"
-                  className="max-w-xs"
+                  className="flex"
                   selectedKeys={form.select_produk}
                   onChange={(e) => {
                     let selectedproduk = {
@@ -227,17 +261,16 @@ export default function App({ id_proyek }) {
                         if (item.id == e.target.value) return item;
                       })[0];
                     }
-                    console.log(selectedproduk);
                     return setForm({
                       ...form,
                       id_produk: e.target.value,
                       select_produk: new Set([e.target.value]),
-                      kategori: selectedproduk.id_kategori,
-                      subkategori: selectedproduk.id_subkategori,
-                      merek: selectedproduk.id_merek,
+                      kategori: selectedproduk.kategori,
+                      subkategori: selectedproduk.subkategori,
+                      merek: selectedproduk.merek,
                       tipe: selectedproduk.tipe,
                       satuan: selectedproduk.satuan,
-                      jumlah: selectedproduk.jumlah,
+                      stok: selectedproduk.jumlah,
                     });
                   }}
                 >
@@ -247,9 +280,9 @@ export default function App({ id_proyek }) {
                       value={item.id}
                       textValue={item.nama}
                     >
-                      {item.nama} | {String(item.id_kategori)} |{" "}
-                      {String(item.id_subkategori)} | {String(item.id_merek)} |{" "}
-                      {item.satuan} | Stok: {item.jumlah}
+                      {item.nama} | {item.tipe} | {item.kategori} |{" "}
+                      {item.subkategori} | {item.merek} | {item.satuan} | Stok:{" "}
+                      {item.jumlah}
                     </SelectItem>
                   ))}
                 </Select>
@@ -282,8 +315,101 @@ export default function App({ id_proyek }) {
                   isReadOnly
                   type="number"
                   label="Stok"
-                  value={form.jumlah}
+                  value={form.stok}
                 />
+                <Input
+                  type="number"
+                  label="Harga"
+                  placeholder="Masukkan harga!"
+                  value={form.harga}
+                  onValueChange={(val) => setForm({ ...form, harga: val })}
+                />
+                <Input
+                  type="number"
+                  label="Jumlah Beli"
+                  placeholder="Masukkan jumlah beli!"
+                  value={form.jumlah}
+                  onValueChange={(val) => setForm({ ...form, jumlah: val })}
+                />
+                <Input
+                  isReadOnly
+                  type="number"
+                  label="Total Harga"
+                  value={form.jumlah * form.harga}
+                />
+                <Input
+                  type="number"
+                  label="terbayar"
+                  placeholder="Masukkan jumlah terbayar!"
+                  value={form.terbayar}
+                  onValueChange={(val) => setForm({ ...form, terbayar: val })}
+                />
+                <div className="bg-gray-100 p-3 rounded-lg">
+                  <div>Tanggal Beli</div>
+                  <DatePicker
+                    placeholderText="Pilih tanggal"
+                    dateFormat="dd/MM/yyyy"
+                    selected={form.startdate}
+                    onChange={(v) =>
+                      setForm({ ...form, startdate: v, tanggal: getDate(v) })
+                    }
+                  />
+                  <div>Tanggal : {form.tanggal}</div>
+                </div>
+                <div className="bg-gray-100 p-3 rounded-lg">
+                  <div>Jatuh Tempo</div>
+                  <DatePicker
+                    placeholderText="Pilih tanggal"
+                    dateFormat="dd/MM/yyyy"
+                    selected={form.startdatejatuhtempo}
+                    onChange={(v) =>
+                      setForm({
+                        ...form,
+                        startdatejatuhtempo: v,
+                        jatuhtempo: getDate(v),
+                      })
+                    }
+                  />
+                  <div>Tanggal : {form.jatuhtempo}</div>
+                </div>
+                <Select
+                  label="Distributor"
+                  placeholder="Pilih distributor"
+                  className="max-w-xs"
+                  selectedKeys={form.select_distributor}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      id_distributor: e.target.value,
+                      select_distributor: new Set([e.target.value]),
+                    })
+                  }
+                >
+                  {distributor.data.map((item) => (
+                    <SelectItem key={item.id} value={item.id}>
+                      {item.nama}
+                    </SelectItem>
+                  ))}
+                </Select>
+                <Select
+                  label="Gudang"
+                  placeholder="Pilih gudang"
+                  className="max-w-xs"
+                  selectedKeys={form.select_gudang}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      id_gudang: e.target.value,
+                      select_gudang: new Set([e.target.value]),
+                    })
+                  }
+                >
+                  {gudang.data.map((item) => (
+                    <SelectItem key={item.id} value={item.id}>
+                      {item.nama}
+                    </SelectItem>
+                  ))}
+                </Select>
                 <Textarea
                   label="Keterangan"
                   labelPlacement="inside"

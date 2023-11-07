@@ -151,16 +151,16 @@ export default function App() {
       label: "Nama",
     },
     {
-      key: "id_kategori",
-      label: "Id Kategori",
+      key: "kategori",
+      label: "Kategori",
     },
     {
-      key: "id_subkategori",
-      label: "Id Subkategori",
+      key: "subkategori",
+      label: "Subkategori",
     },
     {
-      key: "id_merek",
-      label: "Id Merek",
+      key: "merek",
+      label: "Merek",
     },
     {
       key: "tipe",
