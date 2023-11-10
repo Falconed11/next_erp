@@ -42,6 +42,11 @@ export default function RootLayout({ children, }: { children: React.ReactNode })
                     href: "/karyawan"
                 },
                 {
+                    key: "neraca",
+                    name: "Neraca",
+                    href: "/karyawan/neraca"
+                },
+                {
                     key: "pengeluaran",
                     name: "Pengeluaran",
                     href: "/karyawan/pengeluaran"

@@ -89,13 +89,13 @@ export default function App({ proyek, id }) {
       const cellValue = data[columnKey];
       switch (columnKey) {
         case "totalharga-beli":
-          return data.jumlah * data.harga;
+          return data.jumlah * data.hargabeli;
         case "totalharga-jual":
           return data.jumlah * data.hargajual;
         case "profit":
-          return data.hargajual - data.harga;
+          return data.hargajual - data.hargabeli;
         case "totalprofit":
-          return data.jumlah * data.hargajual - data.jumlah * data.harga;
+          return data.jumlah * data.hargajual - data.jumlah * data.hargabeli;
         case "aksi":
           return (
             <div className="relative flex items-center gap-2">
@@ -162,7 +162,7 @@ export default function App({ proyek, id }) {
         label: "Jumlah",
       },
       {
-        key: "harga",
+        key: "hargabeli",
         label: "Harga Beli",
       },
       {
@@ -306,7 +306,7 @@ export default function App({ proyek, id }) {
                     />
                   </div>
                 </div>
-                <div>Harga Beli : {form.harga}</div>
+                <div>Harga Beli : {form.hargabeli}</div>
                 <div>
                   <div>Harga Jual : </div>
                   <div>
@@ -317,13 +317,13 @@ export default function App({ proyek, id }) {
                         setForm({
                           ...form,
                           hargajual: v,
-                          profit: parseInt(v) - form.harga,
+                          profit: parseInt(v) - form.hargabeli,
                         })
                       }
                     />
                   </div>
                 </div>
-                <div>Total Harga Beli : {form.harga}</div>
+                <div>Total Harga Beli : {form.hargabeli}</div>
                 <div>Total Harga Jual : {form.hargajual * form.jumlah}</div>
                 <div>
                   <div>Profit : </div>
@@ -335,14 +335,15 @@ export default function App({ proyek, id }) {
                         setForm({
                           ...form,
                           profit: v,
-                          hargajual: form.harga + parseInt(v),
+                          hargajual: form.hargabeli + parseInt(v),
                         })
                       }
                     />
                   </div>
                 </div>
                 <div>
-                  Total Profit : {(form.hargajual - form.harga) * form.jumlah}
+                  Total Profit :{" "}
+                  {(form.hargajual - form.hargabeli) * form.jumlah}
                 </div>
               </ModalBody>
               <ModalFooter>
