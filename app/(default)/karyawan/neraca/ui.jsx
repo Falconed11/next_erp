@@ -36,6 +36,7 @@ import { getApiPath, useClientFetch } from "../../../utils/apiconfig";
 import { getDate } from "../../../utils/date";
 import { Button } from "@nextui-org/react";
 import { Input } from "@nextui-org/react";
+import imageCompression from "browser-image-compression";
 
 const api_path = getApiPath();
 
@@ -140,16 +141,12 @@ export default function app() {
   const col = {
     pengeluaran: [
       {
-        key: "namakaryawan",
-        label: "Nama Karyawan",
+        key: "tanggal",
+        label: "Tanggal",
       },
       {
         key: "keterangan",
         label: "Keterangan",
-      },
-      {
-        key: "tanggal",
-        label: "Tanggal",
       },
       {
         key: "masuk",
@@ -158,6 +155,10 @@ export default function app() {
       {
         key: "keluar",
         label: "Keluar",
+      },
+      {
+        key: "nota",
+        label: "Nota",
       },
       {
         key: "aksi",
@@ -181,7 +182,11 @@ export default function app() {
       <Button onClick={tambahButtonPress} color="primary">
         Tambah
       </Button>
-      <Table className="pt-3" aria-label="Example table with custom cells">
+      <Table
+        className="pt-3"
+        aria-label="Example table with custom cells"
+        bottomContent={<div>Jumlah</div>}
+      >
         <TableHeader columns={col.pengeluaran}>
           {(column) => (
             <TableColumn
@@ -215,20 +220,44 @@ export default function app() {
               </ModalHeader>
               <ModalBody>
                 <div>
-                  <img width="300" src={form.createObjectURL} />
+                  Nota
+                  <img width="300" src={form.compressedFile} />
                   <input
                     type="file"
+                    accept="image/*"
                     label="Gambar"
                     // placeholder="Upload gambar"
                     // value={form.files[0]}
-                    onChange={(v) => {
+                    onChange={async (v) => {
                       if (v.target.files && v.target.files[0]) {
                         const i = v.target.files[0];
-                        console.log(URL.createObjectURL(i));
+                        const options = {
+                          maxSizeMB: 0.1,
+                        };
+                        let compressedFile = null;
+                        try {
+                          compressedFile = await imageCompression(i, options);
+                          console.log(
+                            "compressedFile instanceof Blob",
+                            compressedFile instanceof Blob
+                          ); // true
+                          console.log(
+                            `compressedFile size ${
+                              compressedFile.size / 1024 / 1024
+                            } MB`
+                          ); // smaller than maxSizeMB
+
+                          // await uploadToServer(compressedFile); // write your own logic
+                          console.log(new File(compressedFile, "new.jpeg"));
+                        } catch (error) {
+                          console.log(error);
+                        }
+                        console.log(i);
                         setForm({
                           ...form,
-                          file: i,
+                          file: compressedFile,
                           createObjectURL: URL.createObjectURL(i),
+                          compressedFile: URL.createObjectURL(compressedFile),
                         });
                       }
                     }}

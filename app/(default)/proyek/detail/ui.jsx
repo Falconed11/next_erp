@@ -39,13 +39,14 @@ import logo from "../../../../public/logofinal.jpg";
 
 const api_path = getApiPath();
 
-export default function App({ proyek, id }) {
+export default function App({ id }) {
   const componentRef = useRef();
   const handlePrint = useReactToPrint({
     content: () => componentRef.current,
     bodyClass: "m-10",
   });
 
+  const proyek = useClientFetch(`proyek?id=${id}`);
   const keranjangProyek = useClientFetch(`keranjangproyek?id_proyek=${id}`);
   const [tempProyek, setTempProyek] = useState(proyek);
   const [hargaJual, setHargaJual] = useState(0);
@@ -222,16 +223,21 @@ export default function App({ proyek, id }) {
     },
   ];
 
+  if (proyek.error) return <div>failed to load</div>;
+  if (proyek.isLoading) return <div>loading...</div>;
   if (keranjangProyek.error) return <div>failed to load</div>;
   if (keranjangProyek.isLoading) return <div>loading...</div>;
+
+  const selectedproyek = proyek.data[0];
 
   return (
     <div>
       <div className="flex flex-row">
         <div className="bg-white rounded-lg p-3">
-          <div>Nama: {tempProyek.nama} </div>
-          <div>Klien: {tempProyek.klien} </div>
-          <div>Status: {tempProyek.status} </div>
+          <div>Nama Proyek: {selectedproyek.nama} </div>
+          <div>Klien: {selectedproyek.klien} </div>
+          <div>Sales: {selectedproyek.namakaryawan} </div>
+          <div>Status: {selectedproyek.statusproyek} </div>
         </div>
       </div>
       <div>

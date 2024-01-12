@@ -19,6 +19,7 @@ import {
   DeleteIcon,
   EyeIcon,
   UserIcon,
+  IconScaleBalanced,
 } from "../../components/icon";
 import {
   Modal,
@@ -31,6 +32,7 @@ import {
 import { getApiPath, useClientFetch } from "../../utils/apiconfig";
 import { Button } from "@nextui-org/react";
 import { Input } from "@nextui-org/react";
+import Link from "next/link";
 
 const api_path = getApiPath();
 
@@ -39,12 +41,12 @@ export default function app() {
   const [form, setForm] = useState({});
   const [method, setMethod] = useState();
   const tambahButtonPress = () => {
-    setForm({ id: "", nama: "" });
+    setForm({ id: "", nama: "", modalmode: "Tambah" });
     setMethod("POST");
     modal.karyawan.onOpen();
   };
   const editButtonPress = (data) => {
-    setForm(data);
+    setForm({ ...data, modalmode: "Edit" });
     setMethod("PUT");
     modal.karyawan.onOpen();
   };
@@ -83,6 +85,16 @@ export default function app() {
         case "aksi":
           return (
             <div className="relative flex items-center gap-2">
+              <Tooltip content="Neraca">
+                <span
+                  // onClick={() => alert("Clicked")}
+                  className="text-lg text-default-400 cursor-pointer active:opacity-50"
+                >
+                  <Link href="karyawan/neraca">
+                    <IconScaleBalanced />
+                  </Link>
+                </span>
+              </Tooltip>
               <Tooltip content="Edit">
                 <span
                   onClick={() => editButtonPress(data)}
@@ -169,7 +181,7 @@ export default function app() {
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                Edit Produk
+                {form.modalmode} Karyawan
               </ModalHeader>
               <ModalBody>
                 <Input

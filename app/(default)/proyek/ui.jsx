@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { useClientFetch, getApiPath } from "../../utils/apiconfig";
+import { penawaran } from "../../utils/formatid";
 import {
   Table,
   TableHeader,
@@ -25,6 +26,7 @@ import {
 } from "@nextui-org/react";
 import { Input } from "@nextui-org/react";
 import { Textarea } from "@nextui-org/react";
+import { Select, SelectItem } from "@nextui-org/react";
 import Link from "next/link";
 import {
   AddIcon,
@@ -40,8 +42,12 @@ import "react-datepicker/dist/react-datepicker.css";
 const apiPath = getApiPath();
 export default function App() {
   const proyek = useClientFetch("proyek");
+  const karyawan = useClientFetch("karyawan");
+  const statusproyek = useClientFetch("statusproyek");
   const [form, setForm] = useState({});
   const [method, setMethod] = useState("POST");
+
+  console.log(new Set(form.idkaryawan).values().next().value);
 
   const saveButtonPress = async () => {
     const res = await fetch(`${apiPath}proyek`, {
@@ -61,7 +67,8 @@ export default function App() {
       id: "",
       nama: "",
       klien: "",
-      status: "",
+      selectkaryawan: "",
+      selectstatus: "",
       tanggal: "",
       startdate: "",
       keterangan: "",
@@ -76,6 +83,8 @@ export default function App() {
       modalmode: "Edit",
       tanggal: getDate(startdate),
       startdate,
+      selectkaryawan: String(data.id_karyawan),
+      selectstatus: String(data.id_statusproyek),
     });
     setMethod("PUT");
     onOpen();
@@ -95,7 +104,10 @@ export default function App() {
   };
   const renderCell = React.useCallback((data, columnKey) => {
     const cellValue = data[columnKey];
+    const date = new Date(data.tanggal);
     switch (columnKey) {
+      case "no":
+        return `${penawaran(data.id_kustom, date)}`;
       case "tanggal":
         return getDateF(new Date(data.tanggal));
       case "totalharga":
@@ -139,18 +151,29 @@ export default function App() {
 
   if (proyek.error) return <div>failed to load</div>;
   if (proyek.isLoading) return <div>loading...</div>;
-
+  if (karyawan.error) return <div>failed to load</div>;
+  if (karyawan.isLoading) return <div>loading...</div>;
+  if (statusproyek.error) return <div>failed to load</div>;
+  if (statusproyek.isLoading) return <div>loading...</div>;
   const columns = [
     {
+      key: "no",
+      label: "No",
+    },
+    {
       key: "nama",
-      label: "Nama",
+      label: "Nama Proyek",
     },
     {
       key: "klien",
       label: "Klien",
     },
     {
-      key: "status",
+      key: "namakaryawan",
+      label: "Sales",
+    },
+    {
+      key: "statusproyek",
       label: "Status",
     },
     {
@@ -172,6 +195,7 @@ export default function App() {
       <Button className="bg-background" onPress={tambahButtonPress}>
         Tambah
       </Button>
+      <div>{getDate(new Date())}</div>
       <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
         <ModalContent>
           {(onClose) => (
@@ -182,8 +206,8 @@ export default function App() {
               <ModalBody>
                 <Input
                   type="text"
-                  label="Nama"
-                  placeholder="Masukkan nama!"
+                  label="Nama Proyek"
+                  placeholder="Masukkan nama proyek!"
                   value={form.nama}
                   onValueChange={(val) => setForm({ ...form, nama: val })}
                 />
@@ -194,6 +218,47 @@ export default function App() {
                   value={form.klien}
                   onValueChange={(val) => setForm({ ...form, klien: val })}
                 />
+                <Select
+                  label="Sales"
+                  variant="bordered"
+                  placeholder="Pilih sales!"
+                  selectedKeys={form.selectkaryawan}
+                  className="max-w-xs"
+                  onSelectionChange={(val) => {
+                    console.log(val);
+                    setForm({
+                      ...form,
+                      selectkaryawan: val,
+                      id_karyawan: new Set(val).values().next().value,
+                    });
+                  }}
+                >
+                  {karyawan.data.map((item) => (
+                    <SelectItem key={item.id} value={item.id}>
+                      {item.nama}
+                    </SelectItem>
+                  ))}
+                </Select>
+                <Select
+                  label="Status"
+                  variant="bordered"
+                  placeholder="Pilih status!"
+                  selectedKeys={form.selectstatus}
+                  className="max-w-xs"
+                  onSelectionChange={(val) => {
+                    setForm({
+                      ...form,
+                      selectstatus: val,
+                      id_statusproyek: new Set(val).values().next().value,
+                    });
+                  }}
+                >
+                  {statusproyek.data.map((item) => (
+                    <SelectItem key={item.id} value={item.id}>
+                      {item.nama}
+                    </SelectItem>
+                  ))}
+                </Select>
                 <div className="bg-gray-100 p-3 rounded-lg">
                   <div>Tanggal</div>
                   <DatePicker
@@ -204,15 +269,7 @@ export default function App() {
                       setForm({ ...form, startdate: v, tanggal: getDate(v) })
                     }
                   />
-                  <div>Tanggal : {form.tanggal}</div>
                 </div>
-                <Input
-                  type="text"
-                  label="Status"
-                  placeholder="Masukkan status!"
-                  value={form.status}
-                  onValueChange={(val) => setForm({ ...form, status: val })}
-                />
                 <Textarea
                   label="Keterangan"
                   labelPlacement="inside"

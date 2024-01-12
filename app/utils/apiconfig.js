@@ -1,6 +1,6 @@
 import useSWR from "swr";
 
-export const getApiPath = () => {
+const getApiPath = () => {
   return process.env.NEXT_PUBLIC_API_PATH;
 };
 const useClientFetch = (endpoint) => {
@@ -9,4 +9,5 @@ const useClientFetch = (endpoint) => {
   const fullPath = `${apiPath}${endpoint}`;
   return useSWR(fullPath, fetcher);
 };
-module.exports = { getApiPath, useClientFetch };
+
+export { getApiPath, useClientFetch };
