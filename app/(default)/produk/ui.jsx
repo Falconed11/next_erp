@@ -67,7 +67,7 @@ export default function App() {
       id_subkategori: "",
       id_merek: "",
       tipe: "",
-      jumlah: "",
+      stok: "",
       satuan: "",
       select_kategori: new Set([]),
       select_subkategori: new Set([]),
@@ -82,9 +82,9 @@ export default function App() {
     setForm({
       ...data,
       modalmode: "Edit",
-      select_kategori: new Set([String(data.id_kategori)]),
-      select_subkategori: new Set([String(data.id_subkategori)]),
-      select_merek: new Set([String(data.id_merek)]),
+      // select_kategori: new Set([String(data.id_kategori)]),
+      // select_subkategori: new Set([String(data.id_subkategori)]),
+      // select_merek: new Set([String(data.id_merek)]),
     });
     setMethod("PUT");
     onOpen();
@@ -138,25 +138,21 @@ export default function App() {
 
   if (produk.error) return <div>failed to load</div>;
   if (produk.isLoading) return <div>loading...</div>;
-  if (kategori.error) return <div>failed to load</div>;
-  if (kategori.isLoading) return <div>loading...</div>;
-  if (subkategori.error) return <div>failed to load</div>;
-  if (subkategori.isLoading) return <div>loading...</div>;
-  if (merek.error) return <div>failed to load</div>;
-  if (merek.isLoading) return <div>loading...</div>;
+  // if (kategori.error) return <div>failed to load</div>;
+  // if (kategori.isLoading) return <div>loading...</div>;
+  // if (subkategori.error) return <div>failed to load</div>;
+  // if (subkategori.isLoading) return <div>loading...</div>;
+  // if (merek.error) return <div>failed to load</div>;
+  // if (merek.isLoading) return <div>loading...</div>;
 
   const col = [
-    {
-      key: "nama",
-      label: "Nama",
-    },
     {
       key: "kategori",
       label: "Kategori",
     },
     {
-      key: "subkategori",
-      label: "Subkategori",
+      key: "nama",
+      label: "Nama",
     },
     {
       key: "merek",
@@ -167,12 +163,24 @@ export default function App() {
       label: "Tipe",
     },
     {
-      key: "jumlah",
-      label: "Jumlah",
+      key: "vendor",
+      label: "Vendor",
+    },
+    {
+      key: "stok",
+      label: "Stok",
     },
     {
       key: "satuan",
       label: "Satuan",
+    },
+    {
+      key: "hargamodal",
+      label: "Harga Modal",
+    },
+    {
+      key: "hargajual",
+      label: "Harga Jual",
     },
     {
       key: "keterangan",
@@ -219,7 +227,11 @@ export default function App() {
           )}
         </TableBody>
       </Table>
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+      <Modal
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        scrollBehavior="inside"
+      >
         <ModalContent>
           {(onClose) => (
             <>
@@ -229,12 +241,19 @@ export default function App() {
               <ModalBody>
                 <Input
                   type="text"
+                  label="Kategori"
+                  placeholder="Masukkan kategori!"
+                  value={form.kategori}
+                  onValueChange={(val) => setForm({ ...form, kategori: val })}
+                />
+                <Input
+                  type="text"
                   label="Nama"
                   placeholder="Masukkan nama!"
                   value={form.nama}
                   onValueChange={(val) => setForm({ ...form, nama: val })}
                 />
-                <Select
+                {/* <Select
                   label="Kategori"
                   placeholder="Pilih Kategori"
                   className="max-w-xs"
@@ -295,7 +314,14 @@ export default function App() {
                       {item.nama}
                     </SelectItem>
                   ))}
-                </Select>
+                </Select> */}
+                <Input
+                  type="text"
+                  label="Merek"
+                  placeholder="Masukkan merek!"
+                  value={form.merek}
+                  onValueChange={(val) => setForm({ ...form, merek: val })}
+                />
                 <Input
                   type="text"
                   label="Tipe"
@@ -304,12 +330,18 @@ export default function App() {
                   onValueChange={(val) => setForm({ ...form, tipe: val })}
                 />
                 <Input
-                  isDisabled
+                  type="text"
+                  label="Vendor"
+                  placeholder="Masukkan vendor!"
+                  value={form.vendor}
+                  onValueChange={(val) => setForm({ ...form, vendor: val })}
+                />
+                <Input
                   type="number"
-                  label="Jumlah"
-                  placeholder="Masukkan jumlah!"
-                  value={form.jumlah}
-                  onValueChange={(val) => setForm({ ...form, jumlah: val })}
+                  label="Stok"
+                  placeholder="Masukkan stok!"
+                  value={form.stok}
+                  onValueChange={(val) => setForm({ ...form, stok: val })}
                 />
                 <Input
                   type="text"
@@ -317,6 +349,20 @@ export default function App() {
                   placeholder="Masukkan satuan!"
                   value={form.satuan}
                   onValueChange={(val) => setForm({ ...form, satuan: val })}
+                />
+                <Input
+                  type="text"
+                  label="Harga Modal"
+                  placeholder="Masukkan harga modal!"
+                  value={form.hargamodal}
+                  onValueChange={(val) => setForm({ ...form, hargamodal: val })}
+                />
+                <Input
+                  type="text"
+                  label="Harga Jual"
+                  placeholder="Masukkan harga jual!"
+                  value={form.hargajual}
+                  onValueChange={(val) => setForm({ ...form, hargajual: val })}
                 />
                 <Textarea
                   label="Keterangan"

@@ -12,4 +12,26 @@ const getDateF = (date) => {
   return `${day}-${month}-${year}`;
 };
 
-module.exports = { getDate, getDateF };
+const getDateFId = (date) => {
+  const monthNamesIndonesian = [
+    "Januari",
+    "Februari",
+    "Maret",
+    "April",
+    "Mei",
+    "Juni",
+    "Juli",
+    "Agustus",
+    "September",
+    "Oktober",
+    "November",
+    "Desember",
+  ];
+  const year = date.getFullYear();
+  const month = date.getMonth();
+  const monthNameIndonesian = monthNamesIndonesian[month];
+  const day = date.getDate();
+  return `${day} ${monthNameIndonesian} ${year}`;
+};
+
+module.exports = { getDate, getDateF, getDateFId };
