@@ -42,12 +42,11 @@ import "react-datepicker/dist/react-datepicker.css";
 const apiPath = getApiPath();
 export default function App() {
   const proyek = useClientFetch("proyek");
+  const perusahaan = useClientFetch("perusahaan");
   const karyawan = useClientFetch("karyawan");
   const statusproyek = useClientFetch("statusproyek");
   const [form, setForm] = useState({});
   const [method, setMethod] = useState("POST");
-
-  console.log(new Set(form.idkaryawan).values().next().value);
 
   const saveButtonPress = async () => {
     const res = await fetch(`${apiPath}proyek`, {
@@ -67,7 +66,10 @@ export default function App() {
       id: "",
       nama: "",
       klien: "",
+      instansi: "",
+      kota: "",
       selectkaryawan: "",
+      selectperusahaan: "",
       selectstatus: "",
       tanggal: "",
       startdate: "",
@@ -84,6 +86,7 @@ export default function App() {
       tanggal: getDate(startdate),
       startdate,
       selectkaryawan: String(data.id_karyawan),
+      selectperusahaan: String(data.id_perusahaan),
       selectstatus: String(data.id_statusproyek),
     });
     setMethod("PUT");
@@ -153,12 +156,19 @@ export default function App() {
   if (proyek.isLoading) return <div>loading...</div>;
   if (karyawan.error) return <div>failed to load</div>;
   if (karyawan.isLoading) return <div>loading...</div>;
+  if (perusahaan.error) return <div>failed to load</div>;
+  if (perusahaan.isLoading) return <div>loading...</div>;
   if (statusproyek.error) return <div>failed to load</div>;
   if (statusproyek.isLoading) return <div>loading...</div>;
+
   const columns = [
     {
       key: "no",
       label: "No",
+    },
+    {
+      key: "namaperusahaan",
+      label: "Nama Perusahaan",
     },
     {
       key: "nama",
@@ -167,6 +177,14 @@ export default function App() {
     {
       key: "klien",
       label: "Klien",
+    },
+    {
+      key: "instansi",
+      label: "Instansi",
+    },
+    {
+      key: "kota",
+      label: "Kota",
     },
     {
       key: "namakaryawan",
@@ -195,8 +213,11 @@ export default function App() {
       <Button className="bg-background" onPress={tambahButtonPress}>
         Tambah
       </Button>
-      <div>{getDate(new Date())}</div>
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+      <Modal
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        scrollBehavior="inside"
+      >
         <ModalContent>
           {(onClose) => (
             <>
@@ -204,6 +225,26 @@ export default function App() {
                 {form.modalmode} Proyek
               </ModalHeader>
               <ModalBody>
+                <Select
+                  label="Perusahaan"
+                  variant="bordered"
+                  placeholder="Pilih perusahaan!"
+                  selectedKeys={form.selectperusahaan}
+                  className="max-w-xs"
+                  onSelectionChange={(val) => {
+                    setForm({
+                      ...form,
+                      selectperusahaan: val,
+                      id_perusahaan: new Set(val).values().next().value,
+                    });
+                  }}
+                >
+                  {perusahaan.data.map((item) => (
+                    <SelectItem key={item.id} value={item.id}>
+                      {item.nama}
+                    </SelectItem>
+                  ))}
+                </Select>
                 <Input
                   type="text"
                   label="Nama Proyek"
@@ -217,6 +258,20 @@ export default function App() {
                   placeholder="Masukkan klien!"
                   value={form.klien}
                   onValueChange={(val) => setForm({ ...form, klien: val })}
+                />
+                <Input
+                  type="text"
+                  label="Instansi"
+                  placeholder="Masukkan instansi!"
+                  value={form.instansi}
+                  onValueChange={(val) => setForm({ ...form, instansi: val })}
+                />
+                <Input
+                  type="text"
+                  label="Kota"
+                  placeholder="Masukkan kota!"
+                  value={form.kota}
+                  onValueChange={(val) => setForm({ ...form, kota: val })}
                 />
                 <Select
                   label="Sales"
