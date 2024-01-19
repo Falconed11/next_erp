@@ -51,11 +51,11 @@ export default function App({ id }) {
   };
   const handlePrintInvoice = useReactToPrint({
     content: () => componentRef.invoice.current,
-    bodyClass: "m-10",
+    bodyClass: "m-12",
   });
   const handlePrintPenawaran = useReactToPrint({
     content: () => componentRef.penawaran.current,
-    bodyClass: "m-10",
+    pageStyle: "p-10 block",
   });
 
   // const handlePrintInvoice = (src) => {
@@ -91,7 +91,11 @@ export default function App({ id }) {
   const [formRekapitulasi, setFormRekapitulasi] = useState({ hargadiskon: 0 });
 
   const editButtonPress = (data) => {
-    setForm({ ...data, profit: data.hargajual - data.harga });
+    setForm({
+      ...data,
+      harga: data.hargakustom,
+      profit: data.hargajual - data.harga,
+    });
     modal.produk.onOpen();
   };
   const deleteButtonPress = async (id) => {
@@ -105,10 +109,11 @@ export default function App({ id }) {
         body: JSON.stringify({ id }),
       });
       const json = await res.json();
-      return alert(json.message);
+      return;
+      // return alert(json.message);
     }
   };
-  const tambahButtonPress = async ({ instalasi, select }) => {
+  const tambahButtonPress = async ({ instalasi, select, form }) => {
     if (select.size == 0) return alert("Produk belum dipilih.");
     const res = await fetch(`${api_path}keranjangproyek`, {
       method: "POST",
@@ -119,14 +124,16 @@ export default function App({ id }) {
       body: JSON.stringify({
         id_proyek: id,
         id_produk: select.values().next().value,
-        jumlah: 0,
+        jumlah: form.jumlah,
+        harga: form.harga,
         instalasi,
       }),
     });
     const json = await res.json();
-    return alert(json.message);
+    console.log(json.message);
+    // return alert(json.message);
   };
-  const simpanButtonPress = async (data) => {
+  const simpanButtonPress = async (data, onClose) => {
     const res = await fetch(`${api_path}keranjangproyek`, {
       method: "PUT",
       headers: {
@@ -136,11 +143,14 @@ export default function App({ id }) {
       body: JSON.stringify({
         id: data.id_keranjangproyek,
         jumlah: data.jumlah,
+        harga: data.harga,
         // harga: data.hargajual,
       }),
     });
     const json = await res.json();
-    return alert(json.message);
+    onClose();
+    console.log(json.message);
+    //return alert(json.message);
   };
   const handleButtonEdit = () => {
     // setFormRekapitulasi({
@@ -178,6 +188,8 @@ export default function App({ id }) {
           return <Harga harga={data.hargamodal} />;
         case "hargajual":
           return <Harga harga={data.hargajual} />;
+        case "hargakustom":
+          return <Harga harga={data.hargakustom} />;
         case "totalharga-modal":
           return <Harga harga={data.jumlah * data.hargamodal} />;
         case "totalharga-jual":
@@ -219,19 +231,18 @@ export default function App({ id }) {
     }, []),
     penawaran: React.useCallback((data, columnKey) => {
       const cellValue = data[columnKey];
+      let harga = data.hargakustom ? data.hargakustom : data.hargajual;
       switch (columnKey) {
         case "jumlah":
           return `${data.jumlah} ${data.satuan}`;
         case "hargajual":
           return (
-            <div className="text-right">
-              {data.hargajual.toLocaleString("id-ID")}
-            </div>
+            <div className="text-right">{harga.toLocaleString("id-ID")}</div>
           );
         case "total":
           return (
             <div className="text-right">
-              {(data.jumlah * data.hargajual).toLocaleString("id-ID")}
+              {(data.jumlah * harga).toLocaleString("id-ID")}
             </div>
           );
         default:
@@ -293,6 +304,10 @@ export default function App({ id }) {
         label: "Harga Jual",
       },
       {
+        key: "hargakustom",
+        label: "Harga Kustom",
+      },
+      {
         key: "profit",
         label: "Profit",
       },
@@ -349,6 +364,10 @@ export default function App({ id }) {
       {
         key: "hargajual",
         label: "Harga Instalasi",
+      },
+      {
+        key: "hargakustom",
+        label: "Harga Kustom",
       },
       {
         key: "profit",
@@ -475,9 +494,33 @@ export default function App({ id }) {
     },
     0
   );
+  const subTotalKustomJual = keranjangProyek.data.reduce(
+    (total, currentValue) => {
+      return (
+        total +
+        currentValue.jumlah *
+          (currentValue.hargakustom
+            ? currentValue.hargakustom
+            : currentValue.hargajual)
+      );
+    },
+    0
+  );
   const subTotalHargaInstalasi = keranjangProyekInstalasi.data.reduce(
     (total, currentValue) => {
       return total + currentValue.jumlah * currentValue.hargajual;
+    },
+    0
+  );
+  const subTotalKustomInstalasi = keranjangProyekInstalasi.data.reduce(
+    (total, currentValue) => {
+      return (
+        total +
+        currentValue.jumlah *
+          (currentValue.hargakustom
+            ? currentValue.hargakustom
+            : currentValue.hargajual)
+      );
     },
     0
   );
@@ -544,9 +587,9 @@ export default function App({ id }) {
               <div>Sub Total Harga</div>
               <div>Maks Diskon</div>
               <div>Diskon</div>
-              <div>Harga Diskon</div>
-              <div>Pajak</div>
-              <div>Total Harga</div>
+              <div>Harga Setelah Diskon</div>
+              <div>Pajak ({selectedProyek.pajak}%)</div>
+              <div>Harga Setelah Pajak</div>
             </div>
             <div className="basis-2/4">
               <div>
@@ -571,11 +614,7 @@ export default function App({ id }) {
                 : <Harga harga={hargaDiskon} />
               </div>
               <div>
-                :{" "}
-                <Harga
-                  harga={pajak}
-                  endContent={`(${selectedProyek.pajak}%)`}
-                />
+                : <Harga harga={pajak} />
               </div>
               <div>
                 : <Harga harga={finalHarga} />
@@ -623,7 +662,7 @@ export default function App({ id }) {
               <Select
                 label="Kategori"
                 placeholder="Pilih kategori!"
-                className="w-3/12"
+                className="w-2/12"
                 selectedKeys={selectKategori}
                 onSelectionChange={setSelectKategori}
               >
@@ -636,7 +675,7 @@ export default function App({ id }) {
               <Select
                 label="Produk"
                 placeholder="Pilih produk!"
-                className="w-6/12 pl-2"
+                className="w-5/12 pl-2"
                 selectedKeys={selectProduk}
                 onSelectionChange={setSelectProduk}
               >
@@ -651,9 +690,40 @@ export default function App({ id }) {
                   </SelectItem>
                 ))}
               </Select>
+              <Input
+                type="number"
+                value={form.jumlah}
+                label="Jumlah"
+                placeholder="Masukkan jumlah!"
+                className="w-2/12 pl-2"
+                endContent={
+                  <div className="pointer-events-none flex items-center">
+                    <span className="text-default-400 text-small"></span>
+                  </div>
+                }
+                onValueChange={(v) =>
+                  setForm({
+                    ...form,
+                    jumlah: v,
+                  })
+                }
+              />
+              <Input
+                type="number"
+                value={form.harga}
+                label="Harga Kustom"
+                placeholder="Masukkan harga!"
+                className="w-2/12 pl-2"
+                onValueChange={(v) =>
+                  setForm({
+                    ...form,
+                    harga: v,
+                  })
+                }
+              />
               <Button
                 onClick={() => {
-                  tambahButtonPress({ select: selectProduk });
+                  tambahButtonPress({ select: selectProduk, form });
                 }}
                 color="primary"
                 className="ml-2"
@@ -745,7 +815,7 @@ export default function App({ id }) {
               <Select
                 label="Kategori"
                 placeholder="Pilih kategori!"
-                className="w-3/12"
+                className="w-2/12"
                 selectedKeys={selectKategoriInstalasi}
                 onSelectionChange={setSelectKategoriInstalasi}
               >
@@ -758,7 +828,7 @@ export default function App({ id }) {
               <Select
                 label="Produk"
                 placeholder="Pilih produk!"
-                className="w-6/12 pl-2"
+                className="w-5/12 pl-2"
                 selectedKeys={selectInstalasi}
                 onSelectionChange={setSelectInstalasi}
               >
@@ -773,6 +843,37 @@ export default function App({ id }) {
                   </SelectItem>
                 ))}
               </Select>
+              <Input
+                type="number"
+                value={form.jumlah}
+                label="Jumlah"
+                placeholder="Masukkan jumlah!"
+                className="w-2/12 pl-2"
+                endContent={
+                  <div className="pointer-events-none flex items-center">
+                    <span className="text-default-400 text-small"></span>
+                  </div>
+                }
+                onValueChange={(v) =>
+                  setForm({
+                    ...form,
+                    jumlah: v,
+                  })
+                }
+              />
+              <Input
+                type="number"
+                value={form.harga}
+                label="Harga Kustom"
+                placeholder="Masukkan harga!"
+                className="w-2/12 pl-2"
+                onValueChange={(v) =>
+                  setForm({
+                    ...form,
+                    harga: v,
+                  })
+                }
+              />
               <Button
                 onClick={() => {
                   tambahButtonPress({ instalasi: 1, select: selectInstalasi });
@@ -1003,21 +1104,30 @@ export default function App({ id }) {
                 <div>Tipe : {form.tipe}</div>
                 <div>Satuan : {form.satuan}</div>
                 <div>Stok : {form.stok}</div>
-                <div>
-                  <div>Jumlah : </div>
-                  <div>
-                    <Input
-                      type="number"
-                      value={form.jumlah}
-                      onValueChange={(v) =>
-                        setForm({
-                          ...form,
-                          jumlah: v,
-                        })
-                      }
-                    />
-                  </div>
-                </div>
+                <Input
+                  type="number"
+                  label="Jumlah"
+                  placeholder="Masukkan jumlah!"
+                  value={form.jumlah}
+                  onValueChange={(v) =>
+                    setForm({
+                      ...form,
+                      jumlah: v,
+                    })
+                  }
+                />
+                <Input
+                  type="number"
+                  value={form.harga}
+                  label="Harga Kustom"
+                  placeholder="Masukkan harga!"
+                  onValueChange={(v) =>
+                    setForm({
+                      ...form,
+                      harga: v,
+                    })
+                  }
+                />
                 <div>Harga Modal : {form.hargamodal}</div>
                 <div>Harga Jual : {form.hargajual}</div>
                 <div>Provit : {form.hargajual - form.hargamodal}</div>
@@ -1064,7 +1174,10 @@ export default function App({ id }) {
                 <Button color="danger" variant="light" onPress={onClose}>
                   Batal
                 </Button>
-                <Button color="primary" onPress={() => simpanButtonPress(form)}>
+                <Button
+                  color="primary"
+                  onPress={() => simpanButtonPress(form, onClose)}
+                >
                   Simpan
                 </Button>
               </ModalFooter>
@@ -1112,6 +1225,7 @@ export default function App({ id }) {
                     </div>
                   </div>
                   <Divider className="bg-sky-500 my-3 py-2" />
+                  {/* <hr className="my-3 bg-sky-500 h-5" /> */}
                   <div className="pt-3">
                     <div className="">
                       <div>
@@ -1153,7 +1267,7 @@ export default function App({ id }) {
                       <>
                         <div className="text-right">
                           Sub Total Harga :{" "}
-                          {subTotalHargaJual.toLocaleString("id-ID")}
+                          {subTotalKustomJual.toLocaleString("id-ID")}
                         </div>
                       </>
                     }
@@ -1187,7 +1301,7 @@ export default function App({ id }) {
                       <>
                         <div className="text-right">
                           Sub Total Harga :{" "}
-                          {subTotalHargaInstalasi.toLocaleString("id-ID")}
+                          {subTotalKustomInstalasi.toLocaleString("id-ID")}
                         </div>
                       </>
                     }
@@ -1211,17 +1325,18 @@ export default function App({ id }) {
                       )}
                     </TableBody>
                   </Table>
-                  <div className="mt-3 p-3 border">
+                  <div className="mt-3 p-3 border no-break">
                     <div>Rekapitulasi</div>
                     <div className="flex">
-                      <div className="basis-4/6"></div>
-                      <div className="basis-1/6">
+                      <div className="basis-3/6"></div>
+                      <div className="basis-2/6">
                         <div>Produk</div>
                         <div>Instalasi</div>
                         <div>Sub Total</div>
                         <div>Diskon</div>
-                        <div>Pajak</div>
-                        <div>Total Harga</div>
+                        <div>Harga Setelah Diskon</div>
+                        <div>Pajak ({selectedProyek.pajak}%)</div>
+                        <div>Harga Setelah Pajak</div>
                       </div>
                       <div className="basis-1/6 text-right">
                         <div>
@@ -1233,15 +1348,17 @@ export default function App({ id }) {
                         <div>
                           <Harga harga={totalHarga} />
                         </div>
-                        <div>{diskonPersen.toFixed(2)}%</div>
-                        <div>{selectedProyek.pajak}%</div>
+                        <div>{<Harga harga={selectedProyek.diskon} />}</div>
+                        <div>{<Harga harga={hargaDiskon} />}</div>
+                        <div>{<Harga harga={pajak} />}</div>
                         <div>
                           <Harga harga={finalHarga} />
                         </div>
                       </div>
                     </div>
                   </div>
-                  <div className="flex flex-row mt-3">
+                  {/* keterangan */}
+                  <div className="flex flex-row mt-3 no-break">
                     <div className="">
                       Keterangan <br />
                       - Harga belum termasuk instalasi pemasangan. <br />
@@ -1270,7 +1387,7 @@ export default function App({ id }) {
               </ModalBody>
               <ModalFooter>
                 <Button color="danger" variant="light" onPress={onClose}>
-                  Batal
+                  Tutup
                 </Button>
                 <Button color="primary">Cetak</Button>
                 <Button onClick={handlePrintPenawaran} color="primary">

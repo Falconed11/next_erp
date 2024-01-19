@@ -40,6 +40,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 const apiPath = getApiPath();
+
 export default function App() {
   const proyek = useClientFetch("proyek");
   const perusahaan = useClientFetch("perusahaan");
@@ -48,7 +49,7 @@ export default function App() {
   const [form, setForm] = useState({});
   const [method, setMethod] = useState("POST");
 
-  const saveButtonPress = async () => {
+  const saveButtonPress = async (onClose) => {
     const res = await fetch(`${apiPath}proyek`, {
       method,
       headers: {
@@ -58,7 +59,8 @@ export default function App() {
       body: JSON.stringify(form),
     });
     const json = await res.json();
-    return alert(json.message);
+    onClose();
+    //return alert(json.message);
   };
   const tambahButtonPress = () => {
     setForm({
@@ -102,7 +104,7 @@ export default function App() {
         },
         body: JSON.stringify({ id }),
       });
-      return alert(await res.json().then((json) => json.message));
+      // return alert(await res.json().then((json) => json.message));
     }
   };
   const renderCell = React.useCallback((data, columnKey) => {
@@ -339,7 +341,10 @@ export default function App() {
                 <Button color="danger" variant="light" onPress={onClose}>
                   Batal
                 </Button>
-                <Button color="primary" onPress={saveButtonPress}>
+                <Button
+                  color="primary"
+                  onPress={() => saveButtonPress(onClose)}
+                >
                   Simpan
                 </Button>
               </ModalFooter>

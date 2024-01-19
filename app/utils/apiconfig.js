@@ -7,7 +7,7 @@ const useClientFetch = (endpoint) => {
   const apiPath = getApiPath();
   const fetcher = (...args) => fetch(...args).then((res) => res.json());
   const fullPath = `${apiPath}${endpoint}`;
-  return useSWR(fullPath, fetcher);
+  return useSWR(fullPath, fetcher, { refreshInterval: 1000 });
 };
 
 export { getApiPath, useClientFetch };
