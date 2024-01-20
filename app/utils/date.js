@@ -1,3 +1,18 @@
+const monthNamesIndonesian = [
+  "Januari",
+  "Februari",
+  "Maret",
+  "April",
+  "Mei",
+  "Juni",
+  "Juli",
+  "Agustus",
+  "September",
+  "Oktober",
+  "November",
+  "Desember",
+];
+
 const getDate = (date) => {
   const year = date.getFullYear();
   const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Note that months are zero-based
@@ -13,20 +28,6 @@ const getDateF = (date) => {
 };
 
 const getDateFId = (date) => {
-  const monthNamesIndonesian = [
-    "Januari",
-    "Februari",
-    "Maret",
-    "April",
-    "Mei",
-    "Juni",
-    "Juli",
-    "Agustus",
-    "September",
-    "Oktober",
-    "November",
-    "Desember",
-  ];
   const year = date.getFullYear();
   const month = date.getMonth();
   const monthNameIndonesian = monthNamesIndonesian[month];

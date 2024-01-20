@@ -525,6 +525,7 @@ export default function App({ id }) {
     0
   );
   const totalHarga = subTotalHargaJual + subTotalHargaInstalasi;
+  const totalKustom = subTotalKustomJual + subTotalKustomInstalasi;
   const maksDiskon = totalHarga - totalModal;
   const maksDiskonPersen = (maksDiskon / totalHarga) * 100;
   const maksDiskonInstalasi = keranjangProyekInstalasi.data.reduce(
@@ -540,8 +541,11 @@ export default function App({ id }) {
     (maksDiskonInstalasi / subTotalHargaInstalasi) * 100;
   const diskonPersen = (selectedProyek.diskon / totalHarga) * 100;
   const hargaDiskon = totalHarga - selectedProyek.diskon;
+  const kustomDiskon = totalKustom - selectedProyek.diskon;
   const pajak = (hargaDiskon * selectedProyek.pajak) / 100;
+  const pajakKustom = (kustomDiskon * selectedProyek.pajak) / 100;
   const finalHarga = hargaDiskon + pajak;
+  const finalKustom = kustomDiskon + pajakKustom;
   return (
     <div>
       <div className="flex flex-row gap-2">
@@ -1242,7 +1246,7 @@ export default function App({ id }) {
                       <br />
                       <div>Kepada Yth,</div>
                       <div>Bapak / Ibu {selectedProyek.klien}</div>
-                      <div>{selectedProyek.instalasi}</div>
+                      <div>{selectedProyek.instansi}</div>
                       <div>{selectedProyek.kota}</div>
                     </div>
                     {/* <div className="basis-1/2 text-end">
@@ -1340,19 +1344,19 @@ export default function App({ id }) {
                       </div>
                       <div className="basis-1/6 text-right">
                         <div>
-                          <Harga harga={subTotalHargaJual} />
+                          <Harga harga={subTotalKustomJual} />
                         </div>
                         <div>
-                          <Harga harga={subTotalHargaInstalasi} />
+                          <Harga harga={subTotalKustomInstalasi} />
                         </div>
                         <div>
-                          <Harga harga={totalHarga} />
+                          <Harga harga={totalKustom} />
                         </div>
                         <div>{<Harga harga={selectedProyek.diskon} />}</div>
-                        <div>{<Harga harga={hargaDiskon} />}</div>
-                        <div>{<Harga harga={pajak} />}</div>
+                        <div>{<Harga harga={kustomDiskon} />}</div>
+                        <div>{<Harga harga={pajakKustom} />}</div>
                         <div>
-                          <Harga harga={finalHarga} />
+                          <Harga harga={finalKustom} />
                         </div>
                       </div>
                     </div>
