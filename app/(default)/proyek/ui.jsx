@@ -118,10 +118,16 @@ export default function App() {
       case "totalharga":
         return data.jumlah * data.harga;
       case "aksi":
+        const id_statusproyek = data.id_statusproyek;
+        let link = ``;
+        if (id_statusproyek == 1) {
+          link = `/proyek/detail?id=${data.id}`;
+        } else link = `/proyek/detail/proses?id=${data.id}`;
+
         return (
           <div className="relative flex items-center gap-2">
             <Tooltip content="Detail">
-              <Link href={`/proyek/detail?id=${data.id}`}>
+              <Link href={link}>
                 <span
                   // onClick={() => detailButtonPress(data)}
                   className="text-lg text-default-400 cursor-pointer active:opacity-50"

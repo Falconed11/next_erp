@@ -257,9 +257,9 @@ export default function App({ id }) {
           <div className="flex">
             <div>
               <div>No.</div>
+              <div>Tanggal</div>
               <div>User</div>
               <div>Instansi</div>
-              <div>Tanggal</div>
               <div>Karyawan</div>
             </div>
             <div>
