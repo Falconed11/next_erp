@@ -85,8 +85,6 @@ export default function App({ id }) {
   );
   const [selectProduk, setSelectProduk] = useState(new Set([]));
   const [selectInstalasi, setSelectInstalasi] = useState(new Set([]));
-  const [tempProyek, setTempProyek] = useState(proyek);
-  const [hargaJual, setHargaJual] = useState(0);
   const [form, setForm] = useState({});
   const [formRekapitulasi, setFormRekapitulasi] = useState({ hargadiskon: 0 });
 
