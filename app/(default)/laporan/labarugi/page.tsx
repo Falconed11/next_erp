@@ -1,3 +1,7 @@
+import UI from "./ui"
+
 export default function app() {
-    return <div>Laporan Laba Rugi</div>
+    return <>
+        <UI />
+    </>
 }

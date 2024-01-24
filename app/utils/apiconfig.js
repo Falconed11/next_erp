@@ -9,5 +9,11 @@ const useClientFetch = (endpoint) => {
   const fullPath = `${apiPath}${endpoint}`;
   return useSWR(fullPath, fetcher, { refreshInterval: 1000 });
 };
+const useClientFetchNoInterval = (endpoint) => {
+  const apiPath = getApiPath();
+  const fetcher = (...args) => fetch(...args).then((res) => res.json());
+  const fullPath = `${apiPath}${endpoint}`;
+  return useSWR(fullPath, fetcher);
+};
 
-export { getApiPath, useClientFetch };
+export { getApiPath, useClientFetch, useClientFetchNoInterval };

@@ -35,4 +35,19 @@ const getDateFId = (date) => {
   return `${day} ${monthNameIndonesian} ${year}`;
 };
 
-module.exports = { getDate, getDateF, getDateFId };
+function getMonthYearFId(monthyear) {
+  // Split the input string into parts
+  const [month, year] = monthyear.split("-");
+
+  // Create a Date object with the extracted month and year
+  const date = new Date(`${month}-01-${year}`);
+
+  const monthName = monthNamesIndonesian[date.getMonth()];
+
+  // Construct the final output string
+  const outputString = `${monthName} ${year}`;
+
+  return outputString;
+}
+
+module.exports = { getDate, getDateF, getDateFId, getMonthYearFId };
