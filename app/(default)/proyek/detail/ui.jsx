@@ -48,7 +48,7 @@ import logo from "../../../../public/logofinal.jpg";
 
 const api_path = getApiPath();
 
-export default function App({ id }) {
+export default function App({ id, versi }) {
   const componentRef = {
     penawaran: useRef(),
     invoice: useRef(),
@@ -62,19 +62,23 @@ export default function App({ id }) {
     pageStyle: "p-10 block",
   });
 
+  const [selectVersi, setSelectVersi] = useState(new Set([`${versi}`]));
   const proyek = useClientFetchNoInterval(`proyek?id=${id}`);
   const keranjangProyek = useClientFetch(
-    `keranjangproyek?id_proyek=${id}&instalasi=0`
+    `keranjangproyek?id_proyek=${id}&instalasi=0&versi=${
+      selectVersi.values().next().value
+    }`
   );
   const keranjangProyekInstalasi = useClientFetch(
-    `keranjangproyek?id_proyek=${id}&instalasi=1`
+    `keranjangproyek?id_proyek=${id}&instalasi=1&versi=${
+      selectVersi.values().next().value
+    }`
   );
   const versiKeranjangProyek = useClientFetchNoInterval(
     `versikeranjangproyek?id_proyek=${id}`
   );
   const [form, setForm] = useState({});
   const [formRekapitulasi, setFormRekapitulasi] = useState({ hargadiskon: 0 });
-  const [selectVersi, setSelectVersi] = useState(new Set(["0"]));
 
   const editButtonPress = (data) => {
     setForm({
@@ -98,6 +102,23 @@ export default function App({ id }) {
       return;
       // return alert(json.message);
     }
+  };
+  const handleButtonVersi = async () => {
+    const res = await fetch(`${api_path}versibarukeranjangproyek`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        // 'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: JSON.stringify({
+        id_proyek: id,
+        versi: selectVersi.values().next().value,
+        // harga: data.hargajual,
+      }),
+    });
+    const json = await res.json();
+    console.log(json.message);
+    return alert(json.message);
   };
   const simpanButtonPress = async (data, onClose) => {
     const res = await fetch(`${api_path}keranjangproyek`, {
@@ -508,6 +529,7 @@ export default function App({ id }) {
   const pajakKustom = (kustomDiskon * selectedProyek.pajak) / 100;
   const finalHarga = hargaDiskon + pajak;
   const finalKustom = kustomDiskon + pajakKustom;
+  const selectedVersion = selectVersi.values().next().value;
   return (
     <div>
       <div className="flex flex-row gap-2">
@@ -613,11 +635,7 @@ export default function App({ id }) {
       {/* tombol fungsional */}
       <div className="flex flex-row gap-2">
         <div>
-          <Button
-            onClick={modal.penawaran.onOpen}
-            color="primary"
-            className="mt-3"
-          >
+          <Button onClick={handleButtonVersi} color="primary" className="mt-3">
             Buat Versi Baru
           </Button>
         </div>
@@ -647,7 +665,7 @@ export default function App({ id }) {
           topContent={
             <>
               <div>Produk</div>
-              <TambahProduk id_proyek={id} />
+              <TambahProduk id_proyek={id} versi={selectedVersion} />
             </>
           }
           bottomContent={
@@ -728,7 +746,11 @@ export default function App({ id }) {
           topContent={
             <>
               <div>Instalasi</div>
-              <TambahProduk id_proyek={id} instalasi={1} />
+              <TambahProduk
+                id_proyek={id}
+                instalasi={1}
+                versi={selectedVersion}
+              />
             </>
           }
           bottomContent={
@@ -1360,7 +1382,7 @@ export default function App({ id }) {
   );
 }
 
-const TambahProduk = ({ id_proyek, instalasi }) => {
+const TambahProduk = ({ id_proyek, instalasi, versi }) => {
   const kategori = useClientFetch(`kategoriproduk`);
   const [selectKategori, setSelectKategori] = useState(new Set([]));
   const produk = useClientFetch(
@@ -1372,7 +1394,7 @@ const TambahProduk = ({ id_proyek, instalasi }) => {
   if (kategori.isLoading) return <div>loading...</div>;
   if (produk.error) return <div>failed to load</div>;
   if (produk.isLoading) return <div>loading...</div>;
-  const tambahButtonPress = async ({ instalasi, select, form }) => {
+  const tambahButtonPress = async ({ select, form }) => {
     if (select.size == 0) return alert("Produk belum dipilih.");
     const res = await fetch(`${api_path}keranjangproyek`, {
       method: "POST",
@@ -1386,6 +1408,7 @@ const TambahProduk = ({ id_proyek, instalasi }) => {
         jumlah: form.jumlah,
         harga: form.harga,
         instalasi,
+        versi,
       }),
     });
     const json = await res.json();
