@@ -29,7 +29,11 @@ import {
   useDisclosure,
 } from "@nextui-org/react";
 import { useReactToPrint } from "react-to-print";
-import { getApiPath, useClientFetch } from "../../../utils/apiconfig";
+import {
+  getApiPath,
+  useClientFetch,
+  useClientFetchNoInterval,
+} from "../../../utils/apiconfig";
 import { getDateFId } from "@/app/utils/date";
 import { penawaran } from "@/app/utils/formatid";
 import Harga from "../../../components/harga";
@@ -58,35 +62,19 @@ export default function App({ id }) {
     pageStyle: "p-10 block",
   });
 
-  // const handlePrintInvoice = (src) => {
-  //   useReactToPrint({
-  //     content: () => src.current,
-  //     bodyClass: "m-10",
-  //   });
-  // };
-
-  const proyek = useClientFetch(`proyek?id=${id}`);
+  const proyek = useClientFetchNoInterval(`proyek?id=${id}`);
   const keranjangProyek = useClientFetch(
     `keranjangproyek?id_proyek=${id}&instalasi=0`
   );
   const keranjangProyekInstalasi = useClientFetch(
     `keranjangproyek?id_proyek=${id}&instalasi=1`
   );
-  const kategori = useClientFetch(`kategoriproduk`);
-  const [selectKategori, setSelectKategori] = useState(new Set([]));
-  const [selectKategoriInstalasi, setSelectKategoriInstalasi] = useState(
-    new Set([])
+  const versiKeranjangProyek = useClientFetchNoInterval(
+    `versikeranjangproyek?id_proyek=${id}`
   );
-  const produk = useClientFetch(
-    `produk?kategori=${selectKategori.values().next().value}`
-  );
-  const instalasi = useClientFetch(
-    `produk?kategori=${selectKategoriInstalasi.values().next().value}`
-  );
-  const [selectProduk, setSelectProduk] = useState(new Set([]));
-  const [selectInstalasi, setSelectInstalasi] = useState(new Set([]));
   const [form, setForm] = useState({});
   const [formRekapitulasi, setFormRekapitulasi] = useState({ hargadiskon: 0 });
+  const [selectVersi, setSelectVersi] = useState(new Set(["0"]));
 
   const editButtonPress = (data) => {
     setForm({
@@ -110,26 +98,6 @@ export default function App({ id }) {
       return;
       // return alert(json.message);
     }
-  };
-  const tambahButtonPress = async ({ instalasi, select, form }) => {
-    if (select.size == 0) return alert("Produk belum dipilih.");
-    const res = await fetch(`${api_path}keranjangproyek`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify({
-        id_proyek: id,
-        id_produk: select.values().next().value,
-        jumlah: form.jumlah,
-        harga: form.harga,
-        instalasi,
-      }),
-    });
-    const json = await res.json();
-    console.log(json.message);
-    // return alert(json.message);
   };
   const simpanButtonPress = async (data, onClose) => {
     const res = await fetch(`${api_path}keranjangproyek`, {
@@ -456,12 +424,8 @@ export default function App({ id }) {
   if (keranjangProyek.isLoading) return <div>loading...</div>;
   if (keranjangProyekInstalasi.error) return <div>failed to load</div>;
   if (keranjangProyekInstalasi.isLoading) return <div>loading...</div>;
-  if (kategori.error) return <div>failed to load</div>;
-  if (kategori.isLoading) return <div>loading...</div>;
-  if (produk.error) return <div>failed to load</div>;
-  if (produk.isLoading) return <div>loading...</div>;
-  if (instalasi.error) return <div>failed to load</div>;
-  if (instalasi.isLoading) return <div>loading...</div>;
+  if (versiKeranjangProyek.error) return <div>failed to load</div>;
+  if (versiKeranjangProyek.isLoading) return <div>loading...</div>;
 
   const dataPenawaran = keranjangProyek.data.map((produk, i) => {
     return { ...produk, no: i + 1 };
@@ -550,6 +514,18 @@ export default function App({ id }) {
         {/*Detail  */}
         <div className="bg-white rounded-lg p-3">
           <div>Detail</div>
+          <Select
+            label="Versi"
+            placeholder="Pilih versi!"
+            selectedKeys={selectVersi}
+            onSelectionChange={setSelectVersi}
+          >
+            {versiKeranjangProyek.data.map((item) => (
+              <SelectItem key={item.versi} value={item.versi}>
+                {String(item.versi)}
+              </SelectItem>
+            ))}
+          </Select>
           <div className="flex">
             <div>
               <div>No.</div>
@@ -634,8 +610,17 @@ export default function App({ id }) {
           </div>
         </div>
       </div>
-      {/* tombol print */}
+      {/* tombol fungsional */}
       <div className="flex flex-row gap-2">
+        <div>
+          <Button
+            onClick={modal.penawaran.onOpen}
+            color="primary"
+            className="mt-3"
+          >
+            Buat Versi Baru
+          </Button>
+        </div>
         <div>
           <Button
             onClick={modal.penawaran.onOpen}
@@ -645,7 +630,7 @@ export default function App({ id }) {
             Penawaran
           </Button>
         </div>
-        <div>
+        {/* <div>
           <Button
             onClick={modal.invoice.onOpen}
             color="primary"
@@ -653,125 +638,56 @@ export default function App({ id }) {
           >
             Invoice
           </Button>
-        </div>
+        </div> */}
       </div>
-      {/* tabel produk */}
-      <Table
-        topContent={
-          <>
-            <div>Produk</div>
-            <div className="flex flex-row">
-              <Select
-                label="Kategori"
-                placeholder="Pilih kategori!"
-                className="w-2/12"
-                selectedKeys={selectKategori}
-                onSelectionChange={setSelectKategori}
-              >
-                {kategori.data.map((item) => (
-                  <SelectItem key={item.kategori} value={item.kategori}>
-                    {item.kategori}
-                  </SelectItem>
-                ))}
-              </Select>
-              <Select
-                label="Produk"
-                placeholder="Pilih produk!"
-                className="w-5/12 pl-2"
-                selectedKeys={selectProduk}
-                onSelectionChange={setSelectProduk}
-              >
-                {produk.data.map((item) => (
-                  <SelectItem
-                    key={item.id}
-                    value={item.id}
-                    textValue={`${item.nama}`}
-                  >
-                    {item.nama} | {item.merek} | {item.tipe} | {item.jumlah} |{" "}
-                    {item.satuan} | {item.hargamodal} | {item.hargajual}
-                  </SelectItem>
-                ))}
-              </Select>
-              <Input
-                type="number"
-                value={form.jumlah}
-                label="Jumlah"
-                placeholder="Masukkan jumlah!"
-                className="w-2/12 pl-2"
-                endContent={
-                  <div className="pointer-events-none flex items-center">
-                    <span className="text-default-400 text-small"></span>
-                  </div>
-                }
-                onValueChange={(v) =>
-                  setForm({
-                    ...form,
-                    jumlah: v,
-                  })
-                }
-              />
-              <Input
-                type="number"
-                value={form.harga}
-                label="Harga Kustom"
-                placeholder="Masukkan harga!"
-                className="w-2/12 pl-2"
-                onValueChange={(v) =>
-                  setForm({
-                    ...form,
-                    harga: v,
-                  })
-                }
-              />
-              <Button
-                onClick={() => {
-                  tambahButtonPress({ select: selectProduk, form });
-                }}
-                color="primary"
-                className="ml-2"
-              >
-                Tambah
-              </Button>
-              {/* <div>
-                <Link href={`/stok?id_proyek=${proyek.id}`}>
-                  <Button color="primary">Tambah</Button>
-                </Link>
-              </div> */}
-            </div>
-          </>
-        }
-        bottomContent={
-          <>
-            <div className="text-right">
-              <div>
-                <Harga
-                  harga={keranjangProyek.data.reduce((total, currentValue) => {
-                    return (
-                      total + currentValue.jumlah * currentValue.hargamodal
-                    );
-                  }, 0)}
-                  label="Sub Total Harga Modal :"
-                />
-              </div>
-              <div>
-                <Harga
-                  label="Sub Total Harga Jual :"
-                  harga={subTotalHargaJual}
-                />
-              </div>
-              <div>
-                <Harga
-                  label={"Sub Total Provit :"}
-                  harga={keranjangProyek.data.reduce((total, currentValue) => {
-                    return (
-                      total +
-                      currentValue.jumlah *
-                        (currentValue.hargajual - currentValue.hargamodal)
-                    );
-                  }, 0)}
-                />
-              </div>
-              {/* <div>
+      <div className="-w-11/12">
+        {/* tabel produk */}
+        <Table
+          className="pt-3"
+          topContent={
+            <>
+              <div>Produk</div>
+              <TambahProduk id_proyek={id} />
+            </>
+          }
+          bottomContent={
+            <>
+              <div className="text-right">
+                <div>
+                  <Harga
+                    harga={keranjangProyek.data.reduce(
+                      (total, currentValue) => {
+                        return (
+                          total + currentValue.jumlah * currentValue.hargamodal
+                        );
+                      },
+                      0
+                    )}
+                    label="Sub Total Harga Modal :"
+                  />
+                </div>
+                <div>
+                  <Harga
+                    label="Sub Total Harga Jual :"
+                    harga={subTotalHargaJual}
+                  />
+                </div>
+                <div>
+                  <Harga
+                    label={"Sub Total Provit :"}
+                    harga={keranjangProyek.data.reduce(
+                      (total, currentValue) => {
+                        return (
+                          total +
+                          currentValue.jumlah *
+                            (currentValue.hargajual - currentValue.hargamodal)
+                        );
+                      },
+                      0
+                    )}
+                  />
+                </div>
+                {/* <div>
                 <Harga
                   label="Maks Diskon :"
                   harga={maksDiskon}
@@ -780,157 +696,79 @@ export default function App({ id }) {
               </div>
               <div>Diskon : {proyek.data[0].diskon}</div>
               <div>Pajak : {proyek.data[0].pajak}%</div> */}
-            </div>
-          </>
-        }
-        className="pt-3"
-        aria-label="Example table with custom cells"
-      >
-        <TableHeader columns={col.keranjangproyek}>
-          {(column) => (
-            <TableColumn
-              key={column.key}
-              align={column.key === "aksi" ? "center" : "start"}
-            >
-              {column.label}
-            </TableColumn>
-          )}
-        </TableHeader>
-        <TableBody items={keranjangProyek.data}>
-          {(item) => (
-            <TableRow key={item.no}>
-              {(columnKey) => (
-                <TableCell>
-                  {renderCell.keranjangproyek(item, columnKey)}
-                </TableCell>
-              )}
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-      {/* tabel instalasi */}
-      <Table
-        topContent={
-          <>
-            <div>Instalasi</div>
-            <div className="flex flex-row">
-              <Select
-                label="Kategori"
-                placeholder="Pilih kategori!"
-                className="w-2/12"
-                selectedKeys={selectKategoriInstalasi}
-                onSelectionChange={setSelectKategoriInstalasi}
-              >
-                {kategori.data.map((item) => (
-                  <SelectItem key={item.kategori} value={item.kategori}>
-                    {item.kategori}
-                  </SelectItem>
-                ))}
-              </Select>
-              <Select
-                label="Produk"
-                placeholder="Pilih produk!"
-                className="w-5/12 pl-2"
-                selectedKeys={selectInstalasi}
-                onSelectionChange={setSelectInstalasi}
-              >
-                {instalasi.data.map((item) => (
-                  <SelectItem
-                    key={item.id}
-                    value={item.id}
-                    textValue={`${item.nama}`}
-                  >
-                    {item.nama} | {item.merek} | {item.tipe} | {item.jumlah} |{" "}
-                    {item.satuan} | {item.hargamodal} | {item.hargajual}
-                  </SelectItem>
-                ))}
-              </Select>
-              <Input
-                type="number"
-                value={form.jumlah}
-                label="Jumlah"
-                placeholder="Masukkan jumlah!"
-                className="w-2/12 pl-2"
-                endContent={
-                  <div className="pointer-events-none flex items-center">
-                    <span className="text-default-400 text-small"></span>
-                  </div>
-                }
-                onValueChange={(v) =>
-                  setForm({
-                    ...form,
-                    jumlah: v,
-                  })
-                }
-              />
-              <Input
-                type="number"
-                value={form.harga}
-                label="Harga Kustom"
-                placeholder="Masukkan harga!"
-                className="w-2/12 pl-2"
-                onValueChange={(v) =>
-                  setForm({
-                    ...form,
-                    harga: v,
-                  })
-                }
-              />
-              <Button
-                onClick={() => {
-                  tambahButtonPress({ instalasi: 1, select: selectInstalasi });
-                }}
-                color="primary"
-                className="ml-2"
-              >
-                Tambah
-              </Button>
-              {/* <div>
-                <Link href={`/stok?id_proyek=${proyek.id}`}>
-                  <Button color="primary">Tambah</Button>
-                </Link>
-              </div> */}
-            </div>
-          </>
-        }
-        bottomContent={
-          <>
-            <div className="text-right">
-              <div>
-                <Harga
-                  harga={keranjangProyekInstalasi.data.reduce(
-                    (total, currentValue) => {
-                      return (
-                        total + currentValue.jumlah * currentValue.hargamodal
-                      );
-                    },
-                    0
-                  )}
-                  label="Sub Total Harga Modal :"
-                />
               </div>
-              <div>
-                <Harga
-                  label="Sub Total Harga Instalasi :"
-                  harga={subTotalHargaInstalasi}
-                />
-              </div>
-              <div>
-                <Harga
-                  label={"Sub Total Provit :"}
-                  harga={keranjangProyekInstalasi.data.reduce(
-                    (total, currentValue) => {
-                      return (
-                        total +
-                        currentValue.jumlah *
-                          (currentValue.hargajual - currentValue.hargamodal)
-                      );
-                    },
-                    0
-                  )}
-                />
-              </div>
-              {/* <div>
+            </>
+          }
+          aria-label="Example table with custom cells"
+        >
+          <TableHeader columns={col.keranjangproyek}>
+            {(column) => (
+              <TableColumn
+                key={column.key}
+                align={column.key === "aksi" ? "center" : "start"}
+              >
+                {column.label}
+              </TableColumn>
+            )}
+          </TableHeader>
+          <TableBody items={keranjangProyek.data}>
+            {(item) => (
+              <TableRow key={item.no}>
+                {(columnKey) => (
+                  <TableCell>
+                    {renderCell.keranjangproyek(item, columnKey)}
+                  </TableCell>
+                )}
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+        {/* tabel instalasi */}
+        <Table
+          topContent={
+            <>
+              <div>Instalasi</div>
+              <TambahProduk id_proyek={id} instalasi={1} />
+            </>
+          }
+          bottomContent={
+            <>
+              <div className="text-right">
+                <div>
+                  <Harga
+                    harga={keranjangProyekInstalasi.data.reduce(
+                      (total, currentValue) => {
+                        return (
+                          total + currentValue.jumlah * currentValue.hargamodal
+                        );
+                      },
+                      0
+                    )}
+                    label="Sub Total Harga Modal :"
+                  />
+                </div>
+                <div>
+                  <Harga
+                    label="Sub Total Harga Instalasi :"
+                    harga={subTotalHargaInstalasi}
+                  />
+                </div>
+                <div>
+                  <Harga
+                    label={"Sub Total Provit :"}
+                    harga={keranjangProyekInstalasi.data.reduce(
+                      (total, currentValue) => {
+                        return (
+                          total +
+                          currentValue.jumlah *
+                            (currentValue.hargajual - currentValue.hargamodal)
+                        );
+                      },
+                      0
+                    )}
+                  />
+                </div>
+                {/* <div>
                 <Harga
                   label="Maks Diskon :"
                   harga={maksDiskonInstalasi}
@@ -939,34 +777,35 @@ export default function App({ id }) {
               </div>
               <div>Diskon : {proyek.data[0].diskon}</div>
               <div>Pajak : {proyek.data[0].pajak}%</div> */}
-            </div>
-          </>
-        }
-        className="pt-3"
-        aria-label="Example table with custom cells"
-      >
-        <TableHeader columns={col.instalasi}>
-          {(column) => (
-            <TableColumn
-              key={column.key}
-              align={column.key === "aksi" ? "center" : "start"}
-            >
-              {column.label}
-            </TableColumn>
-          )}
-        </TableHeader>
-        <TableBody items={keranjangProyekInstalasi.data}>
-          {(item) => (
-            <TableRow key={item.no}>
-              {(columnKey) => (
-                <TableCell>
-                  {renderCell.keranjangproyek(item, columnKey)}
-                </TableCell>
-              )}
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+              </div>
+            </>
+          }
+          className="pt-3"
+          aria-label="Example table with custom cells"
+        >
+          <TableHeader columns={col.instalasi}>
+            {(column) => (
+              <TableColumn
+                key={column.key}
+                align={column.key === "aksi" ? "center" : "start"}
+              >
+                {column.label}
+              </TableColumn>
+            )}
+          </TableHeader>
+          <TableBody items={keranjangProyekInstalasi.data}>
+            {(item) => (
+              <TableRow key={item.no}>
+                {(columnKey) => (
+                  <TableCell>
+                    {renderCell.keranjangproyek(item, columnKey)}
+                  </TableCell>
+                )}
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
       {/* edit rekapitulasi */}
       <Modal
         scrollBehavior="inside"
@@ -1018,7 +857,7 @@ export default function App({ id }) {
                 <Input
                   type="number"
                   value={formRekapitulasi.hargadiskon}
-                  label="Harga Diskon"
+                  label="Harga Setelah Diskon"
                   placeholder="Masukkan harga diskon!"
                   endContent={
                     <div className="pointer-events-none flex items-center">
@@ -1520,3 +1359,120 @@ export default function App({ id }) {
     </div>
   );
 }
+
+const TambahProduk = ({ id_proyek, instalasi }) => {
+  const kategori = useClientFetch(`kategoriproduk`);
+  const [selectKategori, setSelectKategori] = useState(new Set([]));
+  const produk = useClientFetch(
+    `produk?kategori=${selectKategori.values().next().value}`
+  );
+  const [selectProduk, setSelectProduk] = useState(new Set([]));
+  const [form, setForm] = useState({});
+  if (kategori.error) return <div>failed to load</div>;
+  if (kategori.isLoading) return <div>loading...</div>;
+  if (produk.error) return <div>failed to load</div>;
+  if (produk.isLoading) return <div>loading...</div>;
+  const tambahButtonPress = async ({ instalasi, select, form }) => {
+    if (select.size == 0) return alert("Produk belum dipilih.");
+    const res = await fetch(`${api_path}keranjangproyek`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        // 'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: JSON.stringify({
+        id_proyek,
+        id_produk: select.values().next().value,
+        jumlah: form.jumlah,
+        harga: form.harga,
+        instalasi,
+      }),
+    });
+    const json = await res.json();
+    // console.log(json.message);
+    // return alert(json.message);
+  };
+  return (
+    <div className="flex flex-row">
+      <Select
+        label="Kategori"
+        placeholder="Pilih kategori!"
+        className="w-2/12"
+        selectedKeys={selectKategori}
+        onSelectionChange={(v) => {
+          setSelectProduk(new Set([]));
+          setSelectKategori(v);
+        }}
+      >
+        {kategori.data.map((item) => (
+          <SelectItem key={item.kategori} value={item.kategori}>
+            {item.kategori}
+          </SelectItem>
+        ))}
+      </Select>
+      <Select
+        label="Produk"
+        placeholder="Pilih produk!"
+        className="w-5/12 pl-2"
+        selectedKeys={selectProduk}
+        onSelectionChange={setSelectProduk}
+      >
+        {produk.data.map((item) => (
+          <SelectItem key={item.id} value={item.id} textValue={`${item.nama}`}>
+            {item.nama} | {item.merek} | {item.tipe} |{" "}
+            <span className="p-1 bg-black text-white">
+              {item.stok} {item.satuan}
+            </span>{" "}
+            | <Harga harga={item.hargamodal} /> |{" "}
+            <Harga harga={item.hargajual} />
+          </SelectItem>
+        ))}
+      </Select>
+      <Input
+        type="number"
+        value={form.jumlah}
+        label="Jumlah"
+        placeholder="Masukkan jumlah!"
+        className="w-2/12 pl-2"
+        endContent={
+          <div className="pointer-events-none flex items-center">
+            <span className="text-default-400 text-small"></span>
+          </div>
+        }
+        onValueChange={(v) =>
+          setForm({
+            ...form,
+            jumlah: v,
+          })
+        }
+      />
+      <Input
+        type="number"
+        value={form.harga}
+        label="Harga Kustom"
+        placeholder="Masukkan harga!"
+        className="w-2/12 pl-2"
+        onValueChange={(v) =>
+          setForm({
+            ...form,
+            harga: v,
+          })
+        }
+      />
+      <Button
+        onClick={() => {
+          tambahButtonPress({ instalasi, select: selectProduk, form });
+        }}
+        color="primary"
+        className="ml-2"
+      >
+        Tambah
+      </Button>
+      {/* <div>
+                <Link href={`/stok?id_proyek=${proyek.id}`}>
+                  <Button color="primary">Tambah</Button>
+                </Link>
+              </div> */}
+    </div>
+  );
+};

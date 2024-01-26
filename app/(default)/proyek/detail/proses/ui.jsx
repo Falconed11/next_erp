@@ -478,7 +478,7 @@ export default function App({ id }) {
                       value={item.id}
                       textValue={`${item.nama}`}
                     >
-                      {item.nama} | {item.merek} | {item.tipe} | {item.jumlah} |{" "}
+                      {item.nama} | {item.merek} | {item.tipe} | {item.stok} |{" "}
                       {item.satuan} | {item.hargamodal} | {item.hargajual}
                     </SelectItem>
                   ))}
