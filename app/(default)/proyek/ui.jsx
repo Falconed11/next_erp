@@ -50,6 +50,7 @@ export default function App() {
   const [method, setMethod] = useState("POST");
 
   const saveButtonPress = async (onClose) => {
+    if (form.isSwasta.size == 0) return alert("Swasta/Negri belum diisi");
     const res = await fetch(`${apiPath}proyek`, {
       method,
       headers: {
@@ -72,7 +73,8 @@ export default function App() {
       kota: "",
       selectkaryawan: "",
       selectperusahaan: "",
-      selectstatus: "",
+      // selectstatus: "",
+      isSwasta: "",
       tanggal: "",
       startdate: "",
       keterangan: "",
@@ -89,7 +91,8 @@ export default function App() {
       startdate,
       selectkaryawan: String(data.id_karyawan),
       selectperusahaan: String(data.id_perusahaan),
-      selectstatus: String(data.id_statusproyek),
+      // selectstatus: String(data.id_statusproyek),
+      isSwasta: String(data.swasta),
     });
     setMethod("PUT");
     onOpen();
@@ -113,6 +116,14 @@ export default function App() {
     switch (columnKey) {
       case "no":
         return `${penawaran(data.id_kustom, date)}`;
+      case "swasta":
+        return data.swasta ? "swasta" : "negri";
+      case "status":
+        return data.versi == -1
+          ? "reject"
+          : data.versi == 0
+          ? "penawaran"
+          : "deal";
       case "tanggal":
         return getDateF(new Date(data.tanggal));
       case "totalharga":
@@ -120,9 +131,11 @@ export default function App() {
       case "aksi":
         const id_statusproyek = data.id_statusproyek;
         let link = ``;
-        if (id_statusproyek == 1) {
-          link = `/proyek/detail?id=${data.id}`;
-        } else link = `/proyek/detail/proses?id=${data.id}`;
+        // if (id_statusproyek == 1) {
+        link = `/proyek/detail?id=${data.id}&versi=${
+          data.versi == 0 ? "1" : data.versi
+        }`;
+        // } else link = `/proyek/detail/proses?id=${data.id}`;
 
         return (
           <div className="relative flex items-center gap-2">
@@ -179,6 +192,10 @@ export default function App() {
       label: "Nama Perusahaan",
     },
     {
+      key: "swasta",
+      label: "Swasta/Negri",
+    },
+    {
       key: "nama",
       label: "Nama Proyek",
     },
@@ -199,7 +216,7 @@ export default function App() {
       label: "Sales",
     },
     {
-      key: "statusproyek",
+      key: "status",
       label: "Status",
     },
     {
@@ -214,6 +231,10 @@ export default function App() {
       key: "aksi",
       label: "Aksi",
     },
+  ];
+  const isSwasta = [
+    { id: 0, nama: "negri" },
+    { id: 1, nama: "swasta" },
   ];
 
   return (
@@ -248,6 +269,26 @@ export default function App() {
                   }}
                 >
                   {perusahaan.data.map((item) => (
+                    <SelectItem key={item.id} value={item.id}>
+                      {item.nama}
+                    </SelectItem>
+                  ))}
+                </Select>
+                <Select
+                  label="Swasta/Negri"
+                  variant="bordered"
+                  placeholder="Pilih swasta/negri!"
+                  selectedKeys={form.isSwasta}
+                  className="max-w-xs"
+                  onSelectionChange={(val) => {
+                    setForm({
+                      ...form,
+                      isSwasta: val,
+                      swasta: new Set(val).values().next().value,
+                    });
+                  }}
+                >
+                  {isSwasta.map((item) => (
                     <SelectItem key={item.id} value={item.id}>
                       {item.nama}
                     </SelectItem>
@@ -302,7 +343,7 @@ export default function App() {
                     </SelectItem>
                   ))}
                 </Select>
-                <Select
+                {/* <Select
                   label="Status"
                   variant="bordered"
                   placeholder="Pilih status!"
@@ -321,7 +362,7 @@ export default function App() {
                       {item.nama}
                     </SelectItem>
                   ))}
-                </Select>
+                </Select> */}
                 <div className="bg-gray-100 p-3 rounded-lg">
                   <div>Tanggal</div>
                   <DatePicker

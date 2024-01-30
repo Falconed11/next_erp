@@ -65,9 +65,10 @@ export default function App({ id, versi }) {
     pageStyle: "p-10 block",
   });
 
+  const [refresh, setRefresh] = useState(0);
   const [selectVersi, setSelectVersi] = useState(new Set(versi ? [versi] : []));
   const [selected, setSelected] = React.useState(["audio", "multimedia"]);
-  const proyek = useClientFetchNoInterval(`proyek?id=${id}`);
+  const proyek = useClientFetch(`proyek?id=${id}`);
   const keranjangProyek = useClientFetch(
     `keranjangproyek?id_proyek=${id}&instalasi=0&versi=${
       selectVersi.values().next().value
@@ -83,7 +84,7 @@ export default function App({ id, versi }) {
       selectVersi.values().next().value
     }`
   );
-  const versiKeranjangProyek = useClientFetchNoInterval(
+  const versiKeranjangProyek = useClientFetch(
     `versikeranjangproyek?id_proyek=${id}`
   );
   const [form, setForm] = useState({});
@@ -139,15 +140,13 @@ export default function App({ id, versi }) {
       }),
     });
     json = await res.json();
-    router.push(
-      `/proyek/detail?id=${id}&versi=${
-        versiKeranjangProyek.data.reduce((acc, v) => {
-          const versi = v.versi;
-          return versi > acc ? versi : acc;
-        }, 0) + 1
-      }`
-    );
-    return router.refresh();
+    const newVersion =
+      versiKeranjangProyek.data.reduce((acc, v) => {
+        const versi = v.versi;
+        return versi > acc ? versi : acc;
+      }, 0) + 1;
+    router.push(`/proyek/detail?id=${id}&versi=${newVersion}`);
+    setSelectVersi(new Set([String(newVersion)]));
     // return alert(json.message);
   };
   const simpanButtonPress = async (data, onClose) => {
@@ -233,6 +232,70 @@ export default function App({ id, versi }) {
     });
     const json = await res.json();
     onClose();
+    // return alert(json.message);
+  };
+  const handleButtonSetAsDealClick = async () => {
+    const res = await fetch(`${api_path}updateversiproyek`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        // 'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: JSON.stringify({
+        id,
+        versi: selectedVersion,
+      }),
+    });
+    const json = await res.json();
+    // console.log(json.message);
+    // return alert(json.message);
+  };
+  const handleButtonCancelDealClick = async () => {
+    const res = await fetch(`${api_path}updateversiproyek`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        // 'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: JSON.stringify({
+        id,
+        versi: 0,
+      }),
+    });
+    const json = await res.json();
+    // console.log(json.message);
+    // return alert(json.message);
+  };
+  const handleButtonSetAsRejectClick = async () => {
+    const res = await fetch(`${api_path}updateversiproyek`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        // 'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: JSON.stringify({
+        id,
+        versi: -1,
+      }),
+    });
+    const json = await res.json();
+    // console.log(json.message);
+    // return alert(json.message);
+  };
+  const handleButtonCancelRejectClick = async () => {
+    const res = await fetch(`${api_path}updateversiproyek`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        // 'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: JSON.stringify({
+        id,
+        versi: 0,
+      }),
+    });
+    const json = await res.json();
+    // console.log(json.message);
     // return alert(json.message);
   };
   const renderCell = {
@@ -621,18 +684,24 @@ export default function App({ id, versi }) {
         {/*Detail  */}
         <div className="bg-white rounded-lg p-3">
           <div>Detail</div>
-          <Select
-            label="Versi"
-            placeholder="Pilih versi!"
-            selectedKeys={selectVersi}
-            onSelectionChange={setSelectVersi}
-          >
-            {versiKeranjangProyek.data.map((item) => (
-              <SelectItem key={item.versi} value={item.versi}>
-                {String(item.versi)}
-              </SelectItem>
-            ))}
-          </Select>
+          {versiKeranjangProyek.data.length > 1 ? (
+            <Select
+              label="Versi"
+              placeholder="Pilih versi!"
+              selectedKeys={selectVersi}
+              onSelectionChange={setSelectVersi}
+            >
+              {versiKeranjangProyek.data.map((item) => (
+                <SelectItem key={item.versi} value={item.versi}>
+                  {`${item.versi} ${
+                    item.versi == selectedProyek.versi ? "(deal)" : ""
+                  }`}
+                </SelectItem>
+              ))}
+            </Select>
+          ) : (
+            <></>
+          )}
           <div className="flex">
             <div>
               <div>No.</div>
@@ -660,7 +729,14 @@ export default function App({ id, versi }) {
               <div>: {selectedProyek.instansi} </div>
               <div>: {selectedProyek.kota} </div>
               <div>: {selectedProyek.namakaryawan} </div>
-              <div>: {selectedProyek.statusproyek} </div>
+              <div>
+                :{" "}
+                {selectedProyek.versi == -1
+                  ? "reject"
+                  : selectedProyek.versi == selectedVersion
+                  ? "deal"
+                  : "penawaran"}
+              </div>
             </div>
           </div>
         </div>
@@ -755,6 +831,48 @@ export default function App({ id, versi }) {
                 Penawaran
               </Button>
             </div>
+            {selectedProyek.versi != selectedVersion ? (
+              <div>
+                <Button
+                  onClick={handleButtonSetAsDealClick}
+                  color="primary"
+                  className="mt-3"
+                >
+                  Set as Deal
+                </Button>
+              </div>
+            ) : (
+              <div>
+                <Button
+                  onClick={handleButtonCancelDealClick}
+                  color="primary"
+                  className="mt-3"
+                >
+                  Cancel Deal
+                </Button>
+              </div>
+            )}
+            {selectedProyek.versi != -1 ? (
+              <div>
+                <Button
+                  onClick={handleButtonSetAsRejectClick}
+                  color="primary"
+                  className="mt-3"
+                >
+                  Set as Reject
+                </Button>
+              </div>
+            ) : (
+              <div>
+                <Button
+                  onClick={handleButtonCancelRejectClick}
+                  color="primary"
+                  className="mt-3"
+                >
+                  Cancel Reject
+                </Button>
+              </div>
+            )}
             {/* <div>
               <Button
                 onClick={modal.invoice.onOpen}
