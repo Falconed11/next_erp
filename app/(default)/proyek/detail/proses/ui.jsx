@@ -33,6 +33,7 @@ import { getApiPath, useClientFetch } from "@/app/utils/apiconfig";
 import { getDateF, getDateFId, getDate } from "@/app/utils/date";
 import { penawaran } from "@/app/utils/formatid";
 import Harga from "@/app/components/harga";
+import TambahProduk from "@/app/components/tambahproduk";
 import { Button } from "@nextui-org/react";
 import { Input } from "@nextui-org/react";
 import { Divider } from "@nextui-org/react";
@@ -55,7 +56,7 @@ export default function App({ id }) {
     pageStyle: "p-10",
   });
   const proyek = useClientFetch(`proyek?id=${id}`);
-  const aruskasproyek = useClientFetch(`aruskasproyek?id_proyek=${id}`);
+  const pengeluaranproyek = useClientFetch(`pengeluaranproyek?id_proyek=${id}`);
   const pembayaranproyek = useClientFetch(`pembayaranproyek?id_proyek=${id}`);
   const kategori = useClientFetch(`kategoriproduk`);
   const [selectKategori, setSelectKategori] = useState(new Set([]));
@@ -65,25 +66,31 @@ export default function App({ id }) {
   const [selectProduk, setSelectProduk] = useState(new Set([]));
   const karyawan = useClientFetch(`karyawan`);
   const [selectKaryawan, setSelectKaryawan] = useState(new Set([]));
-  const [form, setForm] = useState({});
-  const [formPembayaran, setFormPembayaran] = useState({});
+  const [form, setForm] = useState({
+    selectKategori: new Set([]),
+    selectProduk: new Set([]),
+  });
+  const [formPembayaran, setFormPembayaran] = useState({
+    carabayar: "",
+    keterangan: "",
+  });
 
   const editButtonPress = (data) => {
     const startdate = new Date(data.tanggal);
     setForm({
+      ...form,
       ...data,
       harga: data.hargakustom,
       modalmode: "Edit",
       tanggal: getDate(startdate),
       startdate,
     });
-    setSelectProduk(String(data.id_produk));
-    setSelectKaryawan(String(data.id_karyawan));
-    modal.aruskasproyek.onOpen();
+    setSelectKaryawan(new Set([String(data.id_karyawan)]));
+    modal.pengeluaranproyek.onOpen();
   };
   const deleteButtonPress = async (id) => {
     if (confirm("Hapus produk?")) {
-      const res = await fetch(`${api_path}aruskasproyek`, {
+      const res = await fetch(`${api_path}pengeluaranproyek`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -92,13 +99,12 @@ export default function App({ id }) {
         body: JSON.stringify({ id }),
       });
       const json = await res.json();
-      return;
       // return alert(json.message);
     }
   };
   const tambahButtonPress = async ({ selectProduk, selectKaryawan, form }) => {
     // if (select.size == 0) return alert("Produk belum dipilih.");
-    const res = await fetch(`${api_path}aruskasproyek`, {
+    const res = await fetch(`${api_path}pengeluaranproyek`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -106,9 +112,9 @@ export default function App({ id }) {
       },
       body: JSON.stringify({
         id_proyek: id,
-        id_produk: selectProduk.values().next().value,
+        id_produk: form.selectProduk.values().next().value,
         id_karyawan: selectKaryawan.values().next().value,
-        tanggal: getDate(form.startdate),
+        tanggal: form.startdate ? getDate(form.startdate) : "",
         jumlah: form.jumlah,
         harga: form.harga,
         keterangan: form.keterangan ? form.keterangan : "",
@@ -119,26 +125,25 @@ export default function App({ id }) {
     // return alert(json.message);
   };
   const simpanButtonPress = async (data, onClose) => {
-    const res = await fetch(`${api_path}aruskasproyek`, {
+    const res = await fetch(`${api_path}pengeluaranproyek`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
         // 'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: JSON.stringify({
-        id: data.id_aruskasproyek,
-        jumlah: data.jumlah,
-        harga: data.harga,
+        ...data,
+        id: data.id_pengeluaranproyek,
         keterangan: data.keterangan ? data.keterangan : "",
         status: data.status ? data.status : "",
-        tanggal: data.tanggal,
+        tanggal: getDate(new Date(data.startdate)),
         // harga: data.hargajual,
       }),
     });
     const json = await res.json();
     onClose();
-    console.log(json.message);
-    // return alert(json.message);
+    // console.log(json.message);
+    return alert(json.message);
   };
 
   const editButtonPressPembayaran = (data) => {
@@ -199,7 +204,7 @@ export default function App({ id }) {
   };
 
   const renderCell = {
-    aruskasproyek: React.useCallback((data, columnKey) => {
+    pengeluaranproyek: React.useCallback((data, columnKey) => {
       const cellValue = data[columnKey];
       let harga = 0;
       if (data.hargakustom) harga = data.hargakustom;
@@ -236,7 +241,7 @@ export default function App({ id }) {
               </Tooltip>
               <Tooltip color="danger" content="Delete">
                 <span
-                  onClick={() => deleteButtonPress(data.id_aruskasproyek)}
+                  onClick={() => deleteButtonPress(data.id_pengeluaranproyek)}
                   className="text-lg text-danger cursor-pointer active:opacity-50"
                 >
                   <DeleteIcon />
@@ -284,11 +289,11 @@ export default function App({ id }) {
   const modal = {
     produk: useDisclosure(),
     nota: useDisclosure(),
-    aruskasproyek: useDisclosure(),
+    pengeluaranproyek: useDisclosure(),
     pembayaranproyek: useDisclosure(),
   };
   const col = {
-    aruskasproyek: [
+    pengeluaranproyek: [
       {
         key: "tanggal",
         label: "tanggal",
@@ -364,8 +369,8 @@ export default function App({ id }) {
 
   if (proyek.error) return <div>failed to load</div>;
   if (proyek.isLoading) return <div>loading...</div>;
-  if (aruskasproyek.error) return <div>failed to load</div>;
-  if (aruskasproyek.isLoading) return <div>loading...</div>;
+  if (pengeluaranproyek.error) return <div>failed to load</div>;
+  if (pengeluaranproyek.isLoading) return <div>loading...</div>;
   if (pembayaranproyek.error) return <div>failed to load</div>;
   if (pembayaranproyek.isLoading) return <div>loading...</div>;
   if (kategori.error) return <div>failed to load</div>;
@@ -391,7 +396,7 @@ export default function App({ id }) {
   //   },
   //   0
   // );
-  const biayaProduksi = aruskasproyek.data.reduce((total, v) => {
+  const biayaProduksi = pengeluaranproyek.data.reduce((total, v) => {
     return total + v.jumlah * (v.hargakustom ? v.hargakustom : v.hargamodal);
   }, 0);
   const omset = pembayaranproyek.data.reduce((total, v) => {
@@ -443,16 +448,16 @@ export default function App({ id }) {
           </Button>
         </div>
       </div> */}
-      {/* tabel aruskasproyek */}
+      {/* tabel pengeluaran proyek */}
       <Table
         className="pt-3"
         aria-label="Example table with custom cells"
         topContent={
           <>
-            <div>Arus Kas Proyek</div>
+            <div>Pengeluaran Proyek</div>
             <div className="flex-col gap-2">
               <div className="flex flex-row gap-2">
-                <Select
+                {/* <Select
                   label="Kategori"
                   placeholder="Pilih kategori!"
                   className="w-2/12"
@@ -513,7 +518,8 @@ export default function App({ id }) {
                       harga: v,
                     })
                   }
-                />
+                /> */}
+                <TambahProduk form={form} setForm={setForm} />
               </div>
               <div className="flex flex-row gap-2 mt-3">
                 <div className="bg-gray-100 p-3 rounded-lg">
@@ -577,17 +583,17 @@ export default function App({ id }) {
             </div>
           </>
         }
-        bottomContent={
-          <>
-            <div className="text-right">
-              <div>
-                <Harga label="Sub Total Harga Jual :" harga={0} />
-              </div>
-            </div>
-          </>
-        }
+        // bottomContent={
+        //   <>
+        //     <div className="text-right">
+        //       <div>
+        //         <Harga label="Sub Total Harga Jual :" harga={0} />
+        //       </div>
+        //     </div>
+        //   </>
+        // }
       >
-        <TableHeader columns={col.aruskasproyek}>
+        <TableHeader columns={col.pengeluaranproyek}>
           {(column) => (
             <TableColumn
               key={column.key}
@@ -597,12 +603,12 @@ export default function App({ id }) {
             </TableColumn>
           )}
         </TableHeader>
-        <TableBody items={aruskasproyek.data}>
+        <TableBody items={pengeluaranproyek.data}>
           {(item) => (
-            <TableRow key={item.id_aruskasproyek}>
+            <TableRow key={item.id_pengeluaranproyek}>
               {(columnKey) => (
                 <TableCell>
-                  {renderCell.aruskasproyek(item, columnKey)}
+                  {renderCell.pengeluaranproyek(item, columnKey)}
                 </TableCell>
               )}
             </TableRow>
@@ -685,15 +691,15 @@ export default function App({ id }) {
             </div>
           </>
         }
-        bottomContent={
-          <>
-            <div className="text-right">
-              <div>
-                <Harga label="Sub Total Harga Jual :" harga={0} />
-              </div>
-            </div>
-          </>
-        }
+        // bottomContent={
+        //   <>
+        //     <div className="text-right">
+        //       <div>
+        //         <Harga label="Sub Total Harga Jual :" harga={0} />
+        //       </div>
+        //     </div>
+        //   </>
+        // }
       >
         <TableHeader columns={col.pembayaranproyek}>
           {(column) => (
@@ -717,17 +723,17 @@ export default function App({ id }) {
           )}
         </TableBody>
       </Table>
-      {/* edit aruskasproyek */}
+      {/* edit pengeluaranproyek */}
       <Modal
         scrollBehavior="inside"
-        isOpen={modal.aruskasproyek.isOpen}
-        onOpenChange={modal.aruskasproyek.onOpenChange}
+        isOpen={modal.pengeluaranproyek.isOpen}
+        onOpenChange={modal.pengeluaranproyek.onOpenChange}
       >
         <ModalContent>
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                Edit Arus Kas Proyek
+                Edit Pengeluaran Proyek
               </ModalHeader>
               <ModalBody>
                 <div className="bg-gray-100 p-3 rounded-lg">

@@ -19,7 +19,7 @@ import {
   DeleteIcon,
   EyeIcon,
   UserIcon,
-} from "../../../components/icon";
+} from "@/app/components/icon";
 import {
   Modal,
   ModalContent,
@@ -33,10 +33,10 @@ import {
   getApiPath,
   useClientFetch,
   useClientFetchNoInterval,
-} from "../../../utils/apiconfig";
+} from "@/app/utils/apiconfig";
 import { getDateFId } from "@/app/utils/date";
 import { penawaran } from "@/app/utils/formatid";
-import Harga from "../../../components/harga";
+import Harga from "@/app/components/harga";
 import { Button } from "@nextui-org/react";
 import { Input } from "@nextui-org/react";
 import { Divider } from "@nextui-org/react";
@@ -45,7 +45,7 @@ import { Select, SelectItem } from "@nextui-org/react";
 import { CheckboxGroup, Checkbox } from "@nextui-org/react";
 import Link from "next/link";
 import Image from "next/image";
-import logo from "../../../../public/logofinal.jpg";
+import logo from "@/public/logofinal.jpg";
 import { useRouter } from "next/navigation";
 
 const api_path = getApiPath();

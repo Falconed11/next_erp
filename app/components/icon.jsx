@@ -143,7 +143,6 @@ const EyeIcon = (props) => (
     />
   </svg>
 );
-
 const EyeFilledIcon = (props) => (
   <svg
     aria-hidden="true"
@@ -165,7 +164,6 @@ const EyeFilledIcon = (props) => (
     />
   </svg>
 );
-
 const EyeSlashFilledIcon = (props) => (
   <svg
     aria-hidden="true"
@@ -199,7 +197,6 @@ const EyeSlashFilledIcon = (props) => (
     />
   </svg>
 );
-
 const IconScaleBalanced = (props) => {
   return (
     <svg
@@ -213,6 +210,42 @@ const IconScaleBalanced = (props) => {
     </svg>
   );
 };
+const NoteIcon = (props) => {
+  return (
+    <svg fill="none" viewBox="0 0 24 24" height="1em" width="1em" {...props}>
+      <path
+        fill="currentColor"
+        d="M6 6a1 1 0 011-1h10a1 1 0 110 2H7a1 1 0 01-1-1zM6 10a1 1 0 011-1h10a1 1 0 110 2H7a1 1 0 01-1-1zM7 13a1 1 0 100 2h10a1 1 0 100-2H7zM6 18a1 1 0 011-1h4a1 1 0 110 2H7a1 1 0 01-1-1z"
+      />
+      <path
+        fill="currentColor"
+        fillRule="evenodd"
+        d="M2 4a3 3 0 013-3h14a3 3 0 013 3v16a3 3 0 01-3 3H5a3 3 0 01-3-3V4zm3-1h14a1 1 0 011 1v16a1 1 0 01-1 1H5a1 1 0 01-1-1V4a1 1 0 011-1z"
+        clipRule="evenodd"
+      />
+    </svg>
+  );
+};
+const ReportMoneyIcon = (props) => {
+  return (
+    <svg
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      viewBox="0 0 24 24"
+      height="1em"
+      width="1em"
+      {...props}
+    >
+      <path stroke="none" d="M0 0h24v24H0z" />
+      <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" />
+      <path d="M11 3 H13 A2 2 0 0 1 15 5 V5 A2 2 0 0 1 13 7 H11 A2 2 0 0 1 9 5 V5 A2 2 0 0 1 11 3 z" />
+      <path d="M14 11h-2.5a1.5 1.5 0 000 3h1a1.5 1.5 0 010 3H10M12 17v1m0-8v1" />
+    </svg>
+  );
+};
 
 export {
   AddIcon,
@@ -223,6 +256,8 @@ export {
   EyeFilledIcon,
   EyeSlashFilledIcon,
   IconScaleBalanced,
+  NoteIcon,
+  ReportMoneyIcon,
 };
 
 // https://reactsvgicons.com/

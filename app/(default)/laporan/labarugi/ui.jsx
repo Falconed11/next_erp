@@ -22,7 +22,7 @@ const LaporanLR = ({ kategori, monthyear }) => {
     `totalpembayaranproyek?monthyear=${monthyear}`
   );
   const biayaProduksi = useClientFetchNoInterval(
-    `aruskasproyek?monthyear=${monthyear}`
+    `pengeluaranproyek?monthyear=${monthyear}`
   );
   if (operasional.error) return <div>failed to load</div>;
   if (operasional.isLoading) return <div>loading...</div>;

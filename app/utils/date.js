@@ -14,6 +14,7 @@ const monthNamesIndonesian = [
 ];
 
 const getDate = (date) => {
+  if (date === "0000-00-00") return "";
   const year = date.getFullYear();
   const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Note that months are zero-based
   const day = date.getDate().toString().padStart(2, "0");

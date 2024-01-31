@@ -34,6 +34,8 @@ import {
   DeleteIcon,
   EyeIcon,
   UserIcon,
+  NoteIcon,
+  ReportMoneyIcon,
 } from "../../components/icon";
 import { getDate, getDateF } from "@/app/utils/date";
 import DatePicker from "react-datepicker";
@@ -129,26 +131,36 @@ export default function App() {
       case "totalharga":
         return data.jumlah * data.harga;
       case "aksi":
-        const id_statusproyek = data.id_statusproyek;
-        let link = ``;
-        // if (id_statusproyek == 1) {
-        link = `/proyek/detail?id=${data.id}&versi=${
-          data.versi == 0 ? "1" : data.versi
-        }`;
-        // } else link = `/proyek/detail/proses?id=${data.id}`;
-
         return (
           <div className="relative flex items-center gap-2">
-            <Tooltip content="Detail">
-              <Link href={link}>
+            <Tooltip content="Penawaran">
+              <Link
+                href={`/proyek/detail?id=${data.id}&versi=${
+                  data.versi <= 0 ? "1" : data.versi
+                }`}
+              >
                 <span
                   // onClick={() => detailButtonPress(data)}
                   className="text-lg text-default-400 cursor-pointer active:opacity-50"
                 >
-                  <EyeIcon />
+                  <NoteIcon />
                 </span>
               </Link>
             </Tooltip>
+            {data.versi > 0 ? (
+              <Tooltip content="Pengeluaran Proyek">
+                <Link href={`/proyek/detail/proses?id=${data.id}`}>
+                  <span
+                    // onClick={() => detailButtonPress(data)}
+                    className="text-lg text-default-400 cursor-pointer active:opacity-50"
+                  >
+                    <ReportMoneyIcon />
+                  </span>
+                </Link>
+              </Tooltip>
+            ) : (
+              <></>
+            )}
             <Tooltip content="Edit">
               <span
                 onClick={() => editButtonPress(data)}
