@@ -1381,7 +1381,7 @@ export default function App({ id, versi }) {
                       </div>
                       <br />
                       <div>Kepada Yth,</div>
-                      <div>Bapak / Ibu {selectedProyek.klien}</div>
+                      <div>{selectedProyek.klien}</div>
                       <div>{selectedProyek.instansi}</div>
                       <div>{selectedProyek.kota}</div>
                     </div>
@@ -1473,9 +1473,15 @@ export default function App({ id, versi }) {
                         <div>Produk</div>
                         <div>Instalasi</div>
                         <div>Sub Total</div>
-                        <div>Diskon</div>
-                        <div>Harga Setelah Diskon</div>
-                        <div>Pajak ({selectedProyek.pajak}%)</div>
+                        {rekapDiskon > 0 ? (
+                          <>
+                            <div>Diskon</div>
+                            <div>Harga Setelah Diskon</div>
+                          </>
+                        ) : (
+                          <></>
+                        )}
+                        <div>Pajak ({rekapPajak}%)</div>
                         <div>Harga Setelah Pajak</div>
                       </div>
                       <div className="basis-1/6 text-right">
@@ -1488,8 +1494,14 @@ export default function App({ id, versi }) {
                         <div>
                           <Harga harga={totalKustom} />
                         </div>
-                        <div>{<Harga harga={rekapDiskon} />}</div>
-                        <div>{<Harga harga={kustomDiskon} />}</div>
+                        {rekapDiskon > 0 ? (
+                          <>
+                            <div>{<Harga harga={rekapDiskon} />}</div>
+                            <div>{<Harga harga={kustomDiskon} />}</div>
+                          </>
+                        ) : (
+                          <></>
+                        )}
                         <div>{<Harga harga={pajakKustom} />}</div>
                         <div>
                           <Harga harga={finalKustom} />
@@ -1498,8 +1510,8 @@ export default function App({ id, versi }) {
                     </div>
                   </div>
                   {/* keterangan */}
-                  <div className="flex flex-row mt-3 no-break">
-                    <div className="">
+                  <div className="flex flex-col mt-3">
+                    <div className="no-break pb-3">
                       Keterangan <br />
                       - Harga belum termasuk instalasi pemasangan. <br />- Harga{" "}
                       {keteranganPajak} termasuk pajak-pajak. <br />
@@ -1507,13 +1519,15 @@ export default function App({ id, versi }) {
                       pihak. <br />
                       - Waktu penyerahan barang sesuai jadwal yang disepakati
                       bersama. <br />- Harga tidak terikat dan dapat berubah
-                      sewaktu-waktu. <br /> <br />
+                      sewaktu-waktu.
+                    </div>
+                    <div className="no-break">
                       Demikian penawaran ini kami ajukan, sambil menantikan
                       pesanan Bapak/Ibu, kami ucapkan terima kasih. <br />{" "}
                       <br />
                       Hormat kami, <br /> <br />
                       {proyek.data[0].namakaryawan} <br /> <br /># Penawaran ini
-                      dikeluarkan secara otomatis oleh system sehingga tidak
+                      dikeluarkan secara otomatis oleh sistem sehingga tidak
                       memerlukan tanda-tangan.
                     </div>
                   </div>
