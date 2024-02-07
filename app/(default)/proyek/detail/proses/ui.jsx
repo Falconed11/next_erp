@@ -208,7 +208,7 @@ export default function App({ id }) {
       const cellValue = data[columnKey];
       let harga = 0;
       if (data.hargakustom) harga = data.hargakustom;
-      if (data.hargamodal) harga = data.hargamodal;
+      if (data.hargamodal && !data.hargakustom) harga = data.hargamodal;
       switch (columnKey) {
         case "tanggal":
           return getDateF(new Date(data.tanggal));
@@ -307,7 +307,7 @@ export default function App({ id }) {
         label: "Produk",
       },
       {
-        key: "keterangan",
+        key: "keteranganpp",
         label: "Keterangan",
       },
       {

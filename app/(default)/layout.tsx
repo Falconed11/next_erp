@@ -8,81 +8,88 @@ export default function RootLayout({ children, }: { children: React.ReactNode })
     const user = session.data?.user
     const links = [
         { href: "/", name: "Dashboard" },
-        {
-            href: "/produk", name: "Produk", dropdown: [
-                {
-                    key: "data",
-                    name: "Data",
-                    href: "/produk"
-                },
-                {
-                    key: "merek",
-                    name: "Merek",
-                    href: "/produk/merek"
-                },
-                {
-                    key: "kategori",
-                    name: "Kategori",
-                    href: "/produk/kategori"
-                },
-                {
-                    key: "subkategori",
-                    name: "Sub Kategori",
-                    href: "/produk/subkategori"
-                },
-            ]
-        },
-        { href: "/stok", name: "Stok" },
+        { href: "/produk", name: "Produk" },
+        // {
+        //     href: "/produk", name: "Produk", dropdown: [
+        //         {
+        //             key: "data",
+        //             name: "Data",
+        //             href: "/produk"
+        //         },
+        //         // {
+        //         //     key: "merek",
+        //         //     name: "Merek",
+        //         //     href: "/produk/merek"
+        //         // },
+        //         // {
+        //         //     key: "kategori",
+        //         //     name: "Kategori",
+        //         //     href: "/produk/kategori"
+        //         // },
+        //         // {
+        //         //     key: "subkategori",
+        //         //     name: "Sub Kategori",
+        //         //     href: "/produk/subkategori"
+        //         // },
+        //     ]
+        // },
+        // { href: "/stok", name: "Stok" },
         { href: "/proyek", name: "Proyek" },
         { href: "/nota", name: "Nota" },
         { href: "/operasionalkantor", name: "Operasional Kantor" },
-        {
-            href: "/karyawan", name: "Karyawan", dropdown: [
-                {
-                    key: "data",
-                    name: "Data",
-                    href: "/karyawan"
-                },
-                {
-                    key: "neraca",
-                    name: "Neraca",
-                    href: "/karyawan/neraca"
-                },
-                {
-                    key: "pengeluaran",
-                    name: "Pengeluaran",
-                    href: "/karyawan/pengeluaran"
-                },
-                {
-                    key: "lembur",
-                    name: "Lembur",
-                    href: "/karyawan/lembur"
-                },
-            ]
-        },
-        {
-            href: "/perusahaan", name: "Perusahaan", dropdown: [
-                {
-                    key: "pengeluaran",
-                    name: "Pengeluaran",
-                    href: "/perusahaan/pengeluaran"
-                },
-                {
-                    key: "pemasukan",
-                    name: "Pemasukan",
-                    href: "/perusahaan/pemasukan"
-                },
-            ]
-        },
-        { href: "/distributor", name: "Distributor" },
-        { href: "/klien", name: "Klien" },
-        { href: "/gudang", name: "Gudang" },
+        { href: "/karyawan", name: "Karyawan" },
+        // {
+        //     href: "/karyawan", name: "Karyawan", dropdown: [
+        //         {
+        //             key: "data",
+        //             name: "Data",
+        //             href: "/karyawan"
+        //         },
+        //         {
+        //             key: "neraca",
+        //             name: "Neraca",
+        //             href: "/karyawan/neraca"
+        //         },
+        //         {
+        //             key: "pengeluaran",
+        //             name: "Pengeluaran",
+        //             href: "/karyawan/pengeluaran"
+        //         },
+        //         {
+        //             key: "lembur",
+        //             name: "Lembur",
+        //             href: "/karyawan/lembur"
+        //         },
+        //     ]
+        // },
+        // {
+        //     href: "/perusahaan", name: "Perusahaan", dropdown: [
+        //         {
+        //             key: "pengeluaran",
+        //             name: "Pengeluaran",
+        //             href: "/perusahaan/pengeluaran"
+        //         },
+        //         {
+        //             key: "pemasukan",
+        //             name: "Pemasukan",
+        //             href: "/perusahaan/pemasukan"
+        //         },
+        //     ]
+        // },
+        // { href: "/distributor", name: "Distributor" },
+        // { href: "/klien", name: "Klien" },
+        // { href: "/gudang", name: "Gudang" },
         {
             href: "/laporan", name: "Laporan", dropdown: [
                 {
                     key: "labarugi",
                     name: "Laba Rugi",
                     href: "/labarugi"
+                },
+                {
+                    key: "proyekbulanan",
+                    name: "Proyek Bulanan",
+                    href: "/proyekbulanan"
                 },
             ]
         },

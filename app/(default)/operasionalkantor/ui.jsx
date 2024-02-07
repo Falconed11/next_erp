@@ -35,22 +35,35 @@ import {
   EyeIcon,
   UserIcon,
 } from "../../components/icon";
-import { getDate, getDateF } from "@/app/utils/date";
+import { getDate, getDateF, getCurFirstLastDay } from "@/app/utils/date";
 import Harga from "@/app/components/harga";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 const apiPath = getApiPath();
+const [startDate, endDate] = getCurFirstLastDay();
 
 export default function App() {
-  const operasionalkantor = useClientFetch("operasionalkantor");
   const kategorioperasionalkantor = useClientFetch("kategorioperasionalkantor");
+  const [filter, setFilter] = useState({
+    startDate,
+    endDate,
+    selectKategori: new Set([]),
+  });
+  const operasionalkantor = useClientFetch(
+    `operasionalkantor?start=${getDate(filter.startDate)}&end=${getDate(
+      filter.endDate
+    )}&id_kategori=${
+      filter.selectKategori.values().next().value
+        ? filter.selectKategori.values().next().value
+        : ""
+    }`
+  );
   const karyawan = useClientFetch("karyawan");
   const [selectKaryawan, setSelectKaryawan] = useState(new Set([]));
   const [selectKategori, setSelectKategori] = useState(new Set([]));
   const [form, setForm] = useState({});
   const [method, setMethod] = useState("POST");
-
   const simpanButtonPress = async (onClose) => {
     const res = await fetch(`${apiPath}operasionalkantor`, {
       method,
@@ -198,6 +211,10 @@ export default function App() {
       label: "Aksi",
     },
   ];
+
+  const sumBiaya = operasionalkantor.data.reduce((acc, v) => {
+    return acc + v.biaya;
+  });
   return (
     <div className="flex flex-col">
       <Modal
@@ -352,6 +369,44 @@ export default function App() {
                   Tambah
                 </Button>
               </div>
+            </div>
+            <div>Filter</div>
+            <div className="flex flex-row gap-3">
+              <div className="flex flex-col bg-gray-100 p-3 rounded-lg">
+                <div>Periode</div>
+                <DatePicker
+                  dateFormat="dd/MM/yyyy"
+                  selected={filter.startDate}
+                  onChange={(date) => setFilter({ ...filter, startDate: date })}
+                  selectsStart
+                  startDate={filter.startDate}
+                  endDate={filter.endDate}
+                />
+                <DatePicker
+                  dateFormat="dd/MM/yyyy"
+                  selected={filter.endDate}
+                  onChange={(date) => setFilter({ ...filter, endDate: date })}
+                  selectsEnd
+                  startDate={filter.startDate}
+                  endDate={filter.endDate}
+                  minDate={filter.startDate}
+                />
+              </div>
+              <Select
+                label="Kategori"
+                placeholder="Pilih kategori!"
+                className="w-4/12"
+                selectedKeys={filter.selectKategori}
+                onSelectionChange={(v) =>
+                  setFilter({ ...filter, selectKategori: v })
+                }
+              >
+                {kategorioperasionalkantor.data.map((item) => (
+                  <SelectItem key={item.id} value={item.id}>
+                    {item.nama}
+                  </SelectItem>
+                ))}
+              </Select>
             </div>
           </>
         }

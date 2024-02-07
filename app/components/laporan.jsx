@@ -1,10 +1,23 @@
 "use client";
-import { useState } from "react";
+import { useState, useCallback } from "react";
+import {
+  Table,
+  TableHeader,
+  TableColumn,
+  TableBody,
+  TableRow,
+  TableCell,
+  User,
+  Chip,
+  Tooltip,
+  ChipProps,
+  getKeyValue,
+} from "@nextui-org/react";
 import {
   useClientFetch,
   useClientFetchNoInterval,
 } from "@/app/utils/apiconfig";
-import { getDate } from "@/app/utils/date";
+import { getDate, getMonthYear } from "@/app/utils/date";
 import Harga from "@/app/components/harga";
 
 import DatePicker from "react-datepicker";
@@ -150,5 +163,172 @@ const Penawaran = ({ start, end }) => {
     </>
   );
 };
+const BulananProyek = ({ start, end }) => {
+  const [form, setForm] = useState({
+    startDate: start,
+    endDate: end,
+  });
+  const bulananProyek = useClientFetch(
+    `bulananproyek?startDate=${getMonthYear(
+      form.startDate
+    )}&endDate=${getMonthYear(form.endDate)}`
+  );
 
-export { Penawaran, OperasionalKantor };
+  const renderCell = useCallback((data, columnKey) => {
+    const cellValue = data[columnKey];
+    const date = new Date(data.tanggal);
+    switch (columnKey) {
+      case "swasta":
+        return data.swasta ? "Swasta" : "Negri";
+      case "byproduksi":
+        return <Harga harga={+data.byproduksi} />;
+      case "omset":
+        return <Harga harga={+data.omset} />;
+      case "profit":
+        return <Harga harga={data.omset - data.byproduksi} />;
+      case "aksi":
+        return (
+          <div className="relative flex items-center gap-2">
+            <Tooltip content="Penawaran">
+              <Link
+                href={`/proyek/detail?id=${data.id}&versi=${
+                  data.versi <= 0 ? "1" : data.versi
+                }`}
+              >
+                <span
+                  // onClick={() => detailButtonPress(data)}
+                  className="text-lg text-default-400 cursor-pointer active:opacity-50"
+                >
+                  <NoteIcon />
+                </span>
+              </Link>
+            </Tooltip>
+            {data.versi > 0 ? (
+              <Tooltip content="Pengeluaran Proyek">
+                <Link href={`/proyek/detail/proses?id=${data.id}`}>
+                  <span
+                    // onClick={() => detailButtonPress(data)}
+                    className="text-lg text-default-400 cursor-pointer active:opacity-50"
+                  >
+                    <ReportMoneyIcon />
+                  </span>
+                </Link>
+              </Tooltip>
+            ) : (
+              <></>
+            )}
+            <Tooltip content="Edit">
+              <span
+                onClick={() => editButtonPress(data)}
+                className="text-lg text-default-400 cursor-pointer active:opacity-50"
+              >
+                <EditIcon />
+              </span>
+            </Tooltip>
+            <Tooltip color="danger" content="Delete">
+              <span
+                onClick={() => deleteButtonPress(data.id)}
+                className="text-lg text-danger cursor-pointer active:opacity-50"
+              >
+                <DeleteIcon />
+              </span>
+            </Tooltip>
+          </div>
+        );
+      default:
+        return cellValue;
+    }
+  }, []);
+  if (bulananProyek.error) return <div>failed to load</div>;
+  if (bulananProyek.isLoading) return <div>loading...</div>;
+
+  const col = [
+    {
+      key: "id_proyek",
+      label: "Id Proyek",
+    },
+    {
+      key: "instansi",
+      label: "Instansi",
+    },
+    {
+      key: "nama",
+      label: "Nama",
+    },
+    {
+      key: "swasta",
+      label: "S/N",
+    },
+    {
+      key: "byproduksi",
+      label: "Biaya Produksi",
+    },
+    {
+      key: "omset",
+      label: "Omset",
+    },
+    {
+      key: "profit",
+      label: "Profit",
+    },
+    {
+      key: "tt",
+      label: "TT",
+    },
+    {
+      key: "periode",
+      label: "Periode",
+    },
+  ];
+  const mulai = getDate(form.startDate);
+  const selesai = getDate(form.endDate);
+  return (
+    <>
+      <div className="flex flex-col bg-gray-100 p-3 rounded-lg">
+        <div>Periode</div>
+        <DatePicker
+          dateFormat="MM/yyyy"
+          selected={form.startDate}
+          onChange={(date) => setForm({ ...form, startDate: date })}
+          selectsStart
+          startDate={form.startDate}
+          endDate={form.endDate}
+          showMonthYearPicker
+        />
+        <DatePicker
+          dateFormat="MM/yyyy"
+          selected={form.endDate}
+          onChange={(date) => setForm({ ...form, endDate: date })}
+          selectsEnd
+          startDate={form.startDate}
+          endDate={form.endDate}
+          minDate={form.startDate}
+          showMonthYearPicker
+        />
+      </div>
+      <Table className="pt-3" aria-label="Example table with custom cells">
+        <TableHeader columns={col}>
+          {(column) => (
+            <TableColumn
+              key={column.key}
+              align={column.key === "actions" ? "center" : "start"}
+            >
+              {column.label}
+            </TableColumn>
+          )}
+        </TableHeader>
+        <TableBody items={bulananProyek.data}>
+          {(item) => (
+            <TableRow key={`${item.id}-${item.periode}`}>
+              {(columnKey) => (
+                <TableCell>{renderCell(item, columnKey)}</TableCell>
+              )}
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+    </>
+  );
+};
+
+export { Penawaran, OperasionalKantor, BulananProyek };

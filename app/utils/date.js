@@ -36,7 +36,13 @@ const getDateFId = (date) => {
   return `${day} ${monthNameIndonesian} ${year}`;
 };
 
-function getMonthYearFId(monthyear) {
+const getMonthYear = (date) => {
+  let month = (date.getMonth() + 1).toString().padStart(2, "0");
+  let year = date.getFullYear();
+  return `${month}-${year}`;
+};
+
+const getMonthYearFId = (monthyear) => {
   // Split the input string into parts
   const [month, year] = monthyear.split("-");
 
@@ -49,6 +55,31 @@ function getMonthYearFId(monthyear) {
   const outputString = `${monthName} ${year}`;
 
   return outputString;
-}
+};
 
-module.exports = { getDate, getDateF, getDateFId, getMonthYearFId };
+const getCurFirstLastDay = () => {
+  const currentDate = new Date();
+  const currentMonth = currentDate.getMonth();
+  const nextMonthFirstDay = new Date(
+    currentDate.getFullYear(),
+    currentMonth + 1,
+    1
+  );
+  const currentMonthFirstDay = new Date(
+    currentDate.getFullYear(),
+    currentMonth,
+    1
+  );
+  const lastDayOfCurrentMonth = new Date(nextMonthFirstDay - 1);
+  const firstDayOfCurrentMonth = new Date(currentMonthFirstDay);
+  return [firstDayOfCurrentMonth, lastDayOfCurrentMonth];
+};
+
+module.exports = {
+  getDate,
+  getDateF,
+  getDateFId,
+  getMonthYear,
+  getMonthYearFId,
+  getCurFirstLastDay,
+};
