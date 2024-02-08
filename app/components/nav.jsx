@@ -20,8 +20,7 @@ export default function Navigation({ navLinks }) {
         {navLinks.map((link) => {
           const isActive =
             (pathname == "/" && pathname == link.href) ||
-            (pathname.includes(link.href) && link.href != "/");
-
+            (pathname == link.href && link.href != "/");
           if (link.dropdown) {
             const dropdown = link.dropdown;
             const customclass = isActive

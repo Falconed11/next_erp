@@ -215,6 +215,8 @@ export default function App() {
   const sumBiaya = operasionalkantor.data.reduce((acc, v) => {
     return acc + v.biaya;
   });
+
+  console.log(form.file);
   return (
     <div className="flex flex-col">
       <Modal
@@ -349,6 +351,14 @@ export default function App() {
                   placeholder="Masukkan biaya!"
                   className="w-4/12 pl-2"
                   onValueChange={(v) => setForm({ ...form, biaya: v })}
+                />
+                <Input
+                  type="file"
+                  label="Browse"
+                  value={form.file}
+                  placeholder="Pilih file!"
+                  className="w-4/12 pl-2"
+                  onValueChange={(v) => setForm({ ...form, file: v })}
                 />
               </div>
               <div className="flex flex-row gap-2 mt-3">
