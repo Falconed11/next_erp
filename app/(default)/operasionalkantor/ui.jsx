@@ -35,6 +35,7 @@ import {
   EyeIcon,
   UserIcon,
 } from "../../components/icon";
+import { FileUploader } from "@/app/components/input";
 import { getDate, getDateF, getCurFirstLastDay } from "@/app/utils/date";
 import Harga from "@/app/components/harga";
 import DatePicker from "react-datepicker";
@@ -64,6 +65,12 @@ export default function App() {
   const [selectKategori, setSelectKategori] = useState(new Set([]));
   const [form, setForm] = useState({});
   const [method, setMethod] = useState("POST");
+
+  const handleFileUpload = (jsonData) => {
+    console.log(jsonData[0].nama);
+    // Do something with the converted JSON object, e.g., send it to an API
+  };
+
   const simpanButtonPress = async (onClose) => {
     const res = await fetch(`${apiPath}operasionalkantor`, {
       method,
@@ -215,8 +222,6 @@ export default function App() {
   const sumBiaya = operasionalkantor.data.reduce((acc, v) => {
     return acc + v.biaya;
   });
-
-  console.log(form.file);
   return (
     <div className="flex flex-col">
       <Modal
@@ -352,14 +357,7 @@ export default function App() {
                   className="w-4/12 pl-2"
                   onValueChange={(v) => setForm({ ...form, biaya: v })}
                 />
-                <Input
-                  type="file"
-                  label="Browse"
-                  value={form.file}
-                  placeholder="Pilih file!"
-                  className="w-4/12 pl-2"
-                  onValueChange={(v) => setForm({ ...form, file: v })}
-                />
+                <FileUploader onFileUpload={handleFileUpload} />
               </div>
               <div className="flex flex-row gap-2 mt-3">
                 <Textarea
