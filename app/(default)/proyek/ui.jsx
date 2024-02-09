@@ -36,7 +36,7 @@ import {
   UserIcon,
   NoteIcon,
   ReportMoneyIcon,
-} from "../../components/icon";
+} from "../../../components/icon";
 import { getDate, getDateF } from "@/app/utils/date";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";

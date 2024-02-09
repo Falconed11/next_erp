@@ -1,7 +1,7 @@
 "use client"
 import { useSession } from 'next-auth/react'
-import Nav from '../components/nav'
-import User from '../components/user'
+import Nav from '../../components/nav'
+import User from '../../components/user'
 
 export default function RootLayout({ children, }: { children: React.ReactNode }) {
     const session = useSession()

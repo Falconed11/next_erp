@@ -33,13 +33,13 @@ import {
   DeleteIcon,
   EyeIcon,
   UserIcon,
-} from "../../components/icon";
+} from "../../../components/icon";
 import { useClientFetch, getApiPath } from "@/app/utils/apiconfig";
 import { getDateF, getDate } from "@/app/utils/date";
 
 const apiPath = getApiPath();
 
-export default function app() {
+export default function App() {
   const nota = useClientFetch("nota");
   const karyawan = useClientFetch("karyawan");
   const { isOpen, onOpen, onOpenChange } = useDisclosure();

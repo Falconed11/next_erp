@@ -19,7 +19,7 @@ import {
   DeleteIcon,
   EyeIcon,
   UserIcon,
-} from "../../components/icon";
+} from "../../../components/icon";
 import {
   Modal,
   ModalContent,
@@ -35,7 +35,7 @@ import { Input } from "@nextui-org/react";
 
 const api_path = getApiPath();
 
-export default function app() {
+export default function App() {
   const distributor = useClientFetch(`distributor`);
   const [form, setForm] = useState({});
   const [method, setMethod] = useState();
@@ -50,13 +50,13 @@ export default function app() {
     modal.distributor.onOpen();
   };
   const editButtonPress = (data) => {
-    const date = new Date(data.tanggal);
     setForm({
       ...data,
       modalmode: "Edit",
     });
     setMethod("PUT");
     modal.distributor.onOpen();
+    return;
   };
   const deleteButtonPress = async (id) => {
     if (confirm("Hapus distributor?")) {

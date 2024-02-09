@@ -18,7 +18,7 @@ import {
   useClientFetchNoInterval,
 } from "@/app/utils/apiconfig";
 import { getDate, getMonthYear } from "@/app/utils/date";
-import Harga from "@/app/components/harga";
+import Harga from "@/components/harga";
 
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -186,55 +186,6 @@ const BulananProyek = ({ start, end }) => {
         return <Harga harga={+data.omset} />;
       case "profit":
         return <Harga harga={data.omset - data.byproduksi} />;
-      case "aksi":
-        return (
-          <div className="relative flex items-center gap-2">
-            <Tooltip content="Penawaran">
-              <Link
-                href={`/proyek/detail?id=${data.id}&versi=${
-                  data.versi <= 0 ? "1" : data.versi
-                }`}
-              >
-                <span
-                  // onClick={() => detailButtonPress(data)}
-                  className="text-lg text-default-400 cursor-pointer active:opacity-50"
-                >
-                  <NoteIcon />
-                </span>
-              </Link>
-            </Tooltip>
-            {data.versi > 0 ? (
-              <Tooltip content="Pengeluaran Proyek">
-                <Link href={`/proyek/detail/proses?id=${data.id}`}>
-                  <span
-                    // onClick={() => detailButtonPress(data)}
-                    className="text-lg text-default-400 cursor-pointer active:opacity-50"
-                  >
-                    <ReportMoneyIcon />
-                  </span>
-                </Link>
-              </Tooltip>
-            ) : (
-              <></>
-            )}
-            <Tooltip content="Edit">
-              <span
-                onClick={() => editButtonPress(data)}
-                className="text-lg text-default-400 cursor-pointer active:opacity-50"
-              >
-                <EditIcon />
-              </span>
-            </Tooltip>
-            <Tooltip color="danger" content="Delete">
-              <span
-                onClick={() => deleteButtonPress(data.id)}
-                className="text-lg text-danger cursor-pointer active:opacity-50"
-              >
-                <DeleteIcon />
-              </span>
-            </Tooltip>
-          </div>
-        );
       default:
         return cellValue;
     }

@@ -1,5 +1,5 @@
 import UI from "./ui"
 
-export default function app() {
+export default function App() {
     return <UI />
 }

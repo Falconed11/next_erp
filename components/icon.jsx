@@ -1,6 +1,6 @@
 import React from "react";
 
-function AddIcon(props) {
+const AddIcon = (props) => {
   return (
     <svg
       viewBox="0 0 512 512"
@@ -19,7 +19,7 @@ function AddIcon(props) {
       />
     </svg>
   );
-}
+};
 const UserIcon = (props) => (
   <svg
     viewBox="0 0 1024 1024"

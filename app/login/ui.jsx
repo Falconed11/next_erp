@@ -2,7 +2,7 @@
 import React from "react";
 import { Input, Button } from "@nextui-org/react";
 import Link from "next/link";
-import { EyeFilledIcon, EyeSlashFilledIcon } from "../components/icon";
+import { EyeFilledIcon, EyeSlashFilledIcon } from "../../components/icon";
 
 export default function App() {
   const [isVisible, setIsVisible] = React.useState(false);
@@ -11,11 +11,6 @@ export default function App() {
 
   return (
     <div className="fixed top-0 left-0 w-screen h-screen flex items-center justify-center">
-      <img
-        className="fixed"
-        src="https://wallpapers.com/images/hd/1080p-nature-background-6t7fp0ewenlpdjp9.jpg"
-        alt=""
-      />
       <div className="border border-white bg-white/25 rounded-lg p-5 shadow-lg backdrop-blur-sm">
         <div>
           <Input label="Username" placeholder="Masukkan username" />

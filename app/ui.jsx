@@ -1,6 +1,6 @@
 "use client";
 
-export default function () {
+export default function App() {
   return (
     <div>
       {/* <div>Pemasukan Pengeluaran</div>

@@ -19,7 +19,7 @@ import {
   DeleteIcon,
   EyeIcon,
   UserIcon,
-} from "@/app/components/icon";
+} from "@/components/icon";
 import {
   Modal,
   ModalContent,
@@ -36,7 +36,7 @@ import {
 } from "@/app/utils/apiconfig";
 import { getDateFId } from "@/app/utils/date";
 import { penawaran } from "@/app/utils/formatid";
-import Harga from "@/app/components/harga";
+import Harga from "@/components/harga";
 import { Button } from "@nextui-org/react";
 import { Input } from "@nextui-org/react";
 import { Divider } from "@nextui-org/react";

@@ -20,7 +20,7 @@ import {
   EyeIcon,
   UserIcon,
   IconScaleBalanced,
-} from "../../components/icon";
+} from "../../../components/icon";
 import {
   Modal,
   ModalContent,
@@ -36,7 +36,7 @@ import Link from "next/link";
 
 const api_path = getApiPath();
 
-export default function app() {
+export default function App() {
   const karyawan = useClientFetch(`karyawan`);
   const [form, setForm] = useState({});
   const [method, setMethod] = useState();

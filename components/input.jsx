@@ -24,16 +24,15 @@ const FileUploader = ({ onFileUpload }) => {
     reader.readAsArrayBuffer(selectedFile);
   };
 
-  const { getRootProps, getInputProps } = useDropzone({ onDrop });
+  const { getRootProps, getInputProps } = useDropzone({
+    onDrop,
+    maxFiles: 1,
+  });
 
   return (
     <div
       {...getRootProps()}
-      style={{
-        border: "2px dashed #ccc",
-        padding: "20px",
-        textAlign: "center",
-      }}
+      className="p-2 bg-white border-2 border-dashed border-gray-700 rounded-lg"
     >
       <input {...getInputProps()} />
       <p>Drag dan drop file excel di sini, atau klik untuk memilih</p>

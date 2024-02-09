@@ -19,7 +19,7 @@ import {
   DeleteIcon,
   EyeIcon,
   UserIcon,
-} from "../../../components/icon";
+} from "../../../../components/icon";
 import {
   Modal,
   ModalContent,
@@ -36,7 +36,7 @@ import { Input } from "@nextui-org/react";
 
 const api_path = getApiPath();
 
-export default function app() {
+export default function App() {
   const subkategoriproduk = useClientFetch(`subkategoriproduk`);
   const kategoriproduk = useClientFetch(`kategoriproduk`);
   const [form, setForm] = useState({});

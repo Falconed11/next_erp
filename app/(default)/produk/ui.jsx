@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import Link from "next/link";
 import {
   Table,
   TableHeader,
@@ -13,13 +14,14 @@ import {
   ChipProps,
   getKeyValue,
 } from "@nextui-org/react";
+import { Select, SelectItem } from "@nextui-org/react";
 import {
   AddIcon,
   EditIcon,
   DeleteIcon,
   EyeIcon,
   UserIcon,
-} from "../../components/icon";
+} from "../../../components/icon";
 import {
   Modal,
   ModalContent,
@@ -28,7 +30,8 @@ import {
   ModalFooter,
   useDisclosure,
 } from "@nextui-org/react";
-import { Select, SelectItem } from "@nextui-org/react";
+import Harga from "@/components/harga";
+import { FileUploader } from "@/components/input";
 import "react-datepicker/dist/react-datepicker.css";
 import { getApiPath, useClientFetch } from "../../utils/apiconfig";
 import { Button } from "@nextui-org/react";
@@ -37,7 +40,10 @@ import { Input, Textarea } from "@nextui-org/react";
 const apiPath = getApiPath();
 
 export default function App() {
-  const produk = useClientFetch("produk");
+  const [selectKategori, setSelectKategori] = useState([]);
+  const produk = useClientFetch(
+    `produk?kategori=${selectKategori.values().next().value ?? ""}`
+  );
   const kategori = useClientFetch("kategoriproduk");
   const subkategori = useClientFetch("subkategoriproduk");
   const merek = useClientFetch("merek");
@@ -102,9 +108,27 @@ export default function App() {
       return alert(await res.json().then((json) => json.message));
     }
   };
+
+  const handleFileUpload = (jsonData) => {
+    console.log(jsonData);
+    // Do something with the converted JSON object, e.g., send it to an API
+  };
+
   const renderCell = React.useCallback((data, columnKey) => {
     const cellValue = data[columnKey];
     switch (columnKey) {
+      case "hargamodal":
+        return (
+          <div className="text-right">
+            <Harga harga={data.hargamodal} />
+          </div>
+        );
+      case "hargajual":
+        return (
+          <div className="text-right">
+            <Harga harga={data.hargajual} />
+          </div>
+        );
       case "aksi":
         return (
           <div className="relative flex items-center gap-2">
@@ -138,8 +162,8 @@ export default function App() {
 
   if (produk.error) return <div>failed to load</div>;
   if (produk.isLoading) return <div>loading...</div>;
-  // if (kategori.error) return <div>failed to load</div>;
-  // if (kategori.isLoading) return <div>loading...</div>;
+  if (kategori.error) return <div>failed to load</div>;
+  if (kategori.isLoading) return <div>loading...</div>;
   // if (subkategori.error) return <div>failed to load</div>;
   // if (subkategori.isLoading) return <div>loading...</div>;
   // if (merek.error) return <div>failed to load</div>;
@@ -202,11 +226,39 @@ export default function App() {
   }
 
   return (
-    <div className="flex-col">
-      <Button className="bg-background" onPress={tambahButtonPress}>
-        Tambah
-      </Button>
-      <Table className="pt-3" aria-label="Example table with custom cells">
+    <div className="flex flex-col">
+      <div className="flex flex-row gap-2">
+        <Button className="bg-background" onPress={tambahButtonPress}>
+          Tambah
+        </Button>
+        <Link className="bg-white p-2 rounded-lg" href={"/produk.xlsx"}>
+          Download Format
+        </Link>
+        <FileUploader onFileUpload={handleFileUpload} />
+      </div>
+      <Table
+        className="pt-3"
+        aria-label="Example table with custom cells"
+        topContent={
+          <>
+            <div>Filter</div>
+            <Select
+              label="Kategori"
+              variant="bordered"
+              placeholder="Pilih kategori!"
+              selectedKeys={selectKategori}
+              className="max-w-xs"
+              onSelectionChange={setSelectKategori}
+            >
+              {kategori.data.map((item) => (
+                <SelectItem key={item.kategori} value={item.kategori}>
+                  {`${item.kategori}`}
+                </SelectItem>
+              ))}
+            </Select>
+          </>
+        }
+      >
         <TableHeader columns={col}>
           {(column) => (
             <TableColumn

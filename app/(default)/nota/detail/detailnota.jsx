@@ -19,7 +19,7 @@ import {
   DeleteIcon,
   EyeIcon,
   UserIcon,
-} from "../../../components/icon";
+} from "../../../../components/icon";
 import {
   Modal,
   ModalContent,
@@ -32,7 +32,7 @@ import { useReactToPrint } from "react-to-print";
 import { getApiPath, useClientFetch } from "../../../utils/apiconfig";
 import { getDateFId } from "@/app/utils/date";
 import { penawaran } from "@/app/utils/formatid";
-import Harga from "../../../components/harga";
+import Harga from "../../../../components/harga";
 import { Button } from "@nextui-org/react";
 import { Input } from "@nextui-org/react";
 import { Divider } from "@nextui-org/react";
@@ -68,6 +68,7 @@ export default function App({ id }) {
       harga: data.hargakustom,
     });
     modal.produk.onOpen();
+    return;
   };
   const deleteButtonPress = async (id) => {
     if (confirm("Hapus produk?")) {

@@ -1,9 +1,9 @@
 "use client";
 import { useClientFetchNoInterval } from "@/app/utils/apiconfig";
-import Harga from "@/app/components/harga";
+import Harga from "@/components/harga";
 import { getMonthYearFId } from "@/app/utils/date";
 
-export default function app() {
+export default function App() {
   const kategori = useClientFetchNoInterval("kategorioperasionalkantor");
   if (kategori.error) return <div>failed to load</div>;
   if (kategori.isLoading) return <div>loading...</div>;

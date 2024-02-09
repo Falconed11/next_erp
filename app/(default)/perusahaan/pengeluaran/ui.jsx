@@ -19,7 +19,7 @@ import {
   DeleteIcon,
   EyeIcon,
   UserIcon,
-} from "../../../components/icon";
+} from "../../../../components/icon";
 import {
   Modal,
   ModalContent,
@@ -39,7 +39,7 @@ import { Input } from "@nextui-org/react";
 
 const api_path = getApiPath();
 
-export default function app() {
+export default function App() {
   const pengeluaranperusahaan = useClientFetch(`pengeluaranperusahaan`);
   const distributor = useClientFetch(`distributor`);
   const [form, setForm] = useState({});
@@ -72,6 +72,7 @@ export default function app() {
     });
     setMethod("PUT");
     modal.pengeluaranperusahaan.onOpen();
+    return;
   };
   const deleteButtonPress = async (id) => {
     if (confirm("Hapus produk?")) {

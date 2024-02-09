@@ -19,7 +19,7 @@ import {
   DeleteIcon,
   EyeIcon,
   UserIcon,
-} from "@/app/components/icon";
+} from "@/components/icon";
 import {
   Modal,
   ModalContent,
@@ -32,8 +32,8 @@ import { useReactToPrint } from "react-to-print";
 import { getApiPath, useClientFetch } from "@/app/utils/apiconfig";
 import { getDateF, getDateFId, getDate } from "@/app/utils/date";
 import { penawaran } from "@/app/utils/formatid";
-import Harga from "@/app/components/harga";
-import TambahProduk from "@/app/components/tambahproduk";
+import Harga from "@/components/harga";
+import TambahProduk from "@/components/tambahproduk";
 import { Button } from "@nextui-org/react";
 import { Input } from "@nextui-org/react";
 import { Divider } from "@nextui-org/react";

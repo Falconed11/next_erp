@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { getDate } from "@/app/utils/date";
 import { useClientFetch } from "@/app/utils/apiconfig";
-import { Penawaran, OperasionalKantor } from "@/app/components/laporan";
+import { Penawaran, OperasionalKantor } from "@/components/laporan";
 
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";

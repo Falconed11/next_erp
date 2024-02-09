@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { BulananProyek } from "@/app/components/laporan";
+import { BulananProyek } from "@/components/laporan";
 import { getCurFirstLastDay } from "@/app/utils/date";
 
 const [firstDayOfCurrentMonth, lastDayOfCurrentMonth] = getCurFirstLastDay();

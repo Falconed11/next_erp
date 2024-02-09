@@ -3,7 +3,7 @@ import React from "react";
 import { Input } from "@nextui-org/react";
 import { Select, SelectItem } from "@nextui-org/react";
 import { getApiPath, useClientFetch } from "@/app/utils/apiconfig";
-import Harga from "@/app/components/harga";
+import Harga from "@/components/harga";
 
 const api_path = getApiPath();
 

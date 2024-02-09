@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import Image from "next/image";
 import {
   Table,
   TableHeader,
@@ -19,7 +20,7 @@ import {
   DeleteIcon,
   EyeIcon,
   UserIcon,
-} from "../../../components/icon";
+} from "../../../../components/icon";
 import {
   Modal,
   ModalContent,
@@ -40,7 +41,7 @@ import imageCompression from "browser-image-compression";
 
 const api_path = getApiPath();
 
-export default function app() {
+export default function App() {
   const pengeluaran = useClientFetch(`pengeluaran`);
   const karyawan = useClientFetch(`karyawan`);
   const proyek = useClientFetch(`proyek`);
@@ -74,6 +75,7 @@ export default function app() {
     });
     setMethod("PUT");
     modal.pengeluaran.onOpen();
+    return;
   };
   const deleteButtonPress = async (id) => {
     if (confirm("Hapus produk?")) {
@@ -221,7 +223,7 @@ export default function app() {
               <ModalBody>
                 <div>
                   Nota
-                  <img width="300" src={form.compressedFile} />
+                  <Image width="300" src={form.compressedFile} />
                   <input
                     type="file"
                     accept="image/*"

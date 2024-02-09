@@ -34,10 +34,10 @@ import {
   DeleteIcon,
   EyeIcon,
   UserIcon,
-} from "../../components/icon";
-import { FileUploader } from "@/app/components/input";
+} from "../../../components/icon";
+import { FileUploader } from "@/components/input";
 import { getDate, getDateF, getCurFirstLastDay } from "@/app/utils/date";
-import Harga from "@/app/components/harga";
+import Harga from "@/components/harga";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -119,6 +119,7 @@ export default function App() {
     setSelectKategori(new Set(String(data.id_kategorioperasionalkantor)));
     setMethod("PUT");
     onOpen();
+    return;
   };
   const deleteButtonPress = async (id) => {
     if (confirm("Hapus operasinal kantor?")) {
