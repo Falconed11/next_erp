@@ -37,7 +37,8 @@ import {
   NoteIcon,
   ReportMoneyIcon,
 } from "../../../components/icon";
-import { getDate, getDateF } from "@/app/utils/date";
+import { excelToJSDate, getDate, getDateF } from "@/app/utils/date";
+import { FileUploader } from "@/components/input";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -50,6 +51,7 @@ export default function App() {
   const statusproyek = useClientFetch("statusproyek");
   const [form, setForm] = useState({});
   const [method, setMethod] = useState("POST");
+  const [json, setJson] = useState([]);
 
   const saveButtonPress = async (onClose) => {
     if (form.isSwasta.size == 0) return alert("Swasta/Negri belum diisi");
@@ -112,6 +114,33 @@ export default function App() {
       // return alert(await res.json().then((json) => json.message));
     }
   };
+
+  const handleFileUpload = (jsonData) => {
+    // console.log(jsonData);
+    // Do something with the converted JSON object, e.g., send it to an API
+    jsonData = jsonData.map((v) => {
+      v.tanggal = getDate(excelToJSDate(v.tanggal));
+      return v;
+    });
+    setJson(jsonData);
+    console.log(jsonData);
+  };
+  const handleButtonUploadExcelPress = () => {
+    json.map(async (v) => {
+      const res = await fetch(`${apiPath}proyek`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify(v),
+      });
+      const json = await res.json();
+      console.log(json.message);
+      // return alert(json.message);
+    });
+  };
+
   const renderCell = React.useCallback((data, columnKey) => {
     const cellValue = data[columnKey];
     const date = new Date(data.tanggal);
@@ -196,8 +225,8 @@ export default function App() {
 
   const columns = [
     {
-      key: "no",
-      label: "No",
+      key: "id_second",
+      label: "Id",
     },
     {
       key: "namaperusahaan",
@@ -250,10 +279,24 @@ export default function App() {
   ];
 
   return (
-    <div className="flex-col">
-      <Button className="bg-background" onPress={tambahButtonPress}>
-        Tambah
-      </Button>
+    <div className="flex flex-col">
+      <div className="flex flex-row gap-2">
+        <Button color="primary" onPress={tambahButtonPress}>
+          Tambah
+        </Button>
+        <div>
+          <Link
+            className="bg-primary text-white p-2 rounded-lg inline-block"
+            href={"/proyek.xlsx"}
+          >
+            Download Format
+          </Link>
+        </div>
+        <FileUploader onFileUpload={handleFileUpload} />
+        <Button color="primary" onPress={handleButtonUploadExcelPress}>
+          Upload Excel
+        </Button>
+      </div>
       <Modal
         isOpen={isOpen}
         onOpenChange={onOpenChange}

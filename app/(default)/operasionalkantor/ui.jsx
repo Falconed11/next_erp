@@ -36,7 +36,12 @@ import {
   UserIcon,
 } from "../../../components/icon";
 import { FileUploader } from "@/components/input";
-import { getDate, getDateF, getCurFirstLastDay } from "@/app/utils/date";
+import {
+  getDate,
+  getDateF,
+  getCurFirstLastDay,
+  excelToJSDate,
+} from "@/app/utils/date";
 import Harga from "@/components/harga";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -64,11 +69,33 @@ export default function App() {
   const [selectKaryawan, setSelectKaryawan] = useState(new Set([]));
   const [selectKategori, setSelectKategori] = useState(new Set([]));
   const [form, setForm] = useState({});
+  const [json, setJson] = useState([]);
   const [method, setMethod] = useState("POST");
 
   const handleFileUpload = (jsonData) => {
-    console.log(jsonData[0].nama);
+    // console.log(jsonData);
     // Do something with the converted JSON object, e.g., send it to an API
+    jsonData = jsonData.map((v) => {
+      v.tanggal = getDate(excelToJSDate(v.tanggal));
+      return v;
+    });
+    setJson(jsonData);
+    console.log(jsonData);
+  };
+  const handleButtonUploadExcelPress = () => {
+    json.map(async (v) => {
+      const res = await fetch(`${apiPath}operasionalkantor`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify(v),
+      });
+      const json = await res.json();
+      console.log(json.message);
+      // return alert(json.message);
+    });
   };
 
   const simpanButtonPress = async (onClose) => {
@@ -224,7 +251,96 @@ export default function App() {
     return acc + v.biaya;
   });
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col gap-2">
+      <div className="bg-white p-3 rounded-lg">
+        <div>Operasional Kantor</div>
+        <div className="flex-col gap-2">
+          <div className="flex flex-row gap-2">
+            <div className="bg-gray-100 p-3 rounded-lg">
+              <div>Tanggal</div>
+              <DatePicker
+                placeholderText="Pilih tanggal"
+                dateFormat="dd/MM/yyyy"
+                selected={form.startdate}
+                onChange={(v) =>
+                  setForm({ ...form, startdate: v, tanggal: getDate(v) })
+                }
+              />
+            </div>
+            <Select
+              label="Kategori"
+              placeholder="Pilih kategori!"
+              className="w-4/12"
+              selectedKeys={selectKategori}
+              onSelectionChange={setSelectKategori}
+            >
+              {kategorioperasionalkantor.data.map((item) => (
+                <SelectItem key={item.id} value={item.id}>
+                  {item.nama}
+                </SelectItem>
+              ))}
+            </Select>
+            <Select
+              label="Karyawan"
+              placeholder="Pilih karyawan!"
+              className="w-5/12 pl-2"
+              selectedKeys={selectKaryawan}
+              onSelectionChange={setSelectKaryawan}
+            >
+              {karyawan.data.map((item) => (
+                <SelectItem key={item.id} value={item.id}>
+                  {item.nama}
+                </SelectItem>
+              ))}
+            </Select>
+            <Input
+              type="number"
+              min={0}
+              label="Biaya"
+              value={form.biaya}
+              placeholder="Masukkan biaya!"
+              className="w-4/12 pl-2"
+              onValueChange={(v) => setForm({ ...form, biaya: v })}
+            />
+          </div>
+          <div className="flex flex-row gap-2 mt-3">
+            <Textarea
+              label="Keterangan"
+              labelPlacement="inside"
+              placeholder="Masukkan keterangan!"
+              value={form.keterangan}
+              onValueChange={(v) => setForm({ ...form, keterangan: v })}
+            />
+            <Button
+              onClick={() => {
+                tambahButtonPress();
+              }}
+              color="primary"
+              className="ml-2"
+            >
+              Tambah
+            </Button>
+          </div>
+        </div>
+      </div>
+      <div className="flex flex-row gap-2">
+        <div>
+          <Link
+            className="bg-primary text-white p-2 rounded-lg inline-block"
+            href={"/operasionalkantor.xlsx"}
+          >
+            Download Format
+          </Link>
+        </div>
+        <FileUploader onFileUpload={handleFileUpload} />
+        <Button
+          color="primary"
+          className=""
+          onPress={handleButtonUploadExcelPress}
+        >
+          Upload Excel
+        </Button>
+      </div>
       <Modal
         isOpen={isOpen}
         onOpenChange={onOpenChange}
@@ -310,75 +426,6 @@ export default function App() {
         aria-label="Example table with custom cells"
         topContent={
           <>
-            <div>Operasional Kantor</div>
-            <div className="flex-col gap-2">
-              <div className="flex flex-row gap-2">
-                <div className="bg-gray-100 p-3 rounded-lg">
-                  <div>Tanggal</div>
-                  <DatePicker
-                    placeholderText="Pilih tanggal"
-                    dateFormat="dd/MM/yyyy"
-                    selected={form.startdate}
-                    onChange={(v) =>
-                      setForm({ ...form, startdate: v, tanggal: getDate(v) })
-                    }
-                  />
-                </div>
-                <Select
-                  label="Kategori"
-                  placeholder="Pilih kategori!"
-                  className="w-4/12"
-                  selectedKeys={selectKategori}
-                  onSelectionChange={setSelectKategori}
-                >
-                  {kategorioperasionalkantor.data.map((item) => (
-                    <SelectItem key={item.id} value={item.id}>
-                      {item.nama}
-                    </SelectItem>
-                  ))}
-                </Select>
-                <Select
-                  label="Karyawan"
-                  placeholder="Pilih karyawan!"
-                  className="w-5/12 pl-2"
-                  selectedKeys={selectKaryawan}
-                  onSelectionChange={setSelectKaryawan}
-                >
-                  {karyawan.data.map((item) => (
-                    <SelectItem key={item.id} value={item.id}>
-                      {item.nama}
-                    </SelectItem>
-                  ))}
-                </Select>
-                <Input
-                  type="number"
-                  label="Biaya"
-                  value={form.biaya}
-                  placeholder="Masukkan biaya!"
-                  className="w-4/12 pl-2"
-                  onValueChange={(v) => setForm({ ...form, biaya: v })}
-                />
-                <FileUploader onFileUpload={handleFileUpload} />
-              </div>
-              <div className="flex flex-row gap-2 mt-3">
-                <Textarea
-                  label="Keterangan"
-                  labelPlacement="inside"
-                  placeholder="Masukkan keterangan!"
-                  value={form.keterangan}
-                  onValueChange={(v) => setForm({ ...form, keterangan: v })}
-                />
-                <Button
-                  onClick={() => {
-                    tambahButtonPress();
-                  }}
-                  color="primary"
-                  className="ml-2"
-                >
-                  Tambah
-                </Button>
-              </div>
-            </div>
             <div>Filter</div>
             <div className="flex flex-row gap-3">
               <div className="flex flex-col bg-gray-100 p-3 rounded-lg">

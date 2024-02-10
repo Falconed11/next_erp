@@ -75,7 +75,12 @@ const getCurFirstLastDay = () => {
   return [firstDayOfCurrentMonth, lastDayOfCurrentMonth];
 };
 
+const excelToJSDate = (excelDate) => {
+  return new Date((excelDate - 25569) * 86400 * 1000);
+};
+
 module.exports = {
+  excelToJSDate,
   getDate,
   getDateF,
   getDateFId,

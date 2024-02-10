@@ -81,11 +81,11 @@ export default function RootLayout({ children, }: { children: React.ReactNode })
         // { href: "/gudang", name: "Gudang" },
         {
             href: "/laporan", name: "Laporan", dropdown: [
-                {
-                    key: "labarugi",
-                    name: "Laba Rugi",
-                    href: "/labarugi"
-                },
+                // {
+                //     key: "labarugi",
+                //     name: "Laba Rugi",
+                //     href: "/labarugi"
+                // },
                 {
                     key: "proyekbulanan",
                     name: "Proyek Bulanan",

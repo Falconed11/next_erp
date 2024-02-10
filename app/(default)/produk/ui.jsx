@@ -49,6 +49,7 @@ export default function App() {
   const merek = useClientFetch("merek");
   const [method, setMethod] = useState("POST");
   const [form, setForm] = useState({});
+  const [json, setJson] = useState([]);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const saveButtonPress = async () => {
     if (form.nama == "" || form.kategori == "")
@@ -105,13 +106,30 @@ export default function App() {
         },
         body: JSON.stringify({ id }),
       });
-      return alert(await res.json().then((json) => json.message));
+      // return alert(await res.json().then((json) => json.message));
     }
   };
 
   const handleFileUpload = (jsonData) => {
-    console.log(jsonData);
+    // console.log(jsonData);
     // Do something with the converted JSON object, e.g., send it to an API
+    setJson(jsonData);
+    console.log(json);
+  };
+  const handleButtonUploadExcelPress = () => {
+    json.map(async (v) => {
+      const res = await fetch(`${apiPath}produk`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify(v),
+      });
+      const json = await res.json();
+      console.log(json.message);
+      // return alert(json.message);
+    });
   };
 
   const renderCell = React.useCallback((data, columnKey) => {
@@ -132,11 +150,11 @@ export default function App() {
       case "aksi":
         return (
           <div className="relative flex items-center gap-2">
-            <Tooltip content="Details">
+            {/* <Tooltip content="Details">
               <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
                 <EyeIcon />
               </span>
-            </Tooltip>
+            </Tooltip> */}
             <Tooltip content="Edit">
               <span
                 onClick={() => editButtonPress(data)}
@@ -173,6 +191,10 @@ export default function App() {
     {
       key: "kategori",
       label: "Kategori",
+    },
+    {
+      key: "id_kustom",
+      label: "Id",
     },
     {
       key: "nama",
@@ -228,13 +250,21 @@ export default function App() {
   return (
     <div className="flex flex-col">
       <div className="flex flex-row gap-2">
-        <Button className="bg-background" onPress={tambahButtonPress}>
+        <Button color="primary" onPress={tambahButtonPress}>
           Tambah
         </Button>
-        <Link className="bg-white p-2 rounded-lg" href={"/produk.xlsx"}>
-          Download Format
-        </Link>
+        <div>
+          <Link
+            className="bg-primary text-white p-2 rounded-lg inline-block"
+            href={"/produk.xlsx"}
+          >
+            Download Format
+          </Link>
+        </div>
         <FileUploader onFileUpload={handleFileUpload} />
+        <Button color="primary" onPress={handleButtonUploadExcelPress}>
+          Upload Excel
+        </Button>
       </div>
       <Table
         className="pt-3"
@@ -297,6 +327,13 @@ export default function App() {
                   placeholder="Masukkan kategori!"
                   value={form.kategori}
                   onValueChange={(val) => setForm({ ...form, kategori: val })}
+                />
+                <Input
+                  type="text"
+                  label="Id"
+                  placeholder="Masukkan id!"
+                  value={form.id_kustom}
+                  onValueChange={(val) => setForm({ ...form, id_kustom: val })}
                 />
                 <Input
                   type="text"

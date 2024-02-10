@@ -32,10 +32,10 @@ const FileUploader = ({ onFileUpload }) => {
   return (
     <div
       {...getRootProps()}
-      className="p-2 bg-white border-2 border-dashed border-gray-700 rounded-lg"
+      className="p-2 bg-white border-2 border-dashed border-gray-700 rounded-lg block"
     >
       <input {...getInputProps()} />
-      <p>Drag dan drop file excel di sini, atau klik untuk memilih</p>
+      <p>Drag dan drop file excel di sini, atau klik untuk memilih file</p>
       {file && <p>File Terpilih: {file.name}</p>}
     </div>
   );
