@@ -133,12 +133,14 @@ export default function App() {
           "Content-Type": "application/json",
           // 'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: JSON.stringify(v),
+        body: JSON.stringify({ ...v, id_second: v.id }),
       });
       const json = await res.json();
       console.log(json.message);
       // return alert(json.message);
     });
+    setJson([]);
+    return alert("Upload berhasil");
   };
 
   const renderCell = React.useCallback((data, columnKey) => {

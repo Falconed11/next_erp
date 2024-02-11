@@ -34,7 +34,25 @@ export default function RootLayout({ children, }: { children: React.ReactNode })
         //     ]
         // },
         // { href: "/stok", name: "Stok" },
-        { href: "/proyek", name: "Proyek" },
+        {
+            href: "/proyek", name: "Proyek", dropdown: [
+                {
+                    key: "data",
+                    name: "Proyek",
+                    href: ""
+                },
+                {
+                    key: "pengeluaran",
+                    name: "Pengeluaran",
+                    href: "/pengeluaran"
+                },
+                {
+                    key: "pembayaran",
+                    name: "Pembayaran",
+                    href: "/pembayaran"
+                },
+            ]
+        },
         { href: "/nota", name: "Nota" },
         { href: "/operasionalkantor", name: "Operasional Kantor" },
         { href: "/karyawan", name: "Karyawan" },

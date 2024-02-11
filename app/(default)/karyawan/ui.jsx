@@ -30,15 +30,17 @@ import {
   useDisclosure,
 } from "@nextui-org/react";
 import { getApiPath, useClientFetch } from "../../utils/apiconfig";
+import { FileUploader } from "@/components/input";
 import { Button } from "@nextui-org/react";
 import { Input } from "@nextui-org/react";
 import Link from "next/link";
 
-const api_path = getApiPath();
+const apiPath = getApiPath();
 
 export default function App() {
   const karyawan = useClientFetch(`karyawan`);
   const [form, setForm] = useState({});
+  const [json, setJson] = useState([]);
   const [method, setMethod] = useState();
   const tambahButtonPress = () => {
     setForm({ id: "", nama: "", modalmode: "Tambah" });
@@ -52,7 +54,7 @@ export default function App() {
   };
   const deleteButtonPress = async (id) => {
     if (confirm("Hapus produk?")) {
-      const res = await fetch(`${api_path}karyawan`, {
+      const res = await fetch(`${apiPath}karyawan`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -64,8 +66,8 @@ export default function App() {
       return alert(json.message);
     }
   };
-  const simpanButtonPress = async (data) => {
-    const res = await fetch(`${api_path}karyawan`, {
+  const simpanButtonPress = async (data, onClose) => {
+    const res = await fetch(`${apiPath}karyawan`, {
       method,
       headers: {
         "Content-Type": "application/json",
@@ -74,8 +76,32 @@ export default function App() {
       body: JSON.stringify(data),
     });
     const json = await res.json();
-    return alert(json.message);
+    onClose();
+    // return alert(json.message);
   };
+
+  const handleFileUpload = (jsonData) => {
+    // console.log(jsonData);
+    // Do something with the converted JSON object, e.g., send it to an API
+    setJson(jsonData);
+    console.log(json);
+  };
+  const handleButtonUploadExcelPress = () => {
+    json.map(async (v) => {
+      const res = await fetch(`${apiPath}karyawan`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify(v),
+      });
+      const json = await res.json();
+      console.log(json.message);
+      // return alert(json.message);
+    });
+  };
+
   const renderCell = {
     karyawan: React.useCallback((data, columnKey) => {
       const cellValue = data[columnKey];
@@ -85,7 +111,7 @@ export default function App() {
         case "aksi":
           return (
             <div className="relative flex items-center gap-2">
-              <Tooltip content="Neraca">
+              {/* <Tooltip content="Neraca">
                 <span
                   // onClick={() => alert("Clicked")}
                   className="text-lg text-default-400 cursor-pointer active:opacity-50"
@@ -94,7 +120,7 @@ export default function App() {
                     <IconScaleBalanced />
                   </Link>
                 </span>
-              </Tooltip>
+              </Tooltip> */}
               <Tooltip content="Edit">
                 <span
                   onClick={() => editButtonPress(data)}
@@ -148,9 +174,23 @@ export default function App() {
 
   return (
     <div>
-      <Button onClick={tambahButtonPress} color="primary">
-        Tambah
-      </Button>
+      <div className="flex flex-row gap-2">
+        <Button color="primary" onPress={tambahButtonPress}>
+          Tambah
+        </Button>
+        <div>
+          <Link
+            className="bg-primary text-white p-2 rounded-lg inline-block"
+            href={"/karyawan.xlsx"}
+          >
+            Download Format
+          </Link>
+        </div>
+        <FileUploader onFileUpload={handleFileUpload} />
+        <Button color="primary" onPress={handleButtonUploadExcelPress}>
+          Upload Excel
+        </Button>
+      </div>
       <Table className="pt-3" aria-label="Example table with custom cells">
         <TableHeader columns={col.karyawan}>
           {(column) => (
@@ -196,7 +236,10 @@ export default function App() {
                 <Button color="danger" variant="light" onPress={onClose}>
                   Batal
                 </Button>
-                <Button color="primary" onPress={() => simpanButtonPress(form)}>
+                <Button
+                  color="primary"
+                  onPress={() => simpanButtonPress(form, onClose)}
+                >
                   Simpan
                 </Button>
               </ModalFooter>
