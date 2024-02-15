@@ -117,6 +117,7 @@ export default function App() {
     console.log(json);
   };
   const handleButtonUploadExcelPress = () => {
+    if (json.length == 0) return alert("File belum dipilih");
     json.map(async (v) => {
       const res = await fetch(`${apiPath}produk`, {
         method: "POST",
@@ -127,9 +128,9 @@ export default function App() {
         body: JSON.stringify(v),
       });
       const json = await res.json();
-      console.log(json.message);
-      // return alert(json.message);
+      // console.log(json.message);
     });
+    return alert("Upload berhasil");
   };
 
   const renderCell = React.useCallback((data, columnKey) => {

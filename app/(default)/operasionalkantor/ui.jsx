@@ -28,6 +28,7 @@ import { Input } from "@nextui-org/react";
 import { Textarea } from "@nextui-org/react";
 import { Select, SelectItem } from "@nextui-org/react";
 import Link from "next/link";
+import * as XLSX from "xlsx";
 import {
   AddIcon,
   EditIcon,
@@ -83,6 +84,7 @@ export default function App() {
     console.log(jsonData);
   };
   const handleButtonUploadExcelPress = () => {
+    if (json.length == 0) return alert("File belum dipilih");
     json.map(async (v) => {
       const res = await fetch(`${apiPath}operasionalkantor`, {
         method: "POST",
@@ -96,6 +98,27 @@ export default function App() {
       console.log(json.message);
       // return alert(json.message);
     });
+    setJson([]);
+    return alert("Upload berhasil");
+  };
+  const handleButtonExportToExcelPress = () => {
+    const rows = operasionalkantor.data.map((row) => ({
+      tanggal: getDateF(new Date(row.tanggal)),
+      keterangan: row.keterangan,
+      biaya: row.biaya,
+      karyawan: row.karyawan,
+      kategori: row.kategori,
+    }));
+    const worksheet = XLSX.utils.json_to_sheet(rows);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "sheet1");
+    XLSX.writeFile(
+      workbook,
+      `operasionalkantor_${getDateF(filter.startDate)}_${getDateF(
+        filter.endDate
+      )}.xlsx`,
+      { compression: true }
+    );
   };
 
   const simpanButtonPress = async (onClose) => {
@@ -117,6 +140,13 @@ export default function App() {
   };
   const tambahButtonPress = async () => {
     // if (select.size == 0) return alert("Produk belum dipilih.");
+    if (
+      !form.tanggal ||
+      selectKategori.size == 0 ||
+      selectKaryawan.size == 0 ||
+      !form.biaya
+    )
+      return alert("Data belum lengkap");
     const res = await fetch(`${apiPath}operasionalkantor`, {
       method: "POST",
       headers: {
@@ -132,6 +162,9 @@ export default function App() {
       }),
     });
     const json = await res.json();
+    setForm({ biaya: "" });
+    setSelectKaryawan([]);
+    setSelectKategori([]);
     // return alert(json.message);
   };
   const editButtonPress = (data) => {
@@ -178,7 +211,7 @@ export default function App() {
 
         return (
           <div className="relative flex items-center gap-2">
-            <Tooltip content="Detail">
+            {/* <Tooltip content="Detail">
               <Link href={link}>
                 <span
                   // onClick={() => detailButtonPress(data)}
@@ -187,7 +220,7 @@ export default function App() {
                   <EyeIcon />
                 </span>
               </Link>
-            </Tooltip>
+            </Tooltip> */}
             <Tooltip content="Edit">
               <span
                 onClick={() => editButtonPress(data)}
@@ -250,6 +283,7 @@ export default function App() {
   const sumBiaya = operasionalkantor.data.reduce((acc, v) => {
     return acc + v.biaya;
   });
+
   return (
     <div className="flex flex-col gap-2">
       <div className="bg-white p-3 rounded-lg">
@@ -463,6 +497,11 @@ export default function App() {
                   </SelectItem>
                 ))}
               </Select>
+            </div>
+            <div>
+              <Button color="primary" onClick={handleButtonExportToExcelPress}>
+                Export to Excel
+              </Button>
             </div>
           </>
         }

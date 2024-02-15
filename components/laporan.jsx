@@ -13,11 +13,13 @@ import {
   ChipProps,
   getKeyValue,
 } from "@nextui-org/react";
+import { Button } from "@nextui-org/react";
+import * as XLSX from "xlsx";
 import {
   useClientFetch,
   useClientFetchNoInterval,
 } from "@/app/utils/apiconfig";
-import { getDate, getMonthYear } from "@/app/utils/date";
+import { getDate, getDateF, getMonthYear } from "@/app/utils/date";
 import Harga from "@/components/harga";
 
 import DatePicker from "react-datepicker";
@@ -174,6 +176,32 @@ const BulananProyek = ({ start, end }) => {
     )}&endDate=${getMonthYear(form.endDate)}`
   );
 
+  const handleButtonExportToExcelPress = () => {
+    const rows = bulananProyek.data.map((v) => {
+      return {
+        instansi: v.instansi,
+        nama: v.nama,
+        id_proyek: v.id_proyek,
+        swasta: v.swasta,
+        periode: v.periode,
+        byproduksi: v.byproduksi,
+        omset: v.omset,
+        provit: v.omset - v.byproduksi,
+        tt: v.tt,
+      };
+    });
+    const worksheet = XLSX.utils.json_to_sheet(rows);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "sheet1");
+    XLSX.writeFile(
+      workbook,
+      `bulananproyek_${getDateF(form.startDate)}_${getDateF(
+        form.endDate
+      )}.xlsx`,
+      { compression: true }
+    );
+  };
+
   const renderCell = useCallback((data, columnKey) => {
     const cellValue = data[columnKey];
     const date = new Date(data.tanggal);
@@ -231,33 +259,50 @@ const BulananProyek = ({ start, end }) => {
       label: "Periode",
     },
   ];
-  const mulai = getDate(form.startDate);
-  const selesai = getDate(form.endDate);
   return (
     <>
-      <div className="flex flex-col bg-gray-100 p-3 rounded-lg">
-        <div>Periode</div>
-        <DatePicker
-          dateFormat="MM/yyyy"
-          selected={form.startDate}
-          onChange={(date) => setForm({ ...form, startDate: date })}
-          selectsStart
-          startDate={form.startDate}
-          endDate={form.endDate}
-          showMonthYearPicker
-        />
-        <DatePicker
-          dateFormat="MM/yyyy"
-          selected={form.endDate}
-          onChange={(date) => setForm({ ...form, endDate: date })}
-          selectsEnd
-          startDate={form.startDate}
-          endDate={form.endDate}
-          minDate={form.startDate}
-          showMonthYearPicker
-        />
+      <div className="flex flex-row">
+        <div className="flex flex-col bg-gray-100 p-3 rounded-lg gap-2">
+          <div>Periode</div>
+          <DatePicker
+            dateFormat="MM/yyyy"
+            selected={form.startDate}
+            onChange={(date) => setForm({ ...form, startDate: date })}
+            selectsStart
+            startDate={form.startDate}
+            endDate={form.endDate}
+            showMonthYearPicker
+          />
+          <DatePicker
+            dateFormat="MM/yyyy"
+            selected={form.endDate}
+            onChange={(date) => setForm({ ...form, endDate: date })}
+            selectsEnd
+            startDate={form.startDate}
+            endDate={form.endDate}
+            minDate={form.startDate}
+            showMonthYearPicker
+          />
+        </div>
       </div>
-      <Table className="pt-3" aria-label="Example table with custom cells">
+      <Table
+        className="pt-3"
+        aria-label="Example table with custom cells"
+        topContent={
+          <>
+            <div className="flex flex-col gap-2">
+              <div className="flex flex-row gap-2">
+                <Button
+                  color="primary"
+                  onClick={handleButtonExportToExcelPress}
+                >
+                  Export to Excel
+                </Button>
+              </div>
+            </div>
+          </>
+        }
+      >
         <TableHeader columns={col}>
           {(column) => (
             <TableColumn
@@ -270,7 +315,7 @@ const BulananProyek = ({ start, end }) => {
         </TableHeader>
         <TableBody items={bulananProyek.data}>
           {(item) => (
-            <TableRow key={`${item.id}-${item.periode}`}>
+            <TableRow key={`${item.id_proyek}-${item.periode}`}>
               {(columnKey) => (
                 <TableCell>{renderCell(item, columnKey)}</TableCell>
               )}

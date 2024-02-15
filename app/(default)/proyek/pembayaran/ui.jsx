@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import * as XLSX from "xlsx";
 import {
   Table,
   TableHeader,
@@ -24,7 +25,13 @@ import {
 import Link from "next/link";
 import { Input } from "@nextui-org/react";
 import { Button } from "@nextui-org/react";
-import { excelToJSDate, getDateF, getDateFId, getDate } from "@/app/utils/date";
+import {
+  getCurFirstLastDay,
+  excelToJSDate,
+  getDateF,
+  getDateFId,
+  getDate,
+} from "@/app/utils/date";
 import { getApiPath, useClientFetch } from "@/app/utils/apiconfig";
 import Harga from "@/components/harga";
 import { FileUploader } from "@/components/input";
@@ -40,9 +47,19 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 const api_path = getApiPath();
+const [startDate, endDate] = getCurFirstLastDay();
 
 export default function UI() {
-  const pembayaran = useClientFetch(`pembayaranproyek`);
+  const [filter, setFilter] = useState({
+    startDate,
+    endDate,
+    selectKategori: new Set([]),
+  });
+  const pembayaran = useClientFetch(
+    `pembayaranproyek?start=${getDate(filter.startDate)}&end=${getDate(
+      filter.endDate
+    )}`
+  );
   const [form, setForm] = useState({});
   const [json, setJson] = useState([]);
 
@@ -104,6 +121,7 @@ export default function UI() {
     console.log(jsonData);
   };
   const handleButtonUploadExcelPress = () => {
+    if (json.length == 0) return alert("File belum dipilih");
     json.map(async (v) => {
       const res = await fetch(`${api_path}pembayaranproyek`, {
         method: "POST",
@@ -119,6 +137,22 @@ export default function UI() {
     });
     setJson([]);
     return alert("Upload berhasil");
+  };
+  const handleButtonExportToExcelPress = () => {
+    const rows = pembayaran.data.map((v) => {
+      const totalHarga = (v.hargakustom ?? v.hargajual) * v.jumlah;
+      return v;
+    });
+    const worksheet = XLSX.utils.json_to_sheet(rows);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "sheet1");
+    XLSX.writeFile(
+      workbook,
+      `pembayaranproyek_${getDateF(filter.startDate)}_${getDateF(
+        filter.endDate
+      )}.xlsx`,
+      { compression: true }
+    );
   };
 
   const renderCell = React.useCallback((data, columnKey) => {
@@ -212,7 +246,42 @@ export default function UI() {
           Upload Excel
         </Button>
       </div>
-      <Table className="pt-3" aria-label="Example table with custom cells">
+      <Table
+        className="pt-3"
+        aria-label="Example table with custom cells"
+        topContent={
+          <>
+            <div>Filter</div>
+            <div className="flex flex-row gap-2">
+              <div className="flex flex-col bg-gray-100 p-3 rounded-lg">
+                <div>Periode</div>
+                <DatePicker
+                  dateFormat="dd/MM/yyyy"
+                  selected={filter.startDate}
+                  onChange={(date) => setFilter({ ...filter, startDate: date })}
+                  selectsStart
+                  startDate={filter.startDate}
+                  endDate={filter.endDate}
+                />
+                <DatePicker
+                  dateFormat="dd/MM/yyyy"
+                  selected={filter.endDate}
+                  onChange={(date) => setFilter({ ...filter, endDate: date })}
+                  selectsEnd
+                  startDate={filter.startDate}
+                  endDate={filter.endDate}
+                  minDate={filter.startDate}
+                />
+              </div>
+            </div>
+            <div className="flex flex-row gap-2">
+              <Button color="primary" onClick={handleButtonExportToExcelPress}>
+                Export to Excel
+              </Button>
+            </div>
+          </>
+        }
+      >
         <TableHeader columns={col}>
           {(column) => (
             <TableColumn

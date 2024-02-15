@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import * as XLSX from "xlsx";
 import { useClientFetch, getApiPath } from "../../utils/apiconfig";
 import { penawaran } from "../../utils/formatid";
 import {
@@ -37,15 +38,28 @@ import {
   NoteIcon,
   ReportMoneyIcon,
 } from "../../../components/icon";
-import { excelToJSDate, getDate, getDateF } from "@/app/utils/date";
+import {
+  getCurFirstLastDay,
+  excelToJSDate,
+  getDate,
+  getDateF,
+} from "@/app/utils/date";
 import { FileUploader } from "@/components/input";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 const apiPath = getApiPath();
+const [startDate, endDate] = getCurFirstLastDay();
 
 export default function App() {
-  const proyek = useClientFetch("proyek");
+  const [filter, setFilter] = useState({
+    startDate,
+    endDate,
+    selectKategori: new Set([]),
+  });
+  const proyek = useClientFetch(
+    `proyek?start=${getDate(filter.startDate)}&end=${getDate(filter.endDate)}`
+  );
   const perusahaan = useClientFetch("perusahaan");
   const karyawan = useClientFetch("karyawan");
   const statusproyek = useClientFetch("statusproyek");
@@ -126,6 +140,7 @@ export default function App() {
     console.log(jsonData);
   };
   const handleButtonUploadExcelPress = () => {
+    if (json.length == 0) return alert("File belum dipilih");
     json.map(async (v) => {
       const res = await fetch(`${apiPath}proyek`, {
         method: "POST",
@@ -141,6 +156,20 @@ export default function App() {
     });
     setJson([]);
     return alert("Upload berhasil");
+  };
+  const handleButtonExportToExcelPress = () => {
+    const rows = proyek.data.map((v) => {
+      const totalHarga = (v.hargakustom ?? v.hargajual) * v.jumlah;
+      return v;
+    });
+    const worksheet = XLSX.utils.json_to_sheet(rows);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "sheet1");
+    XLSX.writeFile(
+      workbook,
+      `proyek_${getDateF(filter.startDate)}_${getDateF(filter.endDate)}.xlsx`,
+      { compression: true }
+    );
   };
 
   const renderCell = React.useCallback((data, columnKey) => {
@@ -299,6 +328,62 @@ export default function App() {
           Upload Excel
         </Button>
       </div>
+      <Table
+        className="pt-3"
+        aria-label="Example table with custom cells"
+        topContent={
+          <>
+            <div>Filter</div>
+            <div className="flex flex-row gap-2">
+              <div className="flex flex-col bg-gray-100 p-3 rounded-lg">
+                <div>Periode</div>
+                <DatePicker
+                  dateFormat="dd/MM/yyyy"
+                  selected={filter.startDate}
+                  onChange={(date) => setFilter({ ...filter, startDate: date })}
+                  selectsStart
+                  startDate={filter.startDate}
+                  endDate={filter.endDate}
+                />
+                <DatePicker
+                  dateFormat="dd/MM/yyyy"
+                  selected={filter.endDate}
+                  onChange={(date) => setFilter({ ...filter, endDate: date })}
+                  selectsEnd
+                  startDate={filter.startDate}
+                  endDate={filter.endDate}
+                  minDate={filter.startDate}
+                />
+              </div>
+            </div>
+            <div className="flex flex-row gap-2">
+              <Button color="primary" onClick={handleButtonExportToExcelPress}>
+                Export to Excel
+              </Button>
+            </div>
+          </>
+        }
+      >
+        <TableHeader columns={columns}>
+          {(column) => (
+            <TableColumn
+              key={column.key}
+              align={column.key === "actions" ? "center" : "start"}
+            >
+              {column.label}
+            </TableColumn>
+          )}
+        </TableHeader>
+        <TableBody items={proyek.data}>
+          {(item) => (
+            <TableRow key={item.id}>
+              {(columnKey) => (
+                <TableCell>{renderCell(item, columnKey)}</TableCell>
+              )}
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
       <Modal
         isOpen={isOpen}
         onOpenChange={onOpenChange}
@@ -456,27 +541,6 @@ export default function App() {
           )}
         </ModalContent>
       </Modal>
-      <Table className="pt-3" aria-label="Example table with custom cells">
-        <TableHeader columns={columns}>
-          {(column) => (
-            <TableColumn
-              key={column.key}
-              align={column.key === "actions" ? "center" : "start"}
-            >
-              {column.label}
-            </TableColumn>
-          )}
-        </TableHeader>
-        <TableBody items={proyek.data}>
-          {(item) => (
-            <TableRow key={item.id}>
-              {(columnKey) => (
-                <TableCell>{renderCell(item, columnKey)}</TableCell>
-              )}
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
     </div>
   );
 }
