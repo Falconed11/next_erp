@@ -48,10 +48,28 @@ export default function App() {
   const subkategori = useClientFetch("subkategoriproduk");
   const merek = useClientFetch("merek");
   const [method, setMethod] = useState("POST");
-  const [form, setForm] = useState({});
+  const [form, setForm] = useState({
+    modalmode: "Tambah",
+    id: "",
+    kategori: "",
+    id_kustom: "",
+    nama: "",
+    merek: "",
+    tipe: "",
+    vendor: "",
+    stok: "",
+    satuan: "",
+    hargamodal: "",
+    hargajual: "",
+    select_kategori: new Set([]),
+    select_subkategori: new Set([]),
+    select_merek: new Set([]),
+    filteredsubkategori: [],
+    keterangan: "",
+  });
   const [json, setJson] = useState([]);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const saveButtonPress = async () => {
+  const saveButtonPress = async (onClose) => {
     if (form.nama == "" || form.kategori == "")
       return alert("Nama, dan Kategori harus diisi!");
     const res = await fetch(`${apiPath}produk`, {
@@ -63,19 +81,24 @@ export default function App() {
       body: JSON.stringify(form),
     });
     const json = await res.json();
-    return alert(json.message);
+    if (res.status == 400) return alert(json.message);
+    onClose();
+    // return alert(json.message);
   };
   const tambahButtonPress = () => {
     setForm({
       modalmode: "Tambah",
       id: "",
+      kategori: "",
+      id_kustom: "",
       nama: "",
-      id_kategori: "",
-      id_subkategori: "",
-      id_merek: "",
+      merek: "",
       tipe: "",
+      vendor: "",
       stok: "",
       satuan: "",
+      hargamodal: "",
+      hargajual: "",
       select_kategori: new Set([]),
       select_subkategori: new Set([]),
       select_merek: new Set([]),
@@ -466,7 +489,10 @@ export default function App() {
                 <Button color="danger" variant="light" onPress={onClose}>
                   Batal
                 </Button>
-                <Button color="primary" onPress={saveButtonPress}>
+                <Button
+                  color="primary"
+                  onPress={() => saveButtonPress(onClose)}
+                >
                   Simpan
                 </Button>
               </ModalFooter>

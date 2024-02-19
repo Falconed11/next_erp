@@ -36,6 +36,8 @@ export const options: NextAuthOptions = {
             }
         }),
     ],
+    session: { maxAge: 1 * 24 * 60 * 60 },
+    theme: { colorScheme: 'light' },
     callbacks: {
         jwt({ token, user }) {
             if (user) token = { ...token, id: user.id, nama: user.nama, peran: user.peran }
