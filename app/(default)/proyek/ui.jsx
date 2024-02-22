@@ -78,6 +78,7 @@ export default function App() {
       body: JSON.stringify(form),
     });
     const json = await res.json();
+    if (res.status == 400) return alert(json.message);
     onClose();
     //return alert(json.message);
   };
@@ -139,23 +140,31 @@ export default function App() {
     setJson(jsonData);
     console.log(jsonData);
   };
-  const handleButtonUploadExcelPress = () => {
+  const handleButtonUploadExcelPress = async () => {
     if (json.length == 0) return alert("File belum dipilih");
-    json.map(async (v) => {
-      const res = await fetch(`${apiPath}proyek`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          // 'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: JSON.stringify({ ...v, id_second: v.id }),
-      });
-      const json = await res.json();
-      console.log(json.message);
-      // return alert(json.message);
-    });
+    setReportList([]);
+    try {
+      const responses = await Promise.all(
+        json.map((v) =>
+          fetch(`${apiPath}proyek`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              // 'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: JSON.stringify({ ...v, id_second: v.id }),
+          })
+        )
+      );
+      const dataArray = await Promise.all(
+        responses.map((response) => response.json())
+      );
+      setReportList(dataArray.map((v, i) => `${i + 1}. ${v.message}`));
+    } catch (e) {
+      console.error(e);
+    }
     setJson([]);
-    return alert("Upload berhasil");
+    report.onOpen();
   };
   const handleButtonExportToExcelPress = () => {
     const rows = proyek.data.map((v) => {
@@ -244,6 +253,8 @@ export default function App() {
     }
   }, []);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const [reportList, setReportList] = useState([]);
+  const report = useDisclosure();
 
   if (proyek.error) return <div>failed to load</div>;
   if (proyek.isLoading) return <div>loading...</div>;
@@ -329,6 +340,7 @@ export default function App() {
         </Button>
       </div>
       <Table
+        selectionMode="single"
         className="pt-3"
         aria-label="Example table with custom cells"
         topContent={
@@ -521,9 +533,7 @@ export default function App() {
                   labelPlacement="inside"
                   placeholder="Masukkan keterangan!"
                   value={form.keterangan}
-                  onValueChange={(val) =>
-                    setCustom({ ...form, keterangan: val })
-                  }
+                  onValueChange={(val) => setForm({ ...form, keterangan: val })}
                 />
               </ModalBody>
               <ModalFooter>
@@ -535,6 +545,32 @@ export default function App() {
                   onPress={() => saveButtonPress(onClose)}
                 >
                   Simpan
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+      {/* upload report */}
+      <Modal
+        isOpen={report.isOpen}
+        onOpenChange={report.onOpenChange}
+        scrollBehavior="inside"
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">
+                Hasil Upload
+              </ModalHeader>
+              <ModalBody>
+                {reportList.map((r, i) => (
+                  <div key={i}>{r}</div>
+                ))}
+              </ModalBody>
+              <ModalFooter>
+                <Button color="danger" variant="light" onPress={onClose}>
+                  Tutup
                 </Button>
               </ModalFooter>
             </>

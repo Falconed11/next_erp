@@ -164,6 +164,7 @@ export default function App({ id, versi }) {
       }),
     });
     const json = await res.json();
+    if (res.status == 400) return alert(json.message);
     onClose();
     // console.log(json.message);
     //return alert(json.message);
@@ -731,11 +732,17 @@ export default function App({ id, versi }) {
               <div>: {selectedProyek.namakaryawan} </div>
               <div>
                 :{" "}
-                {selectedProyek.versi == -1
-                  ? "reject"
-                  : selectedProyek.versi == selectedVersion
-                  ? "deal"
-                  : "penawaran"}
+                {selectedProyek.versi == -1 ? (
+                  <span className="bg-red-600 text-white p-1 rounded font-bold">
+                    REJECT
+                  </span>
+                ) : selectedProyek.versi == selectedVersion ? (
+                  <span className="bg-green-400 text-white p-1 rounded font-bold">
+                    DEAL
+                  </span>
+                ) : (
+                  "penawaran"
+                )}
               </div>
             </div>
           </div>
@@ -873,6 +880,14 @@ export default function App({ id, versi }) {
                 </Button>
               </div>
             )}
+            {selectedProyek.versi > 0 ? (
+              <Link
+                className="text-blue-600 p-3"
+                href={`/proyek/detail/proses?id=${selectedProyek.id}`}
+              >{`Pengeluaran Proyek ==>>`}</Link>
+            ) : (
+              <></>
+            )}
             {/* <div>
               <Button
                 onClick={modal.invoice.onOpen}
@@ -886,6 +901,7 @@ export default function App({ id, versi }) {
           <div className="-w-11/12">
             {/* tabel produk */}
             <Table
+              selectionMode="single"
               className="pt-3"
               topContent={
                 <>
@@ -970,6 +986,7 @@ export default function App({ id, versi }) {
             </Table>
             {/* tabel instalasi */}
             <Table
+              selectionMode="single"
               topContent={
                 <>
                   <div>Instalasi</div>
@@ -1703,6 +1720,10 @@ const TambahProduk = ({ id_proyek, instalasi, versi }) => {
       }),
     });
     const json = await res.json();
+    if (res.status == 400) return alert(json.message);
+    setForm({ jumlah: "", harga: "" });
+    setSelectKategori([]);
+    setSelectProduk([]);
     // console.log(json.message);
     // return alert(json.message);
   };

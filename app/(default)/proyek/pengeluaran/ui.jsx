@@ -122,23 +122,31 @@ export default function UI() {
     setJson(jsonData);
     console.log(jsonData);
   };
-  const handleButtonUploadExcelPress = () => {
+  const handleButtonUploadExcelPress = async () => {
     if (json.length == 0) return alert("File belum dipilih");
-    json.map(async (v) => {
-      const res = await fetch(`${api_path}pengeluaranproyek`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          // 'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: JSON.stringify({ ...v, id_second: v.id }),
-      });
-      const json = await res.json();
-      console.log(json.message);
-      // return alert(json.message);
-    });
+    setReportList([]);
+    try {
+      const responses = await Promise.all(
+        json.map((v) =>
+          fetch(`${api_path}pengeluaranproyek`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              // 'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: JSON.stringify({ ...v, id_second: v.id }),
+          })
+        )
+      );
+      const dataArray = await Promise.all(
+        responses.map((response) => response.json())
+      );
+      setReportList(dataArray.map((v, i) => `${i + 1}. ${v.message}`));
+    } catch (e) {
+      console.error(e);
+    }
     setJson([]);
-    return alert("Upload berhasil");
+    report.onOpen();
   };
   const handleButtonExportToExcelPress = () => {
     const rows = pengeluaran.data.map((v) => {
@@ -227,6 +235,8 @@ export default function UI() {
   }, []);
 
   const modal = useDisclosure();
+  const [reportList, setReportList] = useState([]);
+  const report = useDisclosure();
 
   if (pengeluaran.error) return <div>failed to load</div>;
   if (pengeluaran.isLoading) return <div>loading...</div>;
@@ -457,6 +467,32 @@ export default function UI() {
                   onPress={() => simpanButtonPress(form, onClose)}
                 >
                   Simpan
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+      {/* upload report */}
+      <Modal
+        isOpen={report.isOpen}
+        onOpenChange={report.onOpenChange}
+        scrollBehavior="inside"
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">
+                Hasil Upload
+              </ModalHeader>
+              <ModalBody>
+                {reportList.map((r, i) => (
+                  <div key={i}>{r}</div>
+                ))}
+              </ModalBody>
+              <ModalFooter>
+                <Button color="danger" variant="light" onPress={onClose}>
+                  Tutup
                 </Button>
               </ModalFooter>
             </>

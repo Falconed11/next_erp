@@ -36,7 +36,7 @@ export const options: NextAuthOptions = {
             }
         }),
     ],
-    session: { maxAge: 1 * 24 * 60 * 60 },
+    session: { maxAge: 1 * 18 * 60 * 60 },
     theme: { colorScheme: 'light' },
     callbacks: {
         jwt({ token, user }) {

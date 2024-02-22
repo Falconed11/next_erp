@@ -53,7 +53,7 @@ export default function App() {
     modal.karyawan.onOpen();
   };
   const deleteButtonPress = async (id) => {
-    if (confirm("Hapus produk?")) {
+    if (confirm("Hapus karyawan?")) {
       const res = await fetch(`${apiPath}karyawan`, {
         method: "DELETE",
         headers: {
@@ -63,7 +63,7 @@ export default function App() {
         body: JSON.stringify({ id }),
       });
       const json = await res.json();
-      return alert(json.message);
+      // return alert(json.message);
     }
   };
   const simpanButtonPress = async (data, onClose) => {
@@ -76,6 +76,7 @@ export default function App() {
       body: JSON.stringify(data),
     });
     const json = await res.json();
+    if (res.status == 400) return alert(json.message);
     onClose();
     // return alert(json.message);
   };
@@ -86,23 +87,31 @@ export default function App() {
     setJson(jsonData);
     console.log(json);
   };
-  const handleButtonUploadExcelPress = () => {
+  const handleButtonUploadExcelPress = async () => {
     if (json.length == 0) return alert("File belum dipilih");
-    json.map(async (v) => {
-      const res = await fetch(`${apiPath}karyawan`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          // 'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: JSON.stringify(v),
-      });
-      const json = await res.json();
-      console.log(json.message);
-      // return alert(json.message);
-    });
+    setReportList([]);
+    try {
+      const responses = await Promise.all(
+        json.map((v) =>
+          fetch(`${apiPath}karyawan`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              // 'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: JSON.stringify(v),
+          })
+        )
+      );
+      const dataArray = await Promise.all(
+        responses.map((response) => response.json())
+      );
+      setReportList(dataArray.map((v, i) => `${i + 1}. ${v.message}`));
+    } catch (e) {
+      console.error(e);
+    }
     setJson([]);
-    return alert("Upload berhasil");
+    report.onOpen();
   };
 
   const renderCell = {
@@ -171,6 +180,8 @@ export default function App() {
   const modal = {
     karyawan: useDisclosure(),
   };
+  const [reportList, setReportList] = useState([]);
+  const report = useDisclosure();
 
   if (karyawan.error) return <div>failed to load</div>;
   if (karyawan.isLoading) return <div>loading...</div>;
@@ -244,6 +255,32 @@ export default function App() {
                   onPress={() => simpanButtonPress(form, onClose)}
                 >
                   Simpan
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+      {/* upload report */}
+      <Modal
+        isOpen={report.isOpen}
+        onOpenChange={report.onOpenChange}
+        scrollBehavior="inside"
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">
+                Hasil Upload
+              </ModalHeader>
+              <ModalBody>
+                {reportList.map((r, i) => (
+                  <div key={i}>{r}</div>
+                ))}
+              </ModalBody>
+              <ModalFooter>
+                <Button color="danger" variant="light" onPress={onClose}>
+                  Tutup
                 </Button>
               </ModalFooter>
             </>

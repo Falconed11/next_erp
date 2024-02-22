@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import * as XLSX from "xlsx";
 import Link from "next/link";
 import {
   Table,
@@ -69,6 +70,9 @@ export default function App() {
   });
   const [json, setJson] = useState([]);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const [reportList, setReportList] = useState([]);
+  const report = useDisclosure();
+
   const saveButtonPress = async (onClose) => {
     if (form.nama == "" || form.kategori == "")
       return alert("Nama, dan Kategori harus diisi!");
@@ -139,21 +143,54 @@ export default function App() {
     setJson(jsonData);
     console.log(json);
   };
-  const handleButtonUploadExcelPress = () => {
+  const handleButtonUploadExcelPress = async () => {
     if (json.length == 0) return alert("File belum dipilih");
-    json.map(async (v) => {
-      const res = await fetch(`${apiPath}produk`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          // 'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: JSON.stringify(v),
-      });
-      const json = await res.json();
-      // console.log(json.message);
+    setReportList([]);
+    try {
+      const responses = await Promise.all(
+        json.map((v) =>
+          fetch(`${apiPath}produk`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              // 'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: JSON.stringify(v),
+          })
+        )
+      );
+      const dataArray = await Promise.all(
+        responses.map((response) => response.json())
+      );
+      setReportList(dataArray.map((v, i) => `${i}. ${v.message}`));
+    } catch (e) {
+      console.error(e);
+    }
+    setJson([]);
+    report.onOpen();
+  };
+  const handleButtonExportToExcelPress = () => {
+    const rows = produk.data.map((v) => {
+      const totalHarga = (v.hargakustom ?? v.hargajual) * v.jumlah;
+      return {
+        id: v.id,
+        id_kustom: v.id_kustom,
+        kategori: v.kategori,
+        nama: v.nama,
+        tipe: v.tipe,
+        stok: v.stok,
+        satuan: v.satuan,
+        merek: v.merek,
+        vendor: v.vendor,
+        hargamodal: v.hargamodal,
+        hargajual: v.hargajual,
+        keterangan: v.keterangan,
+      };
     });
-    return alert("Upload berhasil");
+    const worksheet = XLSX.utils.json_to_sheet(rows);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "sheet1");
+    XLSX.writeFile(workbook, `produk.xlsx`, { compression: true });
   };
 
   const renderCell = React.useCallback((data, columnKey) => {
@@ -291,6 +328,7 @@ export default function App() {
         </Button>
       </div>
       <Table
+        selectionMode="single"
         className="pt-3"
         aria-label="Example table with custom cells"
         topContent={
@@ -310,6 +348,11 @@ export default function App() {
                 </SelectItem>
               ))}
             </Select>
+            <div className="flex flex-row gap-2">
+              <Button color="primary" onClick={handleButtonExportToExcelPress}>
+                Export to Excel
+              </Button>
+            </div>
           </>
         }
       >
@@ -494,6 +537,32 @@ export default function App() {
                   onPress={() => saveButtonPress(onClose)}
                 >
                   Simpan
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+      {/* upload report */}
+      <Modal
+        isOpen={report.isOpen}
+        onOpenChange={report.onOpenChange}
+        scrollBehavior="inside"
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">
+                Hasil Upload
+              </ModalHeader>
+              <ModalBody>
+                {reportList.map((r, i) => (
+                  <div key={i}>{r}</div>
+                ))}
+              </ModalBody>
+              <ModalFooter>
+                <Button color="danger" variant="light" onPress={onClose}>
+                  Tutup
                 </Button>
               </ModalFooter>
             </>

@@ -81,25 +81,39 @@ export default function App() {
       return v;
     });
     setJson(jsonData);
-    console.log(jsonData);
   };
-  const handleButtonUploadExcelPress = () => {
+  const handleButtonUploadExcelPress = async () => {
     if (json.length == 0) return alert("File belum dipilih");
-    json.map(async (v) => {
-      const res = await fetch(`${apiPath}operasionalkantor`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          // 'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: JSON.stringify(v),
-      });
-      const json = await res.json();
-      console.log(json.message);
-      // return alert(json.message);
-    });
+    setReportList([]);
+    try {
+      const responses = await Promise.all(
+        json.map((v) =>
+          fetch(`${apiPath}operasionalkantor`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              // 'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: JSON.stringify({
+              tanggal: v.tanggal ?? "",
+              karyawan: v.karyawan ?? "",
+              kategori: v.kategori ?? "",
+              keterangan: v.keterangan ?? "",
+              biaya: v.biaya ?? "",
+            }),
+          })
+        )
+      );
+      const dataArray = await Promise.all(
+        responses.map((response) => response.json())
+      );
+      setReportList(dataArray.map((v, i) => `${i}. ${v.message}`));
+    } catch (e) {
+      console.error(e);
+    }
     setJson([]);
-    return alert("Upload berhasil");
+    report.onOpen();
+    // return alert(`Upload Berhasil`);
   };
   const handleButtonExportToExcelPress = () => {
     const rows = operasionalkantor.data.map((row) => ({
@@ -162,7 +176,7 @@ export default function App() {
       }),
     });
     const json = await res.json();
-    setForm({ biaya: "" });
+    setForm({ biaya: "", keterangan: "" });
     setSelectKaryawan([]);
     setSelectKategori([]);
     // return alert(json.message);
@@ -245,6 +259,8 @@ export default function App() {
   }, []);
 
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const [reportList, setReportList] = useState([]);
+  const report = useDisclosure();
 
   if (operasionalkantor.error) return <div>failed to load</div>;
   if (operasionalkantor.isLoading) return <div>loading...</div>;
@@ -455,7 +471,34 @@ export default function App() {
           )}
         </ModalContent>
       </Modal>
+      {/* upload report */}
+      <Modal
+        isOpen={report.isOpen}
+        onOpenChange={report.onOpenChange}
+        scrollBehavior="inside"
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">
+                Hasil Upload
+              </ModalHeader>
+              <ModalBody>
+                {reportList.map((r, i) => (
+                  <div key={i}>{r}</div>
+                ))}
+              </ModalBody>
+              <ModalFooter>
+                <Button color="danger" variant="light" onPress={onClose}>
+                  Tutup
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
       <Table
+        selectionMode="single"
         className="h-full w-full"
         aria-label="Example table with custom cells"
         topContent={

@@ -70,10 +70,7 @@ export default function App({ id }) {
     selectKategori: new Set([]),
     selectProduk: new Set([]),
   });
-  const [formPembayaran, setFormPembayaran] = useState({
-    carabayar: "",
-    keterangan: "",
-  });
+  const [formPembayaran, setFormPembayaran] = useState({});
 
   const editButtonPress = (data) => {
     const startdate = new Date(data.tanggal);
@@ -84,6 +81,7 @@ export default function App({ id }) {
       modalmode: "Edit",
       tanggal: getDate(startdate),
       startdate,
+      keterangan: data.keteranganpp,
     });
     setSelectKaryawan(new Set([String(data.id_karyawan)]));
     modal.pengeluaranproyek.onOpen();
@@ -122,6 +120,11 @@ export default function App({ id }) {
       }),
     });
     const json = await res.json();
+    if (res.status == 400) return alert(json.message);
+    setForm({
+      selectKategori: new Set([]),
+      selectProduk: new Set([]),
+    });
     // return alert(json.message);
   };
   const simpanButtonPress = async (data, onClose) => {
@@ -141,6 +144,7 @@ export default function App({ id }) {
       }),
     });
     const json = await res.json();
+    if (res.status == 400) return alert(json.message);
     onClose();
     // console.log(json.message);
     return alert(json.message);
@@ -184,7 +188,10 @@ export default function App({ id }) {
       }),
     });
     const json = await res.json();
-    // return alert(json.message);
+    if (res.status == 400) return alert(json.message);
+    setFormPembayaran({
+      nominal: 0,
+    });
   };
   const simpanButtonPressPembayaran = async (data, onClose) => {
     const res = await fetch(`${api_path}pembayaranproyek`, {
@@ -199,6 +206,8 @@ export default function App({ id }) {
       }),
     });
     const json = await res.json();
+    if (res.status == 400) return alert(json.message);
+    setFormPembayaran({ nominal: "" });
     onClose();
     // return alert(json.message);
   };
