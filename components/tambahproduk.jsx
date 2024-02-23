@@ -10,7 +10,11 @@ const api_path = getApiPath();
 export default function TambahProduk({ form, setForm }) {
   const kategori = useClientFetch(`kategoriproduk`);
   const produk = useClientFetch(
-    `produk?kategori=${form.selectKategori.values().next().value}`
+    `produk?kategori=${
+      form.selectKategori
+        ? form.selectKategori.values().next().value
+        : "undefined"
+    }`
   );
   if (kategori.error) return <div>failed to load</div>;
   if (kategori.isLoading) return <div>loading...</div>;
@@ -47,7 +51,11 @@ export default function TambahProduk({ form, setForm }) {
         onSelectionChange={(v) => setForm({ ...form, selectProduk: v })}
       >
         {produk.data.map((item) => (
-          <SelectItem key={item.id} value={item.id} textValue={`${item.nama}`}>
+          <SelectItem
+            key={item.id}
+            value={item.id}
+            textValue={`${item.nama} | ${item.merek} | ${item.tipe} | ${item.stok} ${item.satuan} | ${item.hargamodal} | ${item.hargajual}`}
+          >
             {item.nama} | {item.merek} | {item.tipe} |{" "}
             <span className="p-1 bg-black text-white">
               {item.stok} {item.satuan}
