@@ -28,11 +28,13 @@ const getDateF = (date) => {
   return `${day}-${month}-${year}`;
 };
 
-const getDateFId = (date) => {
+const getDateFId = (date, format) => {
   const year = date.getFullYear();
   const month = date.getMonth();
   const monthNameIndonesian = monthNamesIndonesian[month];
   const day = date.getDate();
+  if (format == "dd-month") return `${day} ${monthNameIndonesian}`;
+  if (format == "yy") return String(year).slice(-2);
   return `${day} ${monthNameIndonesian} ${year}`;
 };
 

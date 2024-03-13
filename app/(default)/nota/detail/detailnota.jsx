@@ -30,7 +30,7 @@ import {
 } from "@nextui-org/react";
 import { useReactToPrint } from "react-to-print";
 import { getApiPath, useClientFetch } from "../../../utils/apiconfig";
-import { getDateFId } from "@/app/utils/date";
+import myDate, { getDateFId } from "@/app/utils/date";
 import { penawaran } from "@/app/utils/formatid";
 import Harga from "../../../../components/harga";
 import { Button } from "@nextui-org/react";
@@ -481,10 +481,26 @@ export default function App({ id }) {
               <ModalHeader className="flex flex-col gap-1">Nota</ModalHeader>
               <ModalBody>
                 <div ref={componentRef.nota} className="bg-white text-black">
-                  <div className="flex flex-row">
-                    <div className="basis-3/4"></div>
-                    <div className="basis-1/4">
-                      <div>{selectedNota.tanggal}</div>
+                  <div className="flex flex-row mt-0 pt-0 top-0">
+                    <div className="basis-1/4"></div>
+                    <div className="w-36"></div>
+                    <div className="basis-1/4 text-right text-sm">
+                      <div className="">
+                        <div className="flex flex-row">
+                          <div className="basis-3/4">
+                            {`${myDate.getDateFId(
+                              new Date(selectedNota.tanggal),
+                              "dd-month"
+                            )} `}
+                          </div>
+                          <div className="basis-1/4">
+                            {`${myDate.getDateFId(
+                              new Date(selectedNota.tanggal),
+                              "yy"
+                            )}`}
+                          </div>
+                        </div>
+                      </div>
                       <div>{selectedNota.user}</div>
                       <div>{selectedNota.instansi}</div>
                       <div>{selectedNota.id_kustom}</div>
