@@ -171,6 +171,64 @@ export default function App({ id }) {
           return cellValue;
       }
     }, []),
+    keranjangnotaprint: React.useCallback((data, columnKey) => {
+      const cellValue = data[columnKey];
+      const harga = data.hargakustom > 0 ? data.hargakustom : data.hargajual;
+      const subTotal = harga * data.jumlah;
+      switch (columnKey) {
+        case "harga":
+          return (
+            <div className="text-xs">
+              <Harga harga={harga} />
+            </div>
+          );
+        case "total":
+          return <Harga harga={subTotal} />;
+        case "jumlah":
+          return (
+            <div className="">
+              {data.jumlah} {data.satuan}
+            </div>
+          );
+        case "nama":
+          return <div className="">{data.nama}</div>;
+        case "totalharga-jual":
+          return <Harga harga={data.jumlah * data.hargajual} />;
+        case "profit":
+          return <Harga harga={data.hargajual - data.hargamodal} />;
+        case "totalprofit":
+          return (
+            <Harga
+              harga={
+                data.jumlah * data.hargajual - data.jumlah * data.hargamodal
+              }
+            />
+          );
+        case "aksi":
+          return (
+            <div className="relative flex items-center gap-2">
+              <Tooltip content="Edit">
+                <span
+                  onClick={() => editButtonPress(data)}
+                  className="text-lg text-default-400 cursor-pointer active:opacity-50"
+                >
+                  <EditIcon />
+                </span>
+              </Tooltip>
+              <Tooltip color="danger" content="Delete">
+                <span
+                  onClick={() => deleteButtonPress(data.id_keranjangnota)}
+                  className="text-lg text-danger cursor-pointer active:opacity-50"
+                >
+                  <DeleteIcon />
+                </span>
+              </Tooltip>
+            </div>
+          );
+        default:
+          return cellValue;
+      }
+    }, []),
   };
   const modal = {
     produk: useDisclosure(),
@@ -179,8 +237,8 @@ export default function App({ id }) {
   const col = {
     keranjangnota: [
       {
-        key: "kategori",
-        label: "Kategori",
+        key: "jumlah",
+        label: "jumlah",
       },
       {
         key: "nama",
@@ -217,6 +275,24 @@ export default function App({ id }) {
       {
         key: "aksi",
         label: "Aksi",
+      },
+    ],
+    keranjangnotaprint: [
+      {
+        key: "jumlah",
+        label: "Banyaknya",
+      },
+      {
+        key: "nama",
+        label: "Nama",
+      },
+      {
+        key: "harga",
+        label: "Harga",
+      },
+      {
+        key: "total",
+        label: "Total",
       },
     ],
   };
@@ -284,101 +360,6 @@ export default function App({ id }) {
       {/* tabel produk */}
       <Table
         classNames=""
-        topContent={
-          <>
-            <div>Produk</div>
-            <div className="flex flex-row">
-              <Select
-                label="Kategori"
-                placeholder="Pilih kategori!"
-                className="w-2/12"
-                selectedKeys={selectKategori}
-                onSelectionChange={setSelectKategori}
-              >
-                {kategori.data.map((item) => (
-                  <SelectItem key={item.kategori} value={item.kategori}>
-                    {item.kategori}
-                  </SelectItem>
-                ))}
-              </Select>
-              <Select
-                label="Produk"
-                placeholder="Pilih produk!"
-                className="w-5/12 pl-2"
-                selectedKeys={selectProduk}
-                onSelectionChange={setSelectProduk}
-              >
-                {produk.data.map((item) => (
-                  <SelectItem
-                    key={item.id}
-                    value={item.id}
-                    textValue={`${item.nama}`}
-                  >
-                    {item.nama} | {item.merek} | {item.tipe} | {item.jumlah} |{" "}
-                    {item.satuan} | {item.hargamodal} | {item.hargajual}
-                  </SelectItem>
-                ))}
-              </Select>
-              <Input
-                type="number"
-                value={form.jumlah}
-                label="Jumlah"
-                placeholder="Masukkan jumlah!"
-                className="w-2/12 pl-2"
-                endContent={
-                  <div className="pointer-events-none flex items-center">
-                    <span className="text-default-400 text-small"></span>
-                  </div>
-                }
-                onValueChange={(v) =>
-                  setForm({
-                    ...form,
-                    jumlah: v,
-                  })
-                }
-              />
-              <Input
-                type="number"
-                value={form.harga}
-                label="Harga Kustom"
-                placeholder="Masukkan harga!"
-                className="w-2/12 pl-2"
-                onValueChange={(v) =>
-                  setForm({
-                    ...form,
-                    harga: v,
-                  })
-                }
-              />
-              <Button
-                onClick={() => {
-                  tambahButtonPress({ select: selectProduk, form });
-                }}
-                color="primary"
-                className="ml-2"
-              >
-                Tambah
-              </Button>
-              {/* <div>
-                <Link href={`/stok?id_proyek=${proyek.id}`}>
-                  <Button color="primary">Tambah</Button>
-                </Link>
-              </div> */}
-            </div>
-          </>
-        }
-        bottomContent={
-          <>
-            <div className="text-right">
-              <div>
-                <Harga
-                  label="Sub Total Harga Jual :"
-                  harga={subTotalHargaJual}
-                />
-              </div>
-            </div>
-          </>
-        }
         className="pt-3"
         aria-label="Example table with custom cells"
       >
@@ -506,6 +487,38 @@ export default function App({ id }) {
                       <div>{selectedNota.id_kustom}</div>
                     </div>
                   </div>
+                  {/* <div className="flex flex-row"> */}
+                  <div className="">
+                    <Table
+                      // hideHeader
+                      className="pt-3"
+                      aria-label="Example table with custom cells"
+                    >
+                      <TableHeader columns={col.keranjangnotaprint}>
+                        {(column) => (
+                          <TableColumn
+                            key={column.key}
+                            align={"end"}
+                            width={"0px"}
+                          >
+                            {column.label}
+                          </TableColumn>
+                        )}
+                      </TableHeader>
+                      <TableBody items={keranjangNota.data}>
+                        {(item) => (
+                          <TableRow key={item.id}>
+                            {(columnKey) => (
+                              <TableCell>
+                                {renderCell.keranjangnotaprint(item, columnKey)}
+                              </TableCell>
+                            )}
+                          </TableRow>
+                        )}
+                      </TableBody>
+                    </Table>
+                  </div>
+                  {/* </div> */}
                   <div className="h-96"></div>
                   <div>{selectedNota.namakaryawan}</div>
                 </div>
