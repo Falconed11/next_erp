@@ -14,6 +14,7 @@ import {
   Tooltip,
   ChipProps,
   getKeyValue,
+  Textarea,
 } from "@nextui-org/react";
 import {
   Modal,
@@ -60,6 +61,10 @@ export default function App() {
   const [form, setForm] = useState({});
   const [method, setMethod] = useState("");
   const saveButtonPress = async (onClose) => {
+    if (form.keterangan.length > 180)
+      return alert("Keterangan guna membayar maksimal 180 huruf!");
+    if (form.keterangan.length > 15)
+      return alert("Nominal uang sebanyak maksimal 15 digit!");
     const res = await fetch(`${apiPath}kwitansi`, {
       method,
       headers: {
@@ -253,14 +258,18 @@ export default function App() {
                 />
                 <Input
                   type="text"
-                  label="Uang sebanyak"
+                  label={`Uang sebanyak`}
                   placeholder="Masukkan Nominal!"
                   value={form.nominal}
-                  onValueChange={(val) => setForm({ ...form, nominal: val })}
+                  onValueChange={(val) =>
+                    setForm({
+                      ...form,
+                      nominal: val,
+                    })
+                  }
                 />
-                <Input
-                  type="text"
-                  label="Guna membayar"
+                <Textarea
+                  label={`Guna membayar (${form.keterangan.length})`}
                   placeholder="Masukkan Keterangan!"
                   value={form.keterangan}
                   onValueChange={(val) => setForm({ ...form, keterangan: val })}
@@ -314,12 +323,13 @@ export default function App() {
                   <div className="flex">
                     <div className="w-64"></div>
                     <div>
-                      <Harga harga={form.nominal} />
+                      Rp <Harga harga={form.nominal} />
+                      ,00
                     </div>
                   </div>
                   <div className="flex">
                     <div className="w-28 h-20"></div>
-                    <div className="w-101 text-sm leading-7">
+                    <div className="w-101 leading-7">
                       <span className="invisible">aaaaaaaaaaaaaaaaaa</span>
                       {form.keterangan}
                     </div>
@@ -337,7 +347,7 @@ export default function App() {
                   <div className="flex">
                     <div className="w-64"></div>
                     <div className="w-80 text-sm leading-4">
-                      {number.nominalToText(form.nominal)}
+                      {number.nominalToText(form.nominal)} Rupiah
                     </div>
                   </div>
                 </div>
