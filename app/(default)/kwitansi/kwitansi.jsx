@@ -61,8 +61,8 @@ export default function App() {
   const [form, setForm] = useState({});
   const [method, setMethod] = useState("");
   const saveButtonPress = async (onClose) => {
-    if (form.keterangan.length > 180)
-      return alert("Keterangan guna membayar maksimal 180 huruf!");
+    if (form.keterangan.length > 150)
+      return alert("Keterangan guna membayar maksimal 150 huruf!");
     if (form.keterangan.length > 15)
       return alert("Nominal uang sebanyak maksimal 15 digit!");
     const res = await fetch(`${apiPath}kwitansi`, {
