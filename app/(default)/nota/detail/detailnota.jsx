@@ -565,6 +565,7 @@ export default function App({ id }) {
                           </div>
                         </div>
                       </div>
+                      <div className="h-0.5"></div>
                       <div>{selectedNota.user}</div>
                       <div>{selectedNota.instansi}</div>
                       <div>{selectedNota.id_kustom}</div>
@@ -612,7 +613,7 @@ export default function App({ id }) {
                   </div>
                   <div className="flex flex-row">
                     <div className="w-100"></div>
-                    <div className="text-xs text-right w-18">
+                    <div className="text-right w-18">
                       <Harga harga={subTotalKustomJual} />
                     </div>
                   </div>
