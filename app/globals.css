@@ -35,3 +35,41 @@ body {
 .no-break {
   page-break-inside: avoid;
 }
+
+.h-keranjangnotaprint {
+  height: 487px;
+}
+
+.leading-65 {
+  line-height: 26px;
+}
+
+.w-17 {
+  width: 68px;
+}
+.w-18 {
+  width: 72px;
+}
+.w-90 {
+  width: 360px;
+}
+.w-92 {
+  width: 368px;
+}
+.w-100 {
+  width: 440px;
+}
+.w-101 {
+  width: 496px;
+}
+
+.h-15 {
+  height: 60px;
+}
+.h-15-5 {
+  height: 62px;
+}
+
+.top-neg-1 {
+  top: 8px;
+}

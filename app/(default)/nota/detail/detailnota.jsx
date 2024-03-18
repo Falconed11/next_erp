@@ -176,33 +176,25 @@ export default function App({ id }) {
       const harga = data.hargakustom > 0 ? data.hargakustom : data.hargajual;
       const subTotal = harga * data.jumlah;
       switch (columnKey) {
-        case "harga":
-          return (
-            <div className="text-xs">
-              <Harga harga={harga} />
-            </div>
-          );
-        case "total":
-          return <Harga harga={subTotal} />;
         case "jumlah":
           return (
-            <div className="">
+            <div className="w-24 px-0 leading-65 text-sm">
               {data.jumlah} {data.satuan}
             </div>
           );
         case "nama":
-          return <div className="">{data.nama}</div>;
-        case "totalharga-jual":
-          return <Harga harga={data.jumlah * data.hargajual} />;
-        case "profit":
-          return <Harga harga={data.hargajual - data.hargamodal} />;
-        case "totalprofit":
+          return <div className="pl-0 w-60">{data.nama}</div>;
+        case "harga":
           return (
-            <Harga
-              harga={
-                data.jumlah * data.hargajual - data.jumlah * data.hargamodal
-              }
-            />
+            <div className="w-17 text-xs px-0 leading-65 text-right">
+              <Harga harga={harga} />
+            </div>
+          );
+        case "total":
+          return (
+            <div className="w-24 px-0 text-right">
+              <Harga harga={subTotal} />
+            </div>
           );
         case "aksi":
           return (
@@ -236,10 +228,6 @@ export default function App({ id }) {
   };
   const col = {
     keranjangnota: [
-      {
-        key: "jumlah",
-        label: "jumlah",
-      },
       {
         key: "nama",
         label: "Nama",
@@ -360,6 +348,101 @@ export default function App({ id }) {
       {/* tabel produk */}
       <Table
         classNames=""
+        topContent={
+          <>
+            <div>Produk</div>
+            <div className="flex flex-row">
+              <Select
+                label="Kategori"
+                placeholder="Pilih kategori!"
+                className="w-2/12"
+                selectedKeys={selectKategori}
+                onSelectionChange={setSelectKategori}
+              >
+                {kategori.data.map((item) => (
+                  <SelectItem key={item.kategori} value={item.kategori}>
+                    {item.kategori}
+                  </SelectItem>
+                ))}
+              </Select>
+              <Select
+                label="Produk"
+                placeholder="Pilih produk!"
+                className="w-5/12 pl-2"
+                selectedKeys={selectProduk}
+                onSelectionChange={setSelectProduk}
+              >
+                {produk.data.map((item) => (
+                  <SelectItem
+                    key={item.id}
+                    value={item.id}
+                    textValue={`${item.nama}`}
+                  >
+                    {item.nama} | {item.merek} | {item.tipe} | {item.jumlah} |{" "}
+                    {item.satuan} | {item.hargamodal} | {item.hargajual}
+                  </SelectItem>
+                ))}
+              </Select>
+              <Input
+                type="number"
+                value={form.jumlah}
+                label="Jumlah"
+                placeholder="Masukkan jumlah!"
+                className="w-2/12 pl-2"
+                endContent={
+                  <div className="pointer-events-none flex items-center">
+                    <span className="text-default-400 text-small"></span>
+                  </div>
+                }
+                onValueChange={(v) =>
+                  setForm({
+                    ...form,
+                    jumlah: v,
+                  })
+                }
+              />
+              <Input
+                type="number"
+                value={form.harga}
+                label="Harga Kustom"
+                placeholder="Masukkan harga!"
+                className="w-2/12 pl-2"
+                onValueChange={(v) =>
+                  setForm({
+                    ...form,
+                    harga: v,
+                  })
+                }
+              />
+              <Button
+                onClick={() => {
+                  tambahButtonPress({ select: selectProduk, form });
+                }}
+                color="primary"
+                className="ml-2"
+              >
+                Tambah
+              </Button>
+              {/* <div>
+                <Link href={`/stok?id_proyek=${proyek.id}`}>
+                  <Button color="primary">Tambah</Button>
+                </Link>
+              </div> */}
+            </div>
+          </>
+        }
+        bottomContent={
+          <>
+            <div className="text-right">
+              <div>
+                <Harga
+                  label="Sub Total Harga Jual :"
+                  harga={subTotalHargaJual}
+                />
+              </div>
+            </div>
+          </>
+        }
         className="pt-3"
         aria-label="Example table with custom cells"
       >
@@ -375,7 +458,7 @@ export default function App({ id }) {
         </TableHeader>
         <TableBody items={keranjangNota.data}>
           {(item) => (
-            <TableRow key={item.no}>
+            <TableRow key={item.id_keranjangnota}>
               {(columnKey) => (
                 <TableCell>
                   {renderCell.keranjangnota(item, columnKey)}
@@ -464,11 +547,11 @@ export default function App({ id }) {
                 <div ref={componentRef.nota} className="bg-white text-black">
                   <div className="flex flex-row mt-0 pt-0 top-0">
                     <div className="basis-1/4"></div>
-                    <div className="w-36"></div>
+                    <div className="w-44"></div>
                     <div className="basis-1/4 text-right text-sm">
                       <div className="">
                         <div className="flex flex-row">
-                          <div className="basis-3/4">
+                          <div className="basis-3/4 top-neg-1">
                             {`${myDate.getDateFId(
                               new Date(selectedNota.tanggal),
                               "dd-month"
@@ -487,40 +570,58 @@ export default function App({ id }) {
                       <div>{selectedNota.id_kustom}</div>
                     </div>
                   </div>
-                  {/* <div className="flex flex-row"> */}
-                  <div className="">
-                    <Table
-                      // hideHeader
-                      className="pt-3"
-                      aria-label="Example table with custom cells"
-                    >
-                      <TableHeader columns={col.keranjangnotaprint}>
-                        {(column) => (
-                          <TableColumn
-                            key={column.key}
-                            align={"end"}
-                            width={"0px"}
-                          >
-                            {column.label}
-                          </TableColumn>
-                        )}
-                      </TableHeader>
-                      <TableBody items={keranjangNota.data}>
-                        {(item) => (
-                          <TableRow key={item.id}>
-                            {(columnKey) => (
-                              <TableCell>
-                                {renderCell.keranjangnotaprint(item, columnKey)}
-                              </TableCell>
-                            )}
-                          </TableRow>
-                        )}
-                      </TableBody>
-                    </Table>
+                  <div className="h-15-5"></div>
+                  <div className="flex flex-row">
+                    <div className="">
+                      <Table
+                        hideHeader
+                        removeWrapper
+                        className="pt-3 h-keranjangnotaprint"
+                        aria-label="Example table with custom cells"
+                      >
+                        <TableHeader columns={col.keranjangnotaprint}>
+                          {(column) => (
+                            <TableColumn
+                              key={column.key}
+                              align={"end"}
+                              width={"0px"}
+                            >
+                              {column.label}
+                            </TableColumn>
+                          )}
+                        </TableHeader>
+                        <TableBody items={keranjangNota.data}>
+                          {(item) => (
+                            <TableRow
+                              className="flex"
+                              key={item.id_keranjangnota}
+                            >
+                              {(columnKey) => (
+                                <TableCell className="px-1 py-0 leading-65">
+                                  {renderCell.keranjangnotaprint(
+                                    item,
+                                    columnKey
+                                  )}
+                                </TableCell>
+                              )}
+                            </TableRow>
+                          )}
+                        </TableBody>
+                      </Table>
+                    </div>
                   </div>
-                  {/* </div> */}
-                  <div className="h-96"></div>
-                  <div>{selectedNota.namakaryawan}</div>
+                  <div className="flex flex-row">
+                    <div className="w-100"></div>
+                    <div className="text-xs text-right w-18">
+                      <Harga harga={subTotalKustomJual} />
+                    </div>
+                  </div>
+                  <div className="h-8"></div>
+                  <div className="flex flex-row">
+                    <div className="basis-1/4"></div>
+                    <div className="w-44"></div>
+                    <div className="basis-1/4">{selectedNota.namakaryawan}</div>
+                  </div>
                 </div>
               </ModalBody>
               <ModalFooter>

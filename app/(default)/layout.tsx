@@ -54,6 +54,7 @@ export default function RootLayout({ children, }: { children: React.ReactNode })
             ]
         },
         { href: "/nota", name: "Nota" },
+        { href: "/kwitansi", name: "Kwitansi" },
         { href: "/operasionalkantor", name: "Operasional Kantor" },
         { href: "/karyawan", name: "Karyawan" },
         // {
