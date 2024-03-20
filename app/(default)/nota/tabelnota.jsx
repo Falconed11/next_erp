@@ -78,7 +78,7 @@ export default function App() {
       modalmode: "Edit",
       tanggal: getDate(startdate),
       startdate,
-      selectkaryawan: String(data.id_karyawan),
+      selectkaryawan: new Set([String(data.id_karyawan)]),
     });
     setMethod("PUT");
     onOpen();

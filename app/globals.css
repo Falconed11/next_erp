@@ -60,7 +60,16 @@ body {
   width: 440px;
 }
 .w-101 {
-  width: 496px;
+  width: 488px;
+}
+/* dot matrix
+0.1mm = 4px
+0.25mm = 1px */
+.w-416p {
+  width: 552px;
+}
+.w-556p {
+  width: 556px;
 }
 
 .h-15 {

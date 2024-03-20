@@ -26,6 +26,7 @@ import {
 } from "@nextui-org/react";
 import { Button } from "@nextui-org/react";
 import { Input } from "@nextui-org/react";
+import { RadioGroup, Radio } from "@nextui-org/react";
 import { Select, SelectItem } from "@nextui-org/react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -54,6 +55,8 @@ export default function App() {
   });
 
   const kwitansi = useClientFetch("kwitansi");
+  const karyawan = useClientFetch("karyawan");
+  const [selected, setSelected] = React.useState("normal");
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const modal = {
     kwitansi: useDisclosure(),
@@ -63,7 +66,7 @@ export default function App() {
   const saveButtonPress = async (onClose) => {
     if (form.keterangan.length > 150)
       return alert("Keterangan guna membayar maksimal 150 huruf!");
-    if (form.keterangan.length > 15)
+    if (form.nominal.length > 15)
       return alert("Nominal uang sebanyak maksimal 15 digit!");
     const res = await fetch(`${apiPath}kwitansi`, {
       method,
@@ -102,6 +105,7 @@ export default function App() {
       modalmode: "Edit",
       tanggal: getDate(startdate),
       startdate,
+      selectkaryawan: new Set([String(data.id_karyawan)]),
     });
     setMethod("PUT");
     onOpen();
@@ -163,6 +167,8 @@ export default function App() {
   }, []);
   if (kwitansi.error) return <div>failed to load</div>;
   if (kwitansi.isLoading) return <div>loading...</div>;
+  if (karyawan.error) return <div>failed to load</div>;
+  if (karyawan.isLoading) return <div>loading...</div>;
   const col = [
     {
       key: "id_kustom",
@@ -181,6 +187,10 @@ export default function App() {
       label: "Nominal",
     },
     {
+      key: "nama_karyawan",
+      label: "Karyawan",
+    },
+    {
       key: "keterangan",
       label: "keterangan",
     },
@@ -189,7 +199,7 @@ export default function App() {
       label: "Aksi",
     },
   ];
-  const a = "7";
+  const a = "f";
   return (
     <>
       <Table
@@ -268,6 +278,26 @@ export default function App() {
                     })
                   }
                 />
+                <Select
+                  label="Karyawan"
+                  variant="bordered"
+                  placeholder="Pilih karyawan!"
+                  selectedKeys={form.selectkaryawan}
+                  className="max-w-xs"
+                  onSelectionChange={(val) => {
+                    setForm({
+                      ...form,
+                      selectkaryawan: val,
+                      id_karyawan: new Set(val).values().next().value,
+                    });
+                  }}
+                >
+                  {karyawan.data.map((item) => (
+                    <SelectItem key={item.id} value={item.id}>
+                      {item.nama}
+                    </SelectItem>
+                  ))}
+                </Select>
                 <Textarea
                   label={`Guna membayar (${form.keterangan.length})`}
                   placeholder="Masukkan Keterangan!"
@@ -290,7 +320,7 @@ export default function App() {
           )}
         </ModalContent>
       </Modal>
-      {/* nota */}
+      {/* kwitansi */}
       <Modal
         scrollBehavior="inside"
         size="4xl"
@@ -302,54 +332,137 @@ export default function App() {
             <>
               <ModalHeader className="flex flex-col gap-1">Nota</ModalHeader>
               <ModalBody>
+                <RadioGroup
+                  label="Pilih Kwitansi"
+                  orientation="horizontal"
+                  value={selected}
+                  onValueChange={setSelected}
+                >
+                  <Radio value="normal">Normal</Radio>
+                  <Radio value="bks">BKS</Radio>
+                  <Radio value="svt">SVT</Radio>
+                </RadioGroup>
                 <div
                   ref={componentRef.kwitansi}
-                  className="bg-white text-black leading-7"
+                  className="bg-white text-black leading-8"
                 >
-                  <div className="h-12"></div>
-                  <div className="flex">
-                    <div className="w-36"></div>
-                    <div>
-                      <span className="invisible">a</span>
-                      {form.id_kustom}
-                    </div>
-                  </div>
-                  <div className="h-1"></div>
-                  <div className="flex">
-                    <div className="w-72"></div>
-                    <div>{form.nama_pembayar}</div>
-                  </div>
-                  <div className="h-1"></div>
-                  <div className="flex">
-                    <div className="w-64"></div>
-                    <div>
-                      Rp <Harga harga={form.nominal} />
-                      ,00
-                    </div>
-                  </div>
-                  <div className="flex">
-                    <div className="w-28 h-20"></div>
-                    <div className="w-101 leading-7">
-                      <span className="invisible">aaaaaaaaaaaaaaaaaa</span>
-                      {form.keterangan}
-                    </div>
-                  </div>
-
-                  <div className="flex">
-                    <div className="w-90"></div>
-                    <div className="w-28">Yogyakarta</div>
-                    <div className="w-32">
-                      {date.getDateFId(new Date(form.tanggal), "dd-month")}
-                    </div>
-                    <div>{date.getDateFId(new Date(form.tanggal), "yy")}</div>
-                  </div>
-                  <div className="h-8"></div>
-                  <div className="flex">
-                    <div className="w-64"></div>
-                    <div className="w-80 text-sm leading-4">
-                      {number.nominalToText(form.nominal)} Rupiah
-                    </div>
-                  </div>
+                  {selected == "normal" ? (
+                    <>
+                      <div className="h-12"></div>
+                      <div className="flex">
+                        <div className="w-36"></div>
+                        <div>
+                          <span className="invisible">a</span>
+                          {form.id_kustom}
+                        </div>
+                      </div>
+                      <div className="h-1"></div>
+                      <div className="flex">
+                        <div className="w-72"></div>
+                        <div>{form.nama_pembayar}</div>
+                      </div>
+                      <div className="h-1"></div>
+                      <div className="flex">
+                        <div className="w-64"></div>
+                        <div>
+                          Rp <Harga harga={form.nominal} />
+                          ,00
+                        </div>
+                      </div>
+                      <div className="flex">
+                        <div className="w-28 h-20"></div>
+                        <div className="w-101 leading-7">
+                          <span className="invisible">aaaaaaaaaaaaaaaaaa</span>
+                          {form.keterangan}
+                        </div>
+                      </div>
+                      <div className="flex">
+                        <div className="w-90"></div>
+                        <div className="w-28">Yogyakarta</div>
+                        <div className="w-32">
+                          {date.getDateFId(new Date(form.tanggal), "dd-month")}
+                        </div>
+                        <div>
+                          {date.getDateFId(new Date(form.tanggal), "yy")}
+                        </div>
+                      </div>
+                      <div className="h-8"></div>
+                      <div className="flex">
+                        <div className="w-64"></div>
+                        <div className="w-80 text-sm leading-4">
+                          {number.nominalToText(form.nominal)} Rupiah
+                        </div>
+                      </div>
+                    </>
+                  ) : selected == "bks" ? (
+                    // <>
+                    //   <div className="h-36"></div>
+                    //   <div className="flex">
+                    //     <div className="w-36"></div>
+                    //     <div className="w-416p border">
+                    //       <div>{a}</div>
+                    //       <div>{a}</div>
+                    //       <div>
+                    //         {a}
+                    //         <br />
+                    //         {a}
+                    //       </div>
+                    //     </div>
+                    //   </div>
+                    //   <div className="h-2"></div>
+                    //   <div className="flex">
+                    //     <div className="w-556p"></div>
+                    //     <div className="w-28">{a}</div>
+                    //     <div>{a}</div>
+                    //   </div>
+                    //   <div className="flex">
+                    //     <div className="w-24"></div>
+                    //     <div className="w-96">{a}</div>
+                    //     <div className="w-4"></div>
+                    //     <div>
+                    //       <div className="h-8"></div>
+                    //       <div>{a}</div>
+                    //     </div>
+                    //   </div>
+                    // </>
+                    <>
+                      <div className="h-32"></div>
+                      <div className="h-3"></div>
+                      <div className="flex">
+                        <div className="w-36"></div>
+                        <div className="w-416p border">
+                          <div>{form.nama_pembayar}</div>
+                          <div>{form.nominal}</div>
+                          <div className="text-sm leading-8">
+                            {form.keterangan}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="h-2"></div>
+                      <div className="flex">
+                        <div className="w-556p"></div>
+                        <div className="w-28 text-xs self-center">
+                          {date.getDateFId(new Date(form.tanggal), "dd-month")}
+                        </div>
+                        <div>
+                          {date.getDateFId(new Date(form.tanggal), "yy")}
+                        </div>
+                      </div>
+                      <div className="flex">
+                        <div className="w-24"></div>
+                        <div className="w-96 text-sm leading-4">{`${number.nominalToText(
+                          form.nominal
+                        )} Rupiah`}</div>
+                        <div className="w-4"></div>
+                        <div>
+                          <div className="h-8"></div>
+                          <div>{form.nama_karyawan}</div>
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <></>
+                  )}
                 </div>
               </ModalBody>
               <ModalFooter>
