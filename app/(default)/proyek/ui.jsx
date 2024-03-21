@@ -340,7 +340,7 @@ export default function App() {
         </Button>
       </div>
       <Table
-        selectionMode="single"
+        isStriped
         className="pt-3"
         aria-label="Example table with custom cells"
         topContent={

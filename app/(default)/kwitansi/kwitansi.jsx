@@ -330,7 +330,9 @@ export default function App() {
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader className="flex flex-col gap-1">Nota</ModalHeader>
+              <ModalHeader className="flex flex-col gap-1">
+                Kwitansi
+              </ModalHeader>
               <ModalBody>
                 <RadioGroup
                   label="Pilih Kwitansi"
@@ -430,9 +432,11 @@ export default function App() {
                       <div className="h-3"></div>
                       <div className="flex">
                         <div className="w-36"></div>
-                        <div className="w-416p border">
+                        <div className="w-416p">
                           <div>{form.nama_pembayar}</div>
-                          <div>{form.nominal}</div>
+                          <div>
+                            <Harga harga={form.nominal} />
+                          </div>
                           <div className="text-sm leading-8">
                             {form.keterangan}
                           </div>
@@ -456,12 +460,53 @@ export default function App() {
                         <div className="w-4"></div>
                         <div>
                           <div className="h-8"></div>
-                          <div>{form.nama_karyawan}</div>
+                          <div className=" w-40 text-center">
+                            {form.nama_karyawan}
+                          </div>
                         </div>
                       </div>
                     </>
                   ) : (
-                    <></>
+                    <>
+                      <div className="h-32"></div>
+                      <div className="h-3"></div>
+                      <div className="flex">
+                        <div className="w-40"></div>
+                        <div className="w-416p">
+                          <div>{form.nama_pembayar}</div>
+                          <div>
+                            <Harga harga={form.nominal} />
+                          </div>
+                          <div className="text-sm leading-8">
+                            {form.keterangan}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="h-1"></div>
+                      <div className="flex">
+                        <div className="w-556p"></div>
+                        <div className="w-2"></div>
+                        <div className="w-24 text-xs leading-8">
+                          {date.getDateFId(new Date(form.tanggal), "dd-month")}
+                        </div>
+                        <div>
+                          {date.getDateFId(new Date(form.tanggal), "yy")}
+                        </div>
+                      </div>
+                      <div className="flex">
+                        <div className="w-24"></div>
+                        <div className="w-96 text-sm leading-4">{`${number.nominalToText(
+                          form.nominal
+                        )} Rupiah`}</div>
+                        <div className="w-4"></div>
+                        <div>
+                          <div className="h-8"></div>
+                          <div className="w-44 text-center">
+                            {form.nama_karyawan}
+                          </div>
+                        </div>
+                      </div>
+                    </>
                   )}
                 </div>
               </ModalBody>

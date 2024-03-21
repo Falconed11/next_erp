@@ -47,7 +47,8 @@ import { Select, SelectItem } from "@nextui-org/react";
 import { CheckboxGroup, Checkbox } from "@nextui-org/react";
 import Link from "next/link";
 import Image from "next/image";
-import logo from "@/public/logofinal.jpg";
+import logoBks from "@/public/logo-bks.jpeg";
+import logoSvt from "@/public/logo-svt.jpeg";
 import { useRouter } from "next/navigation";
 
 const api_path = getApiPath();
@@ -867,7 +868,7 @@ export default function App({ id, versi }) {
           <>
             {/* tombol fungsional */}
             <div className="flex flex-row gap-2">
-              <div>
+              {/* <div>
                 <Button
                   onClick={handleButtonVersi}
                   color="primary"
@@ -875,7 +876,7 @@ export default function App({ id, versi }) {
                 >
                   Buat Versi Baru
                 </Button>
-              </div>
+              </div> */}
               <div>
                 <Button
                   onClick={modal.penawaran.onOpen}
@@ -1441,25 +1442,52 @@ export default function App({ id, versi }) {
                   className="bg-white text-black"
                 >
                   <div className="flex flex-row items-center">
-                    <Image
-                      src={logo}
-                      alt="Company Logo"
-                      width={70}
-                      // height={500} automatically provided
-                      // blurDataURL="data:..." automatically provided
-                      // placeholder="blur" // Optional blur-up while loading
-                    />
-                    <div className="flex flex-col">
-                      <div>Belga Karya Semesta</div>
-                      <div>
-                        General Trading - Mechanical Electrical - Supplies -
-                        Consultant
-                      </div>
-                      <div>
-                        Jogokaryan MJ 3/789, Mantrijeron - Yogyakarta Telp
-                        08121553765 - 087839280341
-                      </div>
-                    </div>
+                    {selectedProyek.id_perusahaan == 1 ? (
+                      <>
+                        <Image
+                          src={logoBks}
+                          alt="Company Logo"
+                          width={70}
+                          // height={500} automatically provided
+                          // blurDataURL="data:..." automatically provided
+                          // placeholder="blur" // Optional blur-up while loading
+                        />
+                        <div className="flex flex-col pl-2">
+                          <div>Belga Karya Semesta</div>
+                          <div>
+                            General Trading - Mechanical Electrical - Supplies -
+                            Consultant
+                          </div>
+                          <div>
+                            Jogokaryan MJ 3/789, Mantrijeron - Yogyakarta Telp
+                            08121553765
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <Image
+                          src={logoSvt}
+                          alt="Company Logo"
+                          width={70}
+                          // height={500} automatically provided
+                          // blurDataURL="data:..." automatically provided
+                          // placeholder="blur" // Optional blur-up while loading
+                        />
+                        <div className="flex flex-col pl-2">
+                          <div>Satu Visi Teknikatama</div>
+                          <div>
+                            General Trading - Mechanical Electrical - Supplies -
+                            Consultant
+                          </div>
+                          <div>
+                            Wonosalam RT. 005 / RW. 009, Sukoharjo, Ngaglik
+                            Sleman - Yogyakarta 55581 Telp 08121553765 -
+                            081578861740
+                          </div>
+                        </div>
+                      </>
+                    )}
                   </div>
                   <Divider className="bg-sky-500 my-3 py-2" />
                   {/* <hr className="my-3 bg-sky-500 h-5" /> */}

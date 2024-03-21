@@ -296,9 +296,9 @@ export default function App() {
     },
   ];
 
-  const sumBiaya = operasionalkantor.data.reduce((acc, v) => {
-    return acc + v.biaya;
-  });
+  // const sumBiaya = operasionalkantor.data.reduce((acc, v) => {
+  //   return acc + v.biaya;
+  // });
 
   return (
     <div className="flex flex-col gap-2">
@@ -498,7 +498,7 @@ export default function App() {
         </ModalContent>
       </Modal>
       <Table
-        selectionMode="single"
+        isStriped
         className="h-full w-full"
         aria-label="Example table with custom cells"
         topContent={
