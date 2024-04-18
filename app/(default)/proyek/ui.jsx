@@ -186,7 +186,7 @@ export default function App() {
     const date = new Date(data.tanggal);
     switch (columnKey) {
       case "no":
-        return `${penawaran(data.id_kustom, date)}`;
+        return `${penawaran(data.id_kustom, date, data.id_karyawan)}`;
       case "swasta":
         return data.swasta ? "swasta" : "negri";
       case "status":
@@ -267,8 +267,8 @@ export default function App() {
 
   const columns = [
     {
-      key: "id_second",
-      label: "Id",
+      key: "no",
+      label: "No",
     },
     {
       key: "namaperusahaan",

@@ -756,7 +756,8 @@ export default function App({ id, versi }) {
                 :{" "}
                 {penawaran(
                   selectedProyek.id_kustom,
-                  new Date(selectedProyek.tanggal)
+                  new Date(selectedProyek.tanggal),
+                  selectedProyek.id_karyawan
                 )}{" "}
               </div>
               <div>: {selectedProyek.namaperusahaan} </div>
@@ -1501,7 +1502,8 @@ export default function App({ id, versi }) {
                         No :{" "}
                         {penawaran(
                           selectedProyek.id_kustom,
-                          new Date(selectedProyek.tanggal)
+                          new Date(selectedProyek.tanggal),
+                          selectedProyek.id_karyawan
                         )}
                         /{selectedVersion}
                       </div>
