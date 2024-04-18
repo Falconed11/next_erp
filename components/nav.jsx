@@ -30,7 +30,11 @@ export default function Navigation({ navLinks }) {
               <li key={link.name}>
                 <div className={customclass}>
                   <Dropdown>
-                    <DropdownTrigger>{link.name}</DropdownTrigger>
+                    <DropdownTrigger>
+                      <Button className="p-0 m-0 bg-transparent text-left justify-start text-base h-fit">
+                        {link.name}
+                      </Button>
+                    </DropdownTrigger>
                     <DropdownMenu
                       aria-label="Static Actions"
                       onAction={(key) => {
