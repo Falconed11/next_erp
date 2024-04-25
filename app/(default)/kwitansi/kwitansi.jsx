@@ -434,17 +434,17 @@ export default function App() {
                         <div className="w-36"></div>
                         <div className="w-416p">
                           <div>{form.nama_pembayar}</div>
-                          <div>
-                            <Harga harga={form.nominal} />
+                          <div className="text-xs h-6 content-center">
+                            {`${number.nominalToText(form.nominal)} Rupiah`}
                           </div>
-                          <div className="text-sm leading-8">
+                          <div className="text-sm leading-8 h-16">
                             {form.keterangan}
                           </div>
                         </div>
                       </div>
-                      <div className="h-2"></div>
+                      <div className="h-4"></div>
                       <div className="flex">
-                        <div className="w-556p"></div>
+                        <div className="w-548p"></div>
                         <div className="w-28 text-xs self-center">
                           {date.getDateFId(new Date(form.tanggal), "dd-month")}
                         </div>
@@ -454,9 +454,10 @@ export default function App() {
                       </div>
                       <div className="flex">
                         <div className="w-24"></div>
-                        <div className="w-96 text-sm leading-4">{`${number.nominalToText(
-                          form.nominal
-                        )} Rupiah`}</div>
+                        <div className="w-96 text-sm leading-4">
+                          <div className="h-4"></div>
+                          <Harga harga={form.nominal} />
+                        </div>
                         <div className="w-4"></div>
                         <div>
                           <div className="h-8"></div>
@@ -471,20 +472,20 @@ export default function App() {
                       <div className="h-32"></div>
                       <div className="h-3"></div>
                       <div className="flex">
-                        <div className="w-40"></div>
+                        <div className="w-36"></div>
                         <div className="w-416p">
                           <div>{form.nama_pembayar}</div>
-                          <div>
-                            <Harga harga={form.nominal} />
+                          <div className="text-xs h-6 content-center">
+                            {`${number.nominalToText(form.nominal)} Rupiah`}
                           </div>
-                          <div className="text-sm leading-8">
+                          <div className="text-sm leading-8 h-16">
                             {form.keterangan}
                           </div>
                         </div>
                       </div>
-                      <div className="h-1"></div>
+                      <div className="h-4"></div>
                       <div className="flex">
-                        <div className="w-556p"></div>
+                        <div className="w-548p"></div>
                         <div className="w-2"></div>
                         <div className="w-24 text-xs leading-8">
                           {date.getDateFId(new Date(form.tanggal), "dd-month")}
@@ -495,9 +496,10 @@ export default function App() {
                       </div>
                       <div className="flex">
                         <div className="w-24"></div>
-                        <div className="w-96 text-sm leading-4">{`${number.nominalToText(
-                          form.nominal
-                        )} Rupiah`}</div>
+                        <div className="w-96 text-sm leading-4">
+                          <div className="h-2"></div>
+                          <Harga harga={form.nominal} />
+                        </div>
                         <div className="w-4"></div>
                         <div>
                           <div className="h-8"></div>
