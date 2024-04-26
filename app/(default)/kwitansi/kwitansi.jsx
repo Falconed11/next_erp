@@ -434,7 +434,7 @@ export default function App() {
                         <div className="w-36"></div>
                         <div className="w-416p">
                           <div>{form.nama_pembayar}</div>
-                          <div className="text-xs h-6 content-center">
+                          <div className="text-xs h-7 content-center">
                             {`${number.nominalToText(form.nominal)} Rupiah`}
                           </div>
                           <div className="text-sm leading-8 h-16">
@@ -483,7 +483,7 @@ export default function App() {
                           </div>
                         </div>
                       </div>
-                      <div className="h-4"></div>
+                      <div className="h-3"></div>
                       <div className="flex">
                         <div className="w-548p"></div>
                         <div className="w-2"></div>
@@ -497,7 +497,7 @@ export default function App() {
                       <div className="flex">
                         <div className="w-24"></div>
                         <div className="w-96 text-sm leading-4">
-                          <div className="h-2"></div>
+                          <div className="h-1"></div>
                           <Harga harga={form.nominal} />
                         </div>
                         <div className="w-4"></div>
