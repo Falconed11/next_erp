@@ -434,9 +434,10 @@ export default function App() {
                         <div className="w-36"></div>
                         <div className="w-416p">
                           <div>{form.nama_pembayar}</div>
-                          <div className="text-xs h-7 content-center">
+                          <div className="text-xs h-6 content-center">
                             {`${number.nominalToText(form.nominal)} Rupiah`}
                           </div>
+                          <div className="h-1"></div>
                           <div className="text-sm leading-8 h-16">
                             {form.keterangan}
                           </div>
