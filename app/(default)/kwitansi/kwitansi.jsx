@@ -442,7 +442,7 @@ export default function App() {
                           </div>
                         </div>
                       </div>
-                      <div className="h-4"></div>
+                      <div className="h-1"></div>
                       <div className="flex">
                         <div className="w-548p"></div>
                         <div className="w-28 text-xs self-center">
@@ -483,7 +483,7 @@ export default function App() {
                           </div>
                         </div>
                       </div>
-                      <div className="h-1"></div>
+                      <div className="h-3"></div>
                       <div className="flex">
                         <div className="w-548p"></div>
                         <div className="w-2"></div>
@@ -497,7 +497,7 @@ export default function App() {
                       <div className="flex">
                         <div className="w-24"></div>
                         <div className="w-96 text-sm leading-4">
-                          <div className="h-1"></div>
+                          <div className="h-2"></div>
                           <Harga harga={form.nominal} />
                         </div>
                         <div className="w-4"></div>
