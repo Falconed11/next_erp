@@ -443,7 +443,7 @@ export default function App() {
                           </div>
                         </div>
                       </div>
-                      <div className="h-1"></div>
+                      <div className="h-2"></div>
                       <div className="flex">
                         <div className="w-548p"></div>
                         <div className="w-28 text-xs self-center">
