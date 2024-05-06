@@ -2,7 +2,6 @@
 import React, { useState } from "react";
 import * as XLSX from "xlsx";
 import { FileUploader } from "@/components/input";
-import { getApiPath, useClientFetch } from "../../utils/apiconfig";
 import { Button } from "@nextui-org/react";
 import {
   Modal,
@@ -10,14 +9,24 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
-  Button,
   useDisclosure,
 } from "@nextui-org/react";
+import {
+  getDate,
+  getDateF,
+  getCurFirstLastDay,
+  excelToJSDate,
+} from "@/app/utils/date";
+import { useClientFetch, getApiPath } from "../../utils/apiconfig";
 
 import Link from "next/link";
 
+const apiPath = getApiPath();
+
 export default function App() {
   const [json, setJson] = useState([]);
+  const [reportList, setReportList] = useState([]);
+  const report = useDisclosure();
   const handleFileUpload = (jsonData) => {
     // console.log(jsonData);
     // Do something with the converted JSON object, e.g., send it to an API
