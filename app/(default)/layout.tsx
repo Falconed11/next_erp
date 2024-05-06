@@ -114,7 +114,8 @@ export default function RootLayout({ children, }: { children: React.ReactNode })
         },
     ]
     if (user?.peran == "admin") links.push({ href: "/user", name: "User" },)
-    links.push({ href: "/api/auth/signout", name: "Signout" },)
+    links.push({ href: "/alat", name: "Alat" },
+        { href: "/api/auth/signout", name: "Signout" },)
     return (
         <section>
             <div className='pb-3'></div>
