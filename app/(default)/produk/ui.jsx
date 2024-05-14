@@ -262,7 +262,7 @@ export default function App() {
       label: "Nama",
     },
     {
-      key: "merek",
+      key: "nmerek",
       label: "Merek",
     },
     {
@@ -270,7 +270,7 @@ export default function App() {
       label: "Tipe",
     },
     {
-      key: "vendor",
+      key: "nvendor",
       label: "Vendor",
     },
     {

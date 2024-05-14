@@ -271,6 +271,10 @@ export default function App() {
       label: "No",
     },
     {
+      key: "id_second",
+      label: "Id Proyek",
+    },
+    {
       key: "namaperusahaan",
       label: "Nama Perusahaan",
     },

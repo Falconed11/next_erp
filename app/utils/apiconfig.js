@@ -9,6 +9,12 @@ const useClientFetch = (endpoint) => {
   const fullPath = `${apiPath}${endpoint}`;
   return useSWR(fullPath, fetcher, { refreshInterval: 1000 });
 };
+const useClientFetchInterval = (endpoint, interval) => {
+  const apiPath = getApiPath();
+  const fetcher = (...args) => fetch(...args).then((res) => res.json());
+  const fullPath = `${apiPath}${endpoint}`;
+  return useSWR(fullPath, fetcher, { refreshInterval: interval });
+};
 const useClientFetchNoInterval = (endpoint) => {
   const apiPath = getApiPath();
   const fetcher = (...args) => fetch(...args).then((res) => res.json());
@@ -16,4 +22,9 @@ const useClientFetchNoInterval = (endpoint) => {
   return useSWR(fullPath, fetcher);
 };
 
-export { getApiPath, useClientFetch, useClientFetchNoInterval };
+export {
+  getApiPath,
+  useClientFetch,
+  useClientFetchNoInterval,
+  useClientFetchInterval,
+};

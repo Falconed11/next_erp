@@ -228,8 +228,8 @@ export default function UI() {
       label: "Nominal",
     },
     {
-      key: "carabayar",
-      label: "Cara Bayar",
+      key: "metodepembayaran",
+      label: "Metode Pembayaran",
     },
     {
       key: "keterangan",
