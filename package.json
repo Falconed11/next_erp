@@ -19,7 +19,7 @@
     "react-dom": "^18",
     "react-dropzone": "^14.2.3",
     "react-to-print": "^2.14.15",
-    "swr": "^2.2.4",
+    "swr": "^2.2.5",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
