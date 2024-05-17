@@ -56,6 +56,7 @@ export default function RootLayout({ children, }: { children: React.ReactNode })
         { href: "/nota", name: "Nota" },
         { href: "/kwitansi", name: "Kwitansi" },
         { href: "/operasionalkantor", name: "Operasional Kantor" },
+        { href: "/customer", name: "Customer" },
         { href: "/vendor", name: "Vendor" },
         { href: "/bank", name: "Bank" },
         { href: "/karyawan", name: "Karyawan" },
@@ -115,9 +116,9 @@ export default function RootLayout({ children, }: { children: React.ReactNode })
             ]
         },
     ]
-    if (user?.peran == "admin") links.push({ href: "/user", name: "User" },)
-    links.push({ href: "/alat", name: "Alat" },
-        { href: "/api/auth/signout", name: "Signout" },)
+    if (user?.peran == "super") links.push({ href: "/user", name: "User" },)
+    if (user?.peran == "super") links.push({ href: "/alat", name: "Alat" })
+    links.push({ href: "/api/auth/signout", name: "Signout" })
     return (
         <section>
             <div className='pb-3'></div>
