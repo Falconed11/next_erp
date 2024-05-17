@@ -35,8 +35,9 @@ import {
   EyeIcon,
   UserIcon,
   NoteIcon,
+  TransferIcon,
   ReportMoneyIcon,
-} from "../../../components/icon";
+} from "@/components/icon";
 import {
   getCurFirstLastDay,
   excelToJSDate,
@@ -51,12 +52,13 @@ import "react-datepicker/dist/react-datepicker.css";
 const apiPath = getApiPath();
 
 export default function app() {
-  const bank = useClientFetch("totalbank");
+  const bank = useClientFetch("bank");
+  const [form, setForm] = useState({});
 
   const saveButtonPress = async (onClose) => {
-    if (form.isSwasta.size == 0) return alert("Swasta/Negri belum diisi");
-    const res = await fetch(`${apiPath}proyek`, {
-      method,
+    // if (form.isSwasta.size == 0) return alert("Swasta/Negri belum diisi");
+    const res = await fetch(`${apiPath}bank`, {
+      method: form.method,
       headers: {
         "Content-Type": "application/json",
         // 'Content-Type': 'application/x-www-form-urlencoded',
@@ -68,43 +70,52 @@ export default function app() {
     onClose();
     //return alert(json.message);
   };
+  const saveTransferButtonPress = async (onClose) => {
+    // if (form.isSwasta.size == 0) return alert("Swasta/Negri belum diisi");
+    const res = await fetch(`${apiPath}transferbank`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        // 'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: JSON.stringify({
+        src: form.currentId,
+        dst: form.bank,
+      }),
+    });
+    const json = await res.json();
+    if (res.status == 400) return alert(json.message);
+    onClose();
+    //return alert(json.message);
+  };
   const tambahButtonPress = () => {
     setForm({
-      modalmode: "Tambah",
       id: "",
       nama: "",
-      klien: "",
-      instansi: "",
-      kota: "",
-      selectkaryawan: "",
-      selectperusahaan: "",
-      // selectstatus: "",
-      isSwasta: "",
-      tanggal: "",
-      startdate: "",
-      keterangan: "",
+      method: "POST",
+      title: "Tambah",
     });
-    setMethod("POST");
     onOpen();
   };
   const editButtonPress = (data) => {
-    const startdate = new Date(data.tanggal);
+    // const startdate = new Date(data.tanggal);
     setForm({
       ...data,
-      modalmode: "Edit",
-      tanggal: getDate(startdate),
-      startdate,
-      selectkaryawan: String(data.id_karyawan),
-      selectperusahaan: String(data.id_perusahaan),
-      // selectstatus: String(data.id_statusproyek),
-      isSwasta: String(data.swasta),
+      method: "PUT",
+      title: "Edit",
     });
-    setMethod("PUT");
     onOpen();
+  };
+  const transferButtonPress = (data) => {
+    setForm({
+      currentId: data.id,
+      nama: data.nama,
+    });
+    transfer.onOpen();
   };
   const deleteButtonPress = async (id) => {
     if (confirm("Hapus proyek?")) {
-      const res = await fetch(`${apiPath}proyek`, {
+      const res = await fetch(`${apiPath}bank`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -184,19 +195,27 @@ export default function app() {
       case "aksi":
         return (
           <div className="relative flex items-center gap-2">
-            <Tooltip content="Penawaran">
-              <Link
+            <Tooltip content="Detail">
+              {/* <Link
                 href={`/proyek/detail?id=${data.id}&versi=${
                   data.versi <= 0 ? "1" : data.versi
                 }`}
+              > */}
+              <span
+                // onClick={() => detailButtonPress(data)}
+                className="text-lg text-default-400 cursor-pointer active:opacity-50"
               >
-                <span
-                  // onClick={() => detailButtonPress(data)}
-                  className="text-lg text-default-400 cursor-pointer active:opacity-50"
-                >
-                  <NoteIcon />
-                </span>
-              </Link>
+                <EyeIcon />
+              </span>
+              {/* </Link> */}
+            </Tooltip>
+            <Tooltip content="Transfer">
+              <span
+                onClick={() => transferButtonPress(data)}
+                className="text-lg text-default-400 cursor-pointer active:opacity-50"
+              >
+                <TransferIcon />
+              </span>
             </Tooltip>
             {data.versi > 0 ? (
               <Tooltip content="Pengeluaran Proyek">
@@ -235,6 +254,7 @@ export default function app() {
     }
   }, []);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const transfer = useDisclosure();
   const report = useDisclosure();
   if (bank.error) return <div>failed to load</div>;
   if (bank.isLoading) return <div>loading...</div>;
@@ -310,10 +330,10 @@ export default function app() {
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                {form.modalmode} Proyek
+                {form.title} Bank
               </ModalHeader>
               <ModalBody>
-                <Select
+                {/* <Select
                   label="Perusahaan"
                   variant="bordered"
                   placeholder="Pilih perusahaan!"
@@ -332,97 +352,15 @@ export default function app() {
                       {item.nama}
                     </SelectItem>
                   ))}
-                </Select>
-                <Select
-                  label="Swasta/Negri"
-                  variant="bordered"
-                  placeholder="Pilih swasta/negri!"
-                  selectedKeys={form.isSwasta}
-                  className="max-w-xs"
-                  onSelectionChange={(val) => {
-                    setForm({
-                      ...form,
-                      isSwasta: val,
-                      swasta: new Set(val).values().next().value,
-                    });
-                  }}
-                >
-                  {isSwasta.map((item) => (
-                    <SelectItem key={item.id} value={item.id}>
-                      {item.nama}
-                    </SelectItem>
-                  ))}
-                </Select>
+                </Select> */}
                 <Input
                   type="text"
-                  label="Nama Proyek"
-                  placeholder="Masukkan nama proyek!"
+                  label="Nama"
+                  placeholder="Masukkan nama!"
                   value={form.nama}
                   onValueChange={(val) => setForm({ ...form, nama: val })}
                 />
-                <Input
-                  type="text"
-                  label="Klien"
-                  placeholder="Masukkan klien!"
-                  value={form.klien}
-                  onValueChange={(val) => setForm({ ...form, klien: val })}
-                />
-                <Input
-                  type="text"
-                  label="Instansi"
-                  placeholder="Masukkan instansi!"
-                  value={form.instansi}
-                  onValueChange={(val) => setForm({ ...form, instansi: val })}
-                />
-                <Input
-                  type="text"
-                  label="Kota"
-                  placeholder="Masukkan kota!"
-                  value={form.kota}
-                  onValueChange={(val) => setForm({ ...form, kota: val })}
-                />
-                <Select
-                  label="Sales"
-                  variant="bordered"
-                  placeholder="Pilih sales!"
-                  selectedKeys={form.selectkaryawan}
-                  className="max-w-xs"
-                  onSelectionChange={(val) => {
-                    console.log(val);
-                    setForm({
-                      ...form,
-                      selectkaryawan: val,
-                      id_karyawan: new Set(val).values().next().value,
-                    });
-                  }}
-                >
-                  {karyawan.data.map((item) => (
-                    <SelectItem key={item.id} value={item.id}>
-                      {item.nama}
-                    </SelectItem>
-                  ))}
-                </Select>
-                {/* <Select
-                  label="Status"
-                  variant="bordered"
-                  placeholder="Pilih status!"
-                  selectedKeys={form.selectstatus}
-                  className="max-w-xs"
-                  onSelectionChange={(val) => {
-                    setForm({
-                      ...form,
-                      selectstatus: val,
-                      id_statusproyek: new Set(val).values().next().value,
-                    });
-                  }}
-                >
-                  {statusproyek.data.map((item) => (
-                    <SelectItem key={item.id} value={item.id}>
-                      {item.nama}
-                    </SelectItem>
-                  ))}
-                </Select> */}
-                <div className="bg-gray-100 p-3 rounded-lg">
+                {/* <div className="bg-gray-100 p-3 rounded-lg">
                   <div>Tanggal</div>
                   <DatePicker
                     placeholderText="Pilih tanggal"
@@ -432,14 +370,14 @@ export default function app() {
                       setForm({ ...form, startdate: v, tanggal: getDate(v) })
                     }
                   />
-                </div>
-                <Textarea
+                </div> */}
+                {/* <Textarea
                   label="Keterangan"
                   labelPlacement="inside"
                   placeholder="Masukkan keterangan!"
                   value={form.keterangan}
                   onValueChange={(val) => setForm({ ...form, keterangan: val })}
-                />
+                /> */}
               </ModalBody>
               <ModalFooter>
                 <Button color="danger" variant="light" onPress={onClose}>
@@ -448,6 +386,80 @@ export default function app() {
                 <Button
                   color="primary"
                   onPress={() => saveButtonPress(onClose)}
+                >
+                  Simpan
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+      {/* transfer */}
+      <Modal
+        isOpen={transfer.isOpen}
+        onOpenChange={transfer.onOpenChange}
+        scrollBehavior="inside"
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">
+                Transfer Bank
+              </ModalHeader>
+              <ModalBody>
+                <Input
+                  isDisabled
+                  type="text"
+                  label="Bank asal"
+                  defaultValue={form.nama}
+                  className="max-w-xs"
+                />
+                <Select
+                  label="Targer vendor"
+                  variant="bordered"
+                  placeholder="Pilih target vendor"
+                  selectedKeys={form.selectedBank}
+                  className="max-w-xs"
+                  onSelectionChange={(val) => {
+                    setForm({
+                      ...form,
+                      selectedBank: val,
+                      bank: new Set(val).values().next().value,
+                    });
+                  }}
+                >
+                  {bank.data?.map((item) => (
+                    <SelectItem key={item.id} value={item.id}>
+                      {item.nama}
+                    </SelectItem>
+                  ))}
+                </Select>
+                {/* <Input
+                  type="text"
+                  label="Alamat"
+                  placeholder="Masukkan alamat!"
+                  value={form.alamat}
+                  onValueChange={(val) => setForm({ ...form, alamat: val })}
+                /> */}
+                {/* <Textarea
+                  label="Keterangan"
+                  labelPlacement="inside"
+                  placeholder="Masukkan keterangan!"
+                  value={form.keterangan}
+                  onValueChange={(val) => setForm({ ...form, keterangan: val })}
+                /> */}
+              </ModalBody>
+              <ModalFooter>
+                <Button
+                  color="danger"
+                  variant="light"
+                  onPress={transfer.onClose}
+                >
+                  Batal
+                </Button>
+                <Button
+                  color="primary"
+                  onPress={() => saveTransferButtonPress(transfer.onClose)}
                 >
                   Simpan
                 </Button>

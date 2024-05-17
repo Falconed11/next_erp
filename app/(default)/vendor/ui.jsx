@@ -1,7 +1,11 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import * as XLSX from "xlsx";
-import { useClientFetch, getApiPath } from "@/app/utils/apiconfig";
+import {
+  useClientFetch,
+  getApiPath,
+  useClientFetchPagination,
+} from "@/app/utils/apiconfig";
 import {
   Table,
   TableHeader,
@@ -12,6 +16,7 @@ import {
   User,
   Chip,
   Tooltip,
+  Pagination,
   ChipProps,
   getKeyValue,
 } from "@nextui-org/react";
@@ -36,6 +41,7 @@ import {
   UserIcon,
   NoteIcon,
   ReportMoneyIcon,
+  TransferIcon,
 } from "../../../components/icon";
 import {
   getCurFirstLastDay,
@@ -52,11 +58,14 @@ const apiPath = getApiPath();
 
 export default function app() {
   const vendor = useClientFetch("hutangvendor");
+  const [form, setForm] = useState({});
+  const [page, setPage] = React.useState(1);
+  const rowsPerPage = 25;
 
   const saveButtonPress = async (onClose) => {
-    if (form.isSwasta.size == 0) return alert("Swasta/Negri belum diisi");
-    const res = await fetch(`${apiPath}proyek`, {
-      method,
+    // if (form.isSwasta.size == 0) return alert("Swasta/Negri belum diisi");
+    const res = await fetch(`${apiPath}vendor`, {
+      method: form.method,
       headers: {
         "Content-Type": "application/json",
         // 'Content-Type': 'application/x-www-form-urlencoded',
@@ -68,43 +77,52 @@ export default function app() {
     onClose();
     //return alert(json.message);
   };
+  const saveTransferButtonPress = async (onClose) => {
+    // if (form.isSwasta.size == 0) return alert("Swasta/Negri belum diisi");
+    const res = await fetch(`${apiPath}transfervendor`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        // 'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: JSON.stringify({
+        currentId: form.currentId,
+        targetId: form.vendor,
+      }),
+    });
+    const json = await res.json();
+    if (res.status == 400) return alert(json.message);
+    onClose();
+    //return alert(json.message);
+  };
   const tambahButtonPress = () => {
     setForm({
-      modalmode: "Tambah",
       id: "",
       nama: "",
-      klien: "",
-      instansi: "",
-      kota: "",
-      selectkaryawan: "",
-      selectperusahaan: "",
-      // selectstatus: "",
-      isSwasta: "",
-      tanggal: "",
-      startdate: "",
-      keterangan: "",
+      alamat: "",
+      method: "POST",
+      title: "Tambah",
     });
-    setMethod("POST");
     onOpen();
   };
   const editButtonPress = (data) => {
-    const startdate = new Date(data.tanggal);
     setForm({
       ...data,
-      modalmode: "Edit",
-      tanggal: getDate(startdate),
-      startdate,
-      selectkaryawan: String(data.id_karyawan),
-      selectperusahaan: String(data.id_perusahaan),
-      // selectstatus: String(data.id_statusproyek),
-      isSwasta: String(data.swasta),
+      method: "PUT",
+      title: "Edit",
     });
-    setMethod("PUT");
     onOpen();
   };
+  const transferButtonPress = (data) => {
+    setForm({
+      currentId: data.id,
+      nama: data.nama,
+    });
+    transfer.onOpen();
+  };
   const deleteButtonPress = async (id) => {
-    if (confirm("Hapus proyek?")) {
-      const res = await fetch(`${apiPath}proyek`, {
+    if (confirm("Hapus vendor?")) {
+      const res = await fetch(`${apiPath}vendor`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -177,38 +195,36 @@ export default function app() {
       case "totalharga":
         return data.jumlah * data.harga;
       case "hutang":
-        return <Harga harga={+hutang} />;
+        return (
+          <div className="text-right">
+            <Harga harga={+hutang} />
+          </div>
+        );
       case "aksi":
         return (
           <div className="relative flex items-center gap-2">
-            <Tooltip content="Penawaran">
-              <Link
+            <Tooltip content="Detail">
+              {/* <Link
                 href={`/proyek/detail?id=${data.id}&versi=${
                   data.versi <= 0 ? "1" : data.versi
                 }`}
+              > */}
+              <span
+                // onClick={() => detailButtonPress(data)}
+                className="text-lg text-default-400 cursor-pointer active:opacity-50"
               >
-                <span
-                  // onClick={() => detailButtonPress(data)}
-                  className="text-lg text-default-400 cursor-pointer active:opacity-50"
-                >
-                  <NoteIcon />
-                </span>
-              </Link>
+                <EyeIcon />
+              </span>
+              {/* </Link> */}
             </Tooltip>
-            {data.versi > 0 ? (
-              <Tooltip content="Pengeluaran Proyek">
-                <Link href={`/proyek/detail/proses?id=${data.id}`}>
-                  <span
-                    // onClick={() => detailButtonPress(data)}
-                    className="text-lg text-default-400 cursor-pointer active:opacity-50"
-                  >
-                    <ReportMoneyIcon />
-                  </span>
-                </Link>
-              </Tooltip>
-            ) : (
-              <></>
-            )}
+            <Tooltip content="Transfer">
+              <span
+                onClick={() => transferButtonPress(data)}
+                className="text-lg text-default-400 cursor-pointer active:opacity-50"
+              >
+                <TransferIcon />
+              </span>
+            </Tooltip>
             <Tooltip content="Edit">
               <span
                 onClick={() => editButtonPress(data)}
@@ -232,9 +248,16 @@ export default function app() {
     }
   }, []);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const transfer = useDisclosure();
   const report = useDisclosure();
-  if (vendor.error) return <div>failed to load</div>;
-  if (vendor.isLoading) return <div>loading...</div>;
+
+  const pages = useMemo(() => {
+    return vendor.data ? Math.ceil(vendor.data?.length / rowsPerPage) : 0;
+  }, [vendor.data?.length, rowsPerPage]);
+  const loadingState =
+    vendor.isLoading || vendor.data?.length === 0 ? "loading" : "idle";
+  const offset = (page - 1) * rowsPerPage;
+
   const columns = [
     {
       key: "id",
@@ -257,6 +280,7 @@ export default function app() {
       label: "Aksi",
     },
   ];
+
   return (
     <div className="flex flex-col">
       <div className="flex flex-row gap-2">
@@ -281,6 +305,21 @@ export default function app() {
         className="pt-3"
         aria-label="Example table with custom cells"
         topContent={<></>}
+        bottomContent={
+          pages > 0 ? (
+            <div className="flex w-full justify-center">
+              <Pagination
+                isCompact
+                showControls
+                showShadow
+                color="primary"
+                page={page}
+                total={pages}
+                onChange={(page) => setPage(page)}
+              />
+            </div>
+          ) : null
+        }
       >
         <TableHeader columns={columns}>
           {(column) => (
@@ -292,7 +331,13 @@ export default function app() {
             </TableColumn>
           )}
         </TableHeader>
-        <TableBody items={vendor.data}>
+        <TableBody
+          items={
+            vendor.data ? vendor.data.slice(offset, offset + rowsPerPage) : []
+          }
+          loadingContent={"Loading..."}
+          loadingState={loadingState}
+        >
           {(item) => (
             <TableRow key={item.id}>
               {(columnKey) => (
@@ -311,30 +356,10 @@ export default function app() {
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                {form.modalmode} Proyek
+                {form.title} Vendor
               </ModalHeader>
               <ModalBody>
-                <Select
-                  label="Perusahaan"
-                  variant="bordered"
-                  placeholder="Pilih perusahaan!"
-                  selectedKeys={form.selectperusahaan}
-                  className="max-w-xs"
-                  onSelectionChange={(val) => {
-                    setForm({
-                      ...form,
-                      selectperusahaan: val,
-                      id_perusahaan: new Set(val).values().next().value,
-                    });
-                  }}
-                >
-                  {perusahaan.data.map((item) => (
-                    <SelectItem key={item.id} value={item.id}>
-                      {item.nama}
-                    </SelectItem>
-                  ))}
-                </Select>
-                <Select
+                {/* <Select
                   label="Swasta/Negri"
                   variant="bordered"
                   placeholder="Pilih swasta/negri!"
@@ -353,94 +378,28 @@ export default function app() {
                       {item.nama}
                     </SelectItem>
                   ))}
-                </Select>
+                </Select> */}
                 <Input
                   type="text"
-                  label="Nama Proyek"
-                  placeholder="Masukkan nama proyek!"
+                  label="Nama Vendor"
+                  placeholder="Masukkan nama vendor!"
                   value={form.nama}
                   onValueChange={(val) => setForm({ ...form, nama: val })}
                 />
                 <Input
                   type="text"
-                  label="Klien"
-                  placeholder="Masukkan klien!"
-                  value={form.klien}
-                  onValueChange={(val) => setForm({ ...form, klien: val })}
+                  label="Alamat"
+                  placeholder="Masukkan alamat!"
+                  value={form.alamat}
+                  onValueChange={(val) => setForm({ ...form, alamat: val })}
                 />
-                <Input
-                  type="text"
-                  label="Instansi"
-                  placeholder="Masukkan instansi!"
-                  value={form.instansi}
-                  onValueChange={(val) => setForm({ ...form, instansi: val })}
-                />
-                <Input
-                  type="text"
-                  label="Kota"
-                  placeholder="Masukkan kota!"
-                  value={form.kota}
-                  onValueChange={(val) => setForm({ ...form, kota: val })}
-                />
-                <Select
-                  label="Sales"
-                  variant="bordered"
-                  placeholder="Pilih sales!"
-                  selectedKeys={form.selectkaryawan}
-                  className="max-w-xs"
-                  onSelectionChange={(val) => {
-                    console.log(val);
-                    setForm({
-                      ...form,
-                      selectkaryawan: val,
-                      id_karyawan: new Set(val).values().next().value,
-                    });
-                  }}
-                >
-                  {karyawan.data.map((item) => (
-                    <SelectItem key={item.id} value={item.id}>
-                      {item.nama}
-                    </SelectItem>
-                  ))}
-                </Select>
-                {/* <Select
-                  label="Status"
-                  variant="bordered"
-                  placeholder="Pilih status!"
-                  selectedKeys={form.selectstatus}
-                  className="max-w-xs"
-                  onSelectionChange={(val) => {
-                    setForm({
-                      ...form,
-                      selectstatus: val,
-                      id_statusproyek: new Set(val).values().next().value,
-                    });
-                  }}
-                >
-                  {statusproyek.data.map((item) => (
-                    <SelectItem key={item.id} value={item.id}>
-                      {item.nama}
-                    </SelectItem>
-                  ))}
-                </Select> */}
-                <div className="bg-gray-100 p-3 rounded-lg">
-                  <div>Tanggal</div>
-                  <DatePicker
-                    placeholderText="Pilih tanggal"
-                    dateFormat="dd/MM/yyyy"
-                    selected={form.startdate}
-                    onChange={(v) =>
-                      setForm({ ...form, startdate: v, tanggal: getDate(v) })
-                    }
-                  />
-                </div>
-                <Textarea
+                {/* <Textarea
                   label="Keterangan"
                   labelPlacement="inside"
                   placeholder="Masukkan keterangan!"
                   value={form.keterangan}
                   onValueChange={(val) => setForm({ ...form, keterangan: val })}
-                />
+                /> */}
               </ModalBody>
               <ModalFooter>
                 <Button color="danger" variant="light" onPress={onClose}>
@@ -449,6 +408,80 @@ export default function app() {
                 <Button
                   color="primary"
                   onPress={() => saveButtonPress(onClose)}
+                >
+                  Simpan
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+      {/* transfer */}
+      <Modal
+        isOpen={transfer.isOpen}
+        onOpenChange={transfer.onOpenChange}
+        scrollBehavior="inside"
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">
+                Transfer Vendor
+              </ModalHeader>
+              <ModalBody>
+                <Input
+                  isDisabled
+                  type="text"
+                  label="Vendor asal"
+                  defaultValue={form.nama}
+                  className="max-w-xs"
+                />
+                <Select
+                  label="Targer vendor"
+                  variant="bordered"
+                  placeholder="Pilih target vendor"
+                  selectedKeys={form.selectedVendor}
+                  className="max-w-xs"
+                  onSelectionChange={(val) => {
+                    setForm({
+                      ...form,
+                      selectedVendor: val,
+                      vendor: new Set(val).values().next().value,
+                    });
+                  }}
+                >
+                  {vendor.data?.map((item) => (
+                    <SelectItem key={item.id} value={item.id}>
+                      {item.nama}
+                    </SelectItem>
+                  ))}
+                </Select>
+                {/* <Input
+                  type="text"
+                  label="Alamat"
+                  placeholder="Masukkan alamat!"
+                  value={form.alamat}
+                  onValueChange={(val) => setForm({ ...form, alamat: val })}
+                /> */}
+                {/* <Textarea
+                  label="Keterangan"
+                  labelPlacement="inside"
+                  placeholder="Masukkan keterangan!"
+                  value={form.keterangan}
+                  onValueChange={(val) => setForm({ ...form, keterangan: val })}
+                /> */}
+              </ModalBody>
+              <ModalFooter>
+                <Button
+                  color="danger"
+                  variant="light"
+                  onPress={transfer.onClose}
+                >
+                  Batal
+                </Button>
+                <Button
+                  color="primary"
+                  onPress={() => saveTransferButtonPress(transfer.onClose)}
                 >
                   Simpan
                 </Button>

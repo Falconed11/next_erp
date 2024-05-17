@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import * as XLSX from "xlsx";
 import Link from "next/link";
 import {
@@ -12,6 +12,7 @@ import {
   User,
   Chip,
   Tooltip,
+  Pagination,
   ChipProps,
   getKeyValue,
 } from "@nextui-org/react";
@@ -22,7 +23,7 @@ import {
   DeleteIcon,
   EyeIcon,
   UserIcon,
-} from "../../../components/icon";
+} from "@/components/icon";
 import {
   Modal,
   ModalContent,
@@ -34,7 +35,7 @@ import {
 import Harga from "@/components/harga";
 import { FileUploader } from "@/components/input";
 import "react-datepicker/dist/react-datepicker.css";
-import { getApiPath, useClientFetch } from "../../utils/apiconfig";
+import { getApiPath, useClientFetch } from "@/app/utils/apiconfig";
 import { Button } from "@nextui-org/react";
 import { Input, Textarea } from "@nextui-org/react";
 
@@ -48,6 +49,10 @@ export default function App() {
   const kategori = useClientFetch("kategoriproduk");
   const subkategori = useClientFetch("subkategoriproduk");
   const merek = useClientFetch("merek");
+
+  const [page, setPage] = React.useState(1);
+  const rowsPerPage = 25;
+
   const [method, setMethod] = useState("POST");
   const [form, setForm] = useState({
     modalmode: "Tambah",
@@ -239,6 +244,13 @@ export default function App() {
     }
   }, []);
 
+  const pages = useMemo(() => {
+    return produk.data ? Math.ceil(produk.data?.length / rowsPerPage) : 0;
+  }, [produk.data?.length, rowsPerPage]);
+  const loadingState =
+    produk.isLoading || produk.data?.length === 0 ? "loading" : "idle";
+  const offset = (page - 1) * rowsPerPage;
+
   if (produk.error) return <div>failed to load</div>;
   if (produk.isLoading) return <div>loading...</div>;
   if (kategori.error) return <div>failed to load</div>;
@@ -254,7 +266,7 @@ export default function App() {
       label: "Kategori",
     },
     {
-      key: "id_kustom",
+      key: "id",
       label: "Id",
     },
     {
@@ -328,6 +340,7 @@ export default function App() {
         </Button>
       </div>
       <Table
+        isStriped
         selectionMode="single"
         className="pt-3"
         aria-label="Example table with custom cells"
@@ -355,6 +368,21 @@ export default function App() {
             </div>
           </>
         }
+        bottomContent={
+          pages > 0 ? (
+            <div className="flex w-full justify-center">
+              <Pagination
+                isCompact
+                showControls
+                showShadow
+                color="primary"
+                page={page}
+                total={pages}
+                onChange={(page) => setPage(page)}
+              />
+            </div>
+          ) : null
+        }
       >
         <TableHeader columns={col}>
           {(column) => (
@@ -366,7 +394,13 @@ export default function App() {
             </TableColumn>
           )}
         </TableHeader>
-        <TableBody items={produk.data}>
+        <TableBody
+          items={
+            produk.data ? produk.data.slice(offset, offset + rowsPerPage) : []
+          }
+          loadingContent={"Loading..."}
+          loadingState={loadingState}
+        >
           {(item) => (
             <TableRow key={item.id}>
               {(columnKey) => (
