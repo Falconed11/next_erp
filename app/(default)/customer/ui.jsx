@@ -64,7 +64,7 @@ export default function app() {
 
   const saveButtonPress = async (onClose) => {
     // if (form.isSwasta.size == 0) return alert("Swasta/Negri belum diisi");
-    const res = await fetch(`${apiPath}vendor`, {
+    const res = await fetch(`${apiPath}customer`, {
       method: form.method,
       headers: {
         "Content-Type": "application/json",
@@ -79,7 +79,7 @@ export default function app() {
   };
   const saveTransferButtonPress = async (onClose) => {
     // if (form.isSwasta.size == 0) return alert("Swasta/Negri belum diisi");
-    const res = await fetch(`${apiPath}transfervendor`, {
+    const res = await fetch(`${apiPath}transfercustomer`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -87,7 +87,7 @@ export default function app() {
       },
       body: JSON.stringify({
         currentId: form.currentId,
-        targetId: form.vendor,
+        targetId: form.targetId,
       }),
     });
     const json = await res.json();
@@ -122,7 +122,7 @@ export default function app() {
   };
   const deleteButtonPress = async (id) => {
     if (confirm("Hapus vendor?")) {
-      const res = await fetch(`${apiPath}vendor`, {
+      const res = await fetch(`${apiPath}customer`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -268,8 +268,16 @@ export default function app() {
       label: "Nama",
     },
     {
+      key: "jumlah_proyek",
+      label: "Jumlah Proyek",
+    },
+    {
       key: "provit",
       label: "Provit",
+    },
+    {
+      key: "alamat",
+      label: "Alamat",
     },
     {
       key: "aksi",
@@ -354,7 +362,7 @@ export default function app() {
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                {form.title} Vendor
+                {form.title} customer
               </ModalHeader>
               <ModalBody>
                 {/* <Select
@@ -379,8 +387,8 @@ export default function app() {
                 </Select> */}
                 <Input
                   type="text"
-                  label="Nama Vendor"
-                  placeholder="Masukkan nama vendor!"
+                  label="Nama Instansi"
+                  placeholder="Masukkan nama instansi!"
                   value={form.nama}
                   onValueChange={(val) => setForm({ ...form, nama: val })}
                 />
@@ -435,20 +443,20 @@ export default function app() {
                   className="max-w-xs"
                 />
                 <Select
-                  label="Targer vendor"
+                  label="Targer customer"
                   variant="bordered"
-                  placeholder="Pilih target vendor"
-                  selectedKeys={form.selectedVendor}
+                  placeholder="Pilih target customer"
+                  selectedKeys={form.selectedId}
                   className="max-w-xs"
                   onSelectionChange={(val) => {
                     setForm({
                       ...form,
-                      selectedVendor: val,
-                      vendor: new Set(val).values().next().value,
+                      selectedId: val,
+                      targetId: new Set(val).values().next().value,
                     });
                   }}
                 >
-                  {vendor.data?.map((item) => (
+                  {customer.data?.map((item) => (
                     <SelectItem key={item.id} value={item.id}>
                       {item.nama}
                     </SelectItem>

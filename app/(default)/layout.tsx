@@ -8,31 +8,31 @@ export default function RootLayout({ children, }: { children: React.ReactNode })
     const user = session.data?.user
     const links = [
         { href: "/", name: "Dashboard" },
-        { href: "/produk", name: "Produk" },
-        // {
-        //     href: "/produk", name: "Produk", dropdown: [
-        //         {
-        //             key: "data",
-        //             name: "Data",
-        //             href: "/produk"
-        //         },
-        //         // {
-        //         //     key: "merek",
-        //         //     name: "Merek",
-        //         //     href: "/produk/merek"
-        //         // },
-        //         // {
-        //         //     key: "kategori",
-        //         //     name: "Kategori",
-        //         //     href: "/produk/kategori"
-        //         // },
-        //         // {
-        //         //     key: "subkategori",
-        //         //     name: "Sub Kategori",
-        //         //     href: "/produk/subkategori"
-        //         // },
-        //     ]
-        // },
+        // { href: "/produk", name: "Produk" },
+        {
+            href: "/produk", name: "Produk", dropdown: [
+                {
+                    key: "data",
+                    name: "Produk",
+                    href: "/produk"
+                },
+                {
+                    key: "merek",
+                    name: "Merek",
+                    href: "/produk/merek"
+                },
+                {
+                    key: "kategori",
+                    name: "Kategori",
+                    href: "/produk/kategori"
+                },
+                // {
+                //     key: "subkategori",
+                //     name: "Sub Kategori",
+                //     href: "/produk/subkategori"
+                // },
+            ]
+        },
         // { href: "/stok", name: "Stok" },
         {
             href: "/proyek", name: "Proyek", dropdown: [

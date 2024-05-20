@@ -267,8 +267,8 @@ export default function App() {
 
   const columns = [
     {
-      key: "no",
-      label: "No",
+      key: "id",
+      label: "Id",
     },
     {
       key: "id_second",

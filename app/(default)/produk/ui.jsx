@@ -47,8 +47,8 @@ export default function App() {
     `produk?kategori=${selectKategori.values().next().value ?? ""}`
   );
   const kategori = useClientFetch("kategoriproduk");
-  const subkategori = useClientFetch("subkategoriproduk");
   const merek = useClientFetch("merek");
+  const vendor = useClientFetch("vendor");
 
   const [page, setPage] = React.useState(1);
   const rowsPerPage = 25;
@@ -67,7 +67,7 @@ export default function App() {
     satuan: "",
     hargamodal: "",
     hargajual: "",
-    select_kategori: new Set([]),
+    selectedKategori: new Set([]),
     select_subkategori: new Set([]),
     select_merek: new Set([]),
     filteredsubkategori: [],
@@ -108,7 +108,7 @@ export default function App() {
       satuan: "",
       hargamodal: "",
       hargajual: "",
-      select_kategori: new Set([]),
+      selectedKategori: new Set([]),
       select_subkategori: new Set([]),
       select_merek: new Set([]),
       filteredsubkategori: [],
@@ -247,14 +247,15 @@ export default function App() {
   const pages = useMemo(() => {
     return produk.data ? Math.ceil(produk.data?.length / rowsPerPage) : 0;
   }, [produk.data?.length, rowsPerPage]);
-  const loadingState =
-    produk.isLoading || produk.data?.length === 0 ? "loading" : "idle";
+  const loadingState = produk.isLoading ? "loading" : "idle";
   const offset = (page - 1) * rowsPerPage;
 
   if (produk.error) return <div>failed to load</div>;
   if (produk.isLoading) return <div>loading...</div>;
   if (kategori.error) return <div>failed to load</div>;
   if (kategori.isLoading) return <div>loading...</div>;
+  if (vendor.error) return <div>failed to load</div>;
+  if (vendor.isLoading) return <div>loading...</div>;
   // if (subkategori.error) return <div>failed to load</div>;
   // if (subkategori.isLoading) return <div>loading...</div>;
   // if (merek.error) return <div>failed to load</div>;
@@ -314,11 +315,11 @@ export default function App() {
   let filteredsubkategori = [
     { nama: "Silahkan pilih kategori terlebih dahulu" },
   ];
-  if (form.id_kategori) {
-    filteredsubkategori = subkategori.data.filter((item) => {
-      if (item.id_kategoriproduk == form.id_kategori) return item;
-    });
-  }
+  // if (form.id_kategori) {
+  //   filteredsubkategori = subkategori.data.filter((item) => {
+  //     if (item.id_kategoriproduk == form.id_kategori) return item;
+  //   });
+  // }
 
   return (
     <div className="flex flex-col">
@@ -356,8 +357,8 @@ export default function App() {
               onSelectionChange={setSelectKategori}
             >
               {kategori.data.map((item) => (
-                <SelectItem key={item.kategori} value={item.kategori}>
-                  {`${item.kategori}`}
+                <SelectItem key={item.id} value={item.id}>
+                  {`${item.nama}`}
                 </SelectItem>
               ))}
             </Select>
@@ -399,6 +400,7 @@ export default function App() {
             produk.data ? produk.data.slice(offset, offset + rowsPerPage) : []
           }
           loadingContent={"Loading..."}
+          emptyContent={"Kosong"}
           loadingState={loadingState}
         >
           {(item) => (
@@ -422,13 +424,25 @@ export default function App() {
                 {form.modalmode} Produk
               </ModalHeader>
               <ModalBody>
-                <Input
-                  type="text"
+                <Select
                   label="Kategori"
-                  placeholder="Masukkan kategori!"
-                  value={form.kategori}
-                  onValueChange={(val) => setForm({ ...form, kategori: val })}
-                />
+                  placeholder="Pilih Kategori"
+                  className="max-w-xs"
+                  selectedKeys={form.selectKategori}
+                  onSelectionChange={(val) =>
+                    setForm({
+                      ...form,
+                      selectKategori: val,
+                      id_kategori: new Set(val).values().next().value,
+                    })
+                  }
+                >
+                  {kategori.data.map((item) => (
+                    <SelectItem key={item.id} value={item.id}>
+                      {item.nama}
+                    </SelectItem>
+                  ))}
+                </Select>
                 <Input
                   type="text"
                   label="Id"
@@ -443,59 +457,16 @@ export default function App() {
                   value={form.nama}
                   onValueChange={(val) => setForm({ ...form, nama: val })}
                 />
-                {/* <Select
-                  label="Kategori"
-                  placeholder="Pilih Kategori"
-                  className="max-w-xs"
-                  selectedKeys={form.select_kategori}
-                  onChange={(e) =>
-                    setForm({
-                      ...form,
-                      id_kategori: e.target.value,
-                      select_kategori: new Set([e.target.value]),
-                      filteredsubkategori: subkategori.data.filter((item) => {
-                        if (item.id_kategoriproduk == e.target.value) {
-                          return item;
-                        }
-                      }),
-                    })
-                  }
-                >
-                  {kategori.data.map((item) => (
-                    <SelectItem key={item.id} value={item.id}>
-                      {item.nama}
-                    </SelectItem>
-                  ))}
-                </Select>
-                <Select
-                  label="Subkategori"
-                  placeholder="Pilih Subkategori"
-                  className="max-w-xs"
-                  selectedKeys={form.select_subkategori}
-                  onChange={(e) =>
-                    setForm({
-                      ...form,
-                      id_subkategori: e.target.value,
-                      select_subkategori: new Set([e.target.value]),
-                    })
-                  }
-                >
-                  {filteredsubkategori.map((item) => (
-                    <SelectItem key={item.id} value={item.id}>
-                      {item.nama}
-                    </SelectItem>
-                  ))}
-                </Select>
                 <Select
                   label="Merek"
                   placeholder="Pilih Merek"
                   className="max-w-xs"
-                  selectedKeys={form.select_merek}
-                  onChange={(e) =>
+                  selectedKeys={form.selectMerek}
+                  onSelectionChange={(val) =>
                     setForm({
                       ...form,
-                      id_merek: e.target.value,
-                      select_merek: new Set([e.target.value]),
+                      selectMerek: val,
+                      id_merek: new Set(val).values().next().value,
                     })
                   }
                 >
@@ -504,14 +475,7 @@ export default function App() {
                       {item.nama}
                     </SelectItem>
                   ))}
-                </Select> */}
-                <Input
-                  type="text"
-                  label="Merek"
-                  placeholder="Masukkan merek!"
-                  value={form.merek}
-                  onValueChange={(val) => setForm({ ...form, merek: val })}
-                />
+                </Select>
                 <Input
                   type="text"
                   label="Tipe"
@@ -519,13 +483,25 @@ export default function App() {
                   value={form.tipe}
                   onValueChange={(val) => setForm({ ...form, tipe: val })}
                 />
-                <Input
-                  type="text"
+                <Select
                   label="Vendor"
-                  placeholder="Masukkan vendor!"
-                  value={form.vendor}
-                  onValueChange={(val) => setForm({ ...form, vendor: val })}
-                />
+                  placeholder="Pilih Vendor"
+                  className="max-w-xs"
+                  selectedKeys={form.selectVendor}
+                  onSelectionChange={(val) =>
+                    setForm({
+                      ...form,
+                      selectVendor: val,
+                      id_Vendor: new Set(val).values().next().value,
+                    })
+                  }
+                >
+                  {vendor.data.map((item) => (
+                    <SelectItem key={item.id} value={item.id}>
+                      {item.nama}
+                    </SelectItem>
+                  ))}
+                </Select>
                 <Input
                   type="number"
                   label="Stok"
