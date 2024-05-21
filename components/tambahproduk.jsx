@@ -38,8 +38,8 @@ export default function TambahProduk({ form, setForm }) {
         }}
       >
         {kategori.data.map((item) => (
-          <SelectItem key={item.kategori} value={item.kategori}>
-            {item.kategori}
+          <SelectItem key={item.id} value={item.id}>
+            {item.nama}
           </SelectItem>
         ))}
       </Select>
@@ -54,9 +54,9 @@ export default function TambahProduk({ form, setForm }) {
           <SelectItem
             key={item.id}
             value={item.id}
-            textValue={`${item.nama} | ${item.merek} | ${item.tipe} | ${item.stok} ${item.satuan} | ${item.hargamodal} | ${item.hargajual}`}
+            textValue={`${item.nama} | ${item.nmerek} | ${item.nvendor} | ${item.tipe} | ${item.stok} ${item.satuan} | ${item.hargamodal} | ${item.hargajual}`}
           >
-            {item.nama} | {item.merek} | {item.tipe} |{" "}
+            {item.nama} | {item.nmerek} | {item.nvendor} | {item.tipe} |{" "}
             <span className="p-1 bg-black text-white">
               {item.stok} {item.satuan}
             </span>{" "}

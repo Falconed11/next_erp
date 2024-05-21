@@ -38,6 +38,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { getApiPath, useClientFetch } from "@/app/utils/apiconfig";
 import { Button } from "@nextui-org/react";
 import { Input, Textarea } from "@nextui-org/react";
+import { getDateFId } from "@/app/utils/date";
 
 const apiPath = getApiPath();
 
@@ -48,7 +49,7 @@ export default function App() {
   );
   const kategori = useClientFetch("kategoriproduk");
   const merek = useClientFetch("merek");
-  const vendor = useClientFetch("vendor");
+  const vendor = useClientFetch("vendor?columnName=nama");
 
   const [page, setPage] = React.useState(1);
   const rowsPerPage = 25;
@@ -207,6 +208,8 @@ export default function App() {
             <Harga harga={data.hargamodal} />
           </div>
         );
+      case "tanggal":
+        return getDateFId(new Date(data.tanggal));
       case "hargajual":
         return (
           <div className="text-right">
@@ -301,6 +304,10 @@ export default function App() {
     {
       key: "hargajual",
       label: "Harga Jual",
+    },
+    {
+      key: "tanggal",
+      label: "Tanggal",
     },
     {
       key: "keterangan",
