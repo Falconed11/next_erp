@@ -63,6 +63,8 @@ export default function App() {
   const perusahaan = useClientFetch("perusahaan");
   const karyawan = useClientFetch("karyawan");
   const statusproyek = useClientFetch("statusproyek");
+  const customer = useClientFetch("customer");
+  const kategoriproyek = useClientFetch("kategoriproyek");
   const [form, setForm] = useState({});
   const [method, setMethod] = useState("POST");
   const [json, setJson] = useState([]);
@@ -92,6 +94,8 @@ export default function App() {
       kota: "",
       selectkaryawan: "",
       selectperusahaan: "",
+      selectcustomer: "",
+      selectkategoriproyek: "",
       // selectstatus: "",
       isSwasta: "",
       tanggal: "",
@@ -110,6 +114,8 @@ export default function App() {
       startdate,
       selectkaryawan: String(data.id_karyawan),
       selectperusahaan: String(data.id_perusahaan),
+      selectcustomer: String(data.id_instansi),
+      selectkategoriproyek: String(data.id_kategoriproyek),
       // selectstatus: String(data.id_statusproyek),
       isSwasta: String(data.swasta),
     });
@@ -264,6 +270,10 @@ export default function App() {
   if (perusahaan.isLoading) return <div>loading...</div>;
   if (statusproyek.error) return <div>failed to load</div>;
   if (statusproyek.isLoading) return <div>loading...</div>;
+  if (customer.error) return <div>failed to load</div>;
+  if (customer.isLoading) return <div>loading...</div>;
+  if (kategoriproyek.error) return <div>failed to load</div>;
+  if (kategoriproyek.isLoading) return <div>loading...</div>;
 
   const columns = [
     {
@@ -281,6 +291,10 @@ export default function App() {
     {
       key: "swasta",
       label: "Swasta/Negri",
+    },
+    {
+      key: "kategoriproyek",
+      label: "Kategori Proyek",
     },
     {
       key: "nama",
@@ -452,6 +466,26 @@ export default function App() {
                     </SelectItem>
                   ))}
                 </Select>
+                <Select
+                  label="Kategori Proyek"
+                  variant="bordered"
+                  placeholder="Pilih kategori proyek!"
+                  selectedKeys={form.selectkategoriproyek}
+                  className="max-w-xs"
+                  onSelectionChange={(val) => {
+                    setForm({
+                      ...form,
+                      selectkategoriproyek: val,
+                      id_kategoriproyek: new Set(val).values().next().value,
+                    });
+                  }}
+                >
+                  {kategoriproyek.data.map((item) => (
+                    <SelectItem key={item.id} value={item.id}>
+                      {item.nama}
+                    </SelectItem>
+                  ))}
+                </Select>
                 <Input
                   type="text"
                   label="Nama Proyek"
@@ -466,13 +500,26 @@ export default function App() {
                   value={form.klien}
                   onValueChange={(val) => setForm({ ...form, klien: val })}
                 />
-                <Input
-                  type="text"
-                  label="Instansi"
-                  placeholder="Masukkan instansi!"
-                  value={form.instansi}
-                  onValueChange={(val) => setForm({ ...form, instansi: val })}
-                />
+                <Select
+                  label="Customer"
+                  variant="bordered"
+                  placeholder="Pilih customer!"
+                  selectedKeys={form.selectcustomer}
+                  className="max-w-xs"
+                  onSelectionChange={(val) => {
+                    setForm({
+                      ...form,
+                      selectcustomer: val,
+                      id_instansi: new Set(val).values().next().value,
+                    });
+                  }}
+                >
+                  {customer.data.map((item) => (
+                    <SelectItem key={item.id} value={item.id}>
+                      {item.nama}
+                    </SelectItem>
+                  ))}
+                </Select>
                 <Input
                   type="text"
                   label="Kota"

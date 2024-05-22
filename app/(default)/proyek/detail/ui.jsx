@@ -109,7 +109,7 @@ export default function App({ id, versi }) {
       },
       body: JSON.stringify({
         id_proyek: id,
-        id_produk: form.selectProduk.values().next().value,
+        id_produk: form.selectProduk,
         jumlah: form.jumlah,
         harga: form.harga,
         instalasi: form.instalasi,
@@ -225,7 +225,7 @@ export default function App({ id, versi }) {
     //   pajak,
     // });
     // console.log(formRekapitulasi);
-    setSelected(jenisProyek);
+    setSelected(kategoriProyek);
     modal.jenisproyek.onOpen();
   };
   const handleButtonSimpanRekapitulasi = async (data, onClose) => {
@@ -446,10 +446,11 @@ export default function App({ id, versi }) {
     return { ...produk, no: i + 1 };
   });
   const selectedProyek = proyek.data[0];
+
   const col = {
     keranjangproyek: [
       {
-        key: "kategori",
+        key: "kategoriproduk",
         label: "Kategori",
       },
       {
@@ -457,12 +458,16 @@ export default function App({ id, versi }) {
         label: "Nama",
       },
       {
-        key: "merek",
+        key: "nmerek",
         label: "Merek",
       },
       {
         key: "tipe",
         label: "Tipe",
+      },
+      {
+        key: "nvendor",
+        label: "Vendor",
       },
       {
         key: "stok",
@@ -515,12 +520,16 @@ export default function App({ id, versi }) {
         label: "Nama",
       },
       {
-        key: "merek",
+        key: "nmerek",
         label: "Merek",
       },
       {
         key: "tipe",
         label: "Tipe",
+      },
+      {
+        key: "nvendor",
+        label: "Vendor",
       },
       {
         key: "stok",
@@ -616,6 +625,7 @@ export default function App({ id, versi }) {
       },
     ],
   };
+
   if (selectedProyek.versi == 0) {
     col.keranjangproyek.push({
       key: "aksi",
@@ -627,11 +637,12 @@ export default function App({ id, versi }) {
     });
   }
   const selectedRekapitulasiProyek = rekapitulasiProyek.data[0];
-  const jenisProyek = [];
+  const kategoriProyek = [];
   if (selectedRekapitulasiProyek) {
-    if (selectedRekapitulasiProyek.audio) jenisProyek.push("audio");
-    if (selectedRekapitulasiProyek.cctv) jenisProyek.push("cctv");
-    if (selectedRekapitulasiProyek.multimedia) jenisProyek.push("multimedia");
+    if (selectedRekapitulasiProyek.audio) kategoriProyek.push("audio");
+    if (selectedRekapitulasiProyek.cctv) kategoriProyek.push("cctv");
+    if (selectedRekapitulasiProyek.multimedia)
+      kategoriProyek.push("multimedia");
   }
   const rekapDiskon = selectedRekapitulasiProyek
     ? selectedRekapitulasiProyek.diskon
@@ -667,9 +678,7 @@ export default function App({ id, versi }) {
       return (
         total +
         currentValue.jumlah *
-          (currentValue.hargakustom
-            ? currentValue.hargakustom
-            : currentValue.hargajual)
+          (currentValue.hargakustom ?? currentValue.hargajual)
       );
     },
     0
@@ -685,9 +694,7 @@ export default function App({ id, versi }) {
       return (
         total +
         currentValue.jumlah *
-          (currentValue.hargakustom
-            ? currentValue.hargakustom
-            : currentValue.hargajual)
+          (currentValue.hargakustom ?? currentValue.hargajual)
       );
     },
     0
@@ -846,7 +853,7 @@ export default function App({ id, versi }) {
               {/* jenis proyek */}
               <div className="bg-white rounded-lg p-3">
                 <div>Jenis Proyek</div>
-                <div>{jenisProyek.join(", ")}</div>
+                <div>{kategoriProyek.join(", ")}</div>
                 <ConditionalComponent
                   condition={selectedProyek.versi == 0}
                   component={
@@ -1339,8 +1346,9 @@ export default function App({ id, versi }) {
               </ModalHeader>
               <ModalBody>
                 <div>Nama : {form.nama}</div>
-                <div>Merek : {form.merek}</div>
+                <div>Merek : {form.nmerek}</div>
                 <div>Tipe : {form.tipe}</div>
+                <div>Vendor : {form.nvendor}</div>
                 <div>Satuan : {form.satuan}</div>
                 <div>Stok : {form.stok}</div>
                 <Input

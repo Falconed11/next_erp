@@ -57,14 +57,14 @@ import "react-datepicker/dist/react-datepicker.css";
 const apiPath = getApiPath();
 
 export default function app() {
-  const customer = useClientFetch("customer");
+  const kategoriproyek = useClientFetch("kategoriproyek");
   const [form, setForm] = useState({});
   const [page, setPage] = React.useState(1);
   const rowsPerPage = 25;
 
   const saveButtonPress = async (onClose) => {
     // if (form.isSwasta.size == 0) return alert("Swasta/Negri belum diisi");
-    const res = await fetch(`${apiPath}customer`, {
+    const res = await fetch(`${apiPath}kategoriproyek`, {
       method: form.method,
       headers: {
         "Content-Type": "application/json",
@@ -79,7 +79,7 @@ export default function app() {
   };
   const saveTransferButtonPress = async (onClose) => {
     // if (form.isSwasta.size == 0) return alert("Swasta/Negri belum diisi");
-    const res = await fetch(`${apiPath}transfercustomer`, {
+    const res = await fetch(`${apiPath}transferkategoriproyek`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -99,7 +99,6 @@ export default function app() {
     setForm({
       id: "",
       nama: "",
-      alamat: "",
       method: "POST",
       title: "Tambah",
     });
@@ -121,8 +120,8 @@ export default function app() {
     transfer.onOpen();
   };
   const deleteButtonPress = async (id) => {
-    if (confirm("Hapus vendor?")) {
-      const res = await fetch(`${apiPath}customer`, {
+    if (confirm("Hapus kategori proyek?")) {
+      const res = await fetch(`${apiPath}kategoriproyek`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -252,10 +251,14 @@ export default function app() {
   const report = useDisclosure();
 
   const pages = useMemo(() => {
-    return customer.data ? Math.ceil(customer.data?.length / rowsPerPage) : 0;
-  }, [customer.data?.length, rowsPerPage]);
+    return kategoriproyek.data
+      ? Math.ceil(kategoriproyek.data?.length / rowsPerPage)
+      : 0;
+  }, [kategoriproyek.data?.length, rowsPerPage]);
   const loadingState =
-    customer.isLoading || customer.data?.length === 0 ? "loading" : "idle";
+    kategoriproyek.isLoading || kategoriproyek.data?.length === 0
+      ? "loading"
+      : "idle";
   const offset = (page - 1) * rowsPerPage;
 
   const columns = [
@@ -266,18 +269,6 @@ export default function app() {
     {
       key: "nama",
       label: "Nama",
-    },
-    {
-      key: "jumlah_proyek",
-      label: "Jumlah Proyek",
-    },
-    {
-      key: "provit",
-      label: "Provit",
-    },
-    {
-      key: "alamat",
-      label: "Alamat",
     },
     {
       key: "aksi",
@@ -337,8 +328,8 @@ export default function app() {
         </TableHeader>
         <TableBody
           items={
-            customer.data
-              ? customer.data.slice(offset, offset + rowsPerPage)
+            kategoriproyek.data
+              ? kategoriproyek.data.slice(offset, offset + rowsPerPage)
               : []
           }
           loadingContent={"Loading..."}
@@ -362,7 +353,7 @@ export default function app() {
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                {form.title} customer
+                {form.title} Kategori Proyek
               </ModalHeader>
               <ModalBody>
                 {/* <Select
@@ -387,17 +378,10 @@ export default function app() {
                 </Select> */}
                 <Input
                   type="text"
-                  label="Nama Instansi"
-                  placeholder="Masukkan nama instansi!"
+                  label="Nama Kategori Proyek"
+                  placeholder="Masukkan nama kategori proyek!"
                   value={form.nama}
                   onValueChange={(val) => setForm({ ...form, nama: val })}
-                />
-                <Input
-                  type="text"
-                  label="Alamat"
-                  placeholder="Masukkan alamat!"
-                  value={form.alamat}
-                  onValueChange={(val) => setForm({ ...form, alamat: val })}
                 />
                 {/* <Textarea
                   label="Keterangan"
@@ -432,7 +416,7 @@ export default function app() {
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                Transfer Vendor
+                Transfer Kategori Proyek
               </ModalHeader>
               <ModalBody>
                 <Input
@@ -443,9 +427,9 @@ export default function app() {
                   className="max-w-xs"
                 />
                 <Select
-                  label="Targer customer"
+                  label="Targer kategoriproyek"
                   variant="bordered"
-                  placeholder="Pilih target customer"
+                  placeholder="Pilih target kategoriproyek"
                   selectedKeys={form.selectedId}
                   className="max-w-xs"
                   onSelectionChange={(val) => {
@@ -456,7 +440,7 @@ export default function app() {
                     });
                   }}
                 >
-                  {customer.data?.map((item) => (
+                  {kategoriproyek.data?.map((item) => (
                     <SelectItem key={item.id} value={item.id}>
                       {item.nama}
                     </SelectItem>
