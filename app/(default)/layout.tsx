@@ -118,6 +118,11 @@ export default function RootLayout({ children, }: { children: React.ReactNode })
                     name: "Proyek Bulanan",
                     href: "/proyekbulanan"
                 },
+                {
+                    key: "omset",
+                    name: "Omset",
+                    href: "/omset"
+                },
             ]
         },
     ]

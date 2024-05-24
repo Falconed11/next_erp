@@ -2,6 +2,7 @@
 import React, { useState, useMemo } from "react";
 import * as XLSX from "xlsx";
 import Link from "next/link";
+import { Autocomplete, AutocompleteItem } from "@nextui-org/react";
 import {
   Table,
   TableHeader,
@@ -43,6 +44,7 @@ import { getDateFId } from "@/app/utils/date";
 const apiPath = getApiPath();
 
 export default function App() {
+  const [nama, setNama] = useState("");
   const [selectKategori, setSelectKategori] = useState([]);
   const produk = useClientFetch(
     `produk?kategori=${selectKategori.values().next().value ?? ""}`
@@ -80,8 +82,8 @@ export default function App() {
   const report = useDisclosure();
 
   const saveButtonPress = async (onClose) => {
-    if (form.nama == "" || form.kategori == "")
-      return alert("Nama, dan Kategori harus diisi!");
+    if (form.nama == "" || !form.selectKategori.size > 0)
+      return alert("Nama, dan Kategori wajib diisi!");
     const res = await fetch(`${apiPath}produk`, {
       method,
       headers: {
@@ -122,9 +124,9 @@ export default function App() {
     setForm({
       ...data,
       modalmode: "Edit",
-      // select_kategori: new Set([String(data.id_kategori)]),
-      // select_subkategori: new Set([String(data.id_subkategori)]),
-      // select_merek: new Set([String(data.id_merek)]),
+      selectKategori: new Set([String(data.id_kategori)]),
+      selectVendor: new Set([String(data.id_vendor)]),
+      selectMerek: new Set([String(data.id_merek)]),
     });
     setMethod("PUT");
     onOpen();
@@ -247,9 +249,26 @@ export default function App() {
     }
   }, []);
 
+  let data = produk?.data;
+  data = data?.filter(
+    (row) =>
+      row.nama.toLowerCase().includes(nama.toLowerCase()) ||
+      row.nmerek?.toLowerCase().includes(nama.toLowerCase()) ||
+      row.tipe?.toLowerCase().includes(nama.toLowerCase()) ||
+      row.vendor?.toLowerCase().includes(nama.toLowerCase())
+  );
+  data = data?.slice(0, 50);
+  const filteredData = produk?.data?.filter(
+    (row) =>
+      row.nama.toLowerCase().includes(nama.toLowerCase()) ||
+      row.nmerek?.toLowerCase().includes(nama.toLowerCase()) ||
+      row.tipe?.toLowerCase().includes(nama.toLowerCase()) ||
+      row.vendor?.toLowerCase().includes(nama.toLowerCase())
+  );
+
   const pages = useMemo(() => {
-    return produk.data ? Math.ceil(produk.data?.length / rowsPerPage) : 0;
-  }, [produk.data?.length, rowsPerPage]);
+    return filteredData ? Math.ceil(filteredData?.length / rowsPerPage) : 0;
+  }, [filteredData?.length, rowsPerPage]);
   const loadingState = produk.isLoading ? "loading" : "idle";
   const offset = (page - 1) * rowsPerPage;
 
@@ -266,7 +285,7 @@ export default function App() {
 
   const col = [
     {
-      key: "kategori",
+      key: "kategoriproduk",
       label: "Kategori",
     },
     {
@@ -327,7 +346,6 @@ export default function App() {
   //     if (item.id_kategoriproduk == form.id_kategori) return item;
   //   });
   // }
-
   return (
     <div className="flex flex-col">
       <div className="flex flex-row gap-2">
@@ -355,20 +373,51 @@ export default function App() {
         topContent={
           <>
             <div>Filter</div>
-            <Select
-              label="Kategori"
-              variant="bordered"
-              placeholder="Pilih kategori!"
-              selectedKeys={selectKategori}
-              className="max-w-xs"
-              onSelectionChange={setSelectKategori}
-            >
-              {kategori.data.map((item) => (
-                <SelectItem key={item.id} value={item.id}>
-                  {`${item.nama}`}
-                </SelectItem>
-              ))}
-            </Select>
+            <div className="flex gap-3">
+              <Select
+                label="Kategori"
+                variant="bordered"
+                placeholder="Pilih kategori!"
+                selectedKeys={selectKategori}
+                className="max-w-xs"
+                onSelectionChange={(v) => {
+                  setSelectKategori(v);
+                  setPage(1);
+                }}
+              >
+                {kategori.data.map((item) => (
+                  <SelectItem key={item.id} value={item.id}>
+                    {`${item.nama}`}
+                  </SelectItem>
+                ))}
+              </Select>
+              <Autocomplete
+                label="Produk"
+                variant="bordered"
+                defaultItems={data}
+                placeholder="Cari produk"
+                className="max-w-xs"
+                selectedKey={form.selectProduk}
+                onSelectionChange={(v) => {
+                  setForm({ ...form, selectProduk: v });
+                  setNama(
+                    data?.filter((row) => {
+                      return row.id == v;
+                    })[0]?.nama ?? ""
+                  );
+                  setPage(1);
+                }}
+                onValueChange={(v) => {
+                  setNama(v);
+                }}
+              >
+                {(item) => (
+                  <AutocompleteItem key={item.id} textValue={item.nama}>
+                    {item.nama}
+                  </AutocompleteItem>
+                )}
+              </Autocomplete>
+            </div>
             <div className="flex flex-row gap-2">
               <Button color="primary" onClick={handleButtonExportToExcelPress}>
                 Export to Excel
@@ -404,7 +453,7 @@ export default function App() {
         </TableHeader>
         <TableBody
           items={
-            produk.data ? produk.data.slice(offset, offset + rowsPerPage) : []
+            filteredData ? filteredData.slice(offset, offset + rowsPerPage) : []
           }
           loadingContent={"Loading..."}
           emptyContent={"Kosong"}
@@ -499,7 +548,7 @@ export default function App() {
                     setForm({
                       ...form,
                       selectVendor: val,
-                      id_Vendor: new Set(val).values().next().value,
+                      id_vendor: new Set(val).values().next().value,
                     })
                   }
                 >
@@ -540,7 +589,7 @@ export default function App() {
                 <Textarea
                   label="Keterangan"
                   labelPlacement="inside"
-                  placeholder="Masukkan keterangan!"
+                  placeholder="Masukkan keterangan! (Opsional)"
                   value={form.keterangan}
                   onValueChange={(val) => setForm({ ...form, keterangan: val })}
                 />
