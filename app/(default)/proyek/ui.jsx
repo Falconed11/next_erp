@@ -98,8 +98,8 @@ export default function App() {
       selectkategoriproyek: "",
       // selectstatus: "",
       isSwasta: "",
-      tanggal: "",
-      startdate: "",
+      tanggal: getDate(new Date()),
+      startdate: new Date(),
       keterangan: "",
     });
     setMethod("POST");
@@ -112,10 +112,10 @@ export default function App() {
       modalmode: "Edit",
       tanggal: getDate(startdate),
       startdate,
-      selectkaryawan: String(data.id_karyawan),
-      selectperusahaan: String(data.id_perusahaan),
-      selectcustomer: String(data.id_instansi),
-      selectkategoriproyek: String(data.id_kategoriproyek),
+      selectkaryawan: new Set([String(data.id_karyawan)]),
+      selectperusahaan: new Set([String(data.id_perusahaan)]),
+      selectcustomer: new Set([String(data.id_instansi)]),
+      selectkategoriproyek: new Set([String(data.id_kategoriproyek)]),
       // selectstatus: String(data.id_statusproyek),
       isSwasta: String(data.swasta),
     });
@@ -337,7 +337,6 @@ export default function App() {
     { id: 0, nama: "negri" },
     { id: 1, nama: "swasta" },
   ];
-
   return (
     <div className="flex flex-col">
       <div className="flex flex-row gap-2">
@@ -496,7 +495,7 @@ export default function App() {
                 <Input
                   type="text"
                   label="Klien"
-                  placeholder="Masukkan klien!"
+                  placeholder="Masukkan klien! Contoh : Bapak Adi"
                   value={form.klien}
                   onValueChange={(val) => setForm({ ...form, klien: val })}
                 />
@@ -507,10 +506,13 @@ export default function App() {
                   selectedKeys={form.selectcustomer}
                   className="max-w-xs"
                   onSelectionChange={(val) => {
+                    const id_instansi = new Set(val).values().next().value;
                     setForm({
                       ...form,
                       selectcustomer: val,
-                      id_instansi: new Set(val).values().next().value,
+                      id_instansi,
+                      kota: customer.data.filter((v) => v.id == id_instansi)[0]
+                        ?.kota,
                     });
                   }}
                 >
@@ -582,7 +584,7 @@ export default function App() {
                 <Textarea
                   label="Keterangan"
                   labelPlacement="inside"
-                  placeholder="Masukkan keterangan!"
+                  placeholder="Masukkan keterangan! (Opsional)"
                   value={form.keterangan}
                   onValueChange={(val) => setForm({ ...form, keterangan: val })}
                 />
