@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useRef } from "react";
+import { useSession } from "next-auth/react";
 import {
   Table,
   TableHeader,
@@ -54,6 +55,8 @@ import { useRouter } from "next/navigation";
 const api_path = getApiPath();
 
 export default function App({ id, versi }) {
+  const session = useSession();
+  const user = session.data?.user;
   const router = useRouter();
   const componentRef = {
     penawaran: useRef(),
@@ -937,10 +940,14 @@ export default function App({ id, versi }) {
                 </div>
               )}
               {selectedProyek.versi > 0 ? (
-                <Link
-                  className="text-blue-600 p-3"
-                  href={`/proyek/detail/proses?id=${selectedProyek.id}`}
-                >{`Pengeluaran Proyek ==>>`}</Link>
+                user?.peran == "admin" || user?.peran == "super" ? (
+                  <Link
+                    className="text-blue-600 p-3"
+                    href={`/proyek/detail/proses?id=${selectedProyek.id}`}
+                  >{`Pengeluaran Proyek ==>>`}</Link>
+                ) : (
+                  <></>
+                )
               ) : (
                 <></>
               )}

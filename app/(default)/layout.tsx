@@ -6,6 +6,27 @@ import User from '../../components/user'
 export default function RootLayout({ children, }: { children: React.ReactNode }) {
     const session = useSession()
     const user = session.data?.user
+    const proyek = [{
+        key: "data",
+        name: "Proyek",
+        href: ""
+    },
+        // {
+        //     key: "kategori",
+        //     name: "Kategori",
+        //     href: "/kategori"
+        // },
+    ];
+    if (user?.peran == 'admin' || user?.peran == 'super') proyek.push({
+        key: "pengeluaran",
+        name: "Pengeluaran",
+        href: "/pengeluaran"
+    },
+        {
+            key: "pembayaran",
+            name: "Pembayaran",
+            href: "/pembayaran"
+        },)
     const links = [
         { href: "/", name: "Dashboard" },
         // { href: "/produk", name: "Produk" },
@@ -35,36 +56,8 @@ export default function RootLayout({ children, }: { children: React.ReactNode })
         },
         // { href: "/stok", name: "Stok" },
         {
-            href: "/proyek", name: "Proyek", dropdown: [
-                {
-                    key: "data",
-                    name: "Proyek",
-                    href: ""
-                },
-                {
-                    key: "kategori",
-                    name: "Kategori",
-                    href: "/kategori"
-                },
-                {
-                    key: "pengeluaran",
-                    name: "Pengeluaran",
-                    href: "/pengeluaran"
-                },
-                {
-                    key: "pembayaran",
-                    name: "Pembayaran",
-                    href: "/pembayaran"
-                },
-            ]
+            href: "/proyek", name: "Proyek", dropdown: proyek
         },
-        { href: "/nota", name: "Nota" },
-        { href: "/kwitansi", name: "Kwitansi" },
-        { href: "/operasionalkantor", name: "Operasional Kantor" },
-        { href: "/customer", name: "Customer" },
-        { href: "/vendor", name: "Vendor" },
-        { href: "/bank", name: "Bank" },
-        { href: "/karyawan", name: "Karyawan" },
         // {
         //     href: "/karyawan", name: "Karyawan", dropdown: [
         //         {
@@ -106,6 +99,15 @@ export default function RootLayout({ children, }: { children: React.ReactNode })
         // { href: "/distributor", name: "Distributor" },
         // { href: "/klien", name: "Klien" },
         // { href: "/gudang", name: "Gudang" },
+    ]
+    if (user?.peran == "admin" || user?.peran == "super") links.push({ href: "/nota", name: "Nota" },
+        { href: "/kwitansi", name: "Kwitansi" },
+        { href: "/operasionalkantor", name: "Operasional Kantor" },)
+    links.push({ href: "/customer", name: "Customer" },)
+    if (user?.peran == "admin" || user?.peran == "super") links.push(
+        { href: "/vendor", name: "Vendor" },
+        { href: "/bank", name: "Bank" },
+        { href: "/karyawan", name: "Karyawan" },
         {
             href: "/laporan", name: "Laporan", dropdown: [
                 // {
@@ -124,10 +126,9 @@ export default function RootLayout({ children, }: { children: React.ReactNode })
                     href: "/omset"
                 },
             ]
-        },
-    ]
+        },)
     if (user?.peran == "super") links.push({ href: "/user", name: "User" },)
-    if (user?.peran == "super") links.push({ href: "/alat", name: "Alat" })
+    if (user?.peran == "super") links.push({ href: "/alat", name: "Alat" },)
     links.push({ href: "/api/auth/signout", name: "Signout" })
     return (
         <section>

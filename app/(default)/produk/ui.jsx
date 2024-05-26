@@ -125,8 +125,10 @@ export default function App() {
       ...data,
       modalmode: "Edit",
       selectKategori: new Set([String(data.id_kategori)]),
-      selectVendor: new Set([String(data.id_vendor)]),
-      selectMerek: new Set([String(data.id_merek)]),
+      merek: data.nmerek,
+      id_merek: data.id_merek,
+      vendor: data.nvendor,
+      id_vendor: data.id_vendor,
     });
     setMethod("PUT");
     onOpen();
@@ -513,25 +515,23 @@ export default function App() {
                   value={form.nama}
                   onValueChange={(val) => setForm({ ...form, nama: val })}
                 />
-                <Select
+                <Autocomplete
                   label="Merek"
-                  placeholder="Pilih Merek"
+                  variant="bordered"
+                  defaultItems={merek.data}
+                  placeholder="Cari merek"
                   className="max-w-xs"
-                  selectedKeys={form.selectMerek}
-                  onSelectionChange={(val) =>
-                    setForm({
-                      ...form,
-                      selectMerek: val,
-                      id_merek: new Set(val).values().next().value,
-                    })
-                  }
+                  selectedKey={form.id_merek}
+                  defaultSelectedKey={form.id_merek}
+                  defaultInputValue={form.merek}
+                  onSelectionChange={(v) => setForm({ ...form, id_merek: v })}
                 >
-                  {merek.data.map((item) => (
-                    <SelectItem key={item.id} value={item.id}>
+                  {(item) => (
+                    <AutocompleteItem key={item.id} textValue={item.nama}>
                       {item.nama}
-                    </SelectItem>
-                  ))}
-                </Select>
+                    </AutocompleteItem>
+                  )}
+                </Autocomplete>
                 <Input
                   type="text"
                   label="Tipe"
@@ -539,25 +539,23 @@ export default function App() {
                   value={form.tipe}
                   onValueChange={(val) => setForm({ ...form, tipe: val })}
                 />
-                <Select
+                <Autocomplete
                   label="Vendor"
-                  placeholder="Pilih Vendor"
+                  variant="bordered"
+                  defaultItems={vendor.data}
+                  placeholder="Cari vendor"
                   className="max-w-xs"
-                  selectedKeys={form.selectVendor}
-                  onSelectionChange={(val) =>
-                    setForm({
-                      ...form,
-                      selectVendor: val,
-                      id_vendor: new Set(val).values().next().value,
-                    })
-                  }
+                  selectedKey={form.id_vendor}
+                  defaultSelectedKey={form.id_vendor}
+                  defaultInputValue={form.vendor}
+                  onSelectionChange={(v) => setForm({ ...form, id_vendor: v })}
                 >
-                  {vendor.data.map((item) => (
-                    <SelectItem key={item.id} value={item.id}>
+                  {(item) => (
+                    <AutocompleteItem key={item.id} textValue={item.nama}>
                       {item.nama}
-                    </SelectItem>
-                  ))}
-                </Select>
+                    </AutocompleteItem>
+                  )}
+                </Autocomplete>
                 <Input
                   type="number"
                   label="Stok"

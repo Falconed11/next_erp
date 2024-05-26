@@ -1,8 +1,10 @@
 "use client";
 import React, { useState } from "react";
+import { useSession } from "next-auth/react";
 import * as XLSX from "xlsx";
-import { useClientFetch, getApiPath } from "../../utils/apiconfig";
-import { penawaran } from "../../utils/formatid";
+import { useClientFetch, getApiPath } from "@/app/utils/apiconfig";
+import { penawaran } from "@/app/utils/formatid";
+import { Autocomplete, AutocompleteItem } from "@nextui-org/react";
 import {
   Table,
   TableHeader,
@@ -52,6 +54,8 @@ const apiPath = getApiPath();
 const [startDate, endDate] = getCurFirstLastDay();
 
 export default function App() {
+  const session = useSession();
+  const user = session.data?.user;
   const [filter, setFilter] = useState({
     startDate,
     endDate,
@@ -70,7 +74,7 @@ export default function App() {
   const [json, setJson] = useState([]);
 
   const saveButtonPress = async (onClose) => {
-    if (form.isSwasta.size == 0) return alert("Swasta/Negri belum diisi");
+    // if (form.isSwasta.size == 0) return alert("Swasta/Negri belum diisi");
     const res = await fetch(`${apiPath}proyek`, {
       method,
       headers: {
@@ -114,7 +118,8 @@ export default function App() {
       startdate,
       selectkaryawan: new Set([String(data.id_karyawan)]),
       selectperusahaan: new Set([String(data.id_perusahaan)]),
-      selectcustomer: new Set([String(data.id_instansi)]),
+      id_instansi: data.id_instansi,
+      instansi: data.instansi,
       selectkategoriproyek: new Set([String(data.id_kategoriproyek)]),
       // selectstatus: String(data.id_statusproyek),
       isSwasta: String(data.swasta),
@@ -223,16 +228,20 @@ export default function App() {
               </Link>
             </Tooltip>
             {data.versi > 0 ? (
-              <Tooltip content="Pengeluaran Proyek">
-                <Link href={`/proyek/detail/proses?id=${data.id}`}>
-                  <span
-                    // onClick={() => detailButtonPress(data)}
-                    className="text-lg text-default-400 cursor-pointer active:opacity-50"
-                  >
-                    <ReportMoneyIcon />
-                  </span>
-                </Link>
-              </Tooltip>
+              user?.peran == "admin" || user?.peran == "super" ? (
+                <Tooltip content="Pengeluaran Proyek">
+                  <Link href={`/proyek/detail/proses?id=${data.id}`}>
+                    <span
+                      // onClick={() => detailButtonPress(data)}
+                      className="text-lg text-default-400 cursor-pointer active:opacity-50"
+                    >
+                      <ReportMoneyIcon />
+                    </span>
+                  </Link>
+                </Tooltip>
+              ) : (
+                <></>
+              )
             ) : (
               <></>
             )}
@@ -445,7 +454,7 @@ export default function App() {
                     </SelectItem>
                   ))}
                 </Select>
-                <Select
+                {/* <Select
                   label="Swasta/Negri"
                   variant="bordered"
                   placeholder="Pilih swasta/negri!"
@@ -464,8 +473,8 @@ export default function App() {
                       {item.nama}
                     </SelectItem>
                   ))}
-                </Select>
-                <Select
+                </Select> */}
+                {/* <Select
                   label="Kategori Proyek"
                   variant="bordered"
                   placeholder="Pilih kategori proyek!"
@@ -484,22 +493,8 @@ export default function App() {
                       {item.nama}
                     </SelectItem>
                   ))}
-                </Select>
-                <Input
-                  type="text"
-                  label="Nama Proyek"
-                  placeholder="Masukkan nama proyek!"
-                  value={form.nama}
-                  onValueChange={(val) => setForm({ ...form, nama: val })}
-                />
-                <Input
-                  type="text"
-                  label="Klien"
-                  placeholder="Masukkan klien! Contoh : Bapak Adi"
-                  value={form.klien}
-                  onValueChange={(val) => setForm({ ...form, klien: val })}
-                />
-                <Select
+                </Select> */}
+                {/* <Select
                   label="Customer"
                   variant="bordered"
                   placeholder="Pilih customer!"
@@ -517,18 +512,57 @@ export default function App() {
                   }}
                 >
                   {customer.data.map((item) => (
-                    <SelectItem key={item.id} value={item.id}>
-                      {item.nama}
+                    <SelectItem
+                      key={item.id}
+                      value={item.id}
+                      textValue={item.nama}
+                    >
+                      {item.nama} | {item.swasta ? "Swasta" : "Negri"} |{" "}
+                      {item.kota}
                     </SelectItem>
                   ))}
-                </Select>
+                </Select> */}
+                <Autocomplete
+                  label="Customer"
+                  variant="bordered"
+                  defaultItems={customer.data}
+                  placeholder="Cari customer"
+                  className="max-w-xs"
+                  selectedKey={form.id_instansi}
+                  defaultSelectedKey={form.id_instansi}
+                  defaultInputValue={form.instansi}
+                  onSelectionChange={(v) =>
+                    setForm({ ...form, id_instansi: v })
+                  }
+                >
+                  {(item) => (
+                    <AutocompleteItem key={item.id} textValue={item.nama}>
+                      {item.nama} | {item.swasta ? "Swasta" : "Negri"} |{" "}
+                      {item.kota}
+                    </AutocompleteItem>
+                  )}
+                </Autocomplete>
                 <Input
+                  type="text"
+                  label="Nama Proyek"
+                  placeholder="Masukkan nama proyek!"
+                  value={form.nama}
+                  onValueChange={(val) => setForm({ ...form, nama: val })}
+                />
+                <Input
+                  type="text"
+                  label="Klien"
+                  placeholder="Masukkan klien! Contoh : Bapak Adi"
+                  value={form.klien}
+                  onValueChange={(val) => setForm({ ...form, klien: val })}
+                />
+                {/* <Input
                   type="text"
                   label="Kota"
                   placeholder="Masukkan kota!"
                   value={form.kota}
                   onValueChange={(val) => setForm({ ...form, kota: val })}
-                />
+                /> */}
                 <Select
                   label="Sales"
                   variant="bordered"

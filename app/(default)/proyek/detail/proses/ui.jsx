@@ -59,6 +59,7 @@ export default function App({ id }) {
   const pengeluaranproyek = useClientFetch(`pengeluaranproyek?id_proyek=${id}`);
   const pembayaranproyek = useClientFetch(`pembayaranproyek?id_proyek=${id}`);
   const kategori = useClientFetch(`kategoriproduk`);
+  const bank = useClientFetch(`bank`);
   const [selectKategori, setSelectKategori] = useState(new Set([]));
   const produk = useClientFetch(
     `produk?kategori=${selectKategori.values().next().value}`
@@ -77,7 +78,7 @@ export default function App({ id }) {
     setForm({
       ...form,
       ...data,
-      harga: data.hargakustom,
+      harga: data.hargapengeluaran,
       modalmode: "Edit",
       tanggal: getDate(startdate),
       startdate,
@@ -110,7 +111,7 @@ export default function App({ id }) {
       },
       body: JSON.stringify({
         id_proyek: id,
-        id_produk: form.selectProduk.values().next().value,
+        id_produk: form.selectProduk,
         id_karyawan: selectKaryawan.values().next().value,
         tanggal: form.startdate ? getDate(form.startdate) : "",
         jumlah: form.jumlah,
@@ -124,6 +125,7 @@ export default function App({ id }) {
     setForm({
       selectKategori: new Set([]),
       selectProduk: new Set([]),
+      selectKaryawan: new Set([]),
     });
     // return alert(json.message);
   };
@@ -147,7 +149,6 @@ export default function App({ id }) {
     if (res.status == 400) return alert(json.message);
     onClose();
     // console.log(json.message);
-    return alert(json.message);
   };
 
   const editButtonPressPembayaran = (data) => {
@@ -155,6 +156,7 @@ export default function App({ id }) {
     setFormPembayaran({
       ...data,
       modalmode: "Edit",
+      selectMetodePembayaran: new Set([String(data.id_metodepembayaran)]),
       tanggal: getDate(startdate),
       startdate,
     });
@@ -215,12 +217,10 @@ export default function App({ id }) {
   const renderCell = {
     pengeluaranproyek: React.useCallback((data, columnKey) => {
       const cellValue = data[columnKey];
-      let harga = 0;
-      if (data.hargakustom) harga = data.hargakustom;
-      if (data.hargamodal && !data.hargakustom) harga = data.hargamodal;
+      const harga = data.hargapengeluaran;
       switch (columnKey) {
         case "tanggal":
-          return getDateF(new Date(data.tanggal));
+          return getDateF(new Date(data.tanggalpengeluaran));
         case "harga":
           return <Harga harga={harga} />;
         case "totalharga":
@@ -320,7 +320,7 @@ export default function App({ id }) {
         label: "Keterangan",
       },
       {
-        key: "merek",
+        key: "nmerek",
         label: "Merek",
       },
       {
@@ -328,7 +328,7 @@ export default function App({ id }) {
         label: "Tipe",
       },
       {
-        key: "vendor",
+        key: "nvendor",
         label: "Vendor",
       },
       {
@@ -388,6 +388,8 @@ export default function App({ id }) {
   if (produk.isLoading) return <div>loading...</div>;
   if (karyawan.error) return <div>failed to load</div>;
   if (karyawan.isLoading) return <div>loading...</div>;
+  if (bank.error) return <div>failed to load</div>;
+  if (bank.isLoading) return <div>loading...</div>;
 
   const selectedProyek = proyek.data[0];
   // const subTotalHargaJual = keranjangNota.data.reduce((total, currentValue) => {
@@ -412,6 +414,71 @@ export default function App({ id }) {
     return total + v.nominal;
   }, 0);
   const provit = omset - biayaProduksi;
+
+  const PembayaranProyek = (
+    <>
+      <div className="bg-gray-100 p-3 rounded-lg">
+        <div>Tanggal</div>
+        <DatePicker
+          placeholderText="Pilih tanggal"
+          dateFormat="dd/MM/yyyy"
+          selected={formPembayaran.startdate}
+          onChange={(v) => {
+            setFormPembayaran({
+              ...formPembayaran,
+              startdate: v,
+              tanggal: getDate(v),
+            });
+          }}
+        />
+      </div>
+      <Input
+        type="number"
+        label="Nominal"
+        value={formPembayaran.nominal}
+        placeholder="Masukkan nominal!"
+        className=""
+        onValueChange={(v) =>
+          setFormPembayaran({
+            ...formPembayaran,
+            nominal: v,
+          })
+        }
+      />
+      <Select
+        label="Metode Pembayaran"
+        placeholder="Pilih metode pembayaran!"
+        className=""
+        selectedKeys={formPembayaran.selectMetodePembayaran}
+        onSelectionChange={(v) => {
+          setFormPembayaran({
+            ...formPembayaran,
+            selectMetodePembayaran: v,
+            id_metodepembayaran: new Set(v).values().next().value,
+          });
+        }}
+      >
+        {bank.data.map((item) => (
+          <SelectItem key={item.id} value={item.id}>
+            {item.nama}
+          </SelectItem>
+        ))}
+      </Select>
+      <Input
+        type="text"
+        label="Keterangan"
+        placeholder="Masukkan keterangan!"
+        value={formPembayaran.keterangan}
+        className=""
+        onValueChange={(v) =>
+          setFormPembayaran({
+            ...formPembayaran,
+            keterangan: v,
+          })
+        }
+      />
+    </>
+  );
   return (
     <div className="flex flex-col w-full">
       <h1>Proses</h1>
@@ -633,60 +700,7 @@ export default function App({ id }) {
             <div>Pembayaran Proyek</div>
             <div className="flex-col gap-2">
               <div className="flex flex-row gap-2 mt-3">
-                <div className="bg-gray-100 p-3 rounded-lg">
-                  <div>Tanggal</div>
-                  <DatePicker
-                    placeholderText="Pilih tanggal"
-                    dateFormat="dd/MM/yyyy"
-                    selected={formPembayaran.startdate}
-                    onChange={(v) => {
-                      setFormPembayaran({
-                        ...formPembayaran,
-                        startdate: v,
-                        tanggal: getDate(v),
-                      });
-                    }}
-                  />
-                </div>
-                <Input
-                  type="number"
-                  label="Nominal"
-                  value={formPembayaran.nominal}
-                  placeholder="Masukkan nominal!"
-                  className=""
-                  onValueChange={(v) =>
-                    setFormPembayaran({
-                      ...formPembayaran,
-                      nominal: v,
-                    })
-                  }
-                />
-                <Input
-                  type="text"
-                  label="Cara Bayar"
-                  placeholder="Masukkan cara bayar!"
-                  value={formPembayaran.carabayar}
-                  className=""
-                  onValueChange={(v) =>
-                    setFormPembayaran({
-                      ...formPembayaran,
-                      carabayar: v,
-                    })
-                  }
-                />
-                <Input
-                  type="text"
-                  label="Keterangan"
-                  placeholder="Masukkan keterangan!"
-                  value={formPembayaran.keterangan}
-                  className=""
-                  onValueChange={(v) =>
-                    setFormPembayaran({
-                      ...formPembayaran,
-                      keterangan: v,
-                    })
-                  }
-                />
+                {PembayaranProyek}
                 <Button
                   onClick={() => {
                     tambahButtonPressPembayaran(formPembayaran);
@@ -787,7 +801,7 @@ export default function App({ id }) {
                 <Input
                   type="number"
                   value={form.harga}
-                  label="Harga Kustom"
+                  label="Harga Satuan"
                   placeholder="Masukkan harga!"
                   className=""
                   onValueChange={(v) =>
@@ -843,62 +857,7 @@ export default function App({ id }) {
               <ModalHeader className="flex flex-col gap-1">
                 Edit Pembayaran Proyek
               </ModalHeader>
-              <ModalBody>
-                <div className="bg-gray-100 p-3 rounded-lg">
-                  <div>Tanggal</div>
-                  <DatePicker
-                    placeholderText="Pilih tanggal"
-                    dateFormat="dd/MM/yyyy"
-                    selected={formPembayaran.startdate}
-                    onChange={(v) => {
-                      setFormPembayaran({
-                        ...formPembayaran,
-                        startdate: v,
-                        tanggal: getDate(v),
-                      });
-                    }}
-                  />
-                </div>
-                <Input
-                  type="number"
-                  label="Nominal"
-                  value={formPembayaran.nominal}
-                  placeholder="Masukkan nominal!"
-                  className=""
-                  onValueChange={(v) =>
-                    setFormPembayaran({
-                      ...formPembayaran,
-                      nominal: v,
-                    })
-                  }
-                />
-                <Input
-                  type="text"
-                  label="Cara Bayar"
-                  placeholder="Masukkan cara bayar!"
-                  value={formPembayaran.carabayar}
-                  className=""
-                  onValueChange={(v) =>
-                    setFormPembayaran({
-                      ...formPembayaran,
-                      carabayar: v,
-                    })
-                  }
-                />
-                <Input
-                  type="text"
-                  label="Keterangan"
-                  placeholder="Masukkan keterangan!"
-                  value={formPembayaran.keterangan}
-                  className=""
-                  onValueChange={(v) =>
-                    setFormPembayaran({
-                      ...formPembayaran,
-                      keterangan: v,
-                    })
-                  }
-                />
-              </ModalBody>
+              <ModalBody>{PembayaranProyek}</ModalBody>
               <ModalFooter>
                 <Button color="danger" variant="light" onPress={onClose}>
                   Batal

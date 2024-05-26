@@ -80,7 +80,7 @@ export default function TambahProduk({ form, setForm }) {
         variant="bordered"
         defaultItems={data}
         placeholder="Cari produk"
-        // className="max-w-xs"
+        className="w-6/12"
         selectedKey={form.selectProduk}
         onSelectionChange={(v) => setForm({ ...form, selectProduk: v })}
         onValueChange={setNama}
