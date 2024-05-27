@@ -24,8 +24,10 @@ import Link from "next/link";
 const apiPath = getApiPath();
 
 export default function App() {
+  const [isLoading, setIsLoading] = useState(0);
   const [reportList, setReportList] = useState([]);
   const report = useDisclosure();
+  if (isLoading) return <>Loading...</>;
   return (
     <div className="flex flex-col gap-2">
       <TemplateImport
@@ -33,18 +35,24 @@ export default function App() {
         setReportList={setReportList}
         name={"Pengeluaran Proyek"}
         apiendpoint={"importpengeluaranproyek"}
+        isLoading={isLoading}
+        setIsLoading={setIsLoading}
       />
       <TemplateImport
         report={report}
         setReportList={setReportList}
         name={"Pembayaran Proyek"}
         apiendpoint={"importpembayaranproyek"}
+        isLoading={isLoading}
+        setIsLoading={setIsLoading}
       />
       <TemplateImport
         report={report}
         setReportList={setReportList}
         name={"Operasional Kantor"}
         apiendpoint={"importoperasionalkantor"}
+        isLoading={isLoading}
+        setIsLoading={setIsLoading}
       />
       {/* upload report */}
       <Modal
@@ -76,7 +84,14 @@ export default function App() {
   );
 }
 
-function TemplateImport({ setReportList, report, name, apiendpoint }) {
+function TemplateImport({
+  setReportList,
+  report,
+  name,
+  apiendpoint,
+  isLoading,
+  setIsLoading,
+}) {
   const [json, setJson] = useState([]);
   const handleFileUpload = (jsonData) => {
     // console.log(jsonData);
@@ -90,6 +105,7 @@ function TemplateImport({ setReportList, report, name, apiendpoint }) {
   };
   const handleButtonUploadExcelPress = async (apiendpoint) => {
     if (json.length == 0) return alert("File belum dipilih");
+    setIsLoading(1);
     setReportList([]);
     try {
       const responses = await Promise.all(
@@ -112,6 +128,7 @@ function TemplateImport({ setReportList, report, name, apiendpoint }) {
       console.error(e);
     }
     setJson([]);
+    setIsLoading(0);
     report.onOpen();
   };
   return (

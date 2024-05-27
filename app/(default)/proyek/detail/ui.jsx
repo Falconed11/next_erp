@@ -128,8 +128,9 @@ export default function App({ id, versi }) {
   const editButtonPress = (data) => {
     setForm({
       ...data,
-      harga: data.hargakustom,
-      profit: data.hargajual - data.harga,
+      id: data.id_keranjangproyek,
+      profit: data.harga - data.hargamodal,
+      refHarga: data.harga,
     });
     modal.produk.onOpen();
   };
@@ -191,12 +192,7 @@ export default function App({ id, versi }) {
         "Content-Type": "application/json",
         // 'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: JSON.stringify({
-        id: data.id_keranjangproyek,
-        jumlah: data.jumlah,
-        harga: data.harga,
-        // harga: data.hargajual,
-      }),
+      body: JSON.stringify(data),
     });
     const json = await res.json();
     if (res.status == 400) return alert(json.message);
@@ -342,22 +338,24 @@ export default function App({ id, versi }) {
       switch (columnKey) {
         case "hargamodal":
           return <Harga harga={data.hargamodal} />;
-        case "hargajual":
-          return <Harga harga={data.hargajual} />;
+        case "harga":
+          return <Harga harga={data.harga} />;
         case "hargakustom":
-          return <Harga harga={data.hargakustom} />;
+          return data.hargakustom != null ? (
+            <Harga harga={data.hargakustom} />
+          ) : (
+            "Null"
+          );
         case "totalharga-modal":
           return <Harga harga={data.jumlah * data.hargamodal} />;
         case "totalharga-jual":
-          return <Harga harga={data.jumlah * data.hargajual} />;
+          return <Harga harga={data.jumlah * data.harga} />;
         case "profit":
-          return <Harga harga={data.hargajual - data.hargamodal} />;
+          return <Harga harga={data.harga - data.hargamodal} />;
         case "totalprofit":
           return (
             <Harga
-              harga={
-                data.jumlah * data.hargajual - data.jumlah * data.hargamodal
-              }
+              harga={data.jumlah * data.harga - data.jumlah * data.hargamodal}
             />
           );
         case "aksi":
@@ -387,10 +385,10 @@ export default function App({ id, versi }) {
     }, []),
     penawaran: React.useCallback((data, columnKey) => {
       const cellValue = data[columnKey];
-      let harga = data.hargakustom ? data.hargakustom : data.hargajual;
+      let harga = data.hargakustom == null ? data.harga : data.hargakustom;
       switch (columnKey) {
         case "jumlah":
-          return `${data.jumlah} ${data.satuan}`;
+          return `${data.jumlah} ${data.satuan ?? ""}`;
         case "hargajual":
           return (
             <div className="text-right">{harga.toLocaleString("id-ID")}</div>
@@ -489,7 +487,7 @@ export default function App({ id, versi }) {
         label: "Harga Modal",
       },
       {
-        key: "hargajual",
+        key: "harga",
         label: "Harga Jual",
       },
       {
@@ -515,7 +513,7 @@ export default function App({ id, versi }) {
     ],
     instalasi: [
       {
-        key: "kategori",
+        key: "kategoriproduk",
         label: "Kategori",
       },
       {
@@ -551,7 +549,7 @@ export default function App({ id, versi }) {
         label: "Harga Modal",
       },
       {
-        key: "hargajual",
+        key: "harga",
         label: "Harga Instalasi",
       },
       {
@@ -672,7 +670,7 @@ export default function App({ id, versi }) {
   const totalModal = totalModalProduk + totalModalInstalasi;
   const subTotalHargaJual = keranjangProyek.data.reduce(
     (total, currentValue) => {
-      return total + currentValue.jumlah * currentValue.hargajual;
+      return total + currentValue.jumlah * currentValue.harga;
     },
     0
   );
@@ -680,15 +678,14 @@ export default function App({ id, versi }) {
     (total, currentValue) => {
       return (
         total +
-        currentValue.jumlah *
-          (currentValue.hargakustom ?? currentValue.hargajual)
+        currentValue.jumlah * (currentValue.hargakustom ?? currentValue.harga)
       );
     },
     0
   );
   const subTotalHargaInstalasi = keranjangProyekInstalasi.data.reduce(
     (total, currentValue) => {
-      return total + currentValue.jumlah * currentValue.hargajual;
+      return total + currentValue.jumlah * currentValue.harga;
     },
     0
   );
@@ -696,8 +693,7 @@ export default function App({ id, versi }) {
     (total, currentValue) => {
       return (
         total +
-        currentValue.jumlah *
-          (currentValue.hargakustom ?? currentValue.hargajual)
+        currentValue.jumlah * (currentValue.hargakustom ?? currentValue.harga)
       );
     },
     0
@@ -897,54 +893,41 @@ export default function App({ id, versi }) {
                   Penawaran
                 </Button>
               </div>
-              {selectedProyek.versi != selectedVersion ? (
-                <div>
-                  <Button
-                    onClick={handleButtonSetAsDealClick}
-                    color="primary"
-                    className="mt-3"
-                  >
-                    Set as Deal
-                  </Button>
-                </div>
+              {["admin", "super"].includes(user?.peran == "admin") ? (
+                selectedProyek.versi != -1 ? (
+                  <div>
+                    <Button
+                      onClick={handleButtonSetAsRejectClick}
+                      color="primary"
+                      className="mt-3"
+                    >
+                      Set as Reject
+                    </Button>
+                  </div>
+                ) : (
+                  <div>
+                    <Button
+                      onClick={handleButtonCancelRejectClick}
+                      color="primary"
+                      className="mt-3"
+                    >
+                      Cancel Reject
+                    </Button>
+                  </div>
+                )
               ) : (
-                <div>
-                  <Button
-                    onClick={handleButtonCancelDealClick}
-                    color="primary"
-                    className="mt-3"
-                  >
-                    Cancel Deal
-                  </Button>
-                </div>
+                <></>
               )}
-              {selectedProyek.versi != -1 ? (
-                <div>
-                  <Button
-                    onClick={handleButtonSetAsRejectClick}
-                    color="primary"
-                    className="mt-3"
-                  >
-                    Set as Reject
-                  </Button>
-                </div>
-              ) : (
-                <div>
-                  <Button
-                    onClick={handleButtonCancelRejectClick}
-                    color="primary"
-                    className="mt-3"
-                  >
-                    Cancel Reject
-                  </Button>
-                </div>
-              )}
-              {selectedProyek.versi > 0 ? (
-                user?.peran == "admin" || user?.peran == "super" ? (
-                  <Link
-                    className="text-blue-600 p-3"
-                    href={`/proyek/detail/proses?id=${selectedProyek.id}`}
-                  >{`Pengeluaran Proyek ==>>`}</Link>
+              {["admin", "super"].includes(user?.peran == "admin") ? (
+                selectedProyek.versi > 0 ? (
+                  user?.peran == "admin" || user?.peran == "super" ? (
+                    <Link
+                      className="text-blue-600 p-3"
+                      href={`/proyek/detail/proses?id=${selectedProyek.id}`}
+                    >{`Pengeluaran Proyek ==>>`}</Link>
+                  ) : (
+                    <></>
+                  )
                 ) : (
                   <></>
                 )
@@ -1018,8 +1001,7 @@ export default function App({ id, versi }) {
                               return (
                                 total +
                                 currentValue.jumlah *
-                                  (currentValue.hargajual -
-                                    currentValue.hargamodal)
+                                  (currentValue.harga - currentValue.hargamodal)
                               );
                             },
                             0
@@ -1052,7 +1034,7 @@ export default function App({ id, versi }) {
                 </TableHeader>
                 <TableBody items={keranjangProyek.data}>
                   {(item) => (
-                    <TableRow key={item.no}>
+                    <TableRow key={item.id_keranjangproyek}>
                       {(columnKey) => (
                         <TableCell>
                           {renderCell.keranjangproyek(item, columnKey)}
@@ -1065,6 +1047,7 @@ export default function App({ id, versi }) {
               {/* tabel instalasi */}
               <Table
                 selectionMode="single"
+                isStriped
                 topContent={
                   <>
                     <div>Instalasi</div>
@@ -1126,8 +1109,7 @@ export default function App({ id, versi }) {
                               return (
                                 total +
                                 currentValue.jumlah *
-                                  (currentValue.hargajual -
-                                    currentValue.hargamodal)
+                                  (currentValue.harga - currentValue.hargamodal)
                               );
                             },
                             0
@@ -1161,7 +1143,7 @@ export default function App({ id, versi }) {
                 </TableHeader>
                 <TableBody items={keranjangProyekInstalasi.data}>
                   {(item) => (
-                    <TableRow key={item.no}>
+                    <TableRow key={item.id_keranjangproyek}>
                       {(columnKey) => (
                         <TableCell>
                           {renderCell.keranjangproyek(item, columnKey)}
@@ -1373,7 +1355,7 @@ export default function App({ id, versi }) {
                 <Input
                   type="number"
                   value={form.harga}
-                  label="Harga Kustom"
+                  label={`Harga Jual (Ref: ${form.refHarga})`}
                   placeholder="Masukkan harga!"
                   onValueChange={(v) =>
                     setForm({
@@ -1382,9 +1364,21 @@ export default function App({ id, versi }) {
                     })
                   }
                 />
+                <Input
+                  type="number"
+                  value={form.hargakustom}
+                  label="Harga Kustom"
+                  placeholder="Hanya ditampilkan pada penawaran"
+                  onValueChange={(v) =>
+                    setForm({
+                      ...form,
+                      hargakustom: v,
+                    })
+                  }
+                />
                 <div>Harga Modal : {form.hargamodal}</div>
-                <div>Harga Jual : {form.hargajual}</div>
-                <div>Provit : {form.hargajual - form.hargamodal}</div>
+                <div>Harga Jual : {form.harga}</div>
+                <div>Provit : {form.harga - form.hargamodal}</div>
                 {/* <div>
                   <div>Harga Jual : </div>
                   <div>
@@ -1402,7 +1396,7 @@ export default function App({ id, versi }) {
                   </div>
                 </div> */}
                 <div>Total Harga Modal : {form.hargamodal * form.jumlah}</div>
-                <div>Total Harga Jual : {form.hargajual * form.jumlah}</div>
+                <div>Total Harga Jual : {form.harga * form.jumlah}</div>
                 {/* <div>
                   <div>Profit : </div>
                   <div>
@@ -1420,8 +1414,7 @@ export default function App({ id, versi }) {
                   </div>
                 </div> */}
                 <div>
-                  Total Profit :{" "}
-                  {(form.hargajual - form.hargamodal) * form.jumlah}
+                  Total Profit : {(form.harga - form.hargamodal) * form.jumlah}
                 </div>
               </ModalBody>
               <ModalFooter>

@@ -39,6 +39,7 @@ import {
   UserIcon,
   NoteIcon,
   ReportMoneyIcon,
+  FileExportIcon,
 } from "../../../components/icon";
 import {
   getCurFirstLastDay,
@@ -61,9 +62,13 @@ export default function App() {
     endDate,
     selectKategori: new Set([]),
   });
+  const [selectProyek, setSelectProyek] = useState({});
   const proyek = useClientFetch(
     `proyek?start=${getDate(filter.startDate)}&end=${getDate(filter.endDate)}`
   );
+  const penawaran = selectProyek
+    ? useClientFetch(`exportpenawaran?id=${selectProyek.id}`)
+    : {};
   const perusahaan = useClientFetch("perusahaan");
   const karyawan = useClientFetch("karyawan");
   const statusproyek = useClientFetch("statusproyek");
@@ -191,6 +196,18 @@ export default function App() {
       { compression: true }
     );
   };
+  const handleExportButtonPress = (proyek) => {
+    setSelectProyek(proyek);
+    console.log(penawaran.data);
+    // const worksheet = XLSX.utils.json_to_sheet(rows);
+    // const workbook = XLSX.utils.book_new();
+    // XLSX.utils.book_append_sheet(workbook, worksheet, "sheet1");
+    // XLSX.writeFile(
+    //   workbook,
+    //   `proyek_${getDateF(filter.startDate)}_${getDateF(filter.endDate)}.xlsx`,
+    //   { compression: true }
+    // );
+  };
 
   const renderCell = React.useCallback((data, columnKey) => {
     const cellValue = data[columnKey];
@@ -253,6 +270,14 @@ export default function App() {
                 <EditIcon />
               </span>
             </Tooltip>
+            <Tooltip content="Export">
+              <span
+                onClick={() => handleExportButtonPress(data)}
+                className="text-lg text-default-400 cursor-pointer active:opacity-50"
+              >
+                <FileExportIcon />
+              </span>
+            </Tooltip>
             <Tooltip color="danger" content="Delete">
               <span
                 onClick={() => deleteButtonPress(data.id)}
@@ -283,6 +308,8 @@ export default function App() {
   if (customer.isLoading) return <div>loading...</div>;
   if (kategoriproyek.error) return <div>failed to load</div>;
   if (kategoriproyek.isLoading) return <div>loading...</div>;
+  if (penawaran.error) return <div>failed to load</div>;
+  if (penawaran.isLoading) return <div>loading...</div>;
 
   const columns = [
     {

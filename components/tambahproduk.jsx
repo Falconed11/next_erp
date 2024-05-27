@@ -19,6 +19,7 @@ export default function TambahProduk({ form, setForm }) {
         : ""
     }`
   );
+  // const pilihProduk = useClientFetch(`produk`)
 
   if (kategori.error) return <div>failed to load</div>;
   if (kategori.isLoading) return <div>loading...</div>;
@@ -30,12 +31,14 @@ export default function TambahProduk({ form, setForm }) {
     animal.nama.toLowerCase().includes(nama.toLowerCase())
   );
   data = data.slice(0, 100);
+  const selectProduk = () =>
+    produk.data.filter((v) => v.id == form.selectProduk)[0];
   return (
-    <>
+    <div className="w-max flex flex-wrap gap-3">
       <Select
         label="Kategori"
         placeholder="Pilih kategori!"
-        className="w-2/12"
+        className="w-3/12"
         selectedKeys={form.selectKategori}
         onSelectionChange={(v) => {
           setForm({
@@ -80,9 +83,15 @@ export default function TambahProduk({ form, setForm }) {
         variant="bordered"
         defaultItems={data}
         placeholder="Cari produk"
-        className="w-6/12"
+        className="w-8/12"
         selectedKey={form.selectProduk}
-        onSelectionChange={(v) => setForm({ ...form, selectProduk: v })}
+        onSelectionChange={(v) =>
+          setForm({
+            ...form,
+            selectProduk: v,
+            harga: produk.data.filter((p) => p.id == v)[0].hargajual,
+          })
+        }
         onValueChange={setNama}
       >
         {(item) => (
@@ -101,7 +110,7 @@ export default function TambahProduk({ form, setForm }) {
         value={form.jumlah}
         label="Jumlah"
         placeholder="Masukkan jumlah!"
-        className="w-2/12 pl-2"
+        className="w-3/12"
         endContent={
           <div className="pointer-events-none flex items-center">
             <span className="text-default-400 text-small"></span>
@@ -117,9 +126,12 @@ export default function TambahProduk({ form, setForm }) {
       <Input
         type="number"
         value={form.harga}
-        label="Harga Kustom"
+        label={`Harga (Ref: ${
+          produk.data.filter((v) => v.id == form.selectProduk)[0]?.hargajual ??
+          0
+        })`}
         placeholder="Masukkan harga!"
-        className="w-2/12 pl-2"
+        className="w-3/12"
         onValueChange={(v) =>
           setForm({
             ...form,
@@ -127,6 +139,19 @@ export default function TambahProduk({ form, setForm }) {
           })
         }
       />
-    </>
+      <Input
+        type="number"
+        value={form.hargakustom}
+        label={`Harga Kustom`}
+        placeholder="Hanya ditampilkan pada penawaran!"
+        className="w-3/12"
+        onValueChange={(v) =>
+          setForm({
+            ...form,
+            hargakustom: v,
+          })
+        }
+      />
+    </div>
   );
 }
