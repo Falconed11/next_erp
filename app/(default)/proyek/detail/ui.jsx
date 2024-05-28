@@ -850,7 +850,7 @@ export default function App({ id, versi }) {
                 </div>
               </div>
               {/* jenis proyek */}
-              <div className="bg-white rounded-lg p-3">
+              {/* <div className="bg-white rounded-lg p-3">
                 <div>Jenis Proyek</div>
                 <div>{kategoriProyek.join(", ")}</div>
                 <ConditionalComponent
@@ -864,7 +864,7 @@ export default function App({ id, versi }) {
                     </Button>
                   }
                 />
-              </div>
+              </div> */}
             </>
           }
         />

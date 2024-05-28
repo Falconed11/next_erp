@@ -55,6 +55,7 @@ const apiPath = getApiPath();
 const [startDate, endDate] = getCurFirstLastDay();
 
 export default function App() {
+  const [isLoading, setIsLoading] = useState(0);
   const session = useSession();
   const user = session.data?.user;
 
@@ -155,11 +156,40 @@ export default function App() {
     // console.log(jsonData);
     // Do something with the converted JSON object, e.g., send it to an API
     jsonData = jsonData.map((v) => {
-      v.tanggal = getDate(excelToJSDate(v.tanggal));
+      v.tanggalproduk = getDate(new Date(v.tanggalproduk));
+      v.tanggalproyek = getDate(new Date(v.tanggalproyek));
       return v;
     });
     setJson(jsonData);
-    console.log(jsonData);
+    console.log(json);
+  };
+  const importPenawaran = async () => {
+    if (json.length == 0) return alert("File belum dipilih");
+    setIsLoading(1);
+    setReportList([]);
+    try {
+      const responses = await Promise.all(
+        json.map((v) =>
+          fetch(`${apiPath}importpenawaran`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              // 'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: JSON.stringify(v),
+          })
+        )
+      );
+      const dataArray = await Promise.all(
+        responses.map((response) => response.json())
+      );
+      setReportList(dataArray.map((v, i) => `${i + 1}. ${v.message}`));
+    } catch (e) {
+      console.error(e);
+    }
+    setJson([]);
+    setIsLoading(0);
+    report.onOpen();
   };
   const handleButtonUploadExcelPress = async () => {
     if (json.length == 0) return alert("File belum dipilih");
@@ -203,7 +233,7 @@ export default function App() {
   };
   const handleExportButtonPress = (proyek) => {
     const data = penawaran.filter((v) => v.selectedKeys.has(v.id_proyek));
-    console.log(data);
+    // console.log(data);
     // const worksheet = XLSX.utils.json_to_sheet(rows);
     // const workbook = XLSX.utils.book_new();
     // XLSX.utils.book_append_sheet(workbook, worksheet, "sheet1");
@@ -214,6 +244,7 @@ export default function App() {
     // );
   };
   const exportPenawaran = () => {
+    if (selectedKeys.size == 0) return alert("Proyek belum dipilih");
     const data = penawaran.data.filter((v) =>
       selectedKeys.has(String(v.id_proyek))
     );
@@ -312,6 +343,7 @@ export default function App() {
   const [reportList, setReportList] = useState([]);
   const report = useDisclosure();
 
+  if (isLoading) return <div>loading...</div>;
   if (proyek.error) return <div>failed to load</div>;
   if (proyek.isLoading) return <div>loading...</div>;
   if (karyawan.error) return <div>failed to load</div>;
@@ -391,12 +423,11 @@ export default function App() {
   ];
   return (
     <div className="flex flex-col">
-      {<>{selectedKeys}</>}
       <div className="flex flex-row gap-2">
         <Button color="primary" onPress={tambahButtonPress}>
           Tambah
         </Button>
-        <div>
+        {/* <div>
           <Link
             className="bg-primary text-white p-2 rounded-lg inline-block"
             href={"/proyek.xlsx"}
@@ -407,7 +438,7 @@ export default function App() {
         <FileUploader onFileUpload={handleFileUpload} />
         <Button color="primary" onPress={handleButtonUploadExcelPress}>
           Upload Excel
-        </Button>
+        </Button> */}
       </div>
       <Table
         isStriped
@@ -455,6 +486,10 @@ export default function App() {
                   Export Penawaran
                 </Button>
               </div>
+              <FileUploader onFileUpload={handleFileUpload} />
+              <Button color="primary" onPress={importPenawaran}>
+                Import Penawaran
+              </Button>
             </div>
           </>
         }

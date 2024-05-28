@@ -55,9 +55,9 @@ export default function RootLayout({ children, }: { children: React.ReactNode })
             ]
         },
         // { href: "/stok", name: "Stok" },
-        {
-            href: "/proyek", name: "Proyek", dropdown: proyek
-        },
+        // {
+        //     href: "/proyek", name: "Proyek", dropdown: proyek
+        // },
         // {
         //     href: "/karyawan", name: "Karyawan", dropdown: [
         //         {
@@ -100,6 +100,8 @@ export default function RootLayout({ children, }: { children: React.ReactNode })
         // { href: "/klien", name: "Klien" },
         // { href: "/gudang", name: "Gudang" },
     ]
+    if (user?.peran == 'sales') links.push({ href: "/proyek", name: "Proyek" })
+    if (user?.peran == 'admin' || user?.peran == 'super') links.push({ href: "/proyek", name: "Proyek", dropdown: proyek })
     if (user?.peran == "admin" || user?.peran == "super") links.push({ href: "/nota", name: "Nota" },
         { href: "/kwitansi", name: "Kwitansi" },
         { href: "/operasionalkantor", name: "Operasional Kantor" },)
