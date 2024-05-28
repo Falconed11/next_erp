@@ -57,6 +57,9 @@ const [startDate, endDate] = getCurFirstLastDay();
 export default function App() {
   const session = useSession();
   const user = session.data?.user;
+
+  const [selectedKeys, setSelectedKeys] = React.useState(new Set([]));
+
   const [filter, setFilter] = useState({
     startDate,
     endDate,
@@ -66,9 +69,11 @@ export default function App() {
   const proyek = useClientFetch(
     `proyek?start=${getDate(filter.startDate)}&end=${getDate(filter.endDate)}`
   );
-  const penawaran = selectProyek
-    ? useClientFetch(`exportpenawaran?id=${selectProyek.id}`)
-    : {};
+  const penawaran = useClientFetch(
+    `exportpenawaran?start=${getDate(filter.startDate)}&end=${getDate(
+      filter.endDate
+    )}`
+  );
   const perusahaan = useClientFetch("perusahaan");
   const karyawan = useClientFetch("karyawan");
   const statusproyek = useClientFetch("statusproyek");
@@ -197,8 +202,8 @@ export default function App() {
     );
   };
   const handleExportButtonPress = (proyek) => {
-    setSelectProyek(proyek);
-    console.log(penawaran.data);
+    const data = penawaran.filter((v) => v.selectedKeys.has(v.id_proyek));
+    console.log(data);
     // const worksheet = XLSX.utils.json_to_sheet(rows);
     // const workbook = XLSX.utils.book_new();
     // XLSX.utils.book_append_sheet(workbook, worksheet, "sheet1");
@@ -207,6 +212,17 @@ export default function App() {
     //   `proyek_${getDateF(filter.startDate)}_${getDateF(filter.endDate)}.xlsx`,
     //   { compression: true }
     // );
+  };
+  const exportPenawaran = () => {
+    const data = penawaran.data.filter((v) =>
+      selectedKeys.has(String(v.id_proyek))
+    );
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "sheet1");
+    XLSX.writeFile(workbook, `exportpenawaran-${getDateF(new Date())}.xlsx`, {
+      compression: true,
+    });
   };
 
   const renderCell = React.useCallback((data, columnKey) => {
@@ -270,14 +286,14 @@ export default function App() {
                 <EditIcon />
               </span>
             </Tooltip>
-            <Tooltip content="Export">
+            {/* <Tooltip content="Export">
               <span
                 onClick={() => handleExportButtonPress(data)}
                 className="text-lg text-default-400 cursor-pointer active:opacity-50"
               >
                 <FileExportIcon />
               </span>
-            </Tooltip>
+            </Tooltip> */}
             <Tooltip color="danger" content="Delete">
               <span
                 onClick={() => deleteButtonPress(data.id)}
@@ -375,6 +391,7 @@ export default function App() {
   ];
   return (
     <div className="flex flex-col">
+      {<>{selectedKeys}</>}
       <div className="flex flex-row gap-2">
         <Button color="primary" onPress={tambahButtonPress}>
           Tambah
@@ -396,6 +413,9 @@ export default function App() {
         isStriped
         className="pt-3"
         aria-label="Example table with custom cells"
+        selectionMode="multiple"
+        selectedKeys={selectedKeys}
+        onSelectionChange={setSelectedKeys}
         topContent={
           <>
             <div>Filter</div>
@@ -421,10 +441,20 @@ export default function App() {
                 />
               </div>
             </div>
-            <div className="flex flex-row gap-2">
-              <Button color="primary" onClick={handleButtonExportToExcelPress}>
-                Export to Excel
-              </Button>
+            <div className="flex gap-2">
+              <div className="flex flex-row gap-2">
+                <Button
+                  color="primary"
+                  onClick={handleButtonExportToExcelPress}
+                >
+                  Export to Excel
+                </Button>
+              </div>
+              <div className="flex flex-row gap-2">
+                <Button color="primary" onClick={exportPenawaran}>
+                  Export Penawaran
+                </Button>
+              </div>
             </div>
           </>
         }
