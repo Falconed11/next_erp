@@ -1,10 +1,14 @@
 import { convertToRoman } from "./roman";
 
-const penawaran = (no, date, sales) => {
-  const id = `${no}/PNW/${sales}/${convertToRoman(
+const penawaran = (no, date) => {
+  const id = `${no}/PNW/${convertToRoman(
     date.getMonth() + 1
   )}/${date.getFullYear()}`;
   return id;
 };
 
-export { penawaran };
+const fIdProyek = (no, date) => {
+  return `${date.getFullYear()}.${date.getMonth() + 1}.${no}`;
+};
+
+export { penawaran, fIdProyek };

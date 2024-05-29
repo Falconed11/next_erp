@@ -58,6 +58,7 @@ const apiPath = getApiPath();
 
 export default function app() {
   const merek = useClientFetch("merek");
+  const [value, setValue] = React.useState("");
   const [form, setForm] = useState({});
   const [page, setPage] = React.useState(1);
   const rowsPerPage = 25;
@@ -253,11 +254,15 @@ export default function app() {
   const transfer = useDisclosure();
   const report = useDisclosure();
 
+  const data = merek.data?.filter((row) =>
+    row.nama.toLowerCase().includes(value.toLowerCase())
+  );
+
   const pages = useMemo(() => {
-    return merek.data ? Math.ceil(merek.data?.length / rowsPerPage) : 0;
-  }, [merek.data?.length, rowsPerPage]);
+    return data ? Math.ceil(data?.length / rowsPerPage) : 0;
+  }, [data?.length, rowsPerPage]);
   const loadingState =
-    merek.isLoading || merek.data?.length === 0 ? "loading" : "idle";
+    merek.isLoading || data?.length === 0 ? "loading" : "idle";
   const offset = (page - 1) * rowsPerPage;
 
   const columns = [
@@ -298,7 +303,17 @@ export default function app() {
         isStriped
         className="pt-3"
         aria-label="Example table with custom cells"
-        topContent={<></>}
+        topContent={
+          <>
+            <div>Filter</div>
+            <Input
+              label="Nama"
+              placeholder="Masukkan nama!"
+              value={value}
+              onValueChange={setValue}
+            />
+          </>
+        }
         bottomContent={
           pages > 0 ? (
             <div className="flex w-full justify-center">
@@ -326,9 +341,7 @@ export default function app() {
           )}
         </TableHeader>
         <TableBody
-          items={
-            merek.data ? merek.data.slice(offset, offset + rowsPerPage) : []
-          }
+          items={data ? data.slice(offset, offset + rowsPerPage) : []}
           loadingContent={"Loading..."}
           loadingState={loadingState}
         >

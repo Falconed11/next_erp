@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { useSession } from "next-auth/react";
 import * as XLSX from "xlsx";
 import { useClientFetch, getApiPath } from "@/app/utils/apiconfig";
-import { penawaran } from "@/app/utils/formatid";
+import { fIdProyek } from "@/app/utils/formatid";
 import { Autocomplete, AutocompleteItem } from "@nextui-org/react";
 import {
   Table,
@@ -161,7 +161,7 @@ export default function App() {
       return v;
     });
     setJson(jsonData);
-    console.log(json);
+    // console.log(json);
   };
   const importPenawaran = async () => {
     if (json.length == 0) return alert("File belum dipilih");
@@ -274,6 +274,10 @@ export default function App() {
         return getDateF(new Date(data.tanggal));
       case "totalharga":
         return data.jumlah * data.harga;
+      case "id_kustom":
+        return data.versi > 0
+          ? fIdProyek(data.id_kustom, new Date(data.tanggal))
+          : "";
       case "aksi":
         return (
           <div className="relative flex items-center gap-2">
@@ -365,7 +369,7 @@ export default function App() {
       label: "Id",
     },
     {
-      key: "id_second",
+      key: "id_kustom",
       label: "Id Proyek",
     },
     {

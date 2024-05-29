@@ -278,9 +278,11 @@ export default function App({ id, versi }) {
       body: JSON.stringify({
         id,
         versi: selectedVersion,
+        tanggal: selectedProyek.tanggal,
       }),
     });
     const json = await res.json();
+    if (res.status == 400) return alert(json.message);
     // console.log(json.message);
     // return alert(json.message);
   };
@@ -761,9 +763,8 @@ export default function App({ id, versi }) {
               <div>
                 :{" "}
                 {penawaran(
-                  selectedProyek.id_kustom,
-                  new Date(selectedProyek.tanggal),
-                  selectedProyek.id_karyawan
+                  selectedProyek.id_penawaran,
+                  new Date(selectedProyek.tanggal)
                 )}{" "}
               </div>
               <div>: {selectedProyek.namaperusahaan} </div>
@@ -893,7 +894,32 @@ export default function App({ id, versi }) {
                   Penawaran
                 </Button>
               </div>
-              {["admin", "super"].includes(user?.peran == "admin") ? (
+              {["admin", "super"].includes(user?.peran) ? (
+                selectedProyek.versi <= 0 ? (
+                  <div>
+                    <Button
+                      onClick={handleButtonSetAsDealClick}
+                      color="primary"
+                      className="mt-3"
+                    >
+                      Set as Deal
+                    </Button>
+                  </div>
+                ) : (
+                  <div>
+                    <Button
+                      onClick={handleButtonCancelDealClick}
+                      color="primary"
+                      className="mt-3"
+                    >
+                      Cancel Deal
+                    </Button>
+                  </div>
+                )
+              ) : (
+                <></>
+              )}
+              {["admin", "super"].includes(user?.peran) ? (
                 selectedProyek.versi != -1 ? (
                   <div>
                     <Button
@@ -918,7 +944,7 @@ export default function App({ id, versi }) {
               ) : (
                 <></>
               )}
-              {["admin", "super"].includes(user?.peran == "admin") ? (
+              {["admin", "super"].includes(user?.peran) ? (
                 selectedProyek.versi > 0 ? (
                   user?.peran == "admin" || user?.peran == "super" ? (
                     <Link
