@@ -1,4 +1,5 @@
 "use client"
+import { usePathname } from "next/navigation";
 import { useSession } from 'next-auth/react'
 import Nav from '../../components/nav'
 import User from '../../components/user'
@@ -6,6 +7,7 @@ import User from '../../components/user'
 export default function RootLayout({ children, }: { children: React.ReactNode }) {
     const session = useSession()
     const user = session.data?.user
+    const pathname = usePathname();
     const proyek = [{
         key: "data",
         name: "Proyek",
@@ -137,7 +139,7 @@ export default function RootLayout({ children, }: { children: React.ReactNode })
             <div className='pb-3'></div>
             <div className='flex flex-row py-2 mx-3 mb-3 rounded-lg bg-background'>
                 <div className='basis-3/4'>
-                    <div className='p-3'>ERP</div>
+                    <div className='p-3'>ERP{pathname}</div>
                 </div>
                 <div className='basis-1/4 flex flex-row-reverse '>
                     <div className='px-3'>

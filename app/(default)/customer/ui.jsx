@@ -57,6 +57,7 @@ import "react-datepicker/dist/react-datepicker.css";
 const apiPath = getApiPath();
 
 export default function app() {
+  const [value, setValue] = React.useState("");
   const customer = useClientFetch("customer");
   const [form, setForm] = useState({});
   const [page, setPage] = React.useState(1);
@@ -108,6 +109,7 @@ export default function app() {
   const editButtonPress = (data) => {
     setForm({
       ...data,
+      selectSwasta: new Set([String(data.swasta)]),
       method: "PUT",
       title: "Edit",
     });
@@ -194,6 +196,8 @@ export default function app() {
         return getDateF(new Date(data.tanggal));
       case "totalharga":
         return data.jumlah * data.harga;
+      case "swasta":
+        return data.swasta ? "Swasta" : "Negri";
       case "provit":
         return (
           <div className="text-right">
@@ -251,11 +255,14 @@ export default function app() {
   const transfer = useDisclosure();
   const report = useDisclosure();
 
+  const data = customer.data?.filter((row) =>
+    row.nama.toLowerCase().includes(value.toLowerCase())
+  );
   const pages = useMemo(() => {
-    return customer.data ? Math.ceil(customer.data?.length / rowsPerPage) : 0;
-  }, [customer.data?.length, rowsPerPage]);
+    return data ? Math.ceil(data?.length / rowsPerPage) : 0;
+  }, [data?.length, rowsPerPage]);
   const loadingState =
-    customer.isLoading || customer.data?.length === 0 ? "loading" : "idle";
+    customer.isLoading || data?.length === 0 ? "loading" : "idle";
   const offset = (page - 1) * rowsPerPage;
 
   const columns = [
@@ -274,6 +281,14 @@ export default function app() {
     {
       key: "provit",
       label: "Provit",
+    },
+    {
+      key: "swasta",
+      label: "S/N",
+    },
+    {
+      key: "kota",
+      label: "Kota",
     },
     {
       key: "alamat",
@@ -308,7 +323,17 @@ export default function app() {
         isStriped
         className="pt-3"
         aria-label="Example table with custom cells"
-        topContent={<></>}
+        topContent={
+          <>
+            <div>Filter</div>
+            <Input
+              label="Nama"
+              placeholder="Masukkan nama!"
+              value={value}
+              onValueChange={setValue}
+            />
+          </>
+        }
         bottomContent={
           pages > 0 ? (
             <div className="flex w-full justify-center">
@@ -336,11 +361,7 @@ export default function app() {
           )}
         </TableHeader>
         <TableBody
-          items={
-            customer.data
-              ? customer.data.slice(offset, offset + rowsPerPage)
-              : []
-          }
+          items={data ? data.slice(offset, offset + rowsPerPage) : []}
           loadingContent={"Loading..."}
           loadingState={loadingState}
         >
@@ -391,6 +412,35 @@ export default function app() {
                   placeholder="Masukkan nama instansi!"
                   value={form.nama}
                   onValueChange={(val) => setForm({ ...form, nama: val })}
+                />
+                <Select
+                  label="S/N"
+                  placeholder="Pilih s/n!"
+                  className="max-w-xs"
+                  selectedKeys={form.selectSwasta}
+                  onSelectionChange={(val) =>
+                    setForm({
+                      ...form,
+                      selectSwasta: val,
+                      swasta: new Set(val).values().next().value,
+                    })
+                  }
+                >
+                  {[
+                    { id: 1, nama: "swasta" },
+                    { id: 0, nama: "negri" },
+                  ].map((item) => (
+                    <SelectItem key={item.id} value={item.id}>
+                      {item.nama}
+                    </SelectItem>
+                  ))}
+                </Select>
+                <Input
+                  type="text"
+                  label="Kota"
+                  placeholder="Masukkan kota!"
+                  value={form.kota}
+                  onValueChange={(val) => setForm({ ...form, kota: val })}
                 />
                 <Input
                   type="text"

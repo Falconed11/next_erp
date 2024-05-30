@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { useSession } from "next-auth/react";
 import * as XLSX from "xlsx";
+import { RadioGroup, Radio } from "@nextui-org/react";
 import { useClientFetch, getApiPath } from "@/app/utils/apiconfig";
 import { fIdProyek } from "@/app/utils/formatid";
 import { Autocomplete, AutocompleteItem } from "@nextui-org/react";
@@ -55,6 +56,7 @@ const apiPath = getApiPath();
 const [startDate, endDate] = getCurFirstLastDay();
 
 export default function App() {
+  const [selected, setSelected] = React.useState("tanggal_penawaran");
   const [isLoading, setIsLoading] = useState(0);
   const session = useSession();
   const user = session.data?.user;
@@ -68,7 +70,9 @@ export default function App() {
   });
   const [selectProyek, setSelectProyek] = useState({});
   const proyek = useClientFetch(
-    `proyek?start=${getDate(filter.startDate)}&end=${getDate(filter.endDate)}`
+    `proyek?start=${getDate(filter.startDate)}&end=${getDate(
+      filter.endDate
+    )}$sort=${selected}`
   );
   const penawaran = useClientFetch(
     `exportpenawaran?start=${getDate(filter.startDate)}&end=${getDate(
@@ -121,7 +125,7 @@ export default function App() {
     onOpen();
   };
   const editButtonPress = (data) => {
-    const startdate = new Date(data.tanggal);
+    const startdate = new Date(data.tanggal_penawaran);
     setForm({
       ...data,
       modalmode: "Edit",
@@ -272,6 +276,8 @@ export default function App() {
           : "deal";
       case "tanggal":
         return getDateF(new Date(data.tanggal));
+      case "tanggal_penawaran":
+        return getDateF(new Date(data.tanggal_penawaran));
       case "totalharga":
         return data.jumlah * data.harga;
       case "id_kustom":
@@ -364,10 +370,10 @@ export default function App() {
   if (penawaran.isLoading) return <div>loading...</div>;
 
   const columns = [
-    {
-      key: "id",
-      label: "Id",
-    },
+    // {
+    //   key: "id",
+    //   label: "Id",
+    // },
     {
       key: "id_kustom",
       label: "Id Proyek",
@@ -380,18 +386,18 @@ export default function App() {
       key: "swasta",
       label: "Swasta/Negri",
     },
-    {
-      key: "kategoriproyek",
-      label: "Kategori Proyek",
-    },
+    // {
+    //   key: "kategoriproyek",
+    //   label: "Kategori Proyek",
+    // },
     {
       key: "nama",
       label: "Nama Proyek",
     },
-    // {
-    //   key: "klien",
-    //   label: "Klien",
-    // },
+    {
+      key: "klien",
+      label: "Klien",
+    },
     {
       key: "instansi",
       label: "Customer",
@@ -409,8 +415,12 @@ export default function App() {
       label: "Status",
     },
     {
+      key: "tanggal_penawaran",
+      label: "Tanggal Penawaran",
+    },
+    {
       key: "tanggal",
-      label: "Tanggal",
+      label: "Tanggal Proyek",
     },
     {
       key: "keterangan",
@@ -425,6 +435,8 @@ export default function App() {
     { id: 0, nama: "negri" },
     { id: 1, nama: "swasta" },
   ];
+
+  console.log(selected);
   return (
     <div className="flex flex-col">
       <div className="flex flex-row gap-2">
@@ -454,6 +466,14 @@ export default function App() {
         topContent={
           <>
             <div>Filter</div>
+            <RadioGroup
+              orientation="horizontal"
+              value={selected}
+              onValueChange={setSelected}
+            >
+              <Radio value="tanggal_penawaran">Penawaran</Radio>
+              <Radio value="tanggal">Proyek</Radio>
+            </RadioGroup>
             <div className="flex flex-row gap-2">
               <div className="flex flex-col bg-gray-100 p-3 rounded-lg">
                 <div>Periode</div>
@@ -701,7 +721,7 @@ export default function App() {
                   ))}
                 </Select> */}
                 <div className="bg-gray-100 p-3 rounded-lg">
-                  <div>Tanggal</div>
+                  <div>Tanggal Penawaran</div>
                   <DatePicker
                     placeholderText="Pilih tanggal"
                     dateFormat="dd/MM/yyyy"
