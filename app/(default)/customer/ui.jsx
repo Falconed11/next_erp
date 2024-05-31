@@ -306,7 +306,7 @@ export default function app() {
         <Button color="primary" onPress={tambahButtonPress}>
           Tambah
         </Button>
-        <div>
+        {/* <div>
           <Link
             className="bg-primary text-white p-2 rounded-lg inline-block"
             href={"/proyek.xlsx"}
@@ -317,7 +317,7 @@ export default function app() {
         <FileUploader onFileUpload={handleFileUpload} />
         <Button color="primary" onPress={handleButtonUploadExcelPress}>
           Upload Excel
-        </Button>
+        </Button> */}
       </div>
       <Table
         isStriped

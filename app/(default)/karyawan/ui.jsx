@@ -192,7 +192,7 @@ export default function App() {
         <Button color="primary" onPress={tambahButtonPress}>
           Tambah
         </Button>
-        <div>
+        {/* <div>
           <Link
             className="bg-primary text-white p-2 rounded-lg inline-block"
             href={"/karyawan.xlsx"}
@@ -203,7 +203,7 @@ export default function App() {
         <FileUploader onFileUpload={handleFileUpload} />
         <Button color="primary" onPress={handleButtonUploadExcelPress}>
           Upload Excel
-        </Button>
+        </Button> */}
       </div>
       <Table className="pt-3" aria-label="Example table with custom cells">
         <TableHeader columns={col.karyawan}>

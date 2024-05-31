@@ -56,7 +56,7 @@ const apiPath = getApiPath();
 const [startDate, endDate] = getCurFirstLastDay();
 
 export default function App() {
-  const [selected, setSelected] = React.useState("tanggal_penawaran");
+  const [sort, setSort] = React.useState("tanggal_penawaran");
   const [isLoading, setIsLoading] = useState(0);
   const session = useSession();
   const user = session.data?.user;
@@ -72,7 +72,7 @@ export default function App() {
   const proyek = useClientFetch(
     `proyek?start=${getDate(filter.startDate)}&end=${getDate(
       filter.endDate
-    )}$sort=${selected}`
+    )}&sort=${sort}`
   );
   const penawaran = useClientFetch(
     `exportpenawaran?start=${getDate(filter.startDate)}&end=${getDate(
@@ -436,7 +436,7 @@ export default function App() {
     { id: 1, nama: "swasta" },
   ];
 
-  console.log(selected);
+  console.log(sort);
   return (
     <div className="flex flex-col">
       <div className="flex flex-row gap-2">
@@ -468,8 +468,8 @@ export default function App() {
             <div>Filter</div>
             <RadioGroup
               orientation="horizontal"
-              value={selected}
-              onValueChange={setSelected}
+              value={sort}
+              onValueChange={setSort}
             >
               <Radio value="tanggal_penawaran">Penawaran</Radio>
               <Radio value="tanggal">Proyek</Radio>

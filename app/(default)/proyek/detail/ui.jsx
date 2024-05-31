@@ -1527,25 +1527,28 @@ export default function App({ id, versi }) {
                   <Divider className="bg-sky-500 my-3 py-2" />
                   {/* <hr className="my-3 bg-sky-500 h-5" /> */}
                   <div className="pt-3">
-                    <div className="">
-                      <div>
-                        Yogyakarta,{" "}
-                        {getDateFId(new Date(selectedProyek.tanggal))}
+                    <div className="flex">
+                      <div className="w-1/2">
+                        <div>Kepada Yth,</div>
+                        <div>{selectedProyek.klien}</div>
+                        <div>{selectedProyek.instansi}</div>
+                        <div>{selectedProyek.kota}</div>
                       </div>
-                      <div>
-                        No :{" "}
-                        {penawaran(
-                          selectedProyek.id_kustom,
-                          new Date(selectedProyek.tanggal),
-                          selectedProyek.id_karyawan
-                        )}
-                        /{selectedVersion}
+                      <div className="w-1/2 text-right">
+                        <div>
+                          Yogyakarta,{" "}
+                          {getDateFId(new Date(selectedProyek.tanggal))}
+                        </div>
+                        <div>
+                          No :{" "}
+                          {penawaran(
+                            selectedProyek.id_kustom,
+                            new Date(selectedProyek.tanggal),
+                            selectedProyek.id_karyawan
+                          )}
+                          {/* /{selectedVersion} */}
+                        </div>
                       </div>
-                      <br />
-                      <div>Kepada Yth,</div>
-                      <div>{selectedProyek.klien}</div>
-                      <div>{selectedProyek.instansi}</div>
-                      <div>{selectedProyek.kota}</div>
                     </div>
                     {/* <div className="basis-1/2 text-end">
                       <div>Id : ASD21903SAD</div>

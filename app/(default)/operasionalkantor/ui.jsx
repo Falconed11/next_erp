@@ -373,7 +373,7 @@ export default function App() {
           </div>
         </div>
       </div>
-      <div className="flex flex-row gap-2">
+      {/* <div className="flex flex-row gap-2">
         <div>
           <Link
             className="bg-primary text-white p-2 rounded-lg inline-block"
@@ -390,7 +390,7 @@ export default function App() {
         >
           Upload Excel
         </Button>
-      </div>
+      </div> */}
       <Modal
         isOpen={isOpen}
         onOpenChange={onOpenChange}
