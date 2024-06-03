@@ -280,7 +280,7 @@ export default function App() {
     },
   ];
   const privilege = ["admin", "super"];
-  if (privilege.includes(user.peran))
+  if (privilege.includes(user?.peran))
     columns.push(
       {
         key: "jumlah_proyek",
