@@ -56,7 +56,7 @@ import "react-datepicker/dist/react-datepicker.css";
 
 const apiPath = getApiPath();
 
-export default function app() {
+export default function App() {
   const kategoriproyek = useClientFetch("kategoriproyek");
   const [form, setForm] = useState({});
   const [page, setPage] = React.useState(1);

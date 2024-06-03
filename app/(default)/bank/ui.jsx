@@ -51,7 +51,7 @@ import "react-datepicker/dist/react-datepicker.css";
 
 const apiPath = getApiPath();
 
-export default function app() {
+export default function App() {
   const bank = useClientFetch("bank");
   const [form, setForm] = useState({});
 

@@ -56,7 +56,7 @@ import "react-datepicker/dist/react-datepicker.css";
 
 const apiPath = getApiPath();
 
-export default function app() {
+export default function App() {
   const [value, setValue] = React.useState("");
   const customer = useClientFetch("customer");
   const [form, setForm] = useState({});
@@ -260,7 +260,7 @@ export default function app() {
   );
   const pages = useMemo(() => {
     return data ? Math.ceil(data?.length / rowsPerPage) : 0;
-  }, [data?.length, rowsPerPage]);
+  }, [data, rowsPerPage]);
   const loadingState =
     customer.isLoading || data?.length === 0 ? "loading" : "idle";
   const offset = (page - 1) * rowsPerPage;
