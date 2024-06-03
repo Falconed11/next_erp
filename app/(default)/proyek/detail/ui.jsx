@@ -35,7 +35,7 @@ import {
   useClientFetch,
   useClientFetchNoInterval,
 } from "@/app/utils/apiconfig";
-import { getDateFId } from "@/app/utils/date";
+import { getDate, getDateF, getDateFId } from "@/app/utils/date";
 import { penawaran } from "@/app/utils/formatid";
 import Harga from "@/components/harga";
 import { ConditionalComponent } from "@/components/componentmanipulation";
@@ -278,7 +278,7 @@ export default function App({ id, versi }) {
       body: JSON.stringify({
         id,
         versi: selectedVersion,
-        tanggal: selectedProyek.tanggal,
+        tanggal: getDate(new Date()),
       }),
     });
     const json = await res.json();
@@ -764,12 +764,14 @@ export default function App({ id, versi }) {
                 :{" "}
                 {penawaran(
                   selectedProyek.id_penawaran,
-                  new Date(selectedProyek.tanggal)
+                  new Date(selectedProyek.tanggal_penawaran)
                 )}{" "}
               </div>
               <div>: {selectedProyek.namaperusahaan} </div>
               <div>: {selectedProyek.nama} </div>
-              <div>: {getDateFId(new Date(selectedProyek.tanggal))} </div>
+              <div>
+                : {getDateFId(new Date(selectedProyek.tanggal_penawaran))}{" "}
+              </div>
               <div>: {selectedProyek.klien} </div>
               <div>: {selectedProyek.instansi} </div>
               <div>: {selectedProyek.kota} </div>

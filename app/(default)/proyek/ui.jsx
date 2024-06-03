@@ -275,7 +275,7 @@ export default function App() {
           ? "penawaran"
           : "deal";
       case "tanggal":
-        return getDateF(new Date(data.tanggal));
+        return data.tanggal ? getDateF(new Date(data.tanggal)) : "";
       case "tanggal_penawaran":
         return getDateF(new Date(data.tanggal_penawaran));
       case "totalharga":

@@ -9,7 +9,7 @@ import Harga from "@/components/harga";
 
 const api_path = getApiPath();
 
-export default function TambahProduk({ form, setForm }) {
+export default function TambahProduk({ form, setForm, disableHargaKustom }) {
   const [nama, setNama] = useState("");
   const kategori = useClientFetch(`kategoriproduk`);
   const produk = useClientFetch(
@@ -139,19 +139,23 @@ export default function TambahProduk({ form, setForm }) {
           })
         }
       />
-      <Input
-        type="number"
-        value={form.hargakustom}
-        label={`Harga Kustom`}
-        placeholder="Hanya ditampilkan pada penawaran!"
-        className="w-3/12"
-        onValueChange={(v) =>
-          setForm({
-            ...form,
-            hargakustom: v,
-          })
-        }
-      />
+      {disableHargaKustom ? (
+        <></>
+      ) : (
+        <Input
+          type="number"
+          value={form.hargakustom}
+          label={`Harga Kustom`}
+          placeholder="Hanya ditampilkan pada penawaran!"
+          className="w-3/12"
+          onValueChange={(v) =>
+            setForm({
+              ...form,
+              hargakustom: v,
+            })
+          }
+        />
+      )}
     </div>
   );
 }

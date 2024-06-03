@@ -81,6 +81,7 @@ export default function App({ id }) {
       harga: data.hargapengeluaran,
       modalmode: "Edit",
       tanggal: getDate(startdate),
+      selectStatus: new Set([String(data.status)]),
       startdate,
       keterangan: data.keteranganpp,
     });
@@ -110,6 +111,7 @@ export default function App({ id }) {
         // 'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: JSON.stringify({
+        ...form,
         id_proyek: id,
         id_produk: form.selectProduk,
         id_karyawan: selectKaryawan.values().next().value,
@@ -140,7 +142,6 @@ export default function App({ id }) {
         ...data,
         id: data.id_pengeluaranproyek,
         keterangan: data.keterangan ? data.keterangan : "",
-        status: data.status ? data.status : "",
         tanggal: getDate(new Date(data.startdate)),
         // harga: data.hargajual,
       }),
@@ -219,6 +220,8 @@ export default function App({ id }) {
       const cellValue = data[columnKey];
       const harga = data.hargapengeluaran;
       switch (columnKey) {
+        case "status":
+          return data.status == 1 ? "Lunas" : "Belum Lunas";
         case "tanggal":
           return getDateF(new Date(data.tanggalpengeluaran));
         case "harga":
@@ -595,7 +598,11 @@ export default function App({ id }) {
                     })
                   }
                 /> */}
-                <TambahProduk form={form} setForm={setForm} />
+                <TambahProduk
+                  form={form}
+                  setForm={setForm}
+                  disableHargaKustom
+                />
               </div>
               <div className="flex flex-row gap-2 mt-3">
                 <div className="bg-gray-100 p-3 rounded-lg">
@@ -633,7 +640,7 @@ export default function App({ id }) {
                     })
                   }
                 />
-                <Input
+                {/* <Input
                   type="text"
                   value={form.status}
                   label="Status"
@@ -645,7 +652,29 @@ export default function App({ id }) {
                       status: v,
                     })
                   }
-                />
+                /> */}
+                <Select
+                  label="Status"
+                  placeholder="Pilih status!"
+                  className="w-2/12"
+                  selectedKeys={form.selectStatus}
+                  onSelectionChange={(v) =>
+                    setForm({
+                      ...form,
+                      selectStatus: v,
+                      status: v.values().next().value,
+                    })
+                  }
+                >
+                  {[
+                    { id: 0, nama: "Belum Lunas" },
+                    { id: 1, nama: "Lunas" },
+                  ].map((item) => (
+                    <SelectItem key={item.id} value={item.id}>
+                      {item.nama}
+                    </SelectItem>
+                  ))}
+                </Select>
                 <Button
                   onClick={() => {
                     tambahButtonPress({ selectProduk, selectKaryawan, form });
@@ -816,7 +845,7 @@ export default function App({ id }) {
                   {form.jumlah *
                     (form.hargakustom ? form.hargakustom : form.hargamodal)}
                 </div> */}
-                <Input
+                {/* <Input
                   type="text"
                   value={form.status}
                   label="Status"
@@ -828,7 +857,29 @@ export default function App({ id }) {
                       status: v,
                     })
                   }
-                />
+                /> */}
+                <Select
+                  label="Status"
+                  placeholder="Pilih status!"
+                  className=""
+                  selectedKeys={form.selectStatus}
+                  onSelectionChange={(v) =>
+                    setForm({
+                      ...form,
+                      selectStatus: v,
+                      status: v.values().next().value,
+                    })
+                  }
+                >
+                  {[
+                    { id: 0, nama: "Belum Lunas" },
+                    { id: 1, nama: "Lunas" },
+                  ].map((item) => (
+                    <SelectItem key={item.id} value={item.id}>
+                      {item.nama}
+                    </SelectItem>
+                  ))}
+                </Select>
               </ModalBody>
               <ModalFooter>
                 <Button color="danger" variant="light" onPress={onClose}>
