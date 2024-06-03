@@ -41,7 +41,7 @@ import {
   NoteIcon,
   ReportMoneyIcon,
   FileExportIcon,
-} from "../../../components/icon";
+} from "@/components/icon";
 import {
   getCurFirstLastDay,
   excelToJSDate,

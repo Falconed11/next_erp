@@ -305,7 +305,7 @@ export default function UI() {
   ];
   return (
     <div>
-      <div className="flex flex-row gap-2">
+      {/* <div className="flex flex-row gap-2">
         <div>
           <Link
             className="bg-primary text-white p-2 rounded-lg inline-block"
@@ -318,7 +318,7 @@ export default function UI() {
         <Button color="primary" onPress={handleButtonUploadExcelPress}>
           Upload Excel
         </Button>
-      </div>
+      </div> */}
       <Table
         className="pt-3"
         aria-label="Example table with custom cells"
@@ -347,11 +347,11 @@ export default function UI() {
                 />
               </div>
             </div>
-            <div className="flex flex-row gap-2">
+            {/* <div className="flex flex-row gap-2">
               <Button color="primary" onClick={handleButtonExportToExcelPress}>
                 Export to Excel
               </Button>
-            </div>
+            </div> */}
           </>
         }
       >

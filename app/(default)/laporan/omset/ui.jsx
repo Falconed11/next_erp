@@ -346,7 +346,7 @@ export default function App() {
 
   return (
     <div className="flex flex-col">
-      <div className="flex flex-row gap-2">
+      {/* <div className="flex flex-row gap-2">
         <Button color="primary" onPress={tambahButtonPress}>
           Tambah
         </Button>
@@ -362,7 +362,7 @@ export default function App() {
         <Button color="primary" onPress={handleButtonUploadExcelPress}>
           Upload Excel
         </Button>
-      </div>
+      </div> */}
       <Table
         isStriped
         className="pt-3"
@@ -392,11 +392,11 @@ export default function App() {
                 />
               </div>
             </div>
-            <div className="flex flex-row gap-2">
-              <Button color="primary" onClick={handleButtonExportToExcelPress}>
+            {/* <div className="flex flex-row gap-2"> */}
+            {/* <Button color="primary" onClick={handleButtonExportToExcelPress}>
                 Export to Excel
               </Button>
-            </div>
+            </div> */}
             <div className="flex gap-3">
               <div>
                 Biaya Produksi :<Harga harga={biayaProduksi} />{" "}

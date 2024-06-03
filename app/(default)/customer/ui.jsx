@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useMemo } from "react";
+import { useSession } from "next-auth/react";
 import * as XLSX from "xlsx";
 import {
   useClientFetch,
@@ -57,6 +58,9 @@ import "react-datepicker/dist/react-datepicker.css";
 const apiPath = getApiPath();
 
 export default function App() {
+  const session = useSession();
+  const user = session.data?.user;
+
   const [value, setValue] = React.useState("");
   const customer = useClientFetch("customer");
   const [form, setForm] = useState({});
@@ -266,22 +270,28 @@ export default function App() {
   const offset = (page - 1) * rowsPerPage;
 
   const columns = [
-    {
-      key: "id",
-      label: "Id",
-    },
+    // {
+    //   key: "id",
+    //   label: "Id",
+    // },
     {
       key: "nama",
       label: "Nama",
     },
-    {
-      key: "jumlah_proyek",
-      label: "Jumlah Proyek",
-    },
-    {
-      key: "provit",
-      label: "Provit",
-    },
+  ];
+  const privilege = ["admin", "super"];
+  if (privilege.includes(user.peran))
+    columns.push(
+      {
+        key: "jumlah_proyek",
+        label: "Jumlah Proyek",
+      },
+      {
+        key: "provit",
+        label: "Provit",
+      }
+    );
+  columns.push(
     {
       key: "swasta",
       label: "S/N",
@@ -297,8 +307,8 @@ export default function App() {
     {
       key: "aksi",
       label: "Aksi",
-    },
-  ];
+    }
+  );
 
   return (
     <div className="flex flex-col">
