@@ -24,6 +24,7 @@ import {
   DeleteIcon,
   EyeIcon,
   UserIcon,
+  MinIcon,
 } from "@/components/icon";
 import {
   Modal,
@@ -33,18 +34,21 @@ import {
   ModalFooter,
   useDisclosure,
 } from "@nextui-org/react";
+import { RadioGroup, Radio } from "@nextui-org/react";
 import Harga from "@/components/harga";
 import { FileUploader } from "@/components/input";
+import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { getApiPath, useClientFetch } from "@/app/utils/apiconfig";
 import { Button } from "@nextui-org/react";
 import { Input, Textarea } from "@nextui-org/react";
-import { getDateFId } from "@/app/utils/date";
+import { getDate, getDateFId } from "@/app/utils/date";
 
 const apiPath = getApiPath();
 
 export default function App() {
   const [nama, setNama] = useState("");
+  const [id, setId] = useState("");
   const [selectKategori, setSelectKategori] = useState([]);
   const produk = useClientFetch(
     `produk?kategori=${selectKategori.values().next().value ?? ""}`
@@ -81,6 +85,8 @@ export default function App() {
   const [reportList, setReportList] = useState([]);
   const report = useDisclosure();
 
+  const modal = { masuk: useDisclosure(), keluar: useDisclosure() };
+
   const saveButtonPress = async (onClose) => {
     if (form.nama == "" || !form.selectKategori.size > 0)
       return alert("Nama, dan Kategori wajib diisi!");
@@ -102,7 +108,7 @@ export default function App() {
       modalmode: "Tambah",
       id: "",
       kategori: "",
-      id_kustom: "",
+      id_kustom: id,
       nama: "",
       merek: "",
       tipe: "",
@@ -115,6 +121,9 @@ export default function App() {
       select_subkategori: new Set([]),
       select_merek: new Set([]),
       filteredsubkategori: [],
+      startdate: new Date(),
+      tanggal: getDate(new Date()),
+      lunas: "1",
       keterangan: "",
     });
     setMethod("POST");
@@ -129,6 +138,8 @@ export default function App() {
       id_merek: data.id_merek,
       vendor: data.nvendor,
       id_vendor: data.id_vendor,
+      startdate: new Date(data.tanggal),
+      tanggal: data.tanggal,
     });
     setMethod("PUT");
     onOpen();
@@ -203,6 +214,14 @@ export default function App() {
     XLSX.writeFile(workbook, `produk.xlsx`, { compression: true });
   };
 
+  const onProdukMasukClick = (data) => {
+    setForm({
+      ...data,
+      startdate: new Date(),
+    });
+    modal.masuk.onOpen();
+  };
+
   const renderCell = React.useCallback((data, columnKey) => {
     const cellValue = data[columnKey];
     switch (columnKey) {
@@ -236,6 +255,22 @@ export default function App() {
                 <EditIcon />
               </span>
             </Tooltip>
+            <Tooltip content="Produk Masuk">
+              <span
+                onClick={() => onProdukMasukClick(data)}
+                className="text-lg text-default-400 cursor-pointer active:opacity-50"
+              >
+                <AddIcon />
+              </span>
+            </Tooltip>
+            <Tooltip content="Produk Keluar">
+              <span
+                onClick={() => onProdukKeluarClick(data)}
+                className="text-lg text-default-400 cursor-pointer active:opacity-50"
+              >
+                <MinIcon />
+              </span>
+            </Tooltip>
             <Tooltip color="danger" content="Delete">
               <span
                 onClick={() => deleteButtonPress(data.id)}
@@ -254,18 +289,20 @@ export default function App() {
   let data = produk?.data;
   data = data?.filter(
     (row) =>
-      row.nama.toLowerCase().includes(nama.toLowerCase()) ||
-      row.nmerek?.toLowerCase().includes(nama.toLowerCase()) ||
-      row.tipe?.toLowerCase().includes(nama.toLowerCase()) ||
-      row.vendor?.toLowerCase().includes(nama.toLowerCase())
+      (row.nama.toLowerCase().includes(nama.toLowerCase()) ||
+        row.nmerek?.toLowerCase().includes(nama.toLowerCase()) ||
+        row.tipe?.toLowerCase().includes(nama.toLowerCase()) ||
+        row.vendor?.toLowerCase().includes(nama.toLowerCase())) &&
+      row.id_kustom.toLowerCase().includes(id.toLocaleLowerCase())
   );
   data = data?.slice(0, 50);
   const filteredData = produk?.data?.filter(
     (row) =>
-      row.nama.toLowerCase().includes(nama.toLowerCase()) ||
-      row.nmerek?.toLowerCase().includes(nama.toLowerCase()) ||
-      row.tipe?.toLowerCase().includes(nama.toLowerCase()) ||
-      row.vendor?.toLowerCase().includes(nama.toLowerCase())
+      (row.nama.toLowerCase().includes(nama.toLowerCase()) ||
+        row.nmerek?.toLowerCase().includes(nama.toLowerCase()) ||
+        row.tipe?.toLowerCase().includes(nama.toLowerCase()) ||
+        row.vendor?.toLowerCase().includes(nama.toLowerCase())) &&
+      row.id_kustom.toLowerCase().includes(id.toLocaleLowerCase())
   );
 
   const pages = useMemo(() => {
@@ -291,7 +328,7 @@ export default function App() {
       label: "Kategori",
     },
     {
-      key: "id",
+      key: "id_kustom",
       label: "Id",
     },
     {
@@ -348,6 +385,7 @@ export default function App() {
   //     if (item.id_kategoriproduk == form.id_kategori) return item;
   //   });
   // }
+
   return (
     <div className="flex flex-col">
       <div className="flex flex-row gap-2">
@@ -369,7 +407,6 @@ export default function App() {
       </div>
       <Table
         isStriped
-        selectionMode="single"
         className="pt-3"
         aria-label="Example table with custom cells"
         topContent={
@@ -419,6 +456,15 @@ export default function App() {
                   </AutocompleteItem>
                 )}
               </Autocomplete>
+              <Input
+                isClearable
+                type="text"
+                label="Id"
+                placeholder="Masukkan id!"
+                className="max-w-xs"
+                value={id}
+                onValueChange={setId}
+              />
             </div>
             {/* <div className="flex flex-row gap-2">
               <Button color="primary" onClick={handleButtonExportToExcelPress}>
@@ -584,6 +630,64 @@ export default function App() {
                   value={form.hargajual}
                   onValueChange={(val) => setForm({ ...form, hargajual: val })}
                 />
+                <div className="bg-gray-100 p-3 rounded-lg z-40">
+                  <div>Tanggal</div>
+                  <DatePicker
+                    className="z-40"
+                    placeholderText="Pilih tanggal"
+                    dateFormat="dd/MM/yyyy"
+                    selected={form.startdate}
+                    onChange={(v) =>
+                      setForm({ ...form, startdate: v, tanggal: getDate(v) })
+                    }
+                  />
+                </div>
+                {form.modalmode == "Tambah" ? (
+                  <>
+                    <RadioGroup
+                      orientation="horizontal"
+                      defaultValue={"1"}
+                      value={form.lunas}
+                      onValueChange={(v) => setForm({ ...form, lunas: v })}
+                    >
+                      <Radio value="1">Lunas</Radio>
+                      <Radio value="0">Hutang</Radio>
+                    </RadioGroup>
+                    {form.lunas == "0" ? (
+                      <>
+                        <div className="bg-gray-100 p-3 rounded-lg z-40">
+                          <div>Jatuh Tempo</div>
+                          <DatePicker
+                            className="z-40"
+                            placeholderText="Pilih tanggal"
+                            dateFormat="dd/MM/yyyy"
+                            selected={form.startdateJatuhtempo}
+                            onChange={(v) =>
+                              setForm({
+                                ...form,
+                                startdateJatuhtempo: v,
+                                jatuhtempo: getDate(v),
+                              })
+                            }
+                          />
+                        </div>
+                        <Input
+                          type="number"
+                          label="Terbayar"
+                          placeholder="Masukkan nominal!"
+                          value={form.terbayar}
+                          onValueChange={(val) =>
+                            setForm({ ...form, terbayar: val })
+                          }
+                        />
+                      </>
+                    ) : (
+                      <></>
+                    )}
+                  </>
+                ) : (
+                  <></>
+                )}
                 <Textarea
                   label="Keterangan"
                   labelPlacement="inside"
@@ -623,6 +727,95 @@ export default function App() {
                 {reportList.map((r, i) => (
                   <div key={i}>{r}</div>
                 ))}
+              </ModalBody>
+              <ModalFooter>
+                <Button color="danger" variant="light" onPress={onClose}>
+                  Tutup
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+      {/* masuk */}
+      <Modal
+        isOpen={modal.masuk.isOpen}
+        onOpenChange={modal.masuk.onOpenChange}
+        scrollBehavior="inside"
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">
+                Produk Masuk
+              </ModalHeader>
+              <ModalBody>
+                <Input
+                  type="number"
+                  label="Jumlah"
+                  placeholder="Masukkan jumlah!"
+                  value={form.jumlah}
+                  onValueChange={(val) => setForm({ ...form, jumlah: val })}
+                />
+                <Input
+                  type="number"
+                  label="Harga"
+                  placeholder="Masukkan harga!"
+                  value={form.harga}
+                  onValueChange={(val) => setForm({ ...form, harga: val })}
+                />
+                <div className="bg-gray-100 p-3 rounded-lg z-40">
+                  <div>Tanggal</div>
+                  <DatePicker
+                    className="z-40"
+                    placeholderText="Pilih tanggal"
+                    dateFormat="dd/MM/yyyy"
+                    selected={form.startdate}
+                    onChange={(v) =>
+                      setForm({ ...form, startdate: v, tanggal: getDate(v) })
+                    }
+                  />
+                </div>
+                <RadioGroup
+                  orientation="horizontal"
+                  defaultValue={"1"}
+                  value={form.lunas}
+                  onValueChange={(v) => setForm({ ...form, lunas: v })}
+                >
+                  <Radio value="1">Lunas</Radio>
+                  <Radio value="0">Hutang</Radio>
+                </RadioGroup>
+                {form.lunas == "0" ? (
+                  <>
+                    <div className="bg-gray-100 p-3 rounded-lg z-40">
+                      <div>Jatuh Tempo</div>
+                      <DatePicker
+                        className="z-40"
+                        placeholderText="Pilih tanggal"
+                        dateFormat="dd/MM/yyyy"
+                        selected={form.startdateJatuhtempo}
+                        onChange={(v) =>
+                          setForm({
+                            ...form,
+                            startdateJatuhtempo: v,
+                            jatuhtempo: getDate(v),
+                          })
+                        }
+                      />
+                    </div>
+                    <Input
+                      type="number"
+                      label="Terbayar"
+                      placeholder="Masukkan nominal!"
+                      value={form.terbayar}
+                      onValueChange={(val) =>
+                        setForm({ ...form, terbayar: val })
+                      }
+                    />
+                  </>
+                ) : (
+                  <></>
+                )}
               </ModalBody>
               <ModalFooter>
                 <Button color="danger" variant="light" onPress={onClose}>
