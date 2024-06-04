@@ -420,11 +420,11 @@ export default function App() {
                 )}
               </Autocomplete>
             </div>
-            <div className="flex flex-row gap-2">
+            {/* <div className="flex flex-row gap-2">
               <Button color="primary" onClick={handleButtonExportToExcelPress}>
                 Export to Excel
               </Button>
-            </div>
+            </div> */}
           </>
         }
         bottomContent={
