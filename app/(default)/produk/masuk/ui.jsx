@@ -22,7 +22,6 @@ import {
   AddIcon,
   EditIcon,
   DeleteIcon,
-  NoteIcon,
   EyeIcon,
   UserIcon,
   MinIcon,
@@ -47,16 +46,14 @@ import { getDate, getDateFId } from "@/app/utils/date";
 
 const apiPath = getApiPath();
 
-export default function App() {
+export default function App({ id_produk }) {
   const [nama, setNama] = useState("");
   const [id, setId] = useState("");
-  const [selectKategori, setSelectKategori] = useState([]);
-  const produk = useClientFetch(
-    `produk?kategori=${selectKategori.values().next().value ?? ""}`
+  const produkmasuk = useClientFetch(
+    `produkmasuk?${id_produk ? `id_produk=${id_produk}` : ""}`
   );
-  const kategori = useClientFetch("kategoriproduk");
-  const merek = useClientFetch("merek");
-  const vendor = useClientFetch("vendor?columnName=nama");
+  const produk = useClientFetch(`produk?id=${id_produk}`);
+  const vendor = useClientFetch(`vendor?columnName=nama`);
 
   const [page, setPage] = React.useState(1);
   const rowsPerPage = 25;
@@ -89,9 +86,9 @@ export default function App() {
   const modal = { masuk: useDisclosure(), keluar: useDisclosure() };
 
   const saveButtonPress = async (onClose) => {
-    if (form.nama == "" || !form.selectKategori.size > 0)
-      return alert("Nama, dan Kategori wajib diisi!");
-    const res = await fetch(`${apiPath}produk`, {
+    // if (form.nama == "" || !form.selectKategori.size > 0)
+    //   return alert("Nama, dan Kategori wajib diisi!");
+    const res = await fetch(`${apiPath}produkmasuk`, {
       method,
       headers: {
         "Content-Type": "application/json",
@@ -134,26 +131,30 @@ export default function App() {
     setForm({
       ...data,
       modalmode: "Edit",
-      selectKategori: new Set([String(data.id_kategori)]),
-      merek: data.nmerek,
-      id_merek: data.id_merek,
-      vendor: data.nvendor,
-      id_vendor: data.id_vendor,
       startdate: new Date(data.tanggal),
-      tanggal: data.tanggal,
+      tanggal: getDate(new Date(data.tanggal)),
+      startdateJatuhtempo: new Date(data.jatuhtempo),
+      jatuhtempo: getDate(new Date(data.jatuhtempo)),
+      oldJumlah: data.jumlah,
+      oldTerbayar: data.terbayar,
+      lunas: data.jumlah * data.harga > data.terbayar ? "0" : "1",
     });
     setMethod("PUT");
     onOpen();
   };
-  const deleteButtonPress = async (id) => {
-    if (confirm("Hapus product?")) {
-      const res = await fetch(`${apiPath}produk`, {
+  const deleteButtonPress = async (data) => {
+    if (confirm("Hapus produk masuk?")) {
+      const res = await fetch(`${apiPath}produkmasuk`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
           // 'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: JSON.stringify({ id }),
+        body: JSON.stringify({
+          id: data.id,
+          id_produk: data.id_produk,
+          jumlah: data.jumlah,
+        }),
       });
       const json = await res.json();
       if (res.status == 400) return alert(json.message);
@@ -246,14 +247,24 @@ export default function App() {
   const renderCell = React.useCallback((data, columnKey) => {
     const cellValue = data[columnKey];
     switch (columnKey) {
-      case "hargamodal":
-        return (
-          <div className="text-right">
-            <Harga harga={data.hargamodal} />
-          </div>
-        );
       case "tanggal":
         return getDateFId(new Date(data.tanggal));
+      case "terbayar":
+        return (
+          <div
+            className={`text-right px-1 rounded ${
+              data.jumlah * data.harga > data.terbayar
+                ? new Date() >= new Date(data.jatuhtempo)
+                  ? "bg-red-200"
+                  : "bg-yellow-200"
+                : ""
+            }`}
+          >
+            <Harga harga={data.terbayar} />
+          </div>
+        );
+      case "jatuhtempo":
+        return data.jatuhtempo ? getDateFId(new Date(data.jatuhtempo)) : "";
       case "hargajual":
         return (
           <div className="text-right">
@@ -268,16 +279,6 @@ export default function App() {
                 <EyeIcon />
               </span>
             </Tooltip> */}
-            <Tooltip content="Stok">
-              <Link href={`/produk/masuk?id_produk=${data.id}`}>
-                <span
-                  // onClick={() => detailButtonPress(data)}
-                  className="text-lg text-default-400 cursor-pointer active:opacity-50"
-                >
-                  <NoteIcon />
-                </span>
-              </Link>
-            </Tooltip>
             <Tooltip content="Edit">
               <span
                 onClick={() => editButtonPress(data)}
@@ -304,7 +305,7 @@ export default function App() {
             </Tooltip>
             <Tooltip color="danger" content="Delete">
               <span
-                onClick={() => deleteButtonPress(data.id)}
+                onClick={() => deleteButtonPress(data)}
                 className="text-lg text-danger cursor-pointer active:opacity-50"
               >
                 <DeleteIcon />
@@ -317,57 +318,51 @@ export default function App() {
     }
   }, []);
 
-  let data = produk?.data;
-  data = data?.filter(
-    (row) =>
-      (row.nama.toLowerCase().includes(nama.toLowerCase()) ||
-        row.nmerek?.toLowerCase().includes(nama.toLowerCase()) ||
-        row.tipe?.toLowerCase().includes(nama.toLowerCase()) ||
-        row.vendor?.toLowerCase().includes(nama.toLowerCase())) &&
-      row.id_kustom.toLowerCase().includes(id.toLocaleLowerCase())
-  );
-  data = data?.slice(0, 50);
-  const filteredData = produk?.data?.filter(
-    (row) =>
-      (row.nama.toLowerCase().includes(nama.toLowerCase()) ||
-        row.nmerek?.toLowerCase().includes(nama.toLowerCase()) ||
-        row.tipe?.toLowerCase().includes(nama.toLowerCase()) ||
-        row.vendor?.toLowerCase().includes(nama.toLowerCase())) &&
-      row.id_kustom.toLowerCase().includes(id.toLocaleLowerCase())
-  );
+  // let data = produk?.data;
+  // data = data?.filter(
+  //   (row) =>
+  //     (row.nama.toLowerCase().includes(nama.toLowerCase()) ||
+  //       row.nmerek?.toLowerCase().includes(nama.toLowerCase()) ||
+  //       row.tipe?.toLowerCase().includes(nama.toLowerCase()) ||
+  //       row.vendor?.toLowerCase().includes(nama.toLowerCase())) &&
+  //     row.id_kustom.toLowerCase().includes(id.toLocaleLowerCase())
+  // );
+  // data = data?.slice(0, 50);
+  // const filteredData = produk?.data?.filter(
+  //   (row) =>
+  //     (row.nama.toLowerCase().includes(nama.toLowerCase()) ||
+  //       row.nmerek?.toLowerCase().includes(nama.toLowerCase()) ||
+  //       row.tipe?.toLowerCase().includes(nama.toLowerCase()) ||
+  //       row.vendor?.toLowerCase().includes(nama.toLowerCase())) &&
+  //     row.id_kustom.toLowerCase().includes(id.toLocaleLowerCase())
+  // );
+
+  const filteredData = produkmasuk?.data;
 
   const pages = useMemo(() => {
     return filteredData ? Math.ceil(filteredData?.length / rowsPerPage) : 0;
-  }, [filteredData?.length, rowsPerPage]);
-  const loadingState = produk.isLoading ? "loading" : "idle";
+  }, [filteredData, rowsPerPage]);
+  const loadingState = produkmasuk.isLoading ? "loading" : "idle";
   const offset = (page - 1) * rowsPerPage;
 
+  if (produkmasuk.error) return <div>failed to load</div>;
+  if (produkmasuk.isLoading) return <div>loading...</div>;
   if (produk.error) return <div>failed to load</div>;
   if (produk.isLoading) return <div>loading...</div>;
-  if (kategori.error) return <div>failed to load</div>;
-  if (kategori.isLoading) return <div>loading...</div>;
   if (vendor.error) return <div>failed to load</div>;
   if (vendor.isLoading) return <div>loading...</div>;
-  // if (subkategori.error) return <div>failed to load</div>;
-  // if (subkategori.isLoading) return <div>loading...</div>;
-  // if (merek.error) return <div>failed to load</div>;
-  // if (merek.isLoading) return <div>loading...</div>;
 
   const col = [
-    {
-      key: "kategoriproduk",
-      label: "Kategori",
-    },
     {
       key: "id_kustom",
       label: "Id",
     },
     {
       key: "nama",
-      label: "Nama",
+      label: "Produk",
     },
     {
-      key: "nmerek",
+      key: "merek",
       label: "Merek",
     },
     {
@@ -375,7 +370,7 @@ export default function App() {
       label: "Tipe",
     },
     {
-      key: "nvendor",
+      key: "vendor",
       label: "Vendor",
     },
     {
@@ -383,24 +378,28 @@ export default function App() {
       label: "Stok",
     },
     {
+      key: "jumlah",
+      label: "Jumlah",
+    },
+    {
       key: "satuan",
       label: "Satuan",
     },
     {
-      key: "hargamodal",
-      label: "Harga Modal",
-    },
-    {
-      key: "hargajual",
-      label: "Harga Jual",
+      key: "harga",
+      label: "Harga",
     },
     {
       key: "tanggal",
       label: "Tanggal",
     },
     {
-      key: "keterangan",
-      label: "Keterangan",
+      key: "terbayar",
+      label: "Terbayar",
+    },
+    {
+      key: "jatuhtempo",
+      label: "Jatuh Tempo",
     },
     {
       key: "aksi",
@@ -416,6 +415,8 @@ export default function App() {
   //     if (item.id_kategoriproduk == form.id_kategori) return item;
   //   });
   // }
+  const selectedProduk = produk.data;
+  console.log(form);
   return (
     <div className="flex flex-col">
       <div className="flex flex-row gap-2">
@@ -441,7 +442,7 @@ export default function App() {
         aria-label="Example table with custom cells"
         topContent={
           <>
-            <div>Filter</div>
+            {/* <div>Filter</div>
             <div className="flex gap-3">
               <Select
                 label="Kategori"
@@ -454,7 +455,7 @@ export default function App() {
                   setPage(1);
                 }}
               >
-                {kategori.data.map((item) => (
+                {filteredData?.map((item) => (
                   <SelectItem key={item.id} value={item.id}>
                     {`${item.nama}`}
                   </SelectItem>
@@ -495,11 +496,6 @@ export default function App() {
                 value={id}
                 onValueChange={setId}
               />
-            </div>
-            {/* <div className="flex flex-row gap-2">
-              <Button color="primary" onClick={handleButtonExportToExcelPress}>
-                Export to Excel
-              </Button>
             </div> */}
           </>
         }
@@ -555,10 +551,10 @@ export default function App() {
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                {form.modalmode} Produk
+                {form.modalmode} Produk Masuk
               </ModalHeader>
               <ModalBody>
-                <Select
+                {/* <Select
                   label="Kategori"
                   placeholder="Pilih Kategori"
                   className="max-w-xs"
@@ -576,44 +572,23 @@ export default function App() {
                       {item.nama}
                     </SelectItem>
                   ))}
-                </Select>
+                </Select> */}
+                <div>
+                  {form.id_kustom} | {form.nama} | {form.merek} |{form.tipe}
+                </div>
                 <Input
                   type="text"
-                  label="Id"
-                  placeholder="Masukkan id!"
-                  value={form.id_kustom}
-                  onValueChange={(val) => setForm({ ...form, id_kustom: val })}
+                  label="jumlah"
+                  placeholder="Masukkan jumlah!"
+                  value={form.jumlah}
+                  onValueChange={(val) => setForm({ ...form, jumlah: val })}
                 />
                 <Input
-                  type="text"
-                  label="Nama"
-                  placeholder="Masukkan nama!"
-                  value={form.nama}
-                  onValueChange={(val) => setForm({ ...form, nama: val })}
-                />
-                <Autocomplete
-                  label="Merek"
-                  variant="bordered"
-                  defaultItems={merek.data}
-                  placeholder="Cari merek"
-                  className="max-w-xs"
-                  selectedKey={form.id_merek}
-                  defaultSelectedKey={form.id_merek}
-                  defaultInputValue={form.merek}
-                  onSelectionChange={(v) => setForm({ ...form, id_merek: v })}
-                >
-                  {(item) => (
-                    <AutocompleteItem key={item.id} textValue={item.nama}>
-                      {item.nama}
-                    </AutocompleteItem>
-                  )}
-                </Autocomplete>
-                <Input
-                  type="text"
-                  label="Tipe"
-                  placeholder="Masukkan tipe!"
-                  value={form.tipe}
-                  onValueChange={(val) => setForm({ ...form, tipe: val })}
+                  type="number"
+                  label="Harga"
+                  placeholder="Masukkan harga!"
+                  value={form.harga}
+                  onValueChange={(val) => setForm({ ...form, harga: val })}
                 />
                 <Autocomplete
                   label="Vendor"
@@ -632,35 +607,6 @@ export default function App() {
                     </AutocompleteItem>
                   )}
                 </Autocomplete>
-                <Input
-                  type="number"
-                  label="Stok"
-                  placeholder="Masukkan stok!"
-                  isReadOnly={form.modalmode == "Edit" ? true : undefined}
-                  value={form.stok}
-                  onValueChange={(val) => setForm({ ...form, stok: val })}
-                />
-                <Input
-                  type="text"
-                  label="Satuan"
-                  placeholder="Masukkan satuan!"
-                  value={form.satuan}
-                  onValueChange={(val) => setForm({ ...form, satuan: val })}
-                />
-                <Input
-                  type="text"
-                  label="Harga Modal"
-                  placeholder="Masukkan harga modal!"
-                  value={form.hargamodal}
-                  onValueChange={(val) => setForm({ ...form, hargamodal: val })}
-                />
-                <Input
-                  type="text"
-                  label="Harga Jual"
-                  placeholder="Masukkan harga jual!"
-                  value={form.hargajual}
-                  onValueChange={(val) => setForm({ ...form, hargajual: val })}
-                />
                 <div className="bg-gray-100 p-3 rounded-lg z-40">
                   <div>Tanggal</div>
                   <DatePicker
@@ -673,48 +619,48 @@ export default function App() {
                     }
                   />
                 </div>
-                {form.modalmode == "Tambah" ? (
+                <RadioGroup
+                  orientation="horizontal"
+                  defaultValue={form.lunas}
+                  value={form.lunas}
+                  onValueChange={(v) => setForm({ ...form, lunas: v })}
+                >
+                  <Radio value="1">Lunas</Radio>
+                  <Radio value="0">Hutang</Radio>
+                </RadioGroup>
+                {form.lunas == "0" ? (
                   <>
-                    <RadioGroup
-                      orientation="horizontal"
-                      defaultValue={"1"}
-                      value={form.lunas}
-                      onValueChange={(v) => setForm({ ...form, lunas: v })}
-                    >
-                      <Radio value="1">Lunas</Radio>
-                      <Radio value="0">Hutang</Radio>
-                    </RadioGroup>
-                    {form.lunas == "0" ? (
-                      <>
-                        <div className="bg-gray-100 p-3 rounded-lg z-40">
-                          <div>Jatuh Tempo</div>
-                          <DatePicker
-                            className="z-40"
-                            placeholderText="Pilih tanggal"
-                            dateFormat="dd/MM/yyyy"
-                            selected={form.startdateJatuhtempo}
-                            onChange={(v) =>
-                              setForm({
-                                ...form,
-                                startdateJatuhtempo: v,
-                                jatuhtempo: getDate(v),
-                              })
-                            }
-                          />
-                        </div>
-                        <Input
-                          type="number"
-                          label="Terbayar"
-                          placeholder="Masukkan nominal!"
-                          value={form.terbayar}
-                          onValueChange={(val) =>
-                            setForm({ ...form, terbayar: val })
-                          }
+                    <div className="bg-gray-100 p-3 rounded-lg z-40">
+                      <div>Jatuh Tempo</div>
+                      <DatePicker
+                        className="z-40"
+                        placeholderText="Pilih tanggal"
+                        dateFormat="dd/MM/yyyy"
+                        selected={form.startdateJatuhtempo}
+                        onChange={(v) =>
+                          setForm({
+                            ...form,
+                            startdateJatuhtempo: v,
+                            jatuhtempo: getDate(v),
+                          })
+                        }
+                      />
+                    </div>
+                    <Input
+                      type="number"
+                      label={
+                        <Harga
+                          harga={form.oldTerbayar}
+                          label="Terbayar ("
+                          endContent=")"
                         />
-                      </>
-                    ) : (
-                      <></>
-                    )}
+                      }
+                      placeholder="Masukkan nominal!"
+                      value={form.terbayar}
+                      onValueChange={(val) =>
+                        setForm({ ...form, terbayar: val })
+                      }
+                    />
                   </>
                 ) : (
                   <></>
@@ -743,7 +689,7 @@ export default function App() {
         </ModalContent>
       </Modal>
       {/* upload report */}
-      <Modal
+      {/* <Modal
         isOpen={report.isOpen}
         onOpenChange={report.onOpenChange}
         scrollBehavior="inside"
@@ -767,9 +713,9 @@ export default function App() {
             </>
           )}
         </ModalContent>
-      </Modal>
+      </Modal> */}
       {/* masuk */}
-      <Modal
+      {/* <Modal
         isOpen={modal.masuk.isOpen}
         onOpenChange={modal.masuk.onOpenChange}
         scrollBehavior="inside"
@@ -863,7 +809,7 @@ export default function App() {
             </>
           )}
         </ModalContent>
-      </Modal>
+      </Modal> */}
     </div>
   );
 }
