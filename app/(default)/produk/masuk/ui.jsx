@@ -133,8 +133,8 @@ export default function App({ id_produk }) {
       modalmode: "Edit",
       startdate: new Date(data.tanggal),
       tanggal: getDate(new Date(data.tanggal)),
-      startdateJatuhtempo: new Date(data.jatuhtempo),
-      jatuhtempo: getDate(new Date(data.jatuhtempo)),
+      startdateJatuhtempo: data.jatuhtempo ? new Date(data.jatuhtempo) : null,
+      jatuhtempo: data.jatuhtempo ? getDate(new Date(data.jatuhtempo)) : null,
       oldJumlah: data.jumlah,
       oldTerbayar: data.terbayar,
       lunas: data.jumlah * data.harga > data.terbayar ? "0" : "1",
@@ -287,7 +287,7 @@ export default function App({ id_produk }) {
                 <EditIcon />
               </span>
             </Tooltip>
-            <Tooltip content="Produk Masuk">
+            {/* <Tooltip content="Produk Masuk">
               <span
                 onClick={() => onProdukMasukClick(data)}
                 className="text-lg text-default-400 cursor-pointer active:opacity-50"
@@ -302,7 +302,7 @@ export default function App({ id_produk }) {
               >
                 <MinIcon />
               </span>
-            </Tooltip>
+            </Tooltip> */}
             <Tooltip color="danger" content="Delete">
               <span
                 onClick={() => deleteButtonPress(data)}
@@ -338,7 +338,6 @@ export default function App({ id_produk }) {
   // );
 
   const filteredData = produkmasuk?.data;
-
   const pages = useMemo(() => {
     return filteredData ? Math.ceil(filteredData?.length / rowsPerPage) : 0;
   }, [filteredData, rowsPerPage]);
@@ -416,13 +415,12 @@ export default function App({ id_produk }) {
   //   });
   // }
   const selectedProduk = produk.data;
-  console.log(form);
   return (
     <div className="flex flex-col">
       <div className="flex flex-row gap-2">
-        <Button color="primary" onPress={tambahButtonPress}>
+        {/* <Button color="primary" onPress={tambahButtonPress}>
           Tambah
-        </Button>
+        </Button> */}
         {/* <div>
           <Link
             className="bg-primary text-white p-2 rounded-lg inline-block"
@@ -442,6 +440,7 @@ export default function App({ id_produk }) {
         aria-label="Example table with custom cells"
         topContent={
           <>
+            <div>Masuk</div>
             {/* <div>Filter</div>
             <div className="flex gap-3">
               <Select

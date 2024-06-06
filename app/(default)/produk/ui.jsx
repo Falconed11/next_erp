@@ -221,14 +221,15 @@ export default function App() {
     setForm({
       ...data,
       startdate: new Date(),
+      tanggal: getDate(new Date()),
       id_produk: data.id,
       lunas: "1",
     });
     modal.masuk.onOpen();
   };
   const onSimpanClick = async (onClose) => {
-    // if (form.nama == "" || !form.selectKategori.size > 0)
-    //   return alert("Nama, dan Kategori wajib diisi!");
+    if (form.jumlah <= 0 || form.harga < 0 || !form.harga)
+      return alert("Jumlah, dan Harga wajib diisi!");
     const res = await fetch(`${apiPath}produkmasuk`, {
       method: "POST",
       headers: {
@@ -268,7 +269,7 @@ export default function App() {
                 <EyeIcon />
               </span>
             </Tooltip> */}
-            <Tooltip content="Stok">
+            <Tooltip content="Riwayat">
               <Link href={`/produk/masuk?id_produk=${data.id}`}>
                 <span
                   // onClick={() => detailButtonPress(data)}
@@ -416,6 +417,7 @@ export default function App() {
   //     if (item.id_kategoriproduk == form.id_kategori) return item;
   //   });
   // }
+  // console.log(form);
   return (
     <div className="flex flex-col">
       <div className="flex flex-row gap-2">
@@ -673,7 +675,7 @@ export default function App() {
                     }
                   />
                 </div>
-                {form.modalmode == "Tambah" ? (
+                {form.modalmode == "Tambah" && form.stok > 0 ? (
                   <>
                     <RadioGroup
                       orientation="horizontal"
@@ -785,6 +787,23 @@ export default function App() {
                   {form.id_kustom} | {form.nama} | {form.nmerek} | {form.tipe} |{" "}
                   {form.nvendor}{" "}
                 </div>
+                <Autocomplete
+                  label="Vendor"
+                  variant="bordered"
+                  defaultItems={vendor.data}
+                  placeholder="Cari vendor"
+                  className="max-w-xs"
+                  selectedKey={form.id_vendor}
+                  defaultSelectedKey={form.id_vendor}
+                  defaultInputValue={form.vendor}
+                  onSelectionChange={(v) => setForm({ ...form, id_vendor: v })}
+                >
+                  {(item) => (
+                    <AutocompleteItem key={item.id} textValue={item.nama}>
+                      {item.nama}
+                    </AutocompleteItem>
+                  )}
+                </Autocomplete>
                 <Input
                   type="number"
                   label="Jumlah"
