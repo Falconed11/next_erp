@@ -381,6 +381,10 @@ export default function App({ id_produk }) {
       label: "Jumlah",
     },
     {
+      key: "keluar",
+      label: "Keluar",
+    },
+    {
       key: "satuan",
       label: "Satuan",
     },
@@ -518,7 +522,11 @@ export default function App({ id_produk }) {
           {(column) => (
             <TableColumn
               key={column.key}
-              align={column.key === "actions" ? "center" : "start"}
+              align={
+                ["stok", "jumlah", "keluar"].includes(column.key)
+                  ? "end"
+                  : "start"
+              }
             >
               {column.label}
             </TableColumn>

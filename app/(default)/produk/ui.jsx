@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useMemo } from "react";
+import { v4 as uuidv4 } from "uuid";
 import * as XLSX from "xlsx";
 import Link from "next/link";
 import { Autocomplete, AutocompleteItem } from "@nextui-org/react";
@@ -48,6 +49,22 @@ import { getDate, getDateFId } from "@/app/utils/date";
 const apiPath = getApiPath();
 
 export default function App() {
+  // dynamic input
+  const [inputs, setInputs] = useState([{ id: uuidv4(), value: "" }]);
+  const handleChange = (id, value) => {
+    setInputs((prevInputs) =>
+      prevInputs.map((input) => (input.id === id ? { ...input, value } : input))
+    );
+  };
+  const addInput = () => {
+    setInputs((prevInputs) => [...prevInputs, { id: uuidv4(), value: "" }]);
+  };
+  const removeInput = (id) => {
+    if (inputs.length > 1) {
+      setInputs((prevInputs) => prevInputs.filter((input) => input.id !== id));
+    }
+  };
+
   const [nama, setNama] = useState("");
   const [id, setId] = useState("");
   const [selectKategori, setSelectKategori] = useState([]);
@@ -57,6 +74,7 @@ export default function App() {
   const kategori = useClientFetch("kategoriproduk");
   const merek = useClientFetch("merek");
   const vendor = useClientFetch("vendor?columnName=nama");
+  const metodepengeluaran = useClientFetch("metodepengeluaran");
 
   const [page, setPage] = React.useState(1);
   const rowsPerPage = 25;
@@ -121,6 +139,7 @@ export default function App() {
       selectedKategori: new Set([]),
       select_subkategori: new Set([]),
       select_merek: new Set([]),
+      selectKategori: new Set([]),
       filteredsubkategori: [],
       startdate: new Date(),
       tanggal: getDate(new Date()),
@@ -228,8 +247,8 @@ export default function App() {
     modal.masuk.onOpen();
   };
   const onSimpanClick = async (onClose) => {
-    if (form.jumlah <= 0 || form.harga < 0 || !form.harga)
-      return alert("Jumlah, dan Harga wajib diisi!");
+    // if (form.jumlah <= 0 || form.harga < 0 || !form.harga)
+    //   return alert("Jumlah, dan Harga wajib diisi!");
     const res = await fetch(`${apiPath}produkmasuk`, {
       method: "POST",
       headers: {
@@ -237,6 +256,33 @@ export default function App() {
         // 'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: JSON.stringify(form),
+    });
+    const json = await res.json();
+    if (res.status == 400) return alert(json.message);
+    onClose();
+    // return alert(json.message);
+  };
+
+  const onProdukKeluarClick = (data) => {
+    setForm({
+      ...data,
+      startdate: new Date(),
+      tanggal: getDate(new Date()),
+      id_produk: data.id,
+      sn: "1",
+    });
+    modal.keluar.onOpen();
+  };
+  const onSimpanProdukKeluarClick = async (onClose) => {
+    // if (form.jumlah <= 0 || form.harga < 0 || !form.harga)
+    //   return alert("Jumlah, dan Harga wajib diisi!");
+    const res = await fetch(`${apiPath}produkkeluar`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        // 'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: JSON.stringify({ ...form, serialnumbers: inputs }),
     });
     const json = await res.json();
     if (res.status == 400) return alert(json.message);
@@ -349,8 +395,8 @@ export default function App() {
   if (kategori.isLoading) return <div>loading...</div>;
   if (vendor.error) return <div>failed to load</div>;
   if (vendor.isLoading) return <div>loading...</div>;
-  // if (subkategori.error) return <div>failed to load</div>;
-  // if (subkategori.isLoading) return <div>loading...</div>;
+  if (metodepengeluaran.error) return <div>failed to load</div>;
+  if (metodepengeluaran.isLoading) return <div>loading...</div>;
   // if (merek.error) return <div>failed to load</div>;
   // if (merek.isLoading) return <div>loading...</div>;
 
@@ -417,7 +463,7 @@ export default function App() {
   //     if (item.id_kategoriproduk == form.id_kategori) return item;
   //   });
   // }
-  // console.log(form);
+  console.log(form);
   return (
     <div className="flex flex-col">
       <div className="flex flex-row gap-2">
@@ -870,6 +916,155 @@ export default function App() {
                 ) : (
                   <></>
                 )}
+              </ModalBody>
+              <ModalFooter>
+                <Button color="danger" variant="light" onPress={onClose}>
+                  Batal
+                </Button>
+                <Button color="primary" onPress={() => onSimpanClick(onClose)}>
+                  Simpan
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+      {/* keluar */}
+      <Modal
+        isOpen={modal.keluar.isOpen}
+        onOpenChange={modal.keluar.onOpenChange}
+        scrollBehavior="inside"
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">
+                Produk Keluar
+              </ModalHeader>
+              <ModalBody>
+                <div>
+                  {form.id_kustom} | {form.nama} | {form.nmerek} | {form.tipe}
+                </div>
+                {/* <Autocomplete
+                  label="Vendor"
+                  variant="bordered"
+                  defaultItems={vendor.data}
+                  placeholder="Cari vendor"
+                  className="max-w-xs"
+                  selectedKey={form.id_vendor}
+                  defaultSelectedKey={form.id_vendor}
+                  defaultInputValue={form.vendor}
+                  onSelectionChange={(v) => setForm({ ...form, id_vendor: v })}
+                >
+                  {(item) => (
+                    <AutocompleteItem key={item.id} textValue={item.nama}>
+                      {item.nama}
+                    </AutocompleteItem>
+                  )}
+                </Autocomplete> */}
+                <Select
+                  required
+                  label="Metode Pengeluaran"
+                  placeholder="Pilih metode"
+                  className="max-w-xs"
+                  selectedKeys={form.selectMetodePengeluaran}
+                  onSelectionChange={(val) =>
+                    setForm({
+                      ...form,
+                      selectMetodePengeluaran: val,
+                      metodepengeluaran: new Set(val).values().next().value,
+                    })
+                  }
+                >
+                  {metodepengeluaran.data.map((item) => (
+                    <SelectItem key={item.nama} value={item.nama}>
+                      {item.nama}
+                    </SelectItem>
+                  ))}
+                </Select>
+                <RadioGroup
+                  orientation="horizontal"
+                  defaultValue={"1"}
+                  value={form.sn}
+                  onValueChange={(v) => setForm({ ...form, sn: v })}
+                >
+                  <Radio value="1">SN</Radio>
+                  <Radio value="0">Tanpa SN</Radio>
+                </RadioGroup>
+                {form.sn == "1" ? (
+                  <>
+                    {inputs.map((input, i) => (
+                      <div key={input.id}>
+                        <Input
+                          label={`Serial Number ${
+                            inputs.length > 1 ? i + 1 : ""
+                          } `}
+                          placeholder="Masukkan serial number!"
+                          type="text"
+                          endContent={
+                            inputs.length !== 1 ? (
+                              <Button
+                                color="danger"
+                                variant="light"
+                                onClick={() => removeInput(input.id)}
+                              >
+                                Hapus
+                              </Button>
+                            ) : null
+                          }
+                          value={input.value}
+                          onChange={(e) =>
+                            handleChange(input.id, e.target.value)
+                          }
+                        />
+                      </div>
+                    ))}
+                    {inputs.length < form.stok ? (
+                      <div>
+                        <Button color="primary" onClick={addInput}>
+                          Tambah SN
+                        </Button>
+                      </div>
+                    ) : null}
+                  </>
+                ) : (
+                  <Input
+                    type="number"
+                    min={1}
+                    max={form.stok}
+                    label={`Jumlah (Stok: ${form.stok})`}
+                    placeholder="Masukkan jumlah!"
+                    value={form.jumlah}
+                    onValueChange={(val) => setForm({ ...form, jumlah: val })}
+                  />
+                )}
+
+                <Input
+                  type="number"
+                  label="Harga"
+                  placeholder="Masukkan harga!"
+                  value={form.harga}
+                  onValueChange={(val) => setForm({ ...form, harga: val })}
+                />
+                <div className="bg-gray-100 p-3 rounded-lg z-40">
+                  <div>Tanggal</div>
+                  <DatePicker
+                    className="z-40"
+                    placeholderText="Pilih tanggal"
+                    dateFormat="dd/MM/yyyy"
+                    selected={form.startdate}
+                    onChange={(v) =>
+                      setForm({ ...form, startdate: v, tanggal: getDate(v) })
+                    }
+                  />
+                </div>
+                <Textarea
+                  label="Keterangan"
+                  labelPlacement="inside"
+                  placeholder="Masukkan keterangan! (Opsional)"
+                  value={form.keterangan}
+                  onValueChange={(val) => setForm({ ...form, keterangan: val })}
+                />
               </ModalBody>
               <ModalFooter>
                 <Button color="danger" variant="light" onPress={onClose}>

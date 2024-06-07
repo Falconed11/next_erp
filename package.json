@@ -20,6 +20,7 @@
     "react-dropzone": "^14.2.3",
     "react-to-print": "^2.14.15",
     "swr": "^2.2.5",
+    "uuid": "^9.0.1",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
