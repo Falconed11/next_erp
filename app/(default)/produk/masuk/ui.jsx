@@ -410,9 +410,6 @@ export default function App({ id_produk }) {
     },
   ];
 
-  let filteredsubkategori = [
-    { nama: "Silahkan pilih kategori terlebih dahulu" },
-  ];
   // if (form.id_kategori) {
   //   filteredsubkategori = subkategori.data.filter((item) => {
   //     if (item.id_kategoriproduk == form.id_kategori) return item;
@@ -549,6 +546,7 @@ export default function App({ id_produk }) {
           )}
         </TableBody>
       </Table>
+      <TabelProdukKeluar id_produk={id_produk ?? null} />
       <Modal
         isOpen={isOpen}
         onOpenChange={onOpenChange}
@@ -820,3 +818,223 @@ export default function App({ id_produk }) {
     </div>
   );
 }
+
+const TabelProdukKeluar = ({ id_produk }) => {
+  const produkkeluar = useClientFetch(
+    `produkkeluar?${id_produk ? `id_produk=${id_produk}` : ""}`
+  );
+  const [page, setPage] = React.useState(1);
+  const rowsPerPage = 25;
+
+  const deleteButtonPress = async (data) => {
+    if (confirm("Hapus produk keluar?")) {
+      const res = await fetch(`${apiPath}produkkeluar`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify(data),
+      });
+      const json = await res.json();
+      if (res.status == 400) return alert(json.message);
+      // return alert(await res.json().then((json) => json.message));
+    }
+  };
+
+  const renderCell = React.useCallback((data, columnKey) => {
+    const cellValue = data[columnKey];
+    switch (columnKey) {
+      case "tanggal":
+        return getDateFId(new Date(data.tanggal));
+      case "terbayar":
+        return (
+          <div
+            className={`text-right px-1 rounded ${
+              data.jumlah * data.harga > data.terbayar
+                ? new Date() >= new Date(data.jatuhtempo)
+                  ? "bg-red-200"
+                  : "bg-yellow-200"
+                : ""
+            }`}
+          >
+            <Harga harga={data.terbayar} />
+          </div>
+        );
+      case "jatuhtempo":
+        return data.jatuhtempo ? getDateFId(new Date(data.jatuhtempo)) : "";
+      case "hargajual":
+        return (
+          <div className="text-right">
+            <Harga harga={data.hargajual} />
+          </div>
+        );
+      case "aksi":
+        return (
+          <div className="relative flex items-center gap-2">
+            {/* <Tooltip content="Details">
+              <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+                <EyeIcon />
+              </span>
+            </Tooltip> */}
+            <Tooltip content="Edit">
+              <span
+                onClick={() => editButtonPress(data)}
+                className="text-lg text-default-400 cursor-pointer active:opacity-50"
+              >
+                <EditIcon />
+              </span>
+            </Tooltip>
+            {/* <Tooltip content="Produk Masuk">
+              <span
+                onClick={() => onProdukMasukClick(data)}
+                className="text-lg text-default-400 cursor-pointer active:opacity-50"
+              >
+                <AddIcon />
+              </span>
+            </Tooltip>
+            <Tooltip content="Produk Keluar">
+              <span
+                onClick={() => onProdukKeluarClick(data)}
+                className="text-lg text-default-400 cursor-pointer active:opacity-50"
+              >
+                <MinIcon />
+              </span>
+            </Tooltip> */}
+            <Tooltip color="danger" content="Delete">
+              <span
+                onClick={() => deleteButtonPress(data)}
+                className="text-lg text-danger cursor-pointer active:opacity-50"
+              >
+                <DeleteIcon />
+              </span>
+            </Tooltip>
+          </div>
+        );
+      default:
+        return cellValue;
+    }
+  }, []);
+  const filteredData = produkkeluar?.data;
+  const pages = useMemo(() => {
+    return filteredData ? Math.ceil(filteredData?.length / rowsPerPage) : 0;
+  }, [filteredData, rowsPerPage]);
+  const loadingState = produkkeluar.isLoading ? "loading" : "idle";
+  const offset = (page - 1) * rowsPerPage;
+  if (produkkeluar.error) return <div>failed to load</div>;
+  if (produkkeluar.isLoading) return <div>loading...</div>;
+
+  const col = [
+    // {
+    //   key: "id_kustom",
+    //   label: "Id",
+    // },
+    {
+      key: "produk",
+      label: "Produk",
+    },
+    {
+      key: "merek",
+      label: "Merek",
+    },
+    {
+      key: "tipe",
+      label: "Tipe",
+    },
+    {
+      key: "vendor",
+      label: "Vendor",
+    },
+    {
+      key: "metodepengeluaran",
+      label: "Metode Pengeluaran",
+    },
+    {
+      key: "sn",
+      label: "SN",
+    },
+    {
+      key: "stok",
+      label: "Stok",
+    },
+    {
+      key: "jumlah",
+      label: "Jumlah",
+    },
+    {
+      key: "satuan",
+      label: "Satuan",
+    },
+    {
+      key: "harga",
+      label: "Harga",
+    },
+    {
+      key: "tanggal",
+      label: "Tanggal",
+    },
+    {
+      key: "aksi",
+      label: "Aksi",
+    },
+  ];
+
+  return (
+    <Table
+      isStriped
+      className="pt-3"
+      aria-label="Example table with custom cells"
+      topContent={
+        <>
+          <div>Masuk</div>
+        </>
+      }
+      bottomContent={
+        pages > 0 ? (
+          <div className="flex w-full justify-center">
+            <Pagination
+              isCompact
+              showControls
+              showShadow
+              color="primary"
+              page={page}
+              total={pages}
+              onChange={(page) => setPage(page)}
+            />
+          </div>
+        ) : null
+      }
+    >
+      <TableHeader columns={col}>
+        {(column) => (
+          <TableColumn
+            key={column.key}
+            align={
+              ["stok", "jumlah", "keluar"].includes(column.key)
+                ? "end"
+                : "start"
+            }
+          >
+            {column.label}
+          </TableColumn>
+        )}
+      </TableHeader>
+      <TableBody
+        items={
+          filteredData ? filteredData.slice(offset, offset + rowsPerPage) : []
+        }
+        loadingContent={"Loading..."}
+        emptyContent={"Kosong"}
+        loadingState={loadingState}
+      >
+        {(item) => (
+          <TableRow key={item.id}>
+            {(columnKey) => (
+              <TableCell>{renderCell(item, columnKey)}</TableCell>
+            )}
+          </TableRow>
+        )}
+      </TableBody>
+    </Table>
+  );
+};

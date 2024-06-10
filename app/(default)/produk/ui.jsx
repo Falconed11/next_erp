@@ -270,12 +270,22 @@ export default function App() {
       tanggal: getDate(new Date()),
       id_produk: data.id,
       sn: "1",
+      selectMetodePengeluaran: new Set([]),
     });
     modal.keluar.onOpen();
   };
   const onSimpanProdukKeluarClick = async (onClose) => {
-    // if (form.jumlah <= 0 || form.harga < 0 || !form.harga)
-    //   return alert("Jumlah, dan Harga wajib diisi!");
+    if (form.selectMetodePengeluaran.size == 0)
+      return alert("Metode pengeluaran belum diisi.");
+    if (form.sn == 1) {
+      if (
+        inputs.some((i) => {
+          if (i.value == "") return true;
+          return false;
+        })
+      )
+        return alert("Serial number belum diisi.");
+    }
     const res = await fetch(`${apiPath}produkkeluar`, {
       method: "POST",
       headers: {
@@ -463,7 +473,6 @@ export default function App() {
   //     if (item.id_kategoriproduk == form.id_kategori) return item;
   //   });
   // }
-  console.log(form);
   return (
     <div className="flex flex-col">
       <div className="flex flex-row gap-2">
@@ -1070,7 +1079,10 @@ export default function App() {
                 <Button color="danger" variant="light" onPress={onClose}>
                   Batal
                 </Button>
-                <Button color="primary" onPress={() => onSimpanClick(onClose)}>
+                <Button
+                  color="primary"
+                  onPress={() => onSimpanProdukKeluarClick(onClose)}
+                >
                   Simpan
                 </Button>
               </ModalFooter>
