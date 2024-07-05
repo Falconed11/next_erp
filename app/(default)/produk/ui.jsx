@@ -277,6 +277,7 @@ export default function App() {
   const onSimpanProdukKeluarClick = async (onClose) => {
     if (form.selectMetodePengeluaran.size == 0)
       return alert("Metode pengeluaran belum diisi.");
+    if (form.jumlah > form.stok) return alert("Jumlah melebihi stok.");
     if (form.sn == 1) {
       if (
         inputs.some((i) => {

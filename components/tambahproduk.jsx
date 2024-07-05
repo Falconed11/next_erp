@@ -83,13 +83,13 @@ export default function TambahProduk({ form, setForm, disableHargaKustom }) {
         variant="bordered"
         defaultItems={data}
         placeholder="Cari produk"
-        className="w-10/12"
+        className="w-8/12"
         selectedKey={form.selectProduk}
         onSelectionChange={(v) =>
           setForm({
             ...form,
             selectProduk: v,
-            harga: produk.data.filter((p) => p.id == v)[0].hargajual,
+            harga: produk.data.filter((p) => p.id == v)[0]?.hargajual,
           })
         }
         onValueChange={setNama}
@@ -105,6 +105,25 @@ export default function TambahProduk({ form, setForm, disableHargaKustom }) {
           </AutocompleteItem>
         )}
       </Autocomplete>
+      <Input
+        type="text"
+        value={`${form.stok} ${form.satuan}`}
+        disabled
+        label="Jumlah"
+        placeholder="Masukkan jumlah!"
+        className="w-3/12"
+        endContent={
+          <div className="pointer-events-none flex items-center">
+            <span className="text-default-400 text-small"></span>
+          </div>
+        }
+        onValueChange={(v) =>
+          setForm({
+            ...form,
+            jumlah: v,
+          })
+        }
+      />
       <Input
         type="number"
         value={form.jumlah}
