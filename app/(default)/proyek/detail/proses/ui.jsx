@@ -104,24 +104,49 @@ export default function App({ id }) {
   };
   const tambahButtonPress = async ({ selectProduk, selectKaryawan, form }) => {
     // if (select.size == 0) return alert("Produk belum dipilih.");
-    const res = await fetch(`${api_path}pengeluaranproyek`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify({
-        ...form,
-        id_proyek: id,
-        id_produk: form.selectProduk,
-        id_karyawan: selectKaryawan.values().next().value,
-        tanggal: form.startdate ? getDate(form.startdate) : "",
-        jumlah: form.jumlah,
-        harga: form.harga,
-        keterangan: form.keterangan ? form.keterangan : "",
-        status: form.status ? form.status : "",
-      }),
-    });
+    if (form.isSelected == true && form.stok < form.jumlah)
+      return alert("Jumlah melebihi stok.");
+    let res;
+    if (form.isSelected) {
+      res = await fetch(`${api_path}produkkeluar`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify({
+          ...form,
+          id_proyek: id,
+          id_produk: form.selectProduk,
+          id_karyawan: selectKaryawan.values().next().value,
+          tanggal: form.startdate ? getDate(form.startdate) : "",
+          jumlah: form.jumlah,
+          harga: form.harga,
+          keterangan: form.keterangan ? form.keterangan : "",
+          status: form.status ? form.status : "",
+        }),
+      });
+    } else {
+      res = await fetch(`${api_path}pengeluaranproyek`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify({
+          ...form,
+          id_proyek: id,
+          id_produk: form.selectProduk,
+          id_karyawan: selectKaryawan.values().next().value,
+          tanggal: form.startdate ? getDate(form.startdate) : "",
+          jumlah: form.jumlah,
+          harga: form.harga,
+          keterangan: form.keterangan ? form.keterangan : "",
+          status: form.status ? form.status : "",
+        }),
+      });
+    }
+
     const json = await res.json();
     if (res.status == 400) return alert(json.message);
     setForm({
@@ -482,6 +507,7 @@ export default function App({ id }) {
       />
     </>
   );
+  console.log(form.isSelected);
   return (
     <div className="flex flex-col w-full">
       <h1>Proses</h1>
@@ -602,6 +628,7 @@ export default function App({ id }) {
                   form={form}
                   setForm={setForm}
                   disableHargaKustom
+                  refHargaModal
                 />
               </div>
               <div className="flex flex-row gap-2 mt-3">

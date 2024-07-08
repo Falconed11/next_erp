@@ -984,7 +984,11 @@ export default function App({ id, versi }) {
                       condition={selectedProyek.versi == 0}
                       component={
                         <div className="flex flex-row gap-2">
-                          <TambahProduk form={form} setForm={setForm} />
+                          <TambahProduk
+                            form={form}
+                            setForm={setForm}
+                            disableStok
+                          />
                           <Button
                             onClick={() => {
                               tambahButtonPress(form, setForm);
@@ -1086,6 +1090,7 @@ export default function App({ id, versi }) {
                           <TambahProduk
                             form={formInstalasi}
                             setForm={setFormInstalasi}
+                            disableStok
                           />
                           <Button
                             onClick={() => {

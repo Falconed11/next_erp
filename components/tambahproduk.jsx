@@ -4,12 +4,19 @@ import { Autocomplete, AutocompleteItem } from "@nextui-org/react";
 import { useFilter } from "@react-aria/i18n";
 import { Input } from "@nextui-org/react";
 import { Select, SelectItem } from "@nextui-org/react";
+import { Checkbox } from "@nextui-org/react";
 import { getApiPath, useClientFetch } from "@/app/utils/apiconfig";
 import Harga from "@/components/harga";
 
 const api_path = getApiPath();
 
-export default function TambahProduk({ form, setForm, disableHargaKustom }) {
+export default function TambahProduk({
+  form,
+  setForm,
+  disableHargaKustom,
+  disableStok,
+  refHargaModal,
+}) {
   const [nama, setNama] = useState("");
   const kategori = useClientFetch(`kategoriproduk`);
   const produk = useClientFetch(
@@ -31,8 +38,7 @@ export default function TambahProduk({ form, setForm, disableHargaKustom }) {
     animal.nama.toLowerCase().includes(nama.toLowerCase())
   );
   data = data.slice(0, 100);
-  const selectProduk = () =>
-    produk.data.filter((v) => v.id == form.selectProduk)[0];
+  const selectProduk = produk.data.filter((v) => v.id == form.selectProduk)[0];
   return (
     <div className="w-max flex flex-wrap gap-3">
       <Select
@@ -56,28 +62,6 @@ export default function TambahProduk({ form, setForm, disableHargaKustom }) {
           </SelectItem>
         ))}
       </Select>
-      {/* <Select
-        label="Produk"
-        placeholder="Pilih produk!"
-        className="w-5/12 pl-2"
-        selectedKeys={form.selectProduk}
-        onSelectionChange={(v) => setForm({ ...form, selectProduk: v })}
-      >
-        {produk.data.map((item) => (
-          <SelectItem
-            key={item.id}
-            value={item.id}
-            textValue={`${item.nama} | ${item.nmerek} | ${item.nvendor} | ${item.tipe} | ${item.stok} ${item.satuan} | ${item.hargamodal} | ${item.hargajual}`}
-          >
-            {item.nama} | {item.nmerek} | {item.nvendor} | {item.tipe} |{" "}
-            <span className="p-1 bg-black text-white">
-              {item.stok} {item.satuan}
-            </span>{" "}
-            | <Harga harga={item.hargamodal} /> |{" "}
-            <Harga harga={item.hargajual} />
-          </SelectItem>
-        ))}
-      </Select> */}
       <Autocomplete
         label="Produk"
         variant="bordered"
@@ -85,13 +69,19 @@ export default function TambahProduk({ form, setForm, disableHargaKustom }) {
         placeholder="Cari produk"
         className="w-8/12"
         selectedKey={form.selectProduk}
-        onSelectionChange={(v) =>
+        onSelectionChange={(v) => {
+          const selectedProduk = produk.data.filter((p) => p.id == v)[0];
           setForm({
             ...form,
             selectProduk: v,
-            harga: produk.data.filter((p) => p.id == v)[0]?.hargajual,
-          })
-        }
+            harga: refHargaModal
+              ? selectedProduk?.hargamodal ?? 0
+              : selectedProduk?.hargajual ?? 0,
+            stok: selectedProduk?.stok,
+            satuan: selectedProduk?.satuan,
+            isSelected: false,
+          });
+        }}
         onValueChange={setNama}
       >
         {(item) => (
@@ -105,12 +95,26 @@ export default function TambahProduk({ form, setForm, disableHargaKustom }) {
           </AutocompleteItem>
         )}
       </Autocomplete>
+      {!disableStok ? (
+        selectProduk?.stok > 0 ? (
+          <Checkbox
+            isSelected={form.isSelected}
+            onValueChange={(v) => setForm({ ...form, isSelected: v })}
+          >
+            Pakai Stok
+          </Checkbox>
+        ) : (
+          <></>
+        )
+      ) : (
+        <></>
+      )}
       <Input
         type="text"
-        value={`${form.stok} ${form.satuan}`}
+        value={`${form.stok ?? ""} ${form.satuan ?? ""}`}
         disabled
-        label="Jumlah"
-        placeholder="Masukkan jumlah!"
+        label="Stok"
+        // placeholder="Masukkan jumlah!"
         className="w-3/12"
         endContent={
           <div className="pointer-events-none flex items-center">
@@ -145,10 +149,19 @@ export default function TambahProduk({ form, setForm, disableHargaKustom }) {
       <Input
         type="number"
         value={form.harga}
-        label={`Harga (Ref: ${
-          produk.data.filter((v) => v.id == form.selectProduk)[0]?.hargajual ??
-          0
-        })`}
+        label={`Harga (Ref: 
+          ${
+            refHargaModal
+              ? selectProduk?.hargamodal ?? 0
+              : selectProduk?.hargajual ?? 0
+          }
+        )`}
+        // label={`Harga (Ref:
+        //   ${
+        //     produk.data.filter((v) => v.id == form.selectProduk)[0]
+        //       ?.hargajual ?? 0
+        //   }
+        // )`}
         placeholder="Masukkan harga!"
         className="w-3/12"
         onValueChange={(v) =>
