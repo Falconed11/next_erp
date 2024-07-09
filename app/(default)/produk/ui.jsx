@@ -352,14 +352,18 @@ export default function App() {
                 <AddIcon />
               </span>
             </Tooltip>
-            <Tooltip content="Produk Keluar">
-              <span
-                onClick={() => onProdukKeluarClick(data)}
-                className="text-lg text-default-400 cursor-pointer active:opacity-50"
-              >
-                <MinIcon />
-              </span>
-            </Tooltip>
+            {data.stok > 0 ? (
+              <Tooltip content="Produk Keluar">
+                <span
+                  onClick={() => onProdukKeluarClick(data)}
+                  className="text-lg text-default-400 cursor-pointer active:opacity-50"
+                >
+                  <MinIcon />
+                </span>
+              </Tooltip>
+            ) : (
+              <></>
+            )}
             <Tooltip color="danger" content="Delete">
               <span
                 onClick={() => deleteButtonPress(data.id)}

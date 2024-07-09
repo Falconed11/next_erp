@@ -415,9 +415,9 @@ export default function App() {
                   className="max-w-xs"
                 />
                 <Select
-                  label="Targer vendor"
+                  label="Targer bank"
                   variant="bordered"
-                  placeholder="Pilih target vendor"
+                  placeholder="Pilih target bank"
                   selectedKeys={form.selectedBank}
                   className="max-w-xs"
                   onSelectionChange={(val) => {

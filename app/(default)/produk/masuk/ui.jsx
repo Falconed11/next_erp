@@ -976,26 +976,30 @@ const TabelProdukKeluar = ({ id_produk }) => {
                 <div>
                   {form.produk} | {form.merek} | {form.tipe} | {form.vendor}
                 </div>
-                <Select
-                  required
-                  label="Metode Pengeluaran"
-                  placeholder="Pilih metode"
-                  className="max-w-xs"
-                  selectedKeys={form.selectMetodePengeluaran}
-                  onSelectionChange={(val) =>
-                    setForm({
-                      ...form,
-                      selectMetodePengeluaran: val,
-                      metodepengeluaran: new Set(val).values().next().value,
-                    })
-                  }
-                >
-                  {metodepengeluaran.data.map((item) => (
-                    <SelectItem key={item.nama} value={item.nama}>
-                      {item.nama}
-                    </SelectItem>
-                  ))}
-                </Select>
+                {form.metodepengeluaran != "proyek" ? (
+                  <Select
+                    required
+                    label="Metode Pengeluaran"
+                    placeholder="Pilih metode"
+                    className="max-w-xs"
+                    selectedKeys={form.selectMetodePengeluaran}
+                    onSelectionChange={(val) =>
+                      setForm({
+                        ...form,
+                        selectMetodePengeluaran: val,
+                        metodepengeluaran: new Set(val).values().next().value,
+                      })
+                    }
+                  >
+                    {metodepengeluaran.data.map((item) => (
+                      <SelectItem key={item.nama} value={item.nama}>
+                        {item.nama}
+                      </SelectItem>
+                    ))}
+                  </Select>
+                ) : (
+                  <></>
+                )}
                 {form.jumlah == 1 ? (
                   <Input
                     type="text"

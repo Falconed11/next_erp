@@ -88,18 +88,36 @@ export default function App({ id }) {
     setSelectKaryawan(new Set([String(data.id_karyawan)]));
     modal.pengeluaranproyek.onOpen();
   };
-  const deleteButtonPress = async (id) => {
+  const deleteButtonPress = async (data) => {
     if (confirm("Hapus produk?")) {
-      const res = await fetch(`${api_path}pengeluaranproyek`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          // 'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: JSON.stringify({ id }),
-      });
-      const json = await res.json();
-      // return alert(json.message);
+      if (data.id_produkkeluar == "") {
+        const res = await fetch(`${api_path}pengeluaranproyek`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: JSON.stringify({ id: data.id_pengeluaranproyek }),
+        });
+        const json = await res.json();
+        if (res.status == 400) return alert(json.message);
+      } else {
+        const res = await fetch(`${api_path}produkkeluar`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: JSON.stringify({
+            ...data,
+            id: data.id_produkkeluar,
+            metodepengeluaran: "proyek",
+            id_produk: data.id,
+          }),
+        });
+        const json = await res.json();
+        if (res.status == 400) return alert(json.message);
+      }
     }
   };
   const tambahButtonPress = async ({ selectProduk, selectKaryawan, form }) => {
@@ -278,7 +296,7 @@ export default function App({ id }) {
               </Tooltip>
               <Tooltip color="danger" content="Delete">
                 <span
-                  onClick={() => deleteButtonPress(data.id_pengeluaranproyek)}
+                  onClick={() => deleteButtonPress(data)}
                   className="text-lg text-danger cursor-pointer active:opacity-50"
                 >
                   <DeleteIcon />
@@ -348,7 +366,7 @@ export default function App({ id }) {
         label: "Keterangan",
       },
       {
-        key: "nmerek",
+        key: "merek",
         label: "Merek",
       },
       {
@@ -356,7 +374,7 @@ export default function App({ id }) {
         label: "Tipe",
       },
       {
-        key: "nvendor",
+        key: "vendor",
         label: "Vendor",
       },
       {
