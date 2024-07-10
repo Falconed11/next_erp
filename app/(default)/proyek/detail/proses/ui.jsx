@@ -55,15 +55,8 @@ export default function App({ id }) {
     content: () => componentRef.nota.current,
     pageStyle: "p-10",
   });
-  const proyek = useClientFetch(`proyek?id=${id}`);
-  const pengeluaranproyek = useClientFetch(`pengeluaranproyek?id_proyek=${id}`);
-  const pembayaranproyek = useClientFetch(`pembayaranproyek?id_proyek=${id}`);
-  const kategori = useClientFetch(`kategoriproduk`);
-  const bank = useClientFetch(`bank`);
+
   const [selectKategori, setSelectKategori] = useState(new Set([]));
-  const produk = useClientFetch(
-    `produk?kategori=${selectKategori.values().next().value}`
-  );
   const [selectProduk, setSelectProduk] = useState(new Set([]));
   const karyawan = useClientFetch(`karyawan`);
   const [selectKaryawan, setSelectKaryawan] = useState(new Set([]));
@@ -72,6 +65,15 @@ export default function App({ id }) {
     selectProduk: new Set([]),
   });
   const [formPembayaran, setFormPembayaran] = useState({});
+
+  const proyek = useClientFetch(`proyek?id=${id}`);
+  const pengeluaranproyek = useClientFetch(`pengeluaranproyek?id_proyek=${id}`);
+  const pembayaranproyek = useClientFetch(`pembayaranproyek?id_proyek=${id}`);
+  const kategori = useClientFetch(`kategoriproduk`);
+  const bank = useClientFetch(`bank`);
+  const produk = useClientFetch(
+    `produk?kategori=${selectKategori.values().next().value}`
+  );
 
   const editButtonPress = (data) => {
     const startdate = new Date(data.tanggal);
@@ -525,7 +527,6 @@ export default function App({ id }) {
       />
     </>
   );
-  console.log(form.isSelected);
   return (
     <div className="flex flex-col w-full">
       <h1>Proses</h1>

@@ -18,6 +18,7 @@ export default function TambahProduk({
   refHargaModal,
 }) {
   const [nama, setNama] = useState("");
+  const [sVendor, setSVendor] = useState("");
   const kategori = useClientFetch(`kategoriproduk`);
   const produk = useClientFetch(
     `produk?${
@@ -26,18 +27,27 @@ export default function TambahProduk({
         : ""
     }`
   );
+  const vendor = useClientFetch("vendor");
   // const pilihProduk = useClientFetch(`produk`)
 
   if (kategori.error) return <div>failed to load</div>;
   if (kategori.isLoading) return <div>loading...</div>;
   if (produk.error) return <div>failed to load</div>;
   if (produk.isLoading) return <div>loading...</div>;
+  if (vendor.error) return <div>failed to load</div>;
+  if (vendor.isLoading) return <div>loading...</div>;
 
   let data = produk.data;
   data = data.filter((animal) =>
     animal.nama.toLowerCase().includes(nama.toLowerCase())
   );
   data = data.slice(0, 100);
+
+  let fvendor = vendor.data;
+  fvendor = fvendor.filter((animal) =>
+    animal.nama.toLowerCase().includes(sVendor.toLowerCase())
+  );
+  fvendor = fvendor.slice(0, 100);
   const selectProduk = produk.data.filter((v) => v.id == form.selectProduk)[0];
   return (
     <div className="w-max flex flex-wrap gap-3">
@@ -92,6 +102,27 @@ export default function TambahProduk({
             </span>{" "}
             | <Harga harga={item.hargamodal} /> |{" "}
             <Harga harga={item.hargajual} />
+          </AutocompleteItem>
+        )}
+      </Autocomplete>
+      <Autocomplete
+        label="Vendor"
+        variant="bordered"
+        defaultItems={fvendor}
+        placeholder="Cari produk"
+        className="w-3/12"
+        selectedKey={form.selectVendor}
+        onSelectionChange={(v) => {
+          setForm({
+            ...form,
+            selectVendor: v,
+          });
+        }}
+        onValueChange={setSVendor}
+      >
+        {(item) => (
+          <AutocompleteItem key={item.id} textValue={item.nama}>
+            {item.nama}
           </AutocompleteItem>
         )}
       </Autocomplete>
