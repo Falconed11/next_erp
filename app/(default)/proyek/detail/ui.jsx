@@ -988,6 +988,7 @@ export default function App({ id, versi }) {
                             form={form}
                             setForm={setForm}
                             disableStok
+                            disableVendor
                           />
                           <Button
                             onClick={() => {

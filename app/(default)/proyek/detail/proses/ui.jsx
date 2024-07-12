@@ -158,6 +158,7 @@ export default function App({ id }) {
           id_proyek: id,
           id_produk: form.selectProduk,
           id_karyawan: selectKaryawan.values().next().value,
+          id_vendor: form.selectVendor,
           tanggal: form.startdate ? getDate(form.startdate) : "",
           jumlah: form.jumlah,
           harga: form.harga,

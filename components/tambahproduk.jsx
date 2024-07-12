@@ -15,6 +15,7 @@ export default function TambahProduk({
   setForm,
   disableHargaKustom,
   disableStok,
+  disableVendor,
   refHargaModal,
 }) {
   const [nama, setNama] = useState("");
@@ -105,27 +106,33 @@ export default function TambahProduk({
           </AutocompleteItem>
         )}
       </Autocomplete>
-      <Autocomplete
-        label="Vendor"
-        variant="bordered"
-        defaultItems={fvendor}
-        placeholder="Cari produk"
-        className="w-3/12"
-        selectedKey={form.selectVendor}
-        onSelectionChange={(v) => {
-          setForm({
-            ...form,
-            selectVendor: v,
-          });
-        }}
-        onValueChange={setSVendor}
-      >
-        {(item) => (
-          <AutocompleteItem key={item.id} textValue={item.nama}>
-            {item.nama}
-          </AutocompleteItem>
-        )}
-      </Autocomplete>
+      {disableVendor ? (
+        <></>
+      ) : form.isSelected == true ? (
+        <></>
+      ) : (
+        <Autocomplete
+          label="Vendor"
+          variant="bordered"
+          defaultItems={fvendor}
+          placeholder="Cari produk"
+          className="w-3/12"
+          selectedKey={form.selectVendor}
+          onSelectionChange={(v) => {
+            setForm({
+              ...form,
+              selectVendor: v,
+            });
+          }}
+          onValueChange={setSVendor}
+        >
+          {(item) => (
+            <AutocompleteItem key={item.id} textValue={item.nama}>
+              {item.nama}
+            </AutocompleteItem>
+          )}
+        </Autocomplete>
+      )}
       {!disableStok ? (
         selectProduk?.stok > 0 ? (
           <Checkbox
