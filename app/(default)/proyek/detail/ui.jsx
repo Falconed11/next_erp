@@ -116,6 +116,7 @@ export default function App({ id, versi }) {
         jumlah: form.jumlah,
         harga: form.harga,
         instalasi: form.instalasi,
+        hargakustom: form.hargakustom,
         versi,
       }),
     });
@@ -983,21 +984,23 @@ export default function App({ id, versi }) {
                     <ConditionalComponent
                       condition={selectedProyek.versi == 0}
                       component={
-                        <div className="flex flex-row gap-2">
+                        <div className="flex flex-col gap-2">
                           <TambahProduk
                             form={form}
                             setForm={setForm}
                             disableStok
                             disableVendor
                           />
-                          <Button
-                            onClick={() => {
-                              tambahButtonPress(form, setForm);
-                            }}
-                            color="primary"
-                          >
-                            Tambah
-                          </Button>
+                          <div>
+                            <Button
+                              onClick={() => {
+                                tambahButtonPress(form, setForm);
+                              }}
+                              color="primary"
+                            >
+                              Tambah
+                            </Button>
+                          </div>
                         </div>
                       }
                     />
@@ -1087,26 +1090,29 @@ export default function App({ id, versi }) {
                     <ConditionalComponent
                       condition={selectedProyek.versi == 0}
                       component={
-                        <div className="flex flex-row gap-2">
+                        <div className="flex flex-col gap-2">
                           <TambahProduk
                             form={formInstalasi}
                             setForm={setFormInstalasi}
                             disableStok
+                            disableVendor
                           />
-                          <Button
-                            onClick={() => {
-                              tambahButtonPress(
-                                {
-                                  ...formInstalasi,
-                                  instalasi: 1,
-                                },
-                                setFormInstalasi
-                              );
-                            }}
-                            color="primary"
-                          >
-                            Tambah
-                          </Button>
+                          <div>
+                            <Button
+                              onClick={() => {
+                                tambahButtonPress(
+                                  {
+                                    ...formInstalasi,
+                                    instalasi: 1,
+                                  },
+                                  setFormInstalasi
+                                );
+                              }}
+                              color="primary"
+                            >
+                              Tambah
+                            </Button>
+                          </div>
                         </div>
                       }
                     />
@@ -1545,13 +1551,15 @@ export default function App({ id, versi }) {
                       <div className="w-1/2 text-right">
                         <div>
                           Yogyakarta,{" "}
-                          {getDateFId(new Date(selectedProyek.tanggal))}
+                          {getDateFId(
+                            new Date(selectedProyek.tanggal_penawaran)
+                          )}
                         </div>
                         <div>
                           No :{" "}
                           {penawaran(
                             selectedProyek.id_kustom,
-                            new Date(selectedProyek.tanggal),
+                            new Date(selectedProyek.tanggal_penawaran),
                             selectedProyek.id_karyawan
                           )}
                           {/* /{selectedVersion} */}
@@ -1605,39 +1613,43 @@ export default function App({ id, versi }) {
                     </TableBody>
                   </Table>
                   {/* instalasi */}
-                  <Table
-                    className="mt-3 border"
-                    aria-label="Example table with custom cells"
-                    shadow="none"
-                    topContent={<>Instalasi</>}
-                    bottomContent={
-                      <>
-                        <div className="text-right">
-                          Sub Total Harga :{" "}
-                          {subTotalKustomInstalasi.toLocaleString("id-ID")}
-                        </div>
-                      </>
-                    }
-                  >
-                    <TableHeader columns={col.penawaran}>
-                      {(column) => (
-                        <TableColumn key={column.key}>
-                          {column.label}
-                        </TableColumn>
-                      )}
-                    </TableHeader>
-                    <TableBody items={dataInstalasi}>
-                      {(item) => (
-                        <TableRow key={item.no}>
-                          {(columnKey) => (
-                            <TableCell>
-                              {renderCell.penawaran(item, columnKey)}
-                            </TableCell>
-                          )}
-                        </TableRow>
-                      )}
-                    </TableBody>
-                  </Table>
+                  {dataInstalasi.length > 0 ? (
+                    <Table
+                      className="mt-3 border"
+                      aria-label="Example table with custom cells"
+                      shadow="none"
+                      topContent={<>Instalasi</>}
+                      bottomContent={
+                        <>
+                          <div className="text-right">
+                            Sub Total Harga :{" "}
+                            {subTotalKustomInstalasi.toLocaleString("id-ID")}
+                          </div>
+                        </>
+                      }
+                    >
+                      <TableHeader columns={col.penawaran}>
+                        {(column) => (
+                          <TableColumn key={column.key}>
+                            {column.label}
+                          </TableColumn>
+                        )}
+                      </TableHeader>
+                      <TableBody items={dataInstalasi}>
+                        {(item) => (
+                          <TableRow key={item.no}>
+                            {(columnKey) => (
+                              <TableCell>
+                                {renderCell.penawaran(item, columnKey)}
+                              </TableCell>
+                            )}
+                          </TableRow>
+                        )}
+                      </TableBody>
+                    </Table>
+                  ) : (
+                    <></>
+                  )}
                   <div className="mt-3 p-3 border no-break">
                     <div>Rekapitulasi</div>
                     <div className="flex">

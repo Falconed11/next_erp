@@ -109,6 +109,8 @@ export default function App() {
   const saveButtonPress = async (onClose) => {
     if (form.nama == "" || !form.selectKategori.size > 0)
       return alert("Nama, dan Kategori wajib diisi!");
+    if (form.id_vendor && form.stok < 1)
+      return alert("Jika memilih vendor maka stok wajib diisi!");
     const res = await fetch(`${apiPath}produk`, {
       method,
       headers: {
@@ -436,10 +438,10 @@ export default function App() {
       key: "tipe",
       label: "Tipe",
     },
-    {
-      key: "nvendor",
-      label: "Vendor",
-    },
+    // {
+    //   key: "nvendor",
+    //   label: "Vendor",
+    // },
     {
       key: "stok",
       label: "Stok",
@@ -478,6 +480,8 @@ export default function App() {
   //     if (item.id_kategoriproduk == form.id_kategori) return item;
   //   });
   // }
+
+  console.log(form.id_vendor);
   return (
     <div className="flex flex-col">
       <div className="flex flex-row gap-2">
@@ -677,31 +681,44 @@ export default function App() {
                   value={form.tipe}
                   onValueChange={(val) => setForm({ ...form, tipe: val })}
                 />
-                <Autocomplete
-                  label="Vendor"
-                  variant="bordered"
-                  defaultItems={vendor.data}
-                  placeholder="Cari vendor"
-                  className="max-w-xs"
-                  selectedKey={form.id_vendor}
-                  defaultSelectedKey={form.id_vendor}
-                  defaultInputValue={form.vendor}
-                  onSelectionChange={(v) => setForm({ ...form, id_vendor: v })}
-                >
-                  {(item) => (
-                    <AutocompleteItem key={item.id} textValue={item.nama}>
-                      {item.nama}
-                    </AutocompleteItem>
-                  )}
-                </Autocomplete>
-                <Input
-                  type="number"
-                  label="Stok"
-                  placeholder="Masukkan stok!"
-                  isReadOnly={form.modalmode == "Edit" ? true : undefined}
-                  value={form.stok}
-                  onValueChange={(val) => setForm({ ...form, stok: val })}
-                />
+                {form.modalmode == "Tambah" ? (
+                  <>
+                    <Autocomplete
+                      label="Vendor"
+                      variant="bordered"
+                      defaultItems={vendor.data}
+                      placeholder="Cari vendor"
+                      className="max-w-xs"
+                      selectedKey={form.id_vendor}
+                      defaultSelectedKey={form.id_vendor}
+                      defaultInputValue={form.vendor}
+                      onSelectionChange={(v) =>
+                        setForm({ ...form, id_vendor: v })
+                      }
+                    >
+                      {(item) => (
+                        <AutocompleteItem key={item.id} textValue={item.nama}>
+                          {item.nama}
+                        </AutocompleteItem>
+                      )}
+                    </Autocomplete>
+                    {form.id_vendor ? (
+                      <Input
+                        type="number"
+                        label="Stok"
+                        placeholder="Masukkan stok!"
+                        isReadOnly={form.modalmode == "Edit" ? true : undefined}
+                        value={form.stok}
+                        onValueChange={(val) => setForm({ ...form, stok: val })}
+                      />
+                    ) : (
+                      <></>
+                    )}
+                  </>
+                ) : (
+                  <></>
+                )}
+
                 <Input
                   type="text"
                   label="Satuan"
