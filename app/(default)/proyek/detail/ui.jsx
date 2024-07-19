@@ -347,7 +347,7 @@ export default function App({ id, versi }) {
           return data.hargakustom != null ? (
             <Harga harga={data.hargakustom} />
           ) : (
-            "Null"
+            ""
           );
         case "totalharga-modal":
           return <Harga harga={data.jumlah * data.hargamodal} />;
