@@ -101,36 +101,58 @@ function TemplateImport({
       return v;
     });
     setJson(jsonData);
-    console.log(json);
   };
   const handleButtonUploadExcelPress = async (apiendpoint) => {
     if (json.length == 0) return alert("File belum dipilih");
     setIsLoading(1);
     setReportList([]);
-    try {
-      const responses = await Promise.all(
-        json.map((v) =>
-          fetch(`${apiPath}${apiendpoint}`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              // 'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: JSON.stringify(v),
-          })
-        )
-      );
-      const dataArray = await Promise.all(
-        responses.map((response) => response.json())
-      );
-      setReportList(dataArray.map((v, i) => `${i}. ${v.message}`));
-    } catch (e) {
-      console.error(e);
-    }
+    const res = await fetch(`${apiPath}${apiendpoint}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        // 'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: JSON.stringify(json),
+    });
+    const json2 = await res.json();
+    if (res.status == 400) return alert(json2?.message ?? "no msg");
+
+    console.log(json2);
+
     setJson([]);
     setIsLoading(0);
     report.onOpen();
   };
+
+  // const handleButtonUploadExcelPress = async (apiendpoint) => {
+  //   if (json.length == 0) return alert("File belum dipilih");
+  //   setIsLoading(1);
+  //   setReportList([]);
+  //   try {
+  //     const responses = await Promise.all(
+  //       json.map((v) =>
+  //         fetch(`${apiPath}${apiendpoint}`, {
+  //           method: "POST",
+  //           headers: {
+  //             "Content-Type": "application/json",
+  //             // 'Content-Type': 'application/x-www-form-urlencoded',
+  //           },
+  //           body: JSON.stringify(v),
+  //         })
+  //       )
+  //     );
+  //     const dataArray = await Promise.all(
+  //       responses.map((response) => response.json())
+  //     );
+  //     setReportList(dataArray.map((v, i) => `${i}. ${v.message}`));
+  //   } catch (e) {
+  //     console.error(e);
+  //   }
+  //   setJson([]);
+  //   setIsLoading(0);
+  //   report.onOpen();
+  // };
+
   return (
     <div className=" border bg-white rounded-lg p-2">
       {name}
