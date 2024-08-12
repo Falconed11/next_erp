@@ -481,7 +481,6 @@ export default function App() {
   //   });
   // }
 
-  console.log(form.id_vendor);
   return (
     <div className="flex flex-col">
       <div className="flex flex-row gap-2">
@@ -526,7 +525,7 @@ export default function App() {
                   </SelectItem>
                 ))}
               </Select>
-              <Autocomplete
+              {/* <Autocomplete
                 label="Produk"
                 variant="bordered"
                 defaultItems={data}
@@ -551,7 +550,16 @@ export default function App() {
                     {item.nama}
                   </AutocompleteItem>
                 )}
-              </Autocomplete>
+              </Autocomplete> */}
+              <Input
+                isClearable
+                type="text"
+                label="Produk"
+                placeholder="Cari produk"
+                className="max-w-xs"
+                value={nama}
+                onValueChange={setNama}
+              />
               <Input
                 isClearable
                 type="text"
@@ -559,7 +567,12 @@ export default function App() {
                 placeholder="Masukkan id!"
                 className="max-w-xs"
                 value={id}
-                onValueChange={setId}
+                onValueChange={(v) => {
+                  setId(v);
+                  setNama(nama);
+                  setSelectKategori(selectKategori);
+                  setPage(1);
+                }}
               />
             </div>
             {/* <div className="flex flex-row gap-2">
@@ -997,6 +1010,7 @@ export default function App() {
                   label="Metode Pengeluaran"
                   placeholder="Pilih metode"
                   className="max-w-xs"
+                  isRequired
                   selectedKeys={form.selectMetodePengeluaran}
                   onSelectionChange={(val) =>
                     setForm({

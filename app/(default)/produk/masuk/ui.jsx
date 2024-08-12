@@ -142,6 +142,7 @@ export default function App({ id_produk }) {
       oldJumlah: data.jumlah,
       oldTerbayar: data.terbayar,
       lunas: data.jumlah * data.harga > data.terbayar ? "0" : "1",
+      method: "PUT",
     });
     setMethod("PUT");
     onOpen();
@@ -271,10 +272,10 @@ export default function App({ id_produk }) {
         );
       case "jatuhtempo":
         return data.jatuhtempo ? getDateFId(new Date(data.jatuhtempo)) : "";
-      case "hargajual":
+      case "harga":
         return (
           <div className="text-right">
-            <Harga harga={data.hargajual} />
+            <Harga harga={data.harga} />
           </div>
         );
       case "aksi":

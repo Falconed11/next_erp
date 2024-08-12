@@ -435,8 +435,6 @@ export default function App() {
     { id: 0, nama: "negri" },
     { id: 1, nama: "swasta" },
   ];
-
-  console.log(sort);
   return (
     <div className="flex flex-col">
       <div className="flex flex-row gap-2">
