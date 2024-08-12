@@ -68,7 +68,9 @@ export default function App() {
               </ModalHeader>
               <ModalBody>
                 {reportList.map((r, i) => (
-                  <div key={i}>{r}</div>
+                  <div key={i}>
+                    {i + 1}. {r}
+                  </div>
                 ))}
               </ModalBody>
               <ModalFooter>
@@ -116,7 +118,7 @@ function TemplateImport({
     });
     const json2 = await res.json();
     if (res.status == 400) return alert(json2?.message ?? "no msg");
-
+    setReportList(json2.result);
     console.log(json2);
 
     setJson([]);
