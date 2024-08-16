@@ -233,6 +233,15 @@ export default function App() {
                 }`}
               >
                 <span
+                  role="link"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    window.open(
+                      `/proyek/detail?id=${data.id}&versi=${
+                        data.versi <= 0 ? "1" : data.versi
+                      }`
+                    );
+                  }}
                   // onClick={() => detailButtonPress(data)}
                   className="text-lg text-default-400 cursor-pointer active:opacity-50"
                 >
@@ -242,8 +251,13 @@ export default function App() {
             </Tooltip>
             {data.versi > 0 ? (
               <Tooltip content="Pengeluaran Proyek">
-                <Link href={`/proyek/detail/proses?id=${data.id}`}>
+                <Link href={`/proyek/detail/proses?id=${data.id}`} passHref>
                   <span
+                    role="link"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      window.open(`/proyek/detail/proses?id=${data.id}`);
+                    }}
                     // onClick={() => detailButtonPress(data)}
                     className="text-lg text-default-400 cursor-pointer active:opacity-50"
                   >
@@ -254,7 +268,7 @@ export default function App() {
             ) : (
               <></>
             )}
-            <Tooltip content="Edit">
+            {/* <Tooltip content="Edit">
               <span
                 onClick={() => editButtonPress(data)}
                 className="text-lg text-default-400 cursor-pointer active:opacity-50"
@@ -269,7 +283,7 @@ export default function App() {
               >
                 <DeleteIcon />
               </span>
-            </Tooltip>
+            </Tooltip> */}
           </div>
         );
       default:

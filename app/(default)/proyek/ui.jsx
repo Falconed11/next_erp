@@ -295,6 +295,15 @@ export default function App() {
               >
                 <span
                   // onClick={() => detailButtonPress(data)}
+                  role="link"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    window.open(
+                      `/proyek/detail?id=${data.id}&versi=${
+                        data.versi <= 0 ? "1" : data.versi
+                      }`
+                    );
+                  }}
                   className="text-lg text-default-400 cursor-pointer active:opacity-50"
                 >
                   <NoteIcon />
@@ -307,6 +316,11 @@ export default function App() {
                   <Link href={`/proyek/detail/proses?id=${data.id}`}>
                     <span
                       // onClick={() => detailButtonPress(data)}
+                      role="link"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        window.open(`/proyek/detail/proses?id=${data.id}`);
+                      }}
                       className="text-lg text-default-400 cursor-pointer active:opacity-50"
                     >
                       <ReportMoneyIcon />

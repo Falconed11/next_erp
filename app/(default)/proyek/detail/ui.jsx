@@ -1558,7 +1558,7 @@ export default function App({ id, versi }) {
                         <div>
                           No :{" "}
                           {penawaran(
-                            selectedProyek.id_kustom,
+                            selectedProyek.id_penawaran,
                             new Date(selectedProyek.tanggal_penawaran),
                             selectedProyek.id_karyawan
                           )}

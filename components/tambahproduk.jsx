@@ -115,7 +115,7 @@ export default function TambahProduk({
           label="Vendor"
           variant="bordered"
           defaultItems={fvendor}
-          placeholder="Cari produk"
+          placeholder="Pilih vendor"
           className="w-3/12"
           selectedKey={form.selectVendor}
           onSelectionChange={(v) => {

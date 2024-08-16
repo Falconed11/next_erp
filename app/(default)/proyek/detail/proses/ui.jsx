@@ -61,6 +61,7 @@ export default function App({ id }) {
   const karyawan = useClientFetch(`karyawan`);
   const [selectKaryawan, setSelectKaryawan] = useState(new Set([]));
   const [form, setForm] = useState({
+    startdate: new Date(),
     selectKategori: new Set([]),
     selectProduk: new Set([]),
   });
@@ -651,7 +652,7 @@ export default function App({ id }) {
                   refHargaModal
                 />
               </div>
-              <div className="flex flex-row gap-2 mt-3">
+              <div className="flex flex-row gap-2 mt-3 z-40">
                 <div className="bg-gray-100 p-3 rounded-lg">
                   <div>Tanggal</div>
                   <DatePicker
