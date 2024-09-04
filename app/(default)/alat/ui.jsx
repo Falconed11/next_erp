@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import * as XLSX from "xlsx";
 import { FileUploader } from "@/components/input";
 import { Button } from "@nextui-org/react";
+import { Input, Textarea } from "@nextui-org/react";
 import {
   Modal,
   ModalContent,
@@ -94,6 +95,7 @@ function TemplateImport({
   isLoading,
   setIsLoading,
 }) {
+  const [customInputCode, setCustomInputCode] = useState([]);
   const [json, setJson] = useState([]);
   const handleFileUpload = (jsonData) => {
     // console.log(jsonData);
@@ -105,6 +107,7 @@ function TemplateImport({
     setJson(jsonData);
   };
   const handleButtonUploadExcelPress = async (apiendpoint) => {
+    if (!customInputCode) return alert("Kode input wajib diisi!");
     if (json.length == 0) return alert("File belum dipilih");
     setIsLoading(1);
     setReportList([]);
@@ -114,7 +117,7 @@ function TemplateImport({
         "Content-Type": "application/json",
         // 'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: JSON.stringify(json),
+      body: JSON.stringify({ customInputCode, json }),
     });
     const json2 = await res.json();
     if (res.status == 400) return alert(json2?.message ?? "no msg");
@@ -166,6 +169,15 @@ function TemplateImport({
           >
             Download Format
           </Link>
+        </div>
+        <div>
+          <Input
+            type="text"
+            label="Kode Input"
+            placeholder="Masukkan kode input!"
+            value={customInputCode}
+            onValueChange={setCustomInputCode}
+          />
         </div>
         <FileUploader onFileUpload={handleFileUpload} />
         <Button
