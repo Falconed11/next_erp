@@ -58,8 +58,13 @@ export default function App() {
     endDate,
     selectKategori: new Set([]),
   });
+  const [current, setCurrent] = useState({
+    startDate,
+    endDate,
+    selectKategori: new Set([]),
+  });
   const omset = useClientFetch(
-    `omset?start=${getDate(filter.startDate)}&end=${getDate(filter.endDate)}`
+    `omset?start=${getDate(current.startDate)}&end=${getDate(current.endDate)}`
   );
   const karyawan = useClientFetch("karyawan");
   const statusproyek = useClientFetch("statusproyek");
@@ -184,6 +189,10 @@ export default function App() {
       `proyek_${getDateF(filter.startDate)}_${getDateF(filter.endDate)}.xlsx`,
       { compression: true }
     );
+  };
+
+  const cariOnPress = () => {
+    setCurrent(filter);
   };
 
   const renderCell = React.useCallback((data, columnKey) => {
@@ -385,7 +394,7 @@ export default function App() {
           <>
             <div>Filter</div>
             <div className="flex flex-row gap-2">
-              <div className="flex flex-col bg-gray-100 p-3 rounded-lg">
+              <div className="flex flex-col bg-gray-100 p-3 rounded-lg gap-1">
                 <div>Periode</div>
                 <DatePicker
                   dateFormat="dd/MM/yyyy"
@@ -404,6 +413,15 @@ export default function App() {
                   endDate={filter.endDate}
                   minDate={filter.startDate}
                 />
+                <div className="justify-end flex">
+                  <Button
+                    color="primary"
+                    onPress={cariOnPress}
+                    isDisabled={filter == current ? true : null}
+                  >
+                    Cari
+                  </Button>
+                </div>
               </div>
             </div>
             {/* <div className="flex flex-row gap-2"> */}
