@@ -45,7 +45,7 @@ import {
   getDate,
   getDateF,
 } from "@/app/utils/date";
-import { FileUploader } from "@/components/input";
+import { FileUploader, RangeDate } from "@/components/input";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -53,11 +53,6 @@ const apiPath = getApiPath();
 const [startDate, endDate] = getCurFirstLastDay();
 
 export default function App() {
-  const [filter, setFilter] = useState({
-    startDate,
-    endDate,
-    selectKategori: new Set([]),
-  });
   const [current, setCurrent] = useState({
     startDate,
     endDate,
@@ -189,10 +184,6 @@ export default function App() {
       `proyek_${getDateF(filter.startDate)}_${getDateF(filter.endDate)}.xlsx`,
       { compression: true }
     );
-  };
-
-  const cariOnPress = () => {
-    setCurrent(filter);
   };
 
   const renderCell = React.useCallback((data, columnKey) => {
@@ -394,35 +385,7 @@ export default function App() {
           <>
             <div>Filter</div>
             <div className="flex flex-row gap-2">
-              <div className="flex flex-col bg-gray-100 p-3 rounded-lg gap-1">
-                <div>Periode</div>
-                <DatePicker
-                  dateFormat="dd/MM/yyyy"
-                  selected={filter.startDate}
-                  onChange={(date) => setFilter({ ...filter, startDate: date })}
-                  selectsStart
-                  startDate={filter.startDate}
-                  endDate={filter.endDate}
-                />
-                <DatePicker
-                  dateFormat="dd/MM/yyyy"
-                  selected={filter.endDate}
-                  onChange={(date) => setFilter({ ...filter, endDate: date })}
-                  selectsEnd
-                  startDate={filter.startDate}
-                  endDate={filter.endDate}
-                  minDate={filter.startDate}
-                />
-                <div className="justify-end flex">
-                  <Button
-                    color="primary"
-                    onPress={cariOnPress}
-                    isDisabled={filter == current ? true : null}
-                  >
-                    Cari
-                  </Button>
-                </div>
-              </div>
+              <RangeDate current={current} setCurrent={setCurrent} />
             </div>
             {/* <div className="flex flex-row gap-2"> */}
             {/* <Button color="primary" onClick={handleButtonExportToExcelPress}>

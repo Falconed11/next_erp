@@ -1,6 +1,9 @@
 import { useState } from "react";
 import * as XLSX from "xlsx";
 import { useDropzone } from "react-dropzone";
+import { Button } from "@nextui-org/react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 const FileUploader = ({ onFileUpload }) => {
   const [file, setFile] = useState(null);
@@ -41,4 +44,42 @@ const FileUploader = ({ onFileUpload }) => {
   );
 };
 
-export { FileUploader };
+const RangeDate = ({ current, setCurrent }) => {
+  const [filter, setFilter] = useState(current);
+  const cariOnPress = () => {
+    setCurrent(filter);
+  };
+  return (
+    <div className="flex flex-col bg-gray-100 p-3 rounded-lg gap-1">
+      <div>Periode</div>
+      <DatePicker
+        dateFormat="dd/MM/yyyy"
+        selected={filter.startDate}
+        onChange={(date) => setFilter({ ...filter, startDate: date })}
+        selectsStart
+        startDate={filter.startDate}
+        endDate={filter.endDate}
+      />
+      <DatePicker
+        dateFormat="dd/MM/yyyy"
+        selected={filter.endDate}
+        onChange={(date) => setFilter({ ...filter, endDate: date })}
+        selectsEnd
+        startDate={filter.startDate}
+        endDate={filter.endDate}
+        minDate={filter.startDate}
+      />
+      <div className="justify-end flex">
+        <Button
+          color="primary"
+          onPress={cariOnPress}
+          isDisabled={filter === current ? true : null}
+        >
+          Cari
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+export { FileUploader, RangeDate };

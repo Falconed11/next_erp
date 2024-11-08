@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { getDate } from "@/app/utils/date";
+import { getDate, getCurFirstLastDay } from "@/app/utils/date";
 import { useClientFetch } from "@/app/utils/apiconfig";
 import { Penawaran, OperasionalKantor } from "@/components/laporan";
 
@@ -22,16 +22,15 @@ export default function app() {
   );
   const lastDayOfCurrentMonth = new Date(nextMonthFirstDay - 1);
   const firstDayOfCurrentMonth = new Date(currentMonthFirstDay);
+  const [startDate, endDate] = getCurFirstLastDay();
+
   return (
     <div className="flex flex-row gap-3">
       <div className="bg-white p-3 rounded-lg">
         <Penawaran start={firstDayOfCurrentMonth} end={lastDayOfCurrentMonth} />
       </div>
       <div className="bg-white p-3 rounded-lg">
-        <OperasionalKantor
-          start={firstDayOfCurrentMonth}
-          end={lastDayOfCurrentMonth}
-        />
+        <OperasionalKantor startDate={startDate} endDate={endDate} />
       </div>
     </div>
   );

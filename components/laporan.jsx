@@ -21,17 +21,17 @@ import {
 } from "@/app/utils/apiconfig";
 import { getDate, getDateF, getMonthYear } from "@/app/utils/date";
 import Harga from "@/components/harga";
+import { FileUploader, RangeDate } from "@/components/input";
 
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
-const OperasionalKantor = ({ start, end }) => {
+const OperasionalKantor = ({ startDate, endDate }) => {
   const kategori = useClientFetchNoInterval("kategorioperasionalkantor");
-  const [startDate, setStartDate] = useState(new Date(start));
-  const [endDate, setEndDate] = useState(new Date(end));
+  const [current, setCurrent] = useState({ startDate, endDate });
   const operasional = useClientFetchNoInterval(
-    `totaloperasional?startDate=${getDate(startDate)}&endDate=${getDate(
-      endDate
+    `totaloperasional?startDate=${getDate(current.startDate)}&endDate=${getDate(
+      current.endDate
     )}`
   );
   if (kategori.error) return <div>failed to load</div>;
@@ -44,25 +44,8 @@ const OperasionalKantor = ({ start, end }) => {
   return (
     <>
       <div>Operasional Kantor</div>
-      <div className="flex flex-col bg-gray-100 p-3 rounded-lg">
-        <div>Periode</div>
-        <DatePicker
-          dateFormat="dd/MM/yyyy"
-          selected={startDate}
-          onChange={(date) => setStartDate(date)}
-          selectsStart
-          startDate={startDate}
-          endDate={endDate}
-        />
-        <DatePicker
-          dateFormat="dd/MM/yyyy"
-          selected={endDate}
-          onChange={(date) => setEndDate(date)}
-          selectsEnd
-          startDate={startDate}
-          endDate={endDate}
-          minDate={startDate}
-        />
+      <div className="flex">
+        <RangeDate current={current} setCurrent={setCurrent} />
       </div>
       <div className="flex flex-row gap-2">
         <div>
