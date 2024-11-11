@@ -106,6 +106,24 @@ export default function App() {
 
   const modal = { masuk: useDisclosure(), keluar: useDisclosure() };
 
+  const [fieldState, setFieldState] = React.useState({
+    selectedKey: "",
+    inputValue: "",
+    items: vendor.data?.slice(0, 10), // Initially show only top 10 items
+  });
+
+  const onInputChange = (value) => {
+    const filteredItems = vendor.data
+      ?.filter((item) => item.nama.toLowerCase().includes(value.toLowerCase()))
+      .slice(0, 10); // Always limit to top 10 items
+
+    setFieldState((prevState) => ({
+      inputValue: value,
+      selectedKey: value === "" ? null : prevState.selectedKey,
+      items: value ? filteredItems : vendor.data.slice(0, 10), // If no input, show top 10 unfiltered items
+    }));
+  };
+
   const saveButtonPress = async (onClose) => {
     if (form.tipe == "" || !form.selectKategori.size > 0)
       return alert("Tipe, dan Kategori wajib diisi!");
@@ -879,13 +897,15 @@ export default function App() {
                 <Autocomplete
                   label="Vendor"
                   variant="bordered"
-                  defaultItems={vendor.data}
+                  //defaultItems={fieldState.items}
+                  items={fieldState.items ?? vendor.data.slice(0, 10)}
                   placeholder="Cari vendor"
                   className="max-w-xs"
                   selectedKey={form.id_vendor}
                   defaultSelectedKey={form.id_vendor}
                   defaultInputValue={form.vendor}
                   onSelectionChange={(v) => setForm({ ...form, id_vendor: v })}
+                  onInputChange={onInputChange}
                 >
                   {(item) => (
                     <AutocompleteItem key={item.id} textValue={item.nama}>

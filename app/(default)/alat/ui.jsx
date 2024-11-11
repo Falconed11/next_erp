@@ -107,6 +107,7 @@ function TemplateImport({
     setJson(jsonData);
   };
   const handleButtonUploadExcelPress = async (apiendpoint) => {
+    console.log(json);
     if (!customInputCode) return alert("Kode input wajib diisi!");
     if (json.length == 0) return alert("File belum dipilih");
     setIsLoading(1);
