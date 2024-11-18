@@ -38,7 +38,7 @@ import {
 } from "@nextui-org/react";
 import { RadioGroup, Radio } from "@nextui-org/react";
 import Harga from "@/components/harga";
-import { FileUploader } from "@/components/input";
+import { TemplateImport } from "@/components/input";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { getApiPath, useClientFetch } from "@/app/utils/apiconfig";
@@ -101,6 +101,7 @@ export default function App() {
   });
   const [json, setJson] = useState([]);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const [isLoading, setIsLoading] = useState(0);
   const [reportList, setReportList] = useState([]);
   const report = useDisclosure();
 
@@ -424,6 +425,7 @@ export default function App() {
   const loadingState = produk.isLoading ? "loading" : "idle";
   const offset = (page - 1) * rowsPerPage;
 
+  if (isLoading) return <>Loading...</>;
   if (produk.error) return <div>failed to load</div>;
   if (produk.isLoading) return <div>loading...</div>;
   if (kategori.error) return <div>failed to load</div>;
@@ -500,23 +502,24 @@ export default function App() {
   // }
 
   return (
-    <div className="flex flex-col">
-      <div className="flex flex-row gap-2">
-        <Button color="primary" onPress={tambahButtonPress}>
-          Tambah
-        </Button>
-        {/* <div>
-          <Link
-            className="bg-primary text-white p-2 rounded-lg inline-block"
-            href={"/produk.xlsx"}
-          >
-            Download Format
-          </Link>
+    <div className="">
+      <div className="flex flex-col gap-2">
+        <div>
+          <Button color="primary" onPress={tambahButtonPress}>
+            Tambah
+          </Button>
         </div>
-        <FileUploader onFileUpload={handleFileUpload} />
-        <Button color="primary" onPress={handleButtonUploadExcelPress}>
-          Upload Excel
-        </Button> */}
+        <div>
+          <TemplateImport
+            report={report}
+            setReportList={setReportList}
+            name={"Import Produk"}
+            apiendpoint={""}
+            isLoading={isLoading}
+            setIsLoading={setIsLoading}
+            formatLink={"/produk.xlsx"}
+          />
+        </div>
       </div>
       <Table
         isStriped
@@ -865,7 +868,9 @@ export default function App() {
               </ModalHeader>
               <ModalBody>
                 {reportList.map((r, i) => (
-                  <div key={i}>{r}</div>
+                  <div key={i}>
+                    {i + 1}. {r}
+                  </div>
                 ))}
               </ModalBody>
               <ModalFooter>
