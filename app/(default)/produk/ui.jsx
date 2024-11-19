@@ -514,7 +514,7 @@ export default function App() {
             report={report}
             setReportList={setReportList}
             name={"Import Produk"}
-            apiendpoint={""}
+            apiendpoint={"importproduk"}
             isLoading={isLoading}
             setIsLoading={setIsLoading}
             formatLink={"/produk.xlsx"}
