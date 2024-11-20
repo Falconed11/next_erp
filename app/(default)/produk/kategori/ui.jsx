@@ -421,20 +421,20 @@ export default function App() {
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                Transfer Vendor
+                Transfer Kategori Produk
               </ModalHeader>
               <ModalBody>
                 <Input
                   isDisabled
                   type="text"
-                  label="Vendor asal"
+                  label="Kategori asal"
                   defaultValue={form.nama}
                   className="max-w-xs"
                 />
                 <Select
-                  label="Targer kategoriproduk"
+                  label="Target Kategori Produk"
                   variant="bordered"
-                  placeholder="Pilih target kategoriproduk"
+                  placeholder="Pilih target kategori produk"
                   selectedKeys={form.selectedId}
                   className="max-w-xs"
                   onSelectionChange={(val) => {
