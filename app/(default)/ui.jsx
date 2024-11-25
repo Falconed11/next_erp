@@ -1,10 +1,7 @@
 "use client";
-import { useState } from "react";
-import { getDate, getCurFirstLastDay } from "@/app/utils/date";
-import { useClientFetch } from "@/app/utils/apiconfig";
+import { getCurFirstLastDay } from "@/app/utils/date";
 import { Penawaran, OperasionalKantor } from "@/components/laporan";
 
-import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 export default function app() {

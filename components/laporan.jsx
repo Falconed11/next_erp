@@ -21,7 +21,7 @@ import {
 } from "@/app/utils/apiconfig";
 import { getDate, getDateF, getMonthYear } from "@/app/utils/date";
 import Harga from "@/components/harga";
-import { FileUploader, RangeDate } from "@/components/input";
+import { RangeDate } from "@/components/input";
 
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
