@@ -92,6 +92,7 @@ export default function App({ id, versi }) {
   const versiKeranjangProyek = useClientFetch(
     `versikeranjangproyek?id_proyek=${id}`
   );
+  const subProyek = useClientFetch(`subproyek?id_proyek=${id}`);
   const [form, setForm] = useState({
     selectProduk: new Set([]),
     selectKategori: new Set([]),
@@ -123,6 +124,25 @@ export default function App({ id, versi }) {
     const json = await res.json();
     if (res.status == 400) return alert(json.message);
     setForm({ jumlah: "", harga: "" });
+    // console.log(json.message);
+    // return alert(json.message);
+  };
+  const tambahSubProyekButtonPress = async () => {
+    if (!form.namaSubProyek) return alert("Silahkan masukkan nama sub proyek!");
+    const res = await fetch(`${api_path}subproyek`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        // 'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: JSON.stringify({
+        id_proyek: id,
+        nama: form.namaSubProyek,
+      }),
+    });
+    const json = await res.json();
+    if (res.status == 400) return alert(json.message);
+    setForm({ ...form, namaSubProyek: "" });
     // console.log(json.message);
     // return alert(json.message);
   };
@@ -443,6 +463,9 @@ export default function App({ id, versi }) {
   if (rekapitulasiProyek.isLoading) return <div>loading...</div>;
   if (versiKeranjangProyek.error) return <div>failed to load</div>;
   if (versiKeranjangProyek.isLoading) return <div>loading...</div>;
+  if (subProyek.error) return <div>failed to load</div>;
+  if (subProyek.isLoading) return <div>loading...</div>;
+
   const dataPenawaran = keranjangProyek.data.map((produk, i) => {
     return { ...produk, no: i + 1 };
   });
@@ -724,6 +747,8 @@ export default function App({ id, versi }) {
   const finalHarga = hargaDiskon + pajak;
   const finalKustom = kustomDiskon + pajakKustom;
   const selectedVersion = selectVersi.values().next().value;
+
+  // console.log(subProyek.data);
   return (
     <div>
       <div className="flex flex-row gap-2">
@@ -974,6 +999,45 @@ export default function App({ id, versi }) {
           </div> */}
             </div>
             <div className="-w-11/12">
+              {/* sub proyek */}
+              <div className="bg-white rounded-lg flex flex-col gap-2 mt-2 p-3">
+                <div>Sub Proyek (Opsional)</div>
+                <div className="flex gap-2">
+                  <Input
+                    type="text"
+                    value={form.namaSubProyek}
+                    label="Nama"
+                    placeholder="Masukkan nama Sub Proyek!"
+                    className="w-3/12"
+                    endContent={
+                      <div className="pointer-events-none flex items-center">
+                        <span className="text-default-400 text-small"></span>
+                      </div>
+                    }
+                    onValueChange={(v) =>
+                      setForm({
+                        ...form,
+                        namaSubProyek: v,
+                      })
+                    }
+                  />
+                  <div>
+                    <Button
+                      onClick={() => {
+                        tambahSubProyekButtonPress();
+                      }}
+                      color="primary"
+                    >
+                      Tambah
+                    </Button>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  {subProyek.data.map((i) => {
+                    return <div key={i.id}>{i.nama}</div>;
+                  })}
+                </div>
+              </div>
               {/* tabel produk */}
               <Table
                 selectionMode="single"
