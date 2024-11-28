@@ -42,7 +42,7 @@ export default function TambahProduk({
   data = data.filter((animal) =>
     animal.nama.toLowerCase().includes(nama.toLowerCase())
   );
-  data = data.slice(0, 100);
+  data = data.slice(0, 20);
 
   let fvendor = vendor.data;
   fvendor = fvendor.filter((animal) =>

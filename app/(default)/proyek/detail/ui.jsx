@@ -92,7 +92,6 @@ export default function App({ id, versi }) {
   const versiKeranjangProyek = useClientFetch(
     `versikeranjangproyek?id_proyek=${id}`
   );
-  const subProyek = useClientFetch(`subproyek?id_proyek=${id}`);
   const [form, setForm] = useState({
     selectProduk: new Set([]),
     selectKategori: new Set([]),
@@ -124,25 +123,6 @@ export default function App({ id, versi }) {
     const json = await res.json();
     if (res.status == 400) return alert(json.message);
     setForm({ jumlah: "", harga: "" });
-    // console.log(json.message);
-    // return alert(json.message);
-  };
-  const tambahSubProyekButtonPress = async () => {
-    if (!form.namaSubProyek) return alert("Silahkan masukkan nama sub proyek!");
-    const res = await fetch(`${api_path}subproyek`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify({
-        id_proyek: id,
-        nama: form.namaSubProyek,
-      }),
-    });
-    const json = await res.json();
-    if (res.status == 400) return alert(json.message);
-    setForm({ ...form, namaSubProyek: "" });
     // console.log(json.message);
     // return alert(json.message);
   };
@@ -463,8 +443,6 @@ export default function App({ id, versi }) {
   if (rekapitulasiProyek.isLoading) return <div>loading...</div>;
   if (versiKeranjangProyek.error) return <div>failed to load</div>;
   if (versiKeranjangProyek.isLoading) return <div>loading...</div>;
-  if (subProyek.error) return <div>failed to load</div>;
-  if (subProyek.isLoading) return <div>loading...</div>;
 
   const dataPenawaran = keranjangProyek.data.map((produk, i) => {
     return { ...produk, no: i + 1 };
@@ -479,6 +457,10 @@ export default function App({ id, versi }) {
       {
         key: "kategoriproduk",
         label: "Kategori",
+      },
+      {
+        key: "subproyek",
+        label: "Sub Proyek",
       },
       {
         key: "nama",
@@ -541,6 +523,10 @@ export default function App({ id, versi }) {
       {
         key: "kategoriproduk",
         label: "Kategori",
+      },
+      {
+        key: "subproyek",
+        label: "Sub Proyek",
       },
       {
         key: "nama",
@@ -1000,44 +986,7 @@ export default function App({ id, versi }) {
             </div>
             <div className="-w-11/12">
               {/* sub proyek */}
-              <div className="bg-white rounded-lg flex flex-col gap-2 mt-2 p-3">
-                <div>Sub Proyek (Opsional)</div>
-                <div className="flex gap-2">
-                  <Input
-                    type="text"
-                    value={form.namaSubProyek}
-                    label="Nama"
-                    placeholder="Masukkan nama Sub Proyek!"
-                    className="w-3/12"
-                    endContent={
-                      <div className="pointer-events-none flex items-center">
-                        <span className="text-default-400 text-small"></span>
-                      </div>
-                    }
-                    onValueChange={(v) =>
-                      setForm({
-                        ...form,
-                        namaSubProyek: v,
-                      })
-                    }
-                  />
-                  <div>
-                    <Button
-                      onClick={() => {
-                        tambahSubProyekButtonPress();
-                      }}
-                      color="primary"
-                    >
-                      Tambah
-                    </Button>
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  {subProyek.data.map((i) => {
-                    return <div key={i.id}>{i.nama}</div>;
-                  })}
-                </div>
-              </div>
+              <SubProyek id={id} selectedProyek={selectedProyek} />
               {/* tabel produk */}
               <Table
                 selectionMode="single"
@@ -1922,128 +1871,188 @@ export default function App({ id, versi }) {
   );
 }
 
-// const TambahProduk = ({ id_proyek, instalasi, versi }) => {
-//   const kategori = useClientFetch(`kategoriproduk`);
-//   const [selectKategori, setSelectKategori] = useState(new Set([]));
-//   const produk = useClientFetch(
-//     `produk?kategori=${selectKategori.values().next().value}`
-//   );
-//   const [selectProduk, setSelectProduk] = useState(new Set([]));
-//   const [form, setForm] = useState({});
-//   if (kategori.error) return <div>failed to load</div>;
-//   if (kategori.isLoading) return <div>loading...</div>;
-//   if (produk.error) return <div>failed to load</div>;
-//   if (produk.isLoading) return <div>loading...</div>;
-//   const tambahButtonPress = async ({ select, form }) => {
-//     if (select.size == 0) return alert("Produk belum dipilih.");
-//     const res = await fetch(`${api_path}keranjangproyek`, {
-//       method: "POST",
-//       headers: {
-//         "Content-Type": "application/json",
-//         // 'Content-Type': 'application/x-www-form-urlencoded',
-//       },
-//       body: JSON.stringify({
-//         id_proyek,
-//         id_produk: select.values().next().value,
-//         jumlah: form.jumlah,
-//         harga: form.harga,
-//         instalasi,
-//         versi,
-//       }),
-//     });
-//     const json = await res.json();
-//     if (res.status == 400) return alert(json.message);
-//     setForm({ jumlah: "", harga: "" });
-//     setSelectKategori([]);
-//     setSelectProduk([]);
-//     // console.log(json.message);
-//     // return alert(json.message);
-//   };
-//   return (
-//     <div className="flex flex-row">
-//       <Select
-//         label="Kategori"
-//         placeholder="Pilih kategori!"
-//         className="w-2/12"
-//         selectedKeys={selectKategori}
-//         onSelectionChange={(v) => {
-//           setSelectProduk(new Set([]));
-//           setSelectKategori(v);
-//         }}
-//       >
-//         {kategori.data.map((item) => (
-//           <SelectItem key={item.kategori} value={item.kategori}>
-//             {item.kategori}
-//           </SelectItem>
-//         ))}
-//       </Select>
-//       <Select
-//         label="Produk"
-//         placeholder="Pilih produk!"
-//         className="w-5/12 pl-2"
-//         selectedKeys={selectProduk}
-//         onSelectionChange={setSelectProduk}
-//       >
-//         {produk.data.map((item) => (
-//           <SelectItem
-//             key={item.id}
-//             value={item.id}
-//             textValue={`${item.nama} | ${item.merek} | ${item.tipe} | ${item.stok} ${item.satuan} | ${item.hargamodal} | ${item.hargajual}`}
-//           >
-//             {item.nama} | {item.merek} | {item.tipe} |{" "}
-//             <span className="p-1 bg-black text-white">
-//               {item.stok} {item.satuan}
-//             </span>{" "}
-//             | <Harga harga={item.hargamodal} /> |{" "}
-//             <Harga harga={item.hargajual} />
-//           </SelectItem>
-//         ))}
-//       </Select>
-//       <Input
-//         type="number"
-//         value={form.jumlah}
-//         label="Jumlah"
-//         placeholder="Masukkan jumlah!"
-//         className="w-2/12 pl-2"
-//         endContent={
-//           <div className="pointer-events-none flex items-center">
-//             <span className="text-default-400 text-small"></span>
-//           </div>
-//         }
-//         onValueChange={(v) =>
-//           setForm({
-//             ...form,
-//             jumlah: v,
-//           })
-//         }
-//       />
-//       <Input
-//         type="number"
-//         value={form.harga}
-//         label="Harga Kustom"
-//         placeholder="Masukkan harga!"
-//         className="w-2/12 pl-2"
-//         onValueChange={(v) =>
-//           setForm({
-//             ...form,
-//             harga: v,
-//           })
-//         }
-//       />
-//       <Button
-//         onClick={() => {
-//           tambahButtonPress({ instalasi, select: selectProduk, form });
-//         }}
-//         color="primary"
-//         className="ml-2"
-//       >
-//         Tambah
-//       </Button>
-//       {/* <div>
-//                 <Link href={`/stok?id_proyek=${proyek.id}`}>
-//                   <Button color="primary">Tambah</Button>
-//                 </Link>
-//               </div> */}
-//     </div>
-//   );
-// };
+const SubProyek = ({ id, selectedProyek }) => {
+  const [form, setForm] = useState({});
+  const modal = useDisclosure();
+
+  const subProyek = useClientFetch(`subproyek?id_proyek=${id}`);
+
+  const tambahSubProyekButtonPress = async () => {
+    if (!form.namaSubProyek) return alert("Silahkan masukkan nama sub proyek!");
+    const res = await fetch(`${api_path}subproyek`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        // 'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: JSON.stringify({
+        id_proyek: id,
+        nama: form.namaSubProyek,
+      }),
+    });
+    const json = await res.json();
+    if (res.status == 400) return alert(json.message);
+    setForm({ ...form, namaSubProyek: "" });
+    // console.log(json.message);
+    // return alert(json.message);
+  };
+  const editButtonPress = (data, onOpen) => {
+    setForm(data);
+    modal.onOpen();
+  };
+  const simpanButtonPress = async (data, onClose) => {
+    const res = await fetch(`${api_path}subproyek`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        // 'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: JSON.stringify(data),
+    });
+    const json = await res.json();
+    if (res.status == 400) return alert(json.message);
+    onClose();
+    // console.log(json.message);
+    //return alert(json.message);
+  };
+  const deleteButtonPress = async (data) => {
+    if (confirm(`Hapus sub proyek ${data.nama}?`)) {
+      const res = await fetch(`${api_path}subproyek`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify({ id: data.id }),
+      });
+      const json = await res.json();
+      if (res.status == 400) return alert(json.message);
+      return;
+      // return alert(json.message);
+    }
+  };
+
+  if (subProyek.error) return <div>failed to load</div>;
+  if (subProyek.isLoading) return <div>loading...</div>;
+  return (
+    <div className="bg-white rounded-lg flex flex-col gap-2 mt-2 p-3">
+      <div>Sub Proyek</div>
+      {selectedProyek.versi == 0 ? (
+        <div className="flex gap-2">
+          <Input
+            type="text"
+            value={form.namaSubProyek}
+            label="Nama"
+            placeholder="Masukkan nama Sub Proyek!"
+            className="w-3/12"
+            endContent={
+              <div className="pointer-events-none flex items-center">
+                <span className="text-default-400 text-small"></span>
+              </div>
+            }
+            onValueChange={(v) =>
+              setForm({
+                ...form,
+                namaSubProyek: v,
+              })
+            }
+          />
+          <div>
+            <Button
+              onClick={() => {
+                tambahSubProyekButtonPress();
+              }}
+              color="primary"
+            >
+              Tambah
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <></>
+      )}
+      <div className="flex gap-2">
+        {subProyek.data.map((data, i) => (
+          <Chip
+            key={i}
+            // onClose={() => handleClose(sP)}
+            variant="flat"
+            endContent={
+              selectedProyek.versi == 0 ? (
+                <div className="flex gap-2">
+                  <Tooltip content="Edit">
+                    <span
+                      onClick={() => editButtonPress(data)}
+                      className="text-lg text-default-400 cursor-pointer active:opacity-50"
+                    >
+                      <EditIcon />
+                    </span>
+                  </Tooltip>
+                  <Tooltip color="danger" content="Delete">
+                    <span
+                      onClick={() => deleteButtonPress(data)}
+                      className="text-lg text-danger cursor-pointer active:opacity-50"
+                    >
+                      <DeleteIcon />
+                    </span>
+                  </Tooltip>
+                </div>
+              ) : (
+                <></>
+              )
+            }
+          >
+            {data.nama}
+          </Chip>
+        ))}
+      </div>
+      <Modal
+        scrollBehavior="inside"
+        isOpen={modal.isOpen}
+        onOpenChange={modal.onOpenChange}
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">
+                Edit Sub Proyek
+              </ModalHeader>
+              <ModalBody>
+                <Input
+                  type="text"
+                  value={form.nama}
+                  label="Nama Sub Proyek"
+                  placeholder="Masukkan nama sub proyek!"
+                  onValueChange={(v) =>
+                    setForm({
+                      ...form,
+                      nama: v,
+                    })
+                  }
+                />
+              </ModalBody>
+              <ModalFooter>
+                <Button
+                  color="danger"
+                  variant="light"
+                  onPress={() => {
+                    setForm({ nama: "" });
+                    onClose();
+                  }}
+                >
+                  Batal
+                </Button>
+                <Button
+                  color="primary"
+                  onPress={() => simpanButtonPress(form, onClose)}
+                >
+                  Simpan
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+    </div>
+  );
+};
