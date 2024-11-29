@@ -17,6 +17,7 @@ export default function TambahProduk({
   disableStok,
   disableVendor,
   refHargaModal,
+  customInput,
 }) {
   const [nama, setNama] = useState("");
   const [sVendor, setSVendor] = useState("");
@@ -226,6 +227,7 @@ export default function TambahProduk({
           }
         />
       )}
+      {customInput ? customInput : <></>}
     </div>
   );
 }

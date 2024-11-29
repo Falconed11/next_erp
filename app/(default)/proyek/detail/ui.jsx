@@ -92,6 +92,7 @@ export default function App({ id, versi }) {
   const versiKeranjangProyek = useClientFetch(
     `versikeranjangproyek?id_proyek=${id}`
   );
+  const subProyek = useClientFetch(`subproyek?id_proyek=${id}`);
   const [form, setForm] = useState({
     selectProduk: new Set([]),
     selectKategori: new Set([]),
@@ -443,6 +444,8 @@ export default function App({ id, versi }) {
   if (rekapitulasiProyek.isLoading) return <div>loading...</div>;
   if (versiKeranjangProyek.error) return <div>failed to load</div>;
   if (versiKeranjangProyek.isLoading) return <div>loading...</div>;
+  if (subProyek.error) return <div>failed to load</div>;
+  if (subProyek.isLoading) return <div>loading...</div>;
 
   const dataPenawaran = keranjangProyek.data.map((produk, i) => {
     return { ...produk, no: i + 1 };
@@ -734,7 +737,8 @@ export default function App({ id, versi }) {
   const finalKustom = kustomDiskon + pajakKustom;
   const selectedVersion = selectVersi.values().next().value;
 
-  // console.log(subProyek.data);
+  console.log(form.selectSubProyek?.values().next().value ?? 0);
+  // console.log(form);
   return (
     <div>
       <div className="flex flex-row gap-2">
@@ -1003,6 +1007,28 @@ export default function App({ id, versi }) {
                             setForm={setForm}
                             disableStok
                             disableVendor
+                            customInput={
+                              <Select
+                                label="Sub Proyek"
+                                placeholder="Pilih subproyek! (Opsional)"
+                                className="w-3/12"
+                                selectedKeys={form.selectSubProyek}
+                                onSelectionChange={(v) => {
+                                  setForm({
+                                    ...form,
+                                    selectSubProyek: v,
+                                  });
+                                  //   setSelectProduk(new Set([]));
+                                  //   setSelectKategori(v);
+                                }}
+                              >
+                                {subProyek.data.map((item) => (
+                                  <SelectItem key={item.id} value={item.id}>
+                                    {item.nama}
+                                  </SelectItem>
+                                ))}
+                              </Select>
+                            }
                           />
                           <div>
                             <Button
