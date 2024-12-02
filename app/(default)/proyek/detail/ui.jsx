@@ -7,6 +7,7 @@ import {
   TableColumn,
   TableBody,
   TableRow,
+  TableSection,
   TableCell,
   User,
   Chip,
@@ -51,6 +52,7 @@ import Image from "next/image";
 import logoBks from "@/public/logo-bks.jpeg";
 import logoSvt from "@/public/logo-svt.jpeg";
 import { useRouter } from "next/navigation";
+import { v4 as uuidv4 } from "uuid";
 
 const api_path = getApiPath();
 
@@ -113,6 +115,7 @@ export default function App({ id, versi }) {
       },
       body: JSON.stringify({
         id_proyek: id,
+        id_subproyek: form.selectSubProyek?.values().next().value ?? 0,
         id_produk: form.selectProduk,
         jumlah: form.jumlah,
         harga: form.harga,
@@ -133,6 +136,7 @@ export default function App({ id, versi }) {
       id: data.id_keranjangproyek,
       profit: data.harga - data.hargamodal,
       refHarga: data.harga,
+      selectSubProyek: new Set(data.id_subproyek ? [data.id_subproyek] : [0]),
     });
     modal.produk.onOpen();
   };
@@ -194,7 +198,10 @@ export default function App({ id, versi }) {
         "Content-Type": "application/json",
         // 'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: JSON.stringify(data),
+      body: JSON.stringify({
+        ...data,
+        id_subproyek: form.selectSubProyek?.values().next().value ?? 0,
+      }),
     });
     const json = await res.json();
     if (res.status == 400) return alert(json.message);
@@ -391,17 +398,23 @@ export default function App({ id, versi }) {
       const cellValue = data[columnKey];
       let harga = data.hargakustom == null ? data.harga : data.hargakustom;
       switch (columnKey) {
+        case "no":
+          return data.jumlah ? data.no : <></>;
         case "jumlah":
-          return `${data.jumlah} ${data.satuan ?? ""}`;
+          return data.jumlah ? `${data.jumlah} ${data.satuan ?? ""}` : <></>;
         case "hargajual":
-          return (
+          return data.jumlah ? (
             <div className="text-right">{harga.toLocaleString("id-ID")}</div>
+          ) : (
+            <></>
           );
         case "total":
-          return (
+          return data.jumlah ? (
             <div className="text-right">
               {(data.jumlah * harga).toLocaleString("id-ID")}
             </div>
+          ) : (
+            <></>
           );
         default:
           return cellValue;
@@ -433,6 +446,26 @@ export default function App({ id, versi }) {
     },
   ];
 
+  const dataPenawaran = keranjangProyek?.data
+    ?.sort((a, b) => a.subproyek?.localeCompare(b?.subproyek))
+    .map((produk, i) => {
+      return { ...produk, no: i + 1 };
+    });
+
+  // Step 2: Insert rows before each group
+  const result = [];
+  let currentGroup = null;
+
+  dataPenawaran?.forEach((item) => {
+    if (item.subproyek !== currentGroup) {
+      currentGroup = item.subproyek;
+      result.push({ no: uuidv4(), nama: item.subproyek });
+    }
+    result.push(item);
+  });
+  console.log(dataPenawaran);
+  console.log(result);
+
   if (proyek.error) return <div>failed to load</div>;
   if (proyek.isLoading) return <div>loading...</div>;
   if (keranjangProyek.error) return <div>failed to load keranjang proyek</div>;
@@ -447,9 +480,6 @@ export default function App({ id, versi }) {
   if (subProyek.error) return <div>failed to load</div>;
   if (subProyek.isLoading) return <div>loading...</div>;
 
-  const dataPenawaran = keranjangProyek.data.map((produk, i) => {
-    return { ...produk, no: i + 1 };
-  });
   const dataInstalasi = keranjangProyekInstalasi.data.map((produk, i) => {
     return { ...produk, no: i + 1 };
   });
@@ -737,8 +767,8 @@ export default function App({ id, versi }) {
   const finalKustom = kustomDiskon + pajakKustom;
   const selectedVersion = selectVersi.values().next().value;
 
-  console.log(form.selectSubProyek?.values().next().value ?? 0);
-  // console.log(form);
+  // console.log(form.selectSubProyek?.values().next().value ?? 0);
+  // console.log(form.selectSubProyek);
   return (
     <div>
       <div className="flex flex-row gap-2">
@@ -1135,6 +1165,28 @@ export default function App({ id, versi }) {
                             setForm={setFormInstalasi}
                             disableStok
                             disableVendor
+                            customInput={
+                              <Select
+                                label="Sub Proyek"
+                                placeholder="Pilih subproyek! (Opsional)"
+                                className="w-3/12"
+                                selectedKeys={formInstalasi.selectSubProyek}
+                                onSelectionChange={(v) => {
+                                  setFormInstalasi({
+                                    ...formInstalasi,
+                                    selectSubProyek: v,
+                                  });
+                                  //   setSelectProduk(new Set([]));
+                                  //   setSelectKategori(v);
+                                }}
+                              >
+                                {subProyek.data.map((item) => (
+                                  <SelectItem key={item.id} value={item.id}>
+                                    {item.nama}
+                                  </SelectItem>
+                                ))}
+                              </Select>
+                            }
                           />
                           <div>
                             <Button
@@ -1413,6 +1465,23 @@ export default function App({ id, versi }) {
                 Edit Produk
               </ModalHeader>
               <ModalBody>
+                <Select
+                  label="Sub Proyek"
+                  placeholder="Pilih subproyek! (Opsional)"
+                  selectedKeys={form.selectSubProyek}
+                  onSelectionChange={(v) => {
+                    setForm({
+                      ...form,
+                      selectSubProyek: v,
+                    });
+                  }}
+                >
+                  {subProyek.data.map((item) => (
+                    <SelectItem key={item.id} value={item.id}>
+                      {item.nama}
+                    </SelectItem>
+                  ))}
+                </Select>
                 <div>Nama : {form.nama}</div>
                 <div>Merek : {form.nmerek}</div>
                 <div>Tipe : {form.tipe}</div>
@@ -1639,7 +1708,7 @@ export default function App({ id, versi }) {
                         </TableColumn>
                       )}
                     </TableHeader>
-                    <TableBody items={dataPenawaran}>
+                    <TableBody items={result}>
                       {(item) => (
                         <TableRow key={item.no}>
                           {(columnKey) => (
