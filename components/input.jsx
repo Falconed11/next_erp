@@ -62,6 +62,9 @@ const RangeDate = ({ current, setCurrent }) => {
         dateFormat="dd/MM/yyyy"
         selected={filter.startDate}
         onChange={(date) => setFilter({ ...filter, startDate: date })}
+        onSelect={(date) => {
+          setCurrent({ ...filter, startDate: date });
+        }}
         selectsStart
         startDate={filter.startDate}
         endDate={filter.endDate}
@@ -70,6 +73,9 @@ const RangeDate = ({ current, setCurrent }) => {
         dateFormat="dd/MM/yyyy"
         selected={filter.endDate}
         onChange={(date) => setFilter({ ...filter, endDate: date })}
+        onSelect={(date) => {
+          setCurrent({ ...filter, endDate: date });
+        }}
         selectsEnd
         startDate={filter.startDate}
         endDate={filter.endDate}
@@ -79,7 +85,7 @@ const RangeDate = ({ current, setCurrent }) => {
         <Button
           color="primary"
           onPress={cariOnPress}
-          isDisabled={filter === current ? true : null}
+          isDisabled={filter == current ? true : null}
         >
           Cari
         </Button>

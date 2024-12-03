@@ -204,19 +204,42 @@ export default function App() {
       case "aksi":
         return (
           <div className="relative flex items-center gap-2">
-            <Tooltip content="Detail">
-              {/* <Link
+            {/* <Tooltip content="Penawaran">
+              <Link
                 href={`/proyek/detail?id=${data.id}&versi=${
                   data.versi <= 0 ? "1" : data.versi
                 }`}
-              > */}
-              <span
-                // onClick={() => detailButtonPress(data)}
-                className="text-lg text-default-400 cursor-pointer active:opacity-50"
               >
-                <EyeIcon />
-              </span>
-              {/* </Link> */}
+                <span
+                  // onClick={() => detailButtonPress(data)}
+                  role="link"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    window.open(
+                      `/proyek/detail?id=${data.id}&versi=${
+                        data.versi <= 0 ? "1" : data.versi
+                      }`
+                    );
+                  }}
+                  className="text-lg text-default-400 cursor-pointer active:opacity-50"
+                >
+                  <NoteIcon />
+                </span>
+              </Link>
+            </Tooltip> */}
+            <Tooltip content="Detail">
+              <Link href={`/vendor/detail?id=${data.id}`}>
+                <span
+                  role="link"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    window.open(`/vendor/detail?id=${data.id}`);
+                  }}
+                  className="text-lg text-default-400 cursor-pointer active:opacity-50"
+                >
+                  <EyeIcon />
+                </span>
+              </Link>
             </Tooltip>
             <Tooltip content="Transfer">
               <span

@@ -897,7 +897,7 @@ export default function App() {
               <ModalBody>
                 <div>
                   {form.id_kustom} | {form.nama} | {form.nmerek} | {form.tipe} |{" "}
-                  {form.nvendor}{" "}
+                  {form.nvendor} | Stok: {form.stok}
                 </div>
                 <Autocomplete
                   label="Vendor"
@@ -1011,7 +1011,8 @@ export default function App() {
               </ModalHeader>
               <ModalBody>
                 <div>
-                  {form.id_kustom} | {form.nama} | {form.nmerek} | {form.tipe}
+                  {form.id_kustom} | {form.nama} | {form.nmerek} | {form.tipe} |
+                  Stok: {form.stok}
                 </div>
                 {/* <Autocomplete
                   label="Vendor"

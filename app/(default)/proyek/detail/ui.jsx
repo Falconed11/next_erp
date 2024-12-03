@@ -463,8 +463,28 @@ export default function App({ id, versi }) {
     }
     result.push(item);
   });
-  console.log(dataPenawaran);
-  console.log(result);
+  // console.log(dataPenawaran);
+  // console.log(result);
+
+  const dataInstalasi = keranjangProyekInstalasi?.data
+    ?.sort((a, b) => a.subproyek?.localeCompare(b?.subproyek))
+    .map((produk, i) => {
+      return { ...produk, no: i + 1 };
+    });
+
+  // Step 2: Insert rows before each group
+  const resultInstalasi = [];
+  let currentGroupInstalasi = null;
+
+  dataInstalasi?.forEach((item) => {
+    if (item.subproyek !== currentGroupInstalasi) {
+      currentGroupInstalasi = item.subproyek;
+      resultInstalasi.push({ no: uuidv4(), nama: item.subproyek });
+    }
+    resultInstalasi.push(item);
+  });
+  // console.log(dataPenawaran);
+  // console.log(result);
 
   if (proyek.error) return <div>failed to load</div>;
   if (proyek.isLoading) return <div>loading...</div>;
@@ -480,9 +500,6 @@ export default function App({ id, versi }) {
   if (subProyek.error) return <div>failed to load</div>;
   if (subProyek.isLoading) return <div>loading...</div>;
 
-  const dataInstalasi = keranjangProyekInstalasi.data.map((produk, i) => {
-    return { ...produk, no: i + 1 };
-  });
   const selectedProyek = proyek.data[0];
 
   const col = {
@@ -1743,7 +1760,7 @@ export default function App({ id, versi }) {
                           </TableColumn>
                         )}
                       </TableHeader>
-                      <TableBody items={dataInstalasi}>
+                      <TableBody items={resultInstalasi}>
                         {(item) => (
                           <TableRow key={item.no}>
                             {(columnKey) => (
@@ -2021,7 +2038,11 @@ const SubProyek = ({ id, selectedProyek }) => {
         body: JSON.stringify({ id: data.id }),
       });
       const json = await res.json();
-      if (res.status == 400) return alert(json.message);
+      if (res.status == 400)
+        return alert(
+          `Gagal menghapus. Sub proyek masih terikat pada tabel produk atau instalasi. ` +
+            json.message
+        );
       return;
       // return alert(json.message);
     }

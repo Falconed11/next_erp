@@ -44,6 +44,7 @@ import {
   excelToJSDate,
 } from "@/app/utils/date";
 import Harga from "@/components/harga";
+import { RangeDate } from "@/components/input";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -57,9 +58,13 @@ export default function App() {
     endDate,
     selectKategori: new Set([]),
   });
+  const [current, setCurrent] = useState({
+    startDate,
+    endDate,
+  });
   const operasionalkantor = useClientFetch(
-    `operasionalkantor?start=${getDate(filter.startDate)}&end=${getDate(
-      filter.endDate
+    `operasionalkantor?start=${getDate(current.startDate)}&end=${getDate(
+      current.endDate
     )}&id_kategori=${
       filter.selectKategori.values().next().value
         ? filter.selectKategori.values().next().value
@@ -505,26 +510,12 @@ export default function App() {
           <>
             <div>Filter</div>
             <div className="flex flex-row gap-3">
-              <div className="flex flex-col bg-gray-100 p-3 rounded-lg">
-                <div>Periode</div>
-                <DatePicker
-                  dateFormat="dd/MM/yyyy"
-                  selected={filter.startDate}
-                  onChange={(date) => setFilter({ ...filter, startDate: date })}
-                  selectsStart
-                  startDate={filter.startDate}
-                  endDate={filter.endDate}
-                />
-                <DatePicker
-                  dateFormat="dd/MM/yyyy"
-                  selected={filter.endDate}
-                  onChange={(date) => setFilter({ ...filter, endDate: date })}
-                  selectsEnd
-                  startDate={filter.startDate}
-                  endDate={filter.endDate}
-                  minDate={filter.startDate}
-                />
+              <div className="flex flex-row gap-2">
+                <div className="flex">
+                  <RangeDate current={current} setCurrent={setCurrent} />
+                </div>
               </div>
+              {/* kategori */}
               <Select
                 label="Kategori"
                 placeholder="Pilih kategori!"
