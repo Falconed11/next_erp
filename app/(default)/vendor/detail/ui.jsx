@@ -42,6 +42,7 @@ import {
   getDateFId,
   getCurFirstLastDay,
 } from "@/app/utils/date";
+import { MyChip } from "@/components/mycomponent";
 import Harga from "@/components/harga";
 import { Button } from "@nextui-org/react";
 import { Input } from "@nextui-org/react";
@@ -83,6 +84,12 @@ export default function App({ id }) {
       current.startDate
     )}&enda=${getDate(current.endDate)}`
   );
+  const vendor = useClientFetch(
+    `vendor?id=${id}&starta=${getDate(current.startDate)}&enda=${getDate(
+      current.endDate
+    )}`
+  );
+
   const [form, setForm] = useState({
     selectProduk: new Set([]),
     selectKategori: new Set([]),
@@ -202,15 +209,28 @@ export default function App({ id }) {
     keranjangproyek: React.useCallback((data, columnKey) => {
       const cellValue = data[columnKey];
       switch (columnKey) {
+        case "lunas":
+          return (
+            <MyChip
+              text={data.lunas == 1 ? "Lunas" : "Hutang"}
+              theme={data.lunas == 1 ? "success" : "dangger"}
+            />
+          );
+        case "tanggal":
+          return getDateFId(new Date(data.tanggal));
         case "hargamodal":
           return <Harga harga={data.hargamodal} />;
-        case "harga":
-          return <Harga harga={data.harga} />;
-        case "hargakustom":
-          return data.hargakustom != null ? (
-            <Harga harga={data.hargakustom} />
-          ) : (
-            ""
+        case "hargapengeluaran":
+          return (
+            <div className="text-right">
+              <Harga harga={data.hargapengeluaran} />
+            </div>
+          );
+        case "total":
+          return (
+            <div className="text-right">
+              <Harga harga={data.hargapengeluaran * data.jumlah} />
+            </div>
           );
         case "totalharga-modal":
           return <Harga harga={data.jumlah * data.hargamodal} />;
@@ -260,11 +280,17 @@ export default function App({ id }) {
 
   if (pengeluaranproyek.error) return <div>failed to load</div>;
   if (pengeluaranproyek.isLoading) return <div>loading...</div>;
+  if (vendor.error) return <div>failed to load</div>;
+  if (vendor.isLoading) return <div>loading...</div>;
 
   const col = [
     {
       key: "tanggal",
       label: "Tanggal",
+    },
+    {
+      key: "instansi",
+      label: "Customer",
     },
     {
       key: "kategoriproduk",
@@ -295,8 +321,16 @@ export default function App({ id }) {
       label: "Satuan",
     },
     {
-      key: "harga",
+      key: "hargapengeluaran",
       label: "Harga",
+    },
+    {
+      key: "total",
+      label: "Total",
+    },
+    {
+      key: "lunas",
+      label: "Lunas",
     },
     // {
     //   key: "hargajual",
@@ -322,6 +356,7 @@ export default function App({ id }) {
           aria-label="Example table with custom cells"
           topContent={
             <>
+              <div>{vendor.data[0].nama}</div>
               <div>Filter</div>
               <div className="flex gap-3"></div>
               {/* <div className="flex flex-row gap-2">
