@@ -1,0 +1,28 @@
+{
+  /* <Autocomplete
+                label="Produk"
+                variant="bordered"
+                defaultItems={data}
+                placeholder="Cari produk"
+                className="max-w-xs"
+                selectedKey={form.selectProduk}
+                onSelectionChange={(v) => {
+                  setForm({ ...form, selectProduk: v });
+                  setNama(
+                    data?.filter((row) => {
+                      return row.id == v;
+                    })[0]?.nama ?? ""
+                  );
+                  setPage(1);
+                }}
+                onValueChange={(v) => {
+                  setNama(v);
+                }}
+              >
+                {(item) => (
+                  <AutocompleteItem key={item.id} textValue={item.nama}>
+                    {item.nama}
+                  </AutocompleteItem>
+                )}
+              </Autocomplete> */
+}

@@ -57,7 +57,6 @@ import logoSvt from "@/public/logo-svt.jpeg";
 import { useRouter } from "next/navigation";
 import { v4 as uuidv4 } from "uuid";
 import { FilterProduk } from "@/components/filter";
-import { RangeDate } from "@/components/input";
 
 const api_path = getApiPath();
 const [startDate, endDate] = getCurFirstLastDay();
@@ -83,9 +82,9 @@ export default function App({ id }) {
   });
 
   const pengeluaranproyek = useClientFetch(
-    `pengeluaranproyek?id_vendor=${id}&start=${getDate(
+    `pengeluaranproyek?id_vendor=${id}&starta=${getDate(
       current.startDate
-    )}&end=${getDate(current.endDate)}&id_kategori=${
+    )}&enda=${getDate(current.endDate)}&id_kategori=${
       selectKategori.values().next().value ?? ""
     }`
   );
@@ -356,9 +355,6 @@ export default function App({ id }) {
           topContent={
             <>
               <div>{vendor.data[0].nama}</div>
-              <div className="flex">
-                <RangeDate current={current} setCurrent={setCurrent} />
-              </div>
               <FilterProduk
                 id={idF}
                 setId={setIdF}

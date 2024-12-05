@@ -39,6 +39,7 @@ import {
 import { RadioGroup, Radio } from "@nextui-org/react";
 import Harga from "@/components/harga";
 import { TemplateImport } from "@/components/input";
+import { FilterProduk } from "@/components/filter";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { getApiPath, useClientFetch } from "@/app/utils/apiconfig";
@@ -68,16 +69,16 @@ export default function App() {
   const [nama, setNama] = useState("");
   const [id, setId] = useState("");
   const [selectKategori, setSelectKategori] = useState([]);
+  const [page, setPage] = React.useState(1);
+  const rowsPerPage = 10;
+
   const produk = useClientFetch(
     `produk?kategori=${selectKategori.values().next().value ?? ""}`
   );
-  const kategori = useClientFetch("kategoriproduk");
   const merek = useClientFetch("merek");
   const vendor = useClientFetch("vendor?columnName=nama");
   const metodepengeluaran = useClientFetch("metodepengeluaran");
-
-  const [page, setPage] = React.useState(1);
-  const rowsPerPage = 25;
+  const kategori = useClientFetch("kategoriproduk");
 
   const [method, setMethod] = useState("POST");
   const [form, setForm] = useState({
@@ -401,15 +402,15 @@ export default function App() {
   }, []);
 
   let data = produk?.data;
-  data = data?.filter(
-    (row) =>
-      (row.nama.toLowerCase().includes(nama.toLowerCase()) ||
-        row.nmerek?.toLowerCase().includes(nama.toLowerCase()) ||
-        row.tipe?.toLowerCase().includes(nama.toLowerCase()) ||
-        row.vendor?.toLowerCase().includes(nama.toLowerCase())) &&
-      row.id_kustom.toLowerCase().includes(id.toLocaleLowerCase())
-  );
-  data = data?.slice(0, 50);
+  // data = data?.filter(
+  //   (row) =>
+  //     (row.nama.toLowerCase().includes(nama.toLowerCase()) ||
+  //       row.nmerek?.toLowerCase().includes(nama.toLowerCase()) ||
+  //       row.tipe?.toLowerCase().includes(nama.toLowerCase()) ||
+  //       row.vendor?.toLowerCase().includes(nama.toLowerCase())) &&
+  //     row.id_kustom.toLowerCase().includes(id.toLocaleLowerCase())
+  // );
+  // data = data?.slice(0, 10);
   const filteredData = produk?.data?.filter(
     (row) =>
       (row.nama.toLowerCase().includes(nama.toLowerCase()) ||
@@ -428,12 +429,12 @@ export default function App() {
   if (isLoading) return <>Loading...</>;
   if (produk.error) return <div>failed to load</div>;
   if (produk.isLoading) return <div>loading...</div>;
-  if (kategori.error) return <div>failed to load</div>;
-  if (kategori.isLoading) return <div>loading...</div>;
   if (vendor.error) return <div>failed to load</div>;
   if (vendor.isLoading) return <div>loading...</div>;
   if (metodepengeluaran.error) return <div>failed to load</div>;
   if (metodepengeluaran.isLoading) return <div>loading...</div>;
+  if (kategori.error) return <div>failed to load</div>;
+  if (kategori.isLoading) return <div>loading...</div>;
   // if (merek.error) return <div>failed to load</div>;
   // if (merek.isLoading) return <div>loading...</div>;
 
@@ -527,75 +528,17 @@ export default function App() {
         aria-label="Example table with custom cells"
         topContent={
           <>
-            <div>Filter</div>
-            <div className="flex gap-3">
-              <Select
-                label="Kategori"
-                variant="bordered"
-                placeholder="Pilih kategori!"
-                selectedKeys={selectKategori}
-                className="max-w-xs"
-                onSelectionChange={(v) => {
-                  setSelectKategori(v);
-                  setPage(1);
-                }}
-              >
-                {kategori.data.map((item) => (
-                  <SelectItem key={item.id} value={item.id}>
-                    {`${item.nama}`}
-                  </SelectItem>
-                ))}
-              </Select>
-              {/* <Autocomplete
-                label="Produk"
-                variant="bordered"
-                defaultItems={data}
-                placeholder="Cari produk"
-                className="max-w-xs"
-                selectedKey={form.selectProduk}
-                onSelectionChange={(v) => {
-                  setForm({ ...form, selectProduk: v });
-                  setNama(
-                    data?.filter((row) => {
-                      return row.id == v;
-                    })[0]?.nama ?? ""
-                  );
-                  setPage(1);
-                }}
-                onValueChange={(v) => {
-                  setNama(v);
-                }}
-              >
-                {(item) => (
-                  <AutocompleteItem key={item.id} textValue={item.nama}>
-                    {item.nama}
-                  </AutocompleteItem>
-                )}
-              </Autocomplete> */}
-              <Input
-                isClearable
-                type="text"
-                label="Produk"
-                placeholder="Cari produk"
-                className="max-w-xs"
-                value={nama}
-                onValueChange={setNama}
-              />
-              <Input
-                isClearable
-                type="text"
-                label="Id"
-                placeholder="Masukkan id!"
-                className="max-w-xs"
-                value={id}
-                onValueChange={(v) => {
-                  setId(v);
-                  setNama(nama);
-                  setSelectKategori(selectKategori);
-                  setPage(1);
-                }}
-              />
-            </div>
+            <FilterProduk
+              id={id}
+              setId={setId}
+              nama={nama}
+              setNama={setNama}
+              selectKategori={selectKategori}
+              setSelectKategori={setSelectKategori}
+              page={page}
+              setPage={setPage}
+              kategori={kategori}
+            />
             {/* <div className="flex flex-row gap-2">
               <Button color="primary" onClick={handleButtonExportToExcelPress}>
                 Export to Excel
