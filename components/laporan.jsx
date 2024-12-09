@@ -69,12 +69,12 @@ const OperasionalKantor = ({ startDate, endDate }) => {
   );
 };
 const Penawaran = ({ start, end }) => {
-  const [form, setForm] = useState({
+  const [current, setCurrent] = useState({
     startDate: start,
     endDate: end,
   });
-  const mulai = getDate(form.startDate);
-  const selesai = getDate(form.endDate);
+  const mulai = getDate(current.startDate);
+  const selesai = getDate(current.endDate);
   const totalPenawaran = useClientFetch(
     `sumPenawaran?startdate=${mulai}&enddate=${selesai}`
   );
@@ -106,25 +106,10 @@ const Penawaran = ({ start, end }) => {
     <>
       <div>Penawaran</div>
       <div className="flex flex-row gap-3">
-        <div className="flex flex-col bg-gray-100 p-3 rounded-lg">
-          <div>Periode</div>
-          <DatePicker
-            dateFormat="dd/MM/yyyy"
-            selected={form.startDate}
-            onChange={(date) => setForm({ ...form, startDate: date })}
-            selectsStart
-            startDate={form.startDate}
-            endDate={form.endDate}
-          />
-          <DatePicker
-            dateFormat="dd/MM/yyyy"
-            selected={form.endDate}
-            onChange={(date) => setForm({ ...form, endDate: date })}
-            selectsEnd
-            startDate={form.startDate}
-            endDate={form.endDate}
-            minDate={form.startDate}
-          />
+        <div className="flex flex-col bg-gray-100 rounded-lg">
+          <div className="flex">
+            <RangeDate current={current} setCurrent={setCurrent} />
+          </div>
         </div>
       </div>
       <div className="flex flex-row">

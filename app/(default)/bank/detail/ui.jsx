@@ -57,6 +57,7 @@ import logoSvt from "@/public/logo-svt.jpeg";
 import { useRouter } from "next/navigation";
 import { v4 as uuidv4 } from "uuid";
 import { FilterProduk } from "@/components/filter";
+import { RangeDate } from "@/components/input";
 
 const api_path = getApiPath();
 const [startDate, endDate] = getCurFirstLastDay();
@@ -81,39 +82,34 @@ export default function App({ id }) {
     endDate,
   });
 
-  const pengeluaranproyek = useClientFetch(
-    `pengeluaranproyek?id_vendor=${id}&starta=${getDate(
+  const pembayaranproyek = useClientFetch(
+    `pembayaranproyek?id_metodepembayaran=${id}&start=${getDate(
       current.startDate
-    )}&enda=${getDate(current.endDate)}&id_kategori=${
+    )}&end=${getDate(current.endDate)}&id_kategori=${
       selectKategori.values().next().value ?? ""
     }`
   );
-  const vendor = useClientFetch(
-    `vendor?id=${id}&starta=${getDate(current.startDate)}&enda=${getDate(
-      current.endDate
-    )}`
-  );
-  const kategori = useClientFetch("kategoriproduk");
+  const metodepembayaran = useClientFetch(`bank?id=${id}`);
 
   const [form, setForm] = useState({
     selectProduk: new Set([]),
     selectKategori: new Set([]),
   });
 
-  let data = pengeluaranproyek?.data;
-  const filteredData = pengeluaranproyek?.data?.filter(
-    (row) =>
-      (row.nama.toLowerCase().includes(nama.toLowerCase()) ||
-        row.nmerek?.toLowerCase().includes(nama.toLowerCase()) ||
-        row.tipe?.toLowerCase().includes(nama.toLowerCase()) ||
-        row.vendor?.toLowerCase().includes(nama.toLowerCase())) &&
-      row.id_kustom.toLowerCase().includes(idF.toLocaleLowerCase())
-  );
+  const data = pembayaranproyek?.data;
+  // const filteredData = pengeluaranproyek?.data?.filter(
+  //   (row) =>
+  //     (row.nama.toLowerCase().includes(nama.toLowerCase()) ||
+  //       row.nmerek?.toLowerCase().includes(nama.toLowerCase()) ||
+  //       row.tipe?.toLowerCase().includes(nama.toLowerCase()) ||
+  //       row.vendor?.toLowerCase().includes(nama.toLowerCase())) &&
+  //     row.id_kustom.toLowerCase().includes(idF.toLocaleLowerCase())
+  // );
 
   const pages = useMemo(() => {
-    return filteredData ? Math.ceil(filteredData?.length / rowsPerPage) : 0;
-  }, [filteredData?.length, rowsPerPage]);
-  const loadingState = pengeluaranproyek.isLoading ? "loading" : "idle";
+    return data ? Math.ceil(data?.length / rowsPerPage) : 0;
+  }, [data?.length, rowsPerPage]);
+  const loadingState = pembayaranproyek.isLoading ? "loading" : "idle";
   const offset = (page - 1) * rowsPerPage;
 
   const tambahButtonPress = async (form, setForm) => {
@@ -202,7 +198,7 @@ export default function App({ id }) {
     modal.rekapitulasi.onOpen();
   };
   const renderCell = {
-    keranjangproyek: React.useCallback((data, columnKey) => {
+    pembayaranproyek: React.useCallback((data, columnKey) => {
       const cellValue = data[columnKey];
       switch (columnKey) {
         case "lunas":
@@ -214,31 +210,11 @@ export default function App({ id }) {
           );
         case "tanggal":
           return getDateFId(new Date(data.tanggal));
-        case "hargamodal":
-          return <Harga harga={data.hargamodal} />;
-        case "hargapengeluaran":
+        case "nominal":
           return (
             <div className="text-right">
-              <Harga harga={data.hargapengeluaran} />
+              <Harga harga={data.nominal} />
             </div>
-          );
-        case "total":
-          return (
-            <div className="text-right">
-              <Harga harga={data.hargapengeluaran * data.jumlah} />
-            </div>
-          );
-        case "totalharga-modal":
-          return <Harga harga={data.jumlah * data.hargamodal} />;
-        case "totalharga-jual":
-          return <Harga harga={data.jumlah * data.harga} />;
-        case "profit":
-          return <Harga harga={data.harga - data.hargamodal} />;
-        case "totalprofit":
-          return (
-            <Harga
-              harga={data.jumlah * data.harga - data.jumlah * data.hargamodal}
-            />
           );
         case "aksi":
           return (
@@ -274,12 +250,10 @@ export default function App({ id }) {
     jenisproyek: useDisclosure(),
   };
 
-  if (pengeluaranproyek.error) return <div>failed to load</div>;
-  if (pengeluaranproyek.isLoading) return <div>loading...</div>;
-  if (vendor.error) return <div>failed to load</div>;
-  if (vendor.isLoading) return <div>loading...</div>;
-  if (kategori.error) return <div>failed to load</div>;
-  if (kategori.isLoading) return <div>loading...</div>;
+  if (pembayaranproyek.error) return <div>failed to load</div>;
+  if (pembayaranproyek.isLoading) return <div>loading...</div>;
+  if (metodepembayaran.error) return <div>failed to load</div>;
+  if (metodepembayaran.isLoading) return <div>loading...</div>;
 
   const col = [
     {
@@ -291,49 +265,9 @@ export default function App({ id }) {
       label: "Customer",
     },
     {
-      key: "kategori",
-      label: "Kategori",
+      key: "nominal",
+      label: "Nominal",
     },
-    {
-      key: "id_kustom",
-      label: "Id",
-    },
-    {
-      key: "nama",
-      label: "Nama",
-    },
-    {
-      key: "nmerek",
-      label: "Merek",
-    },
-    {
-      key: "tipe",
-      label: "Tipe",
-    },
-    {
-      key: "jumlah",
-      label: "Jumlah",
-    },
-    {
-      key: "satuan",
-      label: "Satuan",
-    },
-    {
-      key: "hargapengeluaran",
-      label: "Harga",
-    },
-    {
-      key: "total",
-      label: "Total",
-    },
-    {
-      key: "lunas",
-      label: "Lunas",
-    },
-    // {
-    //   key: "hargajual",
-    //   label: "Harga Jual",
-    // },
     {
       key: "keterangan",
       label: "Keterangan",
@@ -344,7 +278,7 @@ export default function App({ id }) {
     // },
   ];
 
-  console.log(pengeluaranproyek);
+  // console.log(metodepembayaran);
   return (
     <div>
       <div className="-w-11/12">
@@ -354,18 +288,12 @@ export default function App({ id }) {
           aria-label="Example table with custom cells"
           topContent={
             <>
-              <div>{vendor.data[0].nama}</div>
-              <FilterProduk
-                id={idF}
-                setId={setIdF}
-                nama={nama}
-                setNama={setNama}
-                selectKategori={selectKategori}
-                setSelectKategori={setSelectKategori}
-                page={page}
-                setPage={setPage}
-                kategori={kategori}
-              />
+              <div>
+                Metode Pembayaran: {metodepembayaran.data[0].nama ?? "NN"}
+              </div>
+              <div className="flex">
+                <RangeDate current={current} setCurrent={setCurrent} />
+              </div>
             </>
           }
           bottomContent={
@@ -395,11 +323,7 @@ export default function App({ id }) {
             )}
           </TableHeader>
           <TableBody
-            items={
-              filteredData
-                ? filteredData.slice(offset, offset + rowsPerPage)
-                : []
-            }
+            items={data ? data.slice(offset, offset + rowsPerPage) : []}
             loadingContent={"Loading..."}
             emptyContent={"Kosong"}
             loadingState={loadingState}
@@ -408,7 +332,7 @@ export default function App({ id }) {
               <TableRow key={item.id}>
                 {(columnKey) => (
                   <TableCell>
-                    {renderCell.keranjangproyek(item, columnKey)}
+                    {renderCell.pembayaranproyek(item, columnKey)}
                   </TableCell>
                 )}
               </TableRow>

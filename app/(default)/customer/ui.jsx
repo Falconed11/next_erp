@@ -54,6 +54,7 @@ import Harga from "@/components/harga";
 import { FileUploader } from "@/components/input";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { LinkOpenNewTab } from "@/components/mycomponent";
 
 const apiPath = getApiPath();
 
@@ -211,20 +212,11 @@ export default function App() {
       case "aksi":
         return (
           <div className="relative flex items-center gap-2">
-            <Tooltip content="Detail">
-              {/* <Link
-                href={`/proyek/detail?id=${data.id}&versi=${
-                  data.versi <= 0 ? "1" : data.versi
-                }`}
-              > */}
-              <span
-                // onClick={() => detailButtonPress(data)}
-                className="text-lg text-default-400 cursor-pointer active:opacity-50"
-              >
-                <EyeIcon />
-              </span>
-              {/* </Link> */}
-            </Tooltip>
+            <LinkOpenNewTab
+              content="Detail"
+              link={`/proyek?id_instansi=${data.id}`}
+              icon={<EyeIcon />}
+            />
             <Tooltip content="Transfer">
               <span
                 onClick={() => transferButtonPress(data)}

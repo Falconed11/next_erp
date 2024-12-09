@@ -46,6 +46,7 @@ import { getApiPath, useClientFetch } from "@/app/utils/apiconfig";
 import { Button } from "@nextui-org/react";
 import { Input, Textarea } from "@nextui-org/react";
 import { getDate, getDateFId } from "@/app/utils/date";
+import { LinkOpenNewTab } from "@/components/mycomponent";
 
 const apiPath = getApiPath();
 
@@ -348,16 +349,11 @@ export default function App() {
                 <EyeIcon />
               </span>
             </Tooltip> */}
-            <Tooltip content="Riwayat">
-              <Link href={`/produk/masuk?id_produk=${data.id}`}>
-                <span
-                  // onClick={() => detailButtonPress(data)}
-                  className="text-lg text-default-400 cursor-pointer active:opacity-50"
-                >
-                  <NoteIcon />
-                </span>
-              </Link>
-            </Tooltip>
+            <LinkOpenNewTab
+              content="Riwayat"
+              link={`/produk/masuk?id_produk=${data.id}`}
+              icon={<NoteIcon />}
+            />
             <Tooltip content="Edit">
               <span
                 onClick={() => editButtonPress(data)}

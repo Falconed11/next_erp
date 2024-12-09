@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useSession } from "next-auth/react";
 import * as XLSX from "xlsx";
 import { RadioGroup, Radio } from "@nextui-org/react";
@@ -13,6 +13,7 @@ import {
   TableBody,
   TableRow,
   TableCell,
+  Pagination,
   User,
   Chip,
   Tooltip,
@@ -50,13 +51,14 @@ import {
 } from "@/app/utils/date";
 import { FileUploader } from "@/components/input";
 import { RangeDate } from "@/components/input";
+import { LinkOpenNewTab } from "@/components/mycomponent";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 const apiPath = getApiPath();
 const [startDate, endDate] = getCurFirstLastDay();
 
-export default function App() {
+export default function App({ id_instansi }) {
   const [sort, setSort] = React.useState("tanggal_penawaran");
   const [isLoading, setIsLoading] = useState(0);
   const session = useSession();
@@ -65,25 +67,40 @@ export default function App() {
   const [selectedKeys, setSelectedKeys] = React.useState(new Set([]));
 
   const [current, setCurrent] = useState({
-    startDate,
-    endDate,
+    // startDate,
+    // endDate,
   });
+  console.log(current.startDate);
+  const [page, setPage] = React.useState(1);
+  const rowsPerPage = 10;
 
   const [selectProyek, setSelectProyek] = useState({});
   const proyek = useClientFetch(
-    `proyek?start=${getDate(current.startDate)}&end=${getDate(
-      current.endDate
-    )}&sort=${sort}`
+    `proyek?${id_instansi ? `id_instansi=${id_instansi}` : ""}${
+      current.startDate ? `&start=${getDate(current.startDate)}` : ""
+    }${current.endDate ? `&end=${getDate(current.endDate)}` : ""}&sort=${sort}`
   );
   const penawaran = useClientFetch(
     `exportpenawaran?start=${getDate(current.startDate)}&end=${getDate(
       current.endDate
     )}`
   );
+  console.log(proyek);
+
+  const filteredData = proyek?.data;
+
+  const pages = useMemo(() => {
+    return filteredData ? Math.ceil(filteredData?.length / rowsPerPage) : 0;
+  }, [filteredData?.length, rowsPerPage]);
+  const loadingState = proyek.isLoading ? "loading" : "idle";
+  const offset = (page - 1) * rowsPerPage;
+
   const perusahaan = useClientFetch("perusahaan");
   const karyawan = useClientFetch("karyawan");
   const statusproyek = useClientFetch("statusproyek");
-  const customer = useClientFetch("customer");
+  const customer = useClientFetch(
+    `customer?${id_instansi ? `id=${id_instansi}` : ""}`
+  );
   const kategoriproyek = useClientFetch("kategoriproyek");
   const [form, setForm] = useState({});
   const [method, setMethod] = useState("POST");
@@ -288,29 +305,13 @@ export default function App() {
       case "aksi":
         return (
           <div className="relative flex items-center gap-2">
-            <Tooltip content="Penawaran">
-              <Link
-                href={`/proyek/detail?id=${data.id}&versi=${
-                  data.versi <= 0 ? "1" : data.versi
-                }`}
-              >
-                <span
-                  // onClick={() => detailButtonPress(data)}
-                  role="link"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    window.open(
-                      `/proyek/detail?id=${data.id}&versi=${
-                        data.versi <= 0 ? "1" : data.versi
-                      }`
-                    );
-                  }}
-                  className="text-lg text-default-400 cursor-pointer active:opacity-50"
-                >
-                  <NoteIcon />
-                </span>
-              </Link>
-            </Tooltip>
+            <LinkOpenNewTab
+              content="Penawaran"
+              link={`/proyek/detail?id=${data.id}&versi=${
+                data.versi <= 0 ? "1" : data.versi
+              }`}
+              icon={<NoteIcon />}
+            />
             {data.versi > 0 ? (
               user?.peran == "admin" || user?.peran == "super" ? (
                 <Tooltip content="Pengeluaran Proyek">
@@ -451,7 +452,12 @@ export default function App() {
     { id: 1, nama: "swasta" },
   ];
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col gap-2">
+      <div className="flex">
+        <div className="bg-white rounded-lg p-3">
+          {id_instansi ? `Customer: ${customer.data[0].nama}` : ""}
+        </div>
+      </div>
       <div className="flex flex-row gap-2">
         <Button color="primary" onPress={tambahButtonPress}>
           Tambah
@@ -513,6 +519,21 @@ export default function App() {
             </div>
           </>
         }
+        bottomContent={
+          pages > 0 ? (
+            <div className="flex w-full justify-center">
+              <Pagination
+                isCompact
+                showControls
+                showShadow
+                color="primary"
+                page={page}
+                total={pages}
+                onChange={(page) => setPage(page)}
+              />
+            </div>
+          ) : null
+        }
       >
         <TableHeader columns={columns}>
           {(column) => (
@@ -524,7 +545,14 @@ export default function App() {
             </TableColumn>
           )}
         </TableHeader>
-        <TableBody items={proyek.data}>
+        <TableBody
+          items={
+            filteredData ? filteredData.slice(offset, offset + rowsPerPage) : []
+          }
+          loadingContent={"Loading..."}
+          emptyContent={"Kosong"}
+          loadingState={loadingState}
+        >
           {(item) => (
             <TableRow key={item.id}>
               {(columnKey) => (
