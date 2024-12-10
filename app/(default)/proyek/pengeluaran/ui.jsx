@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import * as XLSX from "xlsx";
 import {
   Table,
@@ -8,6 +8,7 @@ import {
   TableBody,
   TableRow,
   TableCell,
+  Pagination,
   User,
   Chip,
   Tooltip,
@@ -34,7 +35,7 @@ import {
 } from "@/app/utils/date";
 import { getApiPath, useClientFetch } from "@/app/utils/apiconfig";
 import Harga from "@/components/harga";
-import { FileUploader } from "@/components/input";
+import { FileUploader, RangeDate } from "@/components/input";
 import {
   AddIcon,
   EditIcon,
@@ -42,6 +43,7 @@ import {
   EyeIcon,
   UserIcon,
 } from "@/components/icon";
+import { MyChip } from "@/components/mycomponent";
 
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -63,6 +65,16 @@ export default function UI() {
   );
   const [form, setForm] = useState({});
   const [json, setJson] = useState([]);
+  const [page, setPage] = React.useState(1);
+  const rowsPerPage = 10;
+
+  const filteredData = pengeluaran?.data;
+
+  const pages = useMemo(() => {
+    return filteredData ? Math.ceil(filteredData?.length / rowsPerPage) : 0;
+  }, [filteredData?.length, rowsPerPage]);
+  const loadingState = pengeluaran.isLoading ? "loading" : "idle";
+  const offset = (page - 1) * rowsPerPage;
 
   const editButtonPress = (data) => {
     const startdate = new Date(data.tanggal);
@@ -192,12 +204,27 @@ export default function UI() {
     if (data.hargakustom) harga = data.hargakustom;
     if (data.hargamodal && !data.hargakustom) harga = data.hargamodal;
     switch (columnKey) {
+      case "lunas":
+        return (
+          <MyChip
+            text={data.lunas == 1 ? "Lunas" : "Hutang"}
+            theme={data.lunas == 1 ? "success" : "danger"}
+          />
+        );
       case "tanggal":
         return getDateF(new Date(data.tanggal));
       case "harga":
-        return <Harga harga={harga} />;
+        return (
+          <div className="text-right">
+            <Harga harga={harga} />
+          </div>
+        );
       case "totalharga":
-        return <Harga harga={data.jumlah * harga} />;
+        return (
+          <div className="text-right">
+            <Harga harga={data.jumlah * harga} />
+          </div>
+        );
       case "totalharga-jual":
         return <Harga harga={data.jumlah * data.hargajual} />;
       case "profit":
@@ -247,7 +274,7 @@ export default function UI() {
       label: "tanggal",
     },
     {
-      key: "id_proyek",
+      key: "id_second",
       label: "Id Proyek",
     },
     {
@@ -295,7 +322,7 @@ export default function UI() {
       label: "Tota Harga",
     },
     {
-      key: "status",
+      key: "lunas",
       label: "Status",
     },
     {
@@ -326,9 +353,8 @@ export default function UI() {
           <>
             <div>Filter</div>
             <div className="flex flex-row gap-2">
-              <div className="flex flex-col bg-gray-100 p-3 rounded-lg">
-                <div>Periode</div>
-                <DatePicker
+              <div className="flex flex-col bg-gray-100 rounded-lg">
+                {/* <DatePicker
                   dateFormat="dd/MM/yyyy"
                   selected={filter.startDate}
                   onChange={(date) => setFilter({ ...filter, startDate: date })}
@@ -344,7 +370,8 @@ export default function UI() {
                   startDate={filter.startDate}
                   endDate={filter.endDate}
                   minDate={filter.startDate}
-                />
+                /> */}
+                <RangeDate current={filter} setCurrent={setFilter} />
               </div>
             </div>
             {/* <div className="flex flex-row gap-2">
@@ -353,6 +380,21 @@ export default function UI() {
               </Button>
             </div> */}
           </>
+        }
+        bottomContent={
+          pages > 0 ? (
+            <div className="flex w-full justify-center">
+              <Pagination
+                isCompact
+                showControls
+                showShadow
+                color="primary"
+                page={page}
+                total={pages}
+                onChange={(page) => setPage(page)}
+              />
+            </div>
+          ) : null
         }
       >
         <TableHeader columns={col}>
@@ -365,7 +407,14 @@ export default function UI() {
             </TableColumn>
           )}
         </TableHeader>
-        <TableBody items={pengeluaran.data}>
+        <TableBody
+          items={
+            filteredData ? filteredData.slice(offset, offset + rowsPerPage) : []
+          }
+          loadingContent={"Loading..."}
+          emptyContent={"Kosong"}
+          loadingState={loadingState}
+        >
           {(item) => (
             <TableRow key={item.id_pengeluaranproyek}>
               {(columnKey) => (
@@ -425,7 +474,7 @@ export default function UI() {
                     })
                   }
                 />
-                <div>Harga Modal : {form.hargamodal}</div>
+                <div>Harga Modal : {<Harga harga={form.hargamodal} />}</div>
                 <Input
                   type="number"
                   value={form.harga}
@@ -444,7 +493,7 @@ export default function UI() {
                   {form.jumlah *
                     (form.hargakustom ? form.hargakustom : form.hargamodal)}
                 </div> */}
-                <Input
+                {/* <Input
                   type="text"
                   value={form.status}
                   label="Status"
@@ -456,7 +505,7 @@ export default function UI() {
                       status: v,
                     })
                   }
-                />
+                /> */}
               </ModalBody>
               <ModalFooter>
                 <Button color="danger" variant="light" onPress={onClose}>

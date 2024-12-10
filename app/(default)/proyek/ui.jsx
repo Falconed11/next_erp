@@ -62,7 +62,6 @@ export default function App({ id_instansi }) {
   const [sort, setSort] = React.useState("tanggal_penawaran");
   const [isLoading, setIsLoading] = useState(0);
   const session = useSession();
-  const user = session.data?.user;
 
   const [selectedKeys, setSelectedKeys] = React.useState(new Set([]));
 
@@ -70,7 +69,6 @@ export default function App({ id_instansi }) {
     // startDate,
     // endDate,
   });
-  console.log(current.startDate);
   const [page, setPage] = React.useState(1);
   const rowsPerPage = 10;
 
@@ -85,7 +83,6 @@ export default function App({ id_instansi }) {
       current.endDate
     )}`
   );
-  console.log(proyek);
 
   const filteredData = proyek?.data;
 
@@ -281,6 +278,8 @@ export default function App({ id_instansi }) {
   const renderCell = React.useCallback((data, columnKey) => {
     const cellValue = data[columnKey];
     const date = new Date(data.tanggal);
+    const versi = data.versi;
+    const peran = data.peran;
     switch (columnKey) {
       case "no":
         return `${penawaran(data.id_kustom, date, data.id_karyawan)}`;
@@ -312,8 +311,8 @@ export default function App({ id_instansi }) {
               }`}
               icon={<NoteIcon />}
             />
-            {data.versi > 0 ? (
-              user?.peran == "admin" || user?.peran == "super" ? (
+            {versi > 0 ? (
+              peran == "admin" || peran == "super" ? (
                 <Tooltip content="Pengeluaran Proyek">
                   <Link href={`/proyek/detail/proses?id=${data.id}`}>
                     <span
@@ -384,6 +383,10 @@ export default function App({ id_instansi }) {
   if (kategoriproyek.isLoading) return <div>loading...</div>;
   if (penawaran.error) return <div>failed to load</div>;
   if (penawaran.isLoading) return <div>loading...</div>;
+  if (session.data?.user == undefined) return <div>loading...</div>;
+
+  const user = session.data?.user;
+  filteredData.forEach((data) => [(data.peran = user?.peran)]);
 
   const columns = [
     // {
@@ -410,13 +413,16 @@ export default function App({ id_instansi }) {
       key: "nama",
       label: "Nama Proyek",
     },
+  ];
+  if (!id_instansi)
+    columns.push({
+      key: "instansi",
+      label: "Customer",
+    });
+  columns.push(
     {
       key: "klien",
       label: "Klien",
-    },
-    {
-      key: "instansi",
-      label: "Customer",
     },
     {
       key: "kota",
@@ -445,19 +451,23 @@ export default function App({ id_instansi }) {
     {
       key: "aksi",
       label: "Aksi",
-    },
-  ];
+    }
+  );
   const isSwasta = [
     { id: 0, nama: "negri" },
     { id: 1, nama: "swasta" },
   ];
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex">
-        <div className="bg-white rounded-lg p-3">
-          {id_instansi ? `Customer: ${customer.data[0].nama}` : ""}
+      {id_instansi ? (
+        <div className="flex">
+          <div className="bg-white rounded-lg p-3">
+            Customer: {customer.data[0].nama}
+          </div>
         </div>
-      </div>
+      ) : (
+        <></>
+      )}
       <div className="flex flex-row gap-2">
         <Button color="primary" onPress={tambahButtonPress}>
           Tambah

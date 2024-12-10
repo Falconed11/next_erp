@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import * as XLSX from "xlsx";
 import {
   Table,
@@ -8,6 +8,7 @@ import {
   TableBody,
   TableRow,
   TableCell,
+  Pagination,
   User,
   Chip,
   Tooltip,
@@ -25,6 +26,7 @@ import {
 import Link from "next/link";
 import { Input } from "@nextui-org/react";
 import { Button } from "@nextui-org/react";
+import { Select, SelectItem } from "@nextui-org/react";
 import {
   getCurFirstLastDay,
   excelToJSDate,
@@ -34,7 +36,7 @@ import {
 } from "@/app/utils/date";
 import { getApiPath, useClientFetch } from "@/app/utils/apiconfig";
 import Harga from "@/components/harga";
-import { FileUploader } from "@/components/input";
+import { FileUploader, RangeDate } from "@/components/input";
 import {
   AddIcon,
   EditIcon,
@@ -60,8 +62,19 @@ export default function UI() {
       filter.endDate
     )}`
   );
+  const metodepembayaran = useClientFetch(`bank`);
   const [form, setForm] = useState({});
   const [json, setJson] = useState([]);
+  const [page, setPage] = React.useState(1);
+  const rowsPerPage = 10;
+
+  const filteredData = pembayaran?.data;
+
+  const pages = useMemo(() => {
+    return filteredData ? Math.ceil(filteredData?.length / rowsPerPage) : 0;
+  }, [filteredData?.length, rowsPerPage]);
+  const loadingState = pembayaran.isLoading ? "loading" : "idle";
+  const offset = (page - 1) * rowsPerPage;
 
   const editButtonPress = (data) => {
     const startdate = new Date(data.tanggal);
@@ -101,6 +114,7 @@ export default function UI() {
         keterangan: data.keterangan ? data.keterangan : "",
         status: data.status ? data.status : "",
         tanggal: getDate(new Date(data.startdate)),
+        selectmetodepembayaran: new Set([String(data.id_metodepembayaran)]),
         // harga: data.hargajual,
       }),
     });
@@ -172,7 +186,11 @@ export default function UI() {
       case "tanggal":
         return getDateF(new Date(data.tanggal));
       case "nominal":
-        return <Harga harga={data.nominal} />;
+        return (
+          <div className="text-right">
+            <Harga harga={data.nominal} />
+          </div>
+        );
       case "aksi":
         return (
           <div className="relative flex items-center gap-2">
@@ -205,16 +223,18 @@ export default function UI() {
 
   if (pembayaran.error) return <div>failed to load</div>;
   if (pembayaran.isLoading) return <div>loading...</div>;
+  if (metodepembayaran.error) return <div>failed to load</div>;
+  if (metodepembayaran.isLoading) return <div>loading...</div>;
 
   const col = [
     {
       key: "tanggal",
       label: "tanggal",
     },
-    {
-      key: "id_proyek",
-      label: "Id Proyek",
-    },
+    // {
+    //   key: "id_proyek",
+    //   label: "Id Proyek",
+    // },
     {
       key: "nama",
       label: "Nama Proyek",
@@ -263,25 +283,8 @@ export default function UI() {
           <>
             <div>Filter</div>
             <div className="flex flex-row gap-2">
-              <div className="flex flex-col bg-gray-100 p-3 rounded-lg">
-                <div>Periode</div>
-                <DatePicker
-                  dateFormat="dd/MM/yyyy"
-                  selected={filter.startDate}
-                  onChange={(date) => setFilter({ ...filter, startDate: date })}
-                  selectsStart
-                  startDate={filter.startDate}
-                  endDate={filter.endDate}
-                />
-                <DatePicker
-                  dateFormat="dd/MM/yyyy"
-                  selected={filter.endDate}
-                  onChange={(date) => setFilter({ ...filter, endDate: date })}
-                  selectsEnd
-                  startDate={filter.startDate}
-                  endDate={filter.endDate}
-                  minDate={filter.startDate}
-                />
+              <div className="flex flex-col bg-gray-100 rounded-lg">
+                <RangeDate current={filter} setCurrent={setFilter} />
               </div>
             </div>
             {/* <div className="flex flex-row gap-2">
@@ -290,6 +293,21 @@ export default function UI() {
               </Button>
             </div> */}
           </>
+        }
+        bottomContent={
+          pages > 0 ? (
+            <div className="flex w-full justify-center">
+              <Pagination
+                isCompact
+                showControls
+                showShadow
+                color="primary"
+                page={page}
+                total={pages}
+                onChange={(page) => setPage(page)}
+              />
+            </div>
+          ) : null
         }
       >
         <TableHeader columns={col}>
@@ -302,7 +320,14 @@ export default function UI() {
             </TableColumn>
           )}
         </TableHeader>
-        <TableBody items={pembayaran.data}>
+        <TableBody
+          items={
+            filteredData ? filteredData.slice(offset, offset + rowsPerPage) : []
+          }
+          loadingContent={"Loading..."}
+          emptyContent={"Kosong"}
+          loadingState={loadingState}
+        >
           {(item) => (
             <TableRow key={item.id}>
               {(columnKey) => (
@@ -352,19 +377,26 @@ export default function UI() {
                     })
                   }
                 />
-                <Input
-                  type="text"
-                  label="Cara Bayar"
-                  placeholder="Masukkan cara bayar!"
-                  value={form.carabayar}
-                  className=""
-                  onValueChange={(v) =>
+                <Select
+                  label="Metode Pembayaran"
+                  variant="bordered"
+                  placeholder="Pilih metodepembayaran!"
+                  selectedKeys={form.selectmetodepembayaran}
+                  className="max-w-xs"
+                  onSelectionChange={(val) => {
                     setForm({
                       ...form,
-                      carabayar: v,
-                    })
-                  }
-                />
+                      selectmetodepembayaran: val,
+                      id_metodepembayaran: new Set(val).values().next().value,
+                    });
+                  }}
+                >
+                  {metodepembayaran.data.map((item) => (
+                    <SelectItem key={item.id} value={item.id}>
+                      {item.nama}
+                    </SelectItem>
+                  ))}
+                </Select>
                 <Input
                   type="text"
                   label="Keterangan"

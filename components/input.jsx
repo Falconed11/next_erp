@@ -52,44 +52,58 @@ const FileUploader = ({ onFileUpload }) => {
 
 const RangeDate = ({ current, setCurrent }) => {
   const [filter, setFilter] = useState(current);
-  const cariOnPress = () => {
+  const cariOnPress = (e) => {
+    e.preventDefault();
     setCurrent(filter);
   };
   return (
     <div className="flex flex-col bg-gray-100 p-3 rounded-lg gap-1">
       <div>Periode</div>
-      <DatePicker
-        dateFormat="dd/MM/yyyy"
-        selected={filter.startDate}
-        onChange={(date) => setFilter({ ...filter, startDate: date })}
-        onSelect={(date) => {
-          setCurrent({ ...filter, startDate: date });
-        }}
-        selectsStart
-        startDate={filter.startDate}
-        endDate={filter.endDate}
-      />
-      <DatePicker
-        dateFormat="dd/MM/yyyy"
-        selected={filter.endDate}
-        onChange={(date) => setFilter({ ...filter, endDate: date })}
-        onSelect={(date) => {
-          setCurrent({ ...filter, endDate: date });
-        }}
-        selectsEnd
-        startDate={filter.startDate}
-        endDate={filter.endDate}
-        minDate={filter.startDate}
-      />
-      <div className="justify-end flex">
-        <Button
-          color="primary"
-          onPress={cariOnPress}
-          isDisabled={filter == current ? true : null}
-        >
-          Cari
-        </Button>
-      </div>
+      <form onSubmit={cariOnPress} className="flex flex-col gap-2">
+        <DatePicker
+          dateFormat="dd/MM/yyyy"
+          selected={filter.startDate}
+          onChange={(date) => setFilter({ ...filter, startDate: date })}
+          onSelect={(date) => {
+            setCurrent({ ...filter, startDate: date });
+          }}
+          selectsStart
+          startDate={filter.startDate}
+          endDate={filter.endDate}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault(); // Prevents the Date Picker from opening
+            }
+          }}
+        />
+        <DatePicker
+          dateFormat="dd/MM/yyyy"
+          selected={filter.endDate}
+          onChange={(date) => setFilter({ ...filter, endDate: date })}
+          onSelect={(date) => {
+            setCurrent({ ...filter, endDate: date });
+          }}
+          selectsEnd
+          startDate={filter.startDate}
+          endDate={filter.endDate}
+          minDate={filter.startDate}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault(); // Prevents the Date Picker from opening
+            }
+          }}
+        />
+        <div className="justify-end flex">
+          <Button
+            type="submit"
+            color="primary"
+            // onPress={cariOnPress}
+            isDisabled={filter == current ? true : null}
+          >
+            Cari
+          </Button>
+        </div>
+      </form>
     </div>
   );
 };
