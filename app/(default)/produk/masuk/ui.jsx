@@ -278,6 +278,12 @@ export default function App({ id_produk }) {
             <Harga harga={data.harga} />
           </div>
         );
+      case "total":
+        return (
+          <div className="text-right">
+            <Harga harga={data.harga * data.jumlah} />
+          </div>
+        );
       case "aksi":
         return (
           <div className="relative flex items-center gap-2">
@@ -359,30 +365,30 @@ export default function App({ id_produk }) {
   if (vendor.isLoading) return <div>loading...</div>;
 
   const col = [
-    {
-      key: "id_kustom",
-      label: "Id",
-    },
-    {
-      key: "nama",
-      label: "Produk",
-    },
-    {
-      key: "merek",
-      label: "Merek",
-    },
-    {
-      key: "tipe",
-      label: "Tipe",
-    },
+    // {
+    //   key: "id_kustom",
+    //   label: "Id",
+    // },
+    // {
+    //   key: "nama",
+    //   label: "Produk",
+    // },
+    // {
+    //   key: "merek",
+    //   label: "Merek",
+    // },
+    // {
+    //   key: "tipe",
+    //   label: "Tipe",
+    // },
     {
       key: "vendor",
       label: "Vendor",
     },
-    {
-      key: "stok",
-      label: "Stok",
-    },
+    // {
+    //   key: "stok",
+    //   label: "Stok",
+    // },
     {
       key: "jumlah",
       label: "Jumlah",
@@ -400,12 +406,16 @@ export default function App({ id_produk }) {
       label: "Harga",
     },
     {
-      key: "tanggal",
-      label: "Tanggal",
+      key: "total",
+      label: "Total",
     },
     {
       key: "terbayar",
       label: "Terbayar",
+    },
+    {
+      key: "tanggal",
+      label: "Tanggal",
     },
     {
       key: "jatuhtempo",
@@ -417,14 +427,21 @@ export default function App({ id_produk }) {
     },
   ];
 
-  const selectedProduk = produk.data;
+  const selectedProduk = produk.data[0];
+  console.log(selectedProduk);
   return (
-    <div className="flex flex-col">
-      <div className="flex flex-row gap-2">
-        {/* <Button color="primary" onPress={tambahButtonPress}>
+    <div className="flex flex-col gap-2">
+      <div className="bg-white rounded-lg p-2">
+        <div>Produk: {selectedProduk.nama}</div>
+        <div>Merek: {selectedProduk.merek}</div>
+        <div>Tipe: {selectedProduk.tipe}</div>
+        <div>Stok: {selectedProduk.stok}</div>
+      </div>
+      {/* <div className="flex flex-row gap-2">
+        <Button color="primary" onPress={tambahButtonPress}>
           Tambah
-        </Button> */}
-        {/* <div>
+        </Button>
+        <div>
           <Link
             className="bg-primary text-white p-2 rounded-lg inline-block"
             href={"/produk.xlsx"}
@@ -435,12 +452,12 @@ export default function App({ id_produk }) {
         <FileUploader onFileUpload={handleFileUpload} />
         <Button color="primary" onPress={handleButtonUploadExcelPress}>
           Upload Excel
-        </Button> */}
-      </div>
+        </Button>
+      </div> */}
       {/* Table Masuk */}
       <Table
         isStriped
-        className="pt-3"
+        className=""
         aria-label="Example table with custom cells"
         topContent={
           <>
@@ -852,18 +869,18 @@ const TabelProdukKeluar = ({ id_produk }) => {
     //   key: "id_kustom",
     //   label: "Id",
     // },
-    {
-      key: "produk",
-      label: "Produk",
-    },
-    {
-      key: "merek",
-      label: "Merek",
-    },
-    {
-      key: "tipe",
-      label: "Tipe",
-    },
+    // {
+    //   key: "produk",
+    //   label: "Produk",
+    // },
+    // {
+    //   key: "merek",
+    //   label: "Merek",
+    // },
+    // {
+    //   key: "tipe",
+    //   label: "Tipe",
+    // },
     {
       key: "vendor",
       label: "Vendor",
@@ -876,10 +893,10 @@ const TabelProdukKeluar = ({ id_produk }) => {
       key: "sn",
       label: "SN",
     },
-    {
-      key: "stok",
-      label: "Stok",
-    },
+    // {
+    //   key: "stok",
+    //   label: "Stok",
+    // },
     {
       key: "jumlah",
       label: "Jumlah",
@@ -908,7 +925,7 @@ const TabelProdukKeluar = ({ id_produk }) => {
     <>
       <Table
         isStriped
-        className="pt-3"
+        className=""
         aria-label="Example table with custom cells"
         topContent={
           <>
