@@ -462,61 +462,6 @@ export default function App({ id_produk }) {
         topContent={
           <>
             <div>Masuk</div>
-            {/* <div>Filter</div>
-            <div className="flex gap-3">
-              <Select
-                label="Kategori"
-                variant="bordered"
-                placeholder="Pilih kategori!"
-                selectedKeys={selectKategori}
-                className="max-w-xs"
-                onSelectionChange={(v) => {
-                  setSelectKategori(v);
-                  setPage(1);
-                }}
-              >
-                {filteredData?.map((item) => (
-                  <SelectItem key={item.id} value={item.id}>
-                    {`${item.nama}`}
-                  </SelectItem>
-                ))}
-              </Select>
-              <Autocomplete
-                label="Produk"
-                variant="bordered"
-                defaultItems={data}
-                placeholder="Cari produk"
-                className="max-w-xs"
-                selectedKey={form.selectProduk}
-                onSelectionChange={(v) => {
-                  setForm({ ...form, selectProduk: v });
-                  setNama(
-                    data?.filter((row) => {
-                      return row.id == v;
-                    })[0]?.nama ?? ""
-                  );
-                  setPage(1);
-                }}
-                onValueChange={(v) => {
-                  setNama(v);
-                }}
-              >
-                {(item) => (
-                  <AutocompleteItem key={item.id} textValue={item.nama}>
-                    {item.nama}
-                  </AutocompleteItem>
-                )}
-              </Autocomplete>
-              <Input
-                isClearable
-                type="text"
-                label="Id"
-                placeholder="Masukkan id!"
-                className="max-w-xs"
-                value={id}
-                onValueChange={setId}
-              />
-            </div> */}
           </>
         }
         bottomContent={

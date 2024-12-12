@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useMemo } from "react";
 import Link from "next/link";
 import { useReactToPrint } from "react-to-print";
 import {
@@ -9,6 +9,7 @@ import {
   TableBody,
   TableRow,
   TableCell,
+  pagination,
   User,
   Chip,
   Tooltip,
@@ -39,11 +40,13 @@ import {
   PrinterIcon,
 } from "@/components/icon";
 import { useClientFetch, getApiPath } from "@/app/utils/apiconfig";
-import date, { getDateF, getDate } from "@/app/utils/date";
+import date, { getDateF, getDate, getCurFirstLastDay } from "@/app/utils/date";
 import number from "@/app/utils/number";
 import Harga from "@/components/harga";
+import { RangeDate } from "@/components/input";
 
 const apiPath = getApiPath();
+const [startDate, endDate] = getCurFirstLastDay();
 
 export default function App() {
   const componentRef = {
@@ -54,7 +57,16 @@ export default function App() {
     // pageStyle: "p-10",
   });
 
-  const kwitansi = useClientFetch("kwitansi");
+  const [current, setCurrent] = useState({
+    startDate,
+    endDate,
+  });
+
+  const kwitansi = useClientFetch(
+    `kwitansi?start=${getDate(current.startDate)}&end=${getDate(
+      current.endDate
+    )}`
+  );
   const karyawan = useClientFetch("karyawan");
   const [selected, setSelected] = React.useState("normal");
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -63,6 +75,10 @@ export default function App() {
   };
   const [form, setForm] = useState({});
   const [method, setMethod] = useState("");
+
+  const [page, setPage] = React.useState(1);
+  const rowsPerPage = 25;
+
   const saveButtonPress = async (onClose) => {
     if (form.keterangan.length > 150)
       return alert("Keterangan guna membayar maksimal 150 huruf!");
@@ -165,6 +181,14 @@ export default function App() {
         return cellValue;
     }
   }, []);
+
+  const filteredData = kwitansi?.data;
+  const pages = useMemo(() => {
+    return filteredData ? Math.ceil(filteredData?.length / rowsPerPage) : 0;
+  }, [filteredData, rowsPerPage]);
+  const loadingState = kwitansi.isLoading ? "loading" : "idle";
+  const offset = (page - 1) * rowsPerPage;
+
   if (kwitansi.error) return <div>failed to load</div>;
   if (kwitansi.isLoading) return <div>loading...</div>;
   if (karyawan.error) return <div>failed to load</div>;
@@ -201,16 +225,37 @@ export default function App() {
   ];
   const a = "f";
   return (
-    <>
+    <div className="flex flex-col gap-2">
+      <div>
+        <Button color="primary" onClick={tambahButtonPress}>
+          Tambah
+        </Button>
+      </div>
       <Table
-        className="pt-3"
+        className=""
         aria-label="Example table with custom cells"
         topContent={
-          <div>
-            <Button color="primary" onClick={tambahButtonPress}>
-              Tambah
-            </Button>
-          </div>
+          <>
+            <div>Filter</div>
+            <div className="flex">
+              <RangeDate current={current} setCurrent={setCurrent} />
+            </div>
+          </>
+        }
+        bottomContent={
+          pages > 0 ? (
+            <div className="flex w-full justify-center">
+              <Pagination
+                isCompact
+                showControls
+                showShadow
+                color="primary"
+                page={page}
+                total={pages}
+                onChange={(page) => setPage(page)}
+              />
+            </div>
+          ) : null
         }
       >
         <TableHeader columns={col}>
@@ -223,7 +268,14 @@ export default function App() {
             </TableColumn>
           )}
         </TableHeader>
-        <TableBody items={kwitansi.data}>
+        <TableBody
+          items={
+            filteredData ? filteredData.slice(offset, offset + rowsPerPage) : []
+          }
+          loadingContent={"Loading..."}
+          emptyContent={"Kosong"}
+          loadingState={loadingState}
+        >
           {(item) => (
             <TableRow key={item.id}>
               {(columnKey) => (
@@ -525,6 +577,6 @@ export default function App() {
           )}
         </ModalContent>
       </Modal>
-    </>
+    </div>
   );
 }

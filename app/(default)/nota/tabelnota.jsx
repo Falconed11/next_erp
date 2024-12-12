@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import Link from "next/link";
 import {
   Table,
@@ -8,6 +8,7 @@ import {
   TableBody,
   TableRow,
   TableCell,
+  Pagination,
   User,
   Chip,
   Tooltip,
@@ -35,16 +36,28 @@ import {
   UserIcon,
 } from "../../../components/icon";
 import { useClientFetch, getApiPath } from "@/app/utils/apiconfig";
-import { getDateF, getDate } from "@/app/utils/date";
+import { getDateF, getDate, getCurFirstLastDay } from "@/app/utils/date";
+import { RangeDate } from "@/components/input";
 
 const apiPath = getApiPath();
+const [startDate, endDate] = getCurFirstLastDay();
 
 export default function App() {
-  const nota = useClientFetch("nota");
+  const [current, setCurrent] = useState({
+    startDate,
+    endDate,
+  });
+  const nota = useClientFetch(
+    `nota?start=${getDate(current.startDate)}&end=${getDate(current.endDate)}`
+  );
   const karyawan = useClientFetch("karyawan");
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [form, setForm] = useState({});
   const [method, setMethod] = useState("");
+
+  const [page, setPage] = React.useState(1);
+  const rowsPerPage = 25;
+
   const saveButtonPress = async (onClose) => {
     const res = await fetch(`${apiPath}nota`, {
       method,
@@ -137,6 +150,14 @@ export default function App() {
         return cellValue;
     }
   }, []);
+
+  const filteredData = nota?.data;
+  const pages = useMemo(() => {
+    return filteredData ? Math.ceil(filteredData?.length / rowsPerPage) : 0;
+  }, [filteredData, rowsPerPage]);
+  const loadingState = nota.isLoading ? "loading" : "idle";
+  const offset = (page - 1) * rowsPerPage;
+
   if (nota.error) return <div>failed to load</div>;
   if (nota.isLoading) return <div>loading...</div>;
   if (karyawan.error) return <div>failed to load</div>;
@@ -168,16 +189,37 @@ export default function App() {
     },
   ];
   return (
-    <>
+    <div className="flex gap-2 flex-col">
+      <div>
+        <Button color="primary" onClick={tambahButtonPress}>
+          Tambah
+        </Button>
+      </div>
       <Table
-        className="pt-3"
+        className=""
         aria-label="Example table with custom cells"
         topContent={
-          <div>
-            <Button color="primary" onClick={tambahButtonPress}>
-              Tambah
-            </Button>
-          </div>
+          <>
+            <div>Filter</div>
+            <div className="flex">
+              <RangeDate current={current} setCurrent={setCurrent} />
+            </div>
+          </>
+        }
+        bottomContent={
+          pages > 0 ? (
+            <div className="flex w-full justify-center">
+              <Pagination
+                isCompact
+                showControls
+                showShadow
+                color="primary"
+                page={page}
+                total={pages}
+                onChange={(page) => setPage(page)}
+              />
+            </div>
+          ) : null
         }
       >
         <TableHeader columns={col}>
@@ -190,7 +232,14 @@ export default function App() {
             </TableColumn>
           )}
         </TableHeader>
-        <TableBody items={nota.data}>
+        <TableBody
+          items={
+            filteredData ? filteredData.slice(offset, offset + rowsPerPage) : []
+          }
+          loadingContent={"Loading..."}
+          emptyContent={"Kosong"}
+          loadingState={loadingState}
+        >
           {(item) => (
             <TableRow key={item.id}>
               {(columnKey) => (
@@ -273,6 +322,6 @@ export default function App() {
           )}
         </ModalContent>
       </Modal>
-    </>
+    </div>
   );
 }
