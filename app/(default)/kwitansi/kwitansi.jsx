@@ -9,7 +9,7 @@ import {
   TableBody,
   TableRow,
   TableCell,
-  pagination,
+  Pagination,
   User,
   Chip,
   Tooltip,

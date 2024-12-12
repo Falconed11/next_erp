@@ -188,13 +188,21 @@ export default function TambahProduk({
       <Input
         type="number"
         value={form.harga}
-        label={`Harga (Ref: 
-          ${
-            refHargaModal
-              ? selectProduk?.hargamodal ?? 0
-              : selectProduk?.hargajual ?? 0
-          }
-        )`}
+        label={
+          <>
+            Harga (Ref:{" "}
+            {
+              <Harga
+                harga={
+                  refHargaModal
+                    ? selectProduk?.hargamodal ?? 0
+                    : selectProduk?.hargajual ?? 0
+                }
+              />
+            }
+            )
+          </>
+        }
         // label={`Harga (Ref:
         //   ${
         //     produk.data.filter((v) => v.id == form.selectProduk)[0]

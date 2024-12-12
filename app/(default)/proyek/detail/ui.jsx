@@ -106,7 +106,8 @@ export default function App({ id, versi }) {
   const [formRekapitulasi, setFormRekapitulasi] = useState({ hargadiskon: 0 });
 
   const tambahButtonPress = async (form, setForm) => {
-    if (form.selectProduk.size == 0) return alert("Silahkan pilih produk");
+    if (!form.selectProduk) return alert("Silahkan pilih produk");
+    if (form.jumlah <= 0) return alert("Jumlah belum diisi");
     const res = await fetch(`${api_path}keranjangproyek`, {
       method: "POST",
       headers: {
@@ -126,7 +127,7 @@ export default function App({ id, versi }) {
     });
     const json = await res.json();
     if (res.status == 400) return alert(json.message);
-    setForm({ jumlah: "", harga: "" });
+    setForm({ selectProduk: "", jumlah: "", harga: "" });
     // console.log(json.message);
     // return alert(json.message);
   };
@@ -192,6 +193,7 @@ export default function App({ id, versi }) {
     // return alert(json.message);
   };
   const simpanButtonPress = async (data, onClose) => {
+    if (data.jumlah <= 0) return alert("Jumlah belum diisi");
     const res = await fetch(`${api_path}keranjangproyek`, {
       method: "PUT",
       headers: {

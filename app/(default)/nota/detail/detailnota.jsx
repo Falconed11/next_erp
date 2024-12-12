@@ -41,6 +41,7 @@ import { Select, SelectItem } from "@nextui-org/react";
 import Link from "next/link";
 import Image from "next/image";
 import logo from "../../../../public/logofinal.jpg";
+import TambahProduk from "@/components/tambahproduk";
 
 const api_path = getApiPath();
 
@@ -85,8 +86,10 @@ export default function App({ id }) {
       // return alert(json.message);
     }
   };
-  const tambahButtonPress = async ({ select, form }) => {
-    if (select.size == 0) return alert("Produk belum dipilih.");
+  const tambahButtonPress = async (form) => {
+    console.log(form);
+    if (!form.selectProduk) return alert("Silahkan pilih produk");
+    if (form.jumlah <= 0 || !form.jumlah) return alert("Jumlah belum diisi");
     const res = await fetch(`${api_path}keranjangnota`, {
       method: "POST",
       headers: {
@@ -95,12 +98,14 @@ export default function App({ id }) {
       },
       body: JSON.stringify({
         id_nota: id,
-        id_produk: select.values().next().value,
+        id_produk: form.selectProduk,
         jumlah: form.jumlah,
         harga: form.harga,
       }),
     });
     const json = await res.json();
+    if (res.status == 400) return alert(json.message);
+    setForm({ selectProduk: "", jumlah: "", harga: "" });
     // return alert(json.message);
   };
   const simpanButtonPress = async (data, onClose) => {
@@ -351,83 +356,18 @@ export default function App({ id }) {
         topContent={
           <>
             <div>Produk</div>
-            <div className="flex flex-row">
-              <Select
-                label="Kategori"
-                placeholder="Pilih kategori!"
-                className="w-2/12"
-                selectedKeys={selectKategori}
-                onSelectionChange={setSelectKategori}
-              >
-                {kategori.data.map((item) => (
-                  <SelectItem key={item.kategori} value={item.kategori}>
-                    {item.kategori}
-                  </SelectItem>
-                ))}
-              </Select>
-              <Select
-                label="Produk"
-                placeholder="Pilih produk!"
-                className="w-5/12 pl-2"
-                selectedKeys={selectProduk}
-                onSelectionChange={setSelectProduk}
-              >
-                {produk.data.map((item) => (
-                  <SelectItem
-                    key={item.id}
-                    value={item.id}
-                    textValue={`${item.nama}`}
-                  >
-                    {item.nama} | {item.merek} | {item.tipe} | {item.jumlah} |{" "}
-                    {item.satuan} | {item.hargamodal} | {item.hargajual}
-                  </SelectItem>
-                ))}
-              </Select>
-              <Input
-                type="number"
-                value={form.jumlah}
-                label="Jumlah"
-                placeholder="Masukkan jumlah!"
-                className="w-2/12 pl-2"
-                endContent={
-                  <div className="pointer-events-none flex items-center">
-                    <span className="text-default-400 text-small"></span>
-                  </div>
-                }
-                onValueChange={(v) =>
-                  setForm({
-                    ...form,
-                    jumlah: v,
-                  })
-                }
-              />
-              <Input
-                type="number"
-                value={form.harga}
-                label="Harga Kustom"
-                placeholder="Masukkan harga!"
-                className="w-2/12 pl-2"
-                onValueChange={(v) =>
-                  setForm({
-                    ...form,
-                    harga: v,
-                  })
-                }
-              />
-              <Button
-                onClick={() => {
-                  tambahButtonPress({ select: selectProduk, form });
-                }}
-                color="primary"
-                className="ml-2"
-              >
+            <TambahProduk
+              form={form}
+              setForm={setForm}
+              refHargaModal
+              disableHargaKustom
+              disableStok
+              disableVendor
+            />
+            <div>
+              <Button color="primary" onClick={() => tambahButtonPress(form)}>
                 Tambah
               </Button>
-              {/* <div>
-                <Link href={`/stok?id_proyek=${proyek.id}`}>
-                  <Button color="primary">Tambah</Button>
-                </Link>
-              </div> */}
             </div>
           </>
         }

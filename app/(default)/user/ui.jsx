@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import { useSession } from "next-auth/react";
 import {
   Table,
   TableHeader,
@@ -36,6 +37,8 @@ import { Input } from "@nextui-org/react";
 const api_path = getApiPath();
 
 export default function App() {
+  const session = useSession();
+
   const user = useClientFetch(`user`);
   const [form, setForm] = useState({});
   const [method, setMethod] = useState();
@@ -144,6 +147,9 @@ export default function App() {
 
   if (user.error) return <div>failed to load</div>;
   if (user.isLoading) return <div>loading...</div>;
+  if (session.status === "loading") return <>Loading...</>;
+  if (session.data.user.peran != "super")
+    return <div>Anda tidak memiliki akses pada laman ini.</div>;
 
   return (
     <div>

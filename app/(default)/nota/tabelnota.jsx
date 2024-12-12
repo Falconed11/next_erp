@@ -38,6 +38,7 @@ import {
 import { useClientFetch, getApiPath } from "@/app/utils/apiconfig";
 import { getDateF, getDate, getCurFirstLastDay } from "@/app/utils/date";
 import { RangeDate } from "@/components/input";
+import { LinkOpenNewTab } from "@/components/mycomponent";
 
 const apiPath = getApiPath();
 const [startDate, endDate] = getCurFirstLastDay();
@@ -118,16 +119,11 @@ export default function App() {
       case "aksi":
         return (
           <div className="relative flex items-center gap-2">
-            <Tooltip content="Detail">
-              <Link href={`/nota/detail?id=${data.id}`}>
-                <span
-                  // onClick={() => detailButtonPress(data)}
-                  className="text-lg text-default-400 cursor-pointer active:opacity-50"
-                >
-                  <EyeIcon />
-                </span>
-              </Link>
-            </Tooltip>
+            <LinkOpenNewTab
+              content="Detail"
+              link={`/nota/detail?id=${data.id}`}
+              icon={<EyeIcon />}
+            />
             <Tooltip content="Edit">
               <span
                 onClick={() => editButtonPress(data)}
