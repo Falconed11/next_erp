@@ -127,7 +127,9 @@ export default function App({ id, versi }) {
     });
     const json = await res.json();
     if (res.status == 400) return alert(json.message);
-    setForm({ selectProduk: "", jumlah: "", harga: "" });
+    if (form.instalasi)
+      setFormInstalasi({ selectProduk: "", jumlah: "", harga: "" });
+    else setForm({ selectProduk: "", jumlah: "", harga: "" });
     // console.log(json.message);
     // return alert(json.message);
   };
@@ -193,7 +195,7 @@ export default function App({ id, versi }) {
     // return alert(json.message);
   };
   const simpanButtonPress = async (data, onClose) => {
-    if (data.jumlah <= 0) return alert("Jumlah belum diisi");
+    // if (data.jumlah <= 0) return alert("Jumlah belum diisi");
     const res = await fetch(`${api_path}keranjangproyek`, {
       method: "PUT",
       headers: {

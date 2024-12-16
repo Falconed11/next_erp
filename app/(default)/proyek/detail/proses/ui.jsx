@@ -139,7 +139,7 @@ export default function App({ id }) {
           ...form,
           id_proyek: id,
           id_produk: form.selectProduk,
-          id_karyawan: selectKaryawan.values().next().value,
+          id_karyawan: selectKaryawan.values().next().value ?? 0,
           tanggal: form.startdate ? getDate(form.startdate) : "",
           jumlah: form.jumlah,
           harga: form.harga,
@@ -701,28 +701,33 @@ export default function App({ id }) {
                     })
                   }
                 /> */}
-                <Select
-                  label="Status"
-                  placeholder="Pilih status!"
-                  className="w-2/12"
-                  selectedKeys={form.selectStatus}
-                  onSelectionChange={(v) =>
-                    setForm({
-                      ...form,
-                      selectStatus: v,
-                      status: v.values().next().value,
-                    })
-                  }
-                >
-                  {[
-                    { id: 0, nama: "Belum Lunas" },
-                    { id: 1, nama: "Lunas" },
-                  ].map((item) => (
-                    <SelectItem key={item.id} value={item.id}>
-                      {item.nama}
-                    </SelectItem>
-                  ))}
-                </Select>
+                {!form.isSelected ? (
+                  <Select
+                    label="Status"
+                    placeholder="Pilih status!"
+                    className="w-2/12"
+                    selectedKeys={form.selectStatus}
+                    onSelectionChange={(v) =>
+                      setForm({
+                        ...form,
+                        selectStatus: v,
+                        status: v.values().next().value,
+                      })
+                    }
+                  >
+                    {[
+                      { id: 0, nama: "Belum Lunas" },
+                      { id: 1, nama: "Lunas" },
+                    ].map((item) => (
+                      <SelectItem key={item.id} value={item.id}>
+                        {item.nama}
+                      </SelectItem>
+                    ))}
+                  </Select>
+                ) : (
+                  <></>
+                )}
+
                 <Button
                   onClick={() => {
                     tambahButtonPress({ selectProduk, selectKaryawan, form });
