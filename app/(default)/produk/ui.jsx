@@ -68,6 +68,7 @@ export default function App() {
   };
 
   const [nama, setNama] = useState("");
+  const [filterMerek, setFilterMerek] = useState("");
   const [id, setId] = useState("");
   const [selectKategori, setSelectKategori] = useState([]);
   const [page, setPage] = React.useState(1);
@@ -431,8 +432,14 @@ export default function App() {
   if (metodepengeluaran.isLoading) return <div>loading...</div>;
   if (kategori.error) return <div>failed to load</div>;
   if (kategori.isLoading) return <div>loading...</div>;
-  // if (merek.error) return <div>failed to load</div>;
-  // if (merek.isLoading) return <div>loading...</div>;
+  if (merek.error) return <div>failed to load</div>;
+  if (merek.isLoading) return <div>loading...</div>;
+
+  let dataMerek = merek.data;
+  dataMerek = dataMerek.filter((animal) =>
+    animal.nama.toLowerCase().includes(filterMerek.toLowerCase())
+  );
+  dataMerek = dataMerek.slice(0, 20);
 
   const col = [
     {
@@ -633,13 +640,14 @@ export default function App() {
                 <Autocomplete
                   label="Merek"
                   variant="bordered"
-                  defaultItems={merek.data}
+                  defaultItems={dataMerek}
                   placeholder="Cari merek"
                   className="max-w-xs"
                   selectedKey={form.id_merek}
                   defaultSelectedKey={form.id_merek}
                   defaultInputValue={form.merek}
                   onSelectionChange={(v) => setForm({ ...form, id_merek: v })}
+                  onValueChange={setFilterMerek}
                 >
                   {(item) => (
                     <AutocompleteItem key={item.id} textValue={item.nama}>
