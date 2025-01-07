@@ -44,6 +44,9 @@ import date, { getDateF, getDate, getCurFirstLastDay } from "@/app/utils/date";
 import number from "@/app/utils/number";
 import Harga from "@/components/harga";
 import { RangeDate } from "@/components/input";
+import Image from "next/image";
+import logoBks from "@/public/logo-bks.jpeg";
+import logoSvt from "@/public/logo-svt.jpeg";
 
 const apiPath = getApiPath();
 const [startDate, endDate] = getCurFirstLastDay();
@@ -400,6 +403,60 @@ export default function App() {
                   ref={componentRef.kwitansi}
                   className="bg-white text-black leading-8"
                 >
+                  {/* {Logo} */}
+                  <div className="flex flex-row items-center">
+                    {selected == "bks" ? (
+                      <>
+                        <Image
+                          src={logoBks}
+                          alt="Company Logo"
+                          width={70}
+                          // height={500} automatically provided
+                          // blurDataURL="data:..." automatically provided
+                          // placeholder="blur" // Optional blur-up while loading
+                        />
+                        <div className="flex flex-col pl-2">
+                          <div>Belga Karya Semesta</div>
+                          <div>
+                            General Trading - Mechanical Electrical - Supplies -
+                            Consultant
+                          </div>
+                          <div>
+                            Jogokaryan MJ 3/789, Mantrijeron - Yogyakarta Telp
+                            08121553765
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <></>
+                    )}
+                    {selected == "svt" ? (
+                      <>
+                        <Image
+                          src={logoSvt}
+                          alt="Company Logo"
+                          width={100}
+                          // height={500} automatically provided
+                          // blurDataURL="data:..." automatically provided
+                          // placeholder="blur" // Optional blur-up while loading
+                        />
+                        <div className="flex flex-col pl-2">
+                          <div>Satu Visi Teknikatama</div>
+                          <div>
+                            General Trading - Mechanical Electrical - Supplies -
+                            Consultant
+                          </div>
+                          <div>
+                            Wonosalam RT. 005 / RW. 009, Sukoharjo, Ngaglik
+                            Sleman - Yogyakarta 55581 Telp 08121553765 -
+                            081578861740
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <></>
+                    )}
+                  </div>
                   {selected == "normal" ? (
                     <>
                       <div className="h-12"></div>
@@ -449,36 +506,6 @@ export default function App() {
                       </div>
                     </>
                   ) : selected == "bks" ? (
-                    // <>
-                    //   <div className="h-36"></div>
-                    //   <div className="flex">
-                    //     <div className="w-36"></div>
-                    //     <div className="w-416p border">
-                    //       <div>{a}</div>
-                    //       <div>{a}</div>
-                    //       <div>
-                    //         {a}
-                    //         <br />
-                    //         {a}
-                    //       </div>
-                    //     </div>
-                    //   </div>
-                    //   <div className="h-2"></div>
-                    //   <div className="flex">
-                    //     <div className="w-556p"></div>
-                    //     <div className="w-28">{a}</div>
-                    //     <div>{a}</div>
-                    //   </div>
-                    //   <div className="flex">
-                    //     <div className="w-24"></div>
-                    //     <div className="w-96">{a}</div>
-                    //     <div className="w-4"></div>
-                    //     <div>
-                    //       <div className="h-8"></div>
-                    //       <div>{a}</div>
-                    //     </div>
-                    //   </div>
-                    // </>
                     <>
                       <div className="h-32"></div>
                       <div className="h-3"></div>

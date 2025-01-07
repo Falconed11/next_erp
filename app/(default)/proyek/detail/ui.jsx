@@ -860,6 +860,7 @@ export default function App({ id, versi }) {
             </div>
           </div>
         </div>
+        {/* {Rekapitulasi} */}
         <ConditionalComponent
           condition={selectVersi.size}
           component={
@@ -1619,6 +1620,7 @@ export default function App({ id, versi }) {
                   ref={componentRef.penawaran}
                   className="bg-white text-black"
                 >
+                  {/* {Logo} */}
                   <div className="flex flex-row items-center">
                     {selectedProyek.id_perusahaan == 1 ? (
                       <>

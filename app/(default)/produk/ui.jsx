@@ -45,7 +45,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { getApiPath, useClientFetch } from "@/app/utils/apiconfig";
 import { Button } from "@nextui-org/react";
 import { Input, Textarea } from "@nextui-org/react";
-import { getDate, getDateFId } from "@/app/utils/date";
+import { getDate, getDateF, getDateFId } from "@/app/utils/date";
 import { LinkOpenNewTab } from "@/components/mycomponent";
 
 const apiPath = getApiPath();
@@ -325,6 +325,19 @@ export default function App() {
     // return alert(json.message);
   };
 
+  const exportStok = () => {
+    // if (selectedKeys.size == 0) return alert("Proyek belum dipilih");
+    // const data = penawaran.data.filter((v) =>
+    //   selectedKeys.has(String(v.id_proyek))
+    // );
+    const worksheet = XLSX.utils.json_to_sheet(produk.data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "sheet1");
+    XLSX.writeFile(workbook, `stok-${getDateF(new Date())}.xlsx`, {
+      compression: true,
+    });
+  };
+
   const renderCell = React.useCallback((data, columnKey) => {
     const cellValue = data[columnKey];
     switch (columnKey) {
@@ -340,6 +353,18 @@ export default function App() {
         return (
           <div className="text-right">
             <Harga harga={data.hargajual} />
+          </div>
+        );
+      case "totalmodal":
+        return (
+          <div className="text-right">
+            <Harga harga={data.hargamodal * data.stok} />
+          </div>
+        );
+      case "totaljual":
+        return (
+          <div className="text-right">
+            <Harga harga={data.hargajual * data.stok} />
           </div>
         );
       case "aksi":
@@ -483,6 +508,14 @@ export default function App() {
       label: "Harga Jual",
     },
     {
+      key: "totalmodal",
+      label: "Total Modal",
+    },
+    {
+      key: "totaljual",
+      label: "Total Jual",
+    },
+    {
       key: "tanggal",
       label: "Tanggal",
     },
@@ -499,6 +532,15 @@ export default function App() {
   let filteredsubkategori = [
     { nama: "Silahkan pilih kategori terlebih dahulu" },
   ];
+
+  const totalModal = produk.data.reduce(
+    (acc, cur) => acc + cur.stok * cur.hargamodal,
+    0
+  );
+  const totalJual = produk.data.reduce(
+    (acc, cur) => acc + cur.stok * cur.hargajual,
+    0
+  );
   // if (form.id_kategori) {
   //   filteredsubkategori = subkategori.data.filter((item) => {
   //     if (item.id_kategoriproduk == form.id_kategori) return item;
@@ -508,10 +550,27 @@ export default function App() {
   return (
     <div className="">
       <div className="flex flex-col gap-2">
-        <div>
+        <div className="flex gap-2">
           <Button color="primary" onPress={tambahButtonPress}>
             Tambah
           </Button>
+          <div className="flex flex-row gap-2">
+            <Button color="primary" onClick={exportStok}>
+              Export Stok
+            </Button>
+          </div>
+        </div>
+        <div className="bg-white border rounded-lg p-3">
+          <div>Laporan</div>
+          <div>
+            Total Modal: <Harga harga={totalModal} />
+          </div>
+          <div>
+            Total Jual: <Harga harga={totalJual} />
+          </div>
+          <div>
+            Total Provit: <Harga harga={totalJual - totalModal} />
+          </div>
         </div>
         <div>
           <TemplateImport
