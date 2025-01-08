@@ -591,7 +591,7 @@ export default function App() {
             component={
               <>
                 {result.map((cur, i) => (
-                  <div>
+                  <div key={i}>
                     {cur.kategori}: <Harga harga={cur.totalModal} /> /{" "}
                     <Harga harga={cur.totalJual} />
                   </div>
