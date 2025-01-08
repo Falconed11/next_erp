@@ -433,7 +433,7 @@ export default function App({ id_produk }) {
     <div className="flex flex-col gap-2">
       <div className="bg-white rounded-lg p-2">
         <div>Produk: {selectedProduk.nama}</div>
-        <div>Merek: {selectedProduk.merek}</div>
+        <div>Merek: {selectedProduk.nmerek}</div>
         <div>Tipe: {selectedProduk.tipe}</div>
         <div>Stok: {selectedProduk.stok}</div>
       </div>

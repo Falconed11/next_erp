@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useMemo } from "react";
+import { useSession } from "next-auth/react";
 import { v4 as uuidv4 } from "uuid";
 import * as XLSX from "xlsx";
 import Link from "next/link";
@@ -47,10 +48,12 @@ import { Button } from "@nextui-org/react";
 import { Input, Textarea } from "@nextui-org/react";
 import { getDate, getDateF, getDateFId } from "@/app/utils/date";
 import { LinkOpenNewTab } from "@/components/mycomponent";
+import { AuthorizationComponent } from "@/components/componentmanipulation";
 
 const apiPath = getApiPath();
 
 export default function App() {
+  const session = useSession();
   // dynamic input
   const [inputs, setInputs] = useState([{ id: uuidv4(), value: "" }]);
   const handleChange = (id, value) => {
@@ -459,6 +462,9 @@ export default function App() {
   if (kategori.isLoading) return <div>loading...</div>;
   if (merek.error) return <div>failed to load</div>;
   if (merek.isLoading) return <div>loading...</div>;
+  if (session.data?.user == undefined) return <div>loading...</div>;
+
+  const user = session.data?.user;
 
   let dataMerek = merek.data;
   dataMerek = dataMerek.filter((animal) =>
@@ -541,6 +547,23 @@ export default function App() {
     (acc, cur) => acc + cur.stok * cur.hargajual,
     0
   );
+  const result = produk.data.reduce((acc, item) => {
+    const existing = acc.find(
+      (entry) => entry.kategori === item.kategoriproduk
+    );
+    if (existing) {
+      existing.totalModal += item.stok * item.hargamodal;
+      existing.totalJual += item.stok * item.hargajual;
+    } else {
+      acc.push({
+        kategori: item.kategoriproduk,
+        totalModal: item.stok * item.hargamodal,
+        totalJual: item.stok * item.hargajual,
+      });
+    }
+    return acc;
+  }, []);
+
   // if (form.id_kategori) {
   //   filteredsubkategori = subkategori.data.filter((item) => {
   //     if (item.id_kategoriproduk == form.id_kategori) return item;
@@ -562,6 +585,20 @@ export default function App() {
         </div>
         <div className="bg-white border rounded-lg p-3">
           <div>Laporan</div>
+          <AuthorizationComponent
+            roles={["admin", "super"]}
+            user={user}
+            component={
+              <>
+                {result.map((cur, i) => (
+                  <div>
+                    {cur.kategori}: <Harga harga={cur.totalModal} /> /{" "}
+                    <Harga harga={cur.totalJual} />
+                  </div>
+                ))}
+              </>
+            }
+          />
           <div>
             Total Modal: <Harga harga={totalModal} />
           </div>
