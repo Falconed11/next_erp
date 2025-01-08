@@ -40,8 +40,13 @@ export default function TambahProduk({
   if (vendor.isLoading) return <div>loading...</div>;
 
   let data = produk.data;
-  data = data.filter((animal) =>
-    animal.nama.toLowerCase().includes(nama.toLowerCase())
+  data = data.filter(
+    (animal) =>
+      animal.nama.toLowerCase().includes(nama.toLowerCase()) ||
+      animal.nmerek.toLowerCase().includes(nama.toLowerCase()) ||
+      animal.tipe.toLowerCase().includes(nama.toLowerCase()) ||
+      animal.id.toString().includes(nama.toLowerCase()) ||
+      animal.keterangan.toLowerCase().includes(nama.toLowerCase())
   );
   data = data.slice(0, 20);
 

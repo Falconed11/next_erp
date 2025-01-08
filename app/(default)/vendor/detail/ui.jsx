@@ -89,6 +89,7 @@ export default function App({ id }) {
       selectKategori.values().next().value ?? ""
     }`
   );
+  console.log(id);
   const vendor = useClientFetch(
     `vendor?id=${id}&starta=${getDate(current.startDate)}&enda=${getDate(
       current.endDate
@@ -345,7 +346,7 @@ export default function App({ id }) {
     // },
   ];
 
-  console.log(pengeluaranproyek);
+  console.log(vendor.data);
   return (
     <div>
       <div className="-w-11/12">

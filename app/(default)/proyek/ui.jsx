@@ -489,7 +489,7 @@ export default function App({ id_instansi }) {
         isStriped
         className="pt-3"
         aria-label="Example table with custom cells"
-        selectionMode="multiple"
+        // selectionMode="multiple"
         selectedKeys={selectedKeys}
         onSelectionChange={setSelectedKeys}
         topContent={
@@ -508,7 +508,7 @@ export default function App({ id_instansi }) {
                 <RangeDate current={current} setCurrent={setCurrent} />
               </div>
             </div>
-            <div className="flex gap-2">
+            {/* <div className="flex gap-2">
               <div className="flex flex-row gap-2">
                 <Button
                   color="primary"
@@ -526,7 +526,7 @@ export default function App({ id_instansi }) {
               <Button color="primary" onPress={importPenawaran}>
                 Import Penawaran
               </Button>
-            </div>
+            </div> */}
           </>
         }
         bottomContent={

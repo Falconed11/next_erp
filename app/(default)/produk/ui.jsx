@@ -441,7 +441,8 @@ export default function App() {
       (row.nama.toLowerCase().includes(nama.toLowerCase()) ||
         row.nmerek?.toLowerCase().includes(nama.toLowerCase()) ||
         row.tipe?.toLowerCase().includes(nama.toLowerCase()) ||
-        row.vendor?.toLowerCase().includes(nama.toLowerCase())) &&
+        row.vendor?.toLowerCase().includes(nama.toLowerCase()) ||
+        row.keterangan?.toLowerCase().includes(nama.toLowerCase())) &&
       row.id_kustom.toLowerCase().includes(id.toLocaleLowerCase())
   );
 
