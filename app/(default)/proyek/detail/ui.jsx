@@ -1627,12 +1627,12 @@ export default function App({ id, versi }) {
                         <Image
                           src={logoBks}
                           alt="Company Logo"
-                          width={70}
+                          width={40}
                           // height={500} automatically provided
                           // blurDataURL="data:..." automatically provided
                           // placeholder="blur" // Optional blur-up while loading
                         />
-                        <div className="flex flex-col pl-2">
+                        <div className="flex flex-col pl-2 text-xs">
                           <div>Belga Karya Semesta</div>
                           <div>
                             General Trading - Mechanical Electrical - Supplies -
@@ -1649,12 +1649,12 @@ export default function App({ id, versi }) {
                         <Image
                           src={logoSvt}
                           alt="Company Logo"
-                          width={70}
+                          width={40}
                           // height={500} automatically provided
                           // blurDataURL="data:..." automatically provided
                           // placeholder="blur" // Optional blur-up while loading
                         />
-                        <div className="flex flex-col pl-2">
+                        <div className="flex flex-col pl-2 text-xs">
                           <div>Satu Visi Teknikatama</div>
                           <div>
                             General Trading - Mechanical Electrical - Supplies -
@@ -1669,9 +1669,9 @@ export default function App({ id, versi }) {
                       </>
                     )}
                   </div>
-                  <Divider className="bg-sky-500 my-3 py-2" />
+                  <Divider className="bg-sky-500 my-1 py-1" />
                   {/* <hr className="my-3 bg-sky-500 h-5" /> */}
-                  <div className="pt-3">
+                  <div className="pt-1 text-xs">
                     <div className="flex">
                       <div className="w-1/2">
                         <div>Kepada Yth,</div>
@@ -1701,8 +1701,7 @@ export default function App({ id, versi }) {
                       <div>Id : ASD21903SAD</div>
                       <div>Tanggal : 17 Oktober 2023</div>
                     </div> */}
-                    <br />
-                    <div>Dengan Hormat,</div>
+                    <div className="pt-1">Dengan Hormat,</div>
                     <div>
                       Sehubungan dengan adanya permintaan Bapak/Ibu, bersama ini
                       kami sampaikan penawaran harga/RAB di{" "}
@@ -1711,10 +1710,19 @@ export default function App({ id, versi }) {
                   </div>
                   {/* produk */}
                   <Table
-                    className="mt-3 border"
+                    className="border text-xs py-0 my-0"
+                    classNames={{
+                      wrapper: "my-0 py-0",
+                      base: "my-0 py-0",
+                      thead: "my-0 py-0",
+                      table: "my-0 py-0",
+                      tbody: "my-0 py-0",
+                      th: "text-xs py-0 my-0",
+                      td: "text-xs py-0", // Reduce font size and vertical padding
+                    }}
                     aria-label="Example table with custom cells"
                     shadow="none"
-                    topContent={<>Produk</>}
+                    topContent={<div className="py-0 my-0">Produk</div>}
                     bottomContent={
                       <>
                         <div className="text-right">
@@ -1724,9 +1732,9 @@ export default function App({ id, versi }) {
                       </>
                     }
                   >
-                    <TableHeader columns={col.penawaran}>
+                    <TableHeader className="my-0 py-0" columns={col.penawaran}>
                       {(column) => (
-                        <TableColumn key={column.key}>
+                        <TableColumn className="py-0 my-0" key={column.key}>
                           {column.label}
                         </TableColumn>
                       )}
@@ -1746,7 +1754,14 @@ export default function App({ id, versi }) {
                   {/* instalasi */}
                   {dataInstalasi.length > 0 ? (
                     <Table
-                      className="mt-3 border"
+                      className="mt-0 border text-xs my-0 py-0"
+                      classNames={{
+                        base: "py-0 my-0",
+                        wrapper: "py-0 my-0",
+                        td: "text-xs py-0",
+                        thead: "py-0 my-0",
+                        th: "py-0 my-0",
+                      }}
                       aria-label="Example table with custom cells"
                       shadow="none"
                       topContent={<>Instalasi</>}
@@ -1781,10 +1796,11 @@ export default function App({ id, versi }) {
                   ) : (
                     <></>
                   )}
-                  <div className="mt-3 p-3 border no-break">
-                    <div>Rekapitulasi</div>
+                  {/* Rekapitulasi */}
+                  <div className="mt-0 px-3 border no-break text-xs">
+                    {/* <div>Rekapitulasi</div> */}
                     <div className="flex">
-                      <div className="basis-3/6"></div>
+                      <div className="basis-3/6">Rekapitulasi</div>
                       <div className="basis-2/6">
                         <div>Produk</div>
                         <div>Instalasi</div>
@@ -1826,11 +1842,17 @@ export default function App({ id, versi }) {
                     </div>
                   </div>
                   {/* keterangan */}
-                  <div className="flex flex-col mt-3">
-                    <div className="no-break pb-3">
+                  <div className="flex flex-col mt-3 text-xs">
+                    <div className="no-break pb-1">
                       Keterangan <br />
-                      - Harga belum termasuk instalasi pemasangan. <br />- Harga{" "}
-                      {keteranganPajak} termasuk pajak-pajak. <br />
+                      {dataInstalasi.length < 0 ? (
+                        <>
+                          - Harga belum termasuk instalasi pemasangan. <br />
+                        </>
+                      ) : (
+                        ""
+                      )}
+                      - Harga {keteranganPajak} termasuk pajak-pajak. <br />
                       - Syarat pembayaran sesuai dengan kesepakatan kedua belah
                       pihak. <br />
                       - Waktu penyerahan barang sesuai jadwal yang disepakati
@@ -1838,13 +1860,16 @@ export default function App({ id, versi }) {
                       sewaktu-waktu.
                     </div>
                     <div className="no-break">
-                      Demikian penawaran ini kami ajukan, sambil menantikan
-                      pesanan Bapak/Ibu, kami ucapkan terima kasih. <br />{" "}
-                      <br />
-                      Hormat kami, <br /> <br />
-                      {proyek.data[0].namakaryawan} <br /> <br /># Penawaran ini
-                      dikeluarkan secara otomatis oleh sistem sehingga tidak
-                      memerlukan tanda-tangan.
+                      <div>
+                        Demikian penawaran ini kami ajukan, sambil menantikan
+                        pesanan Bapak/Ibu, kami ucapkan terima kasih.
+                      </div>
+                      <div className="pt-1">Hormat kami,</div>
+                      <div>{proyek.data[0].namakaryawan}</div>
+                      <div className="pt-1">
+                        # Penawaran ini dikeluarkan secara otomatis oleh sistem
+                        sehingga tidak memerlukan tanda-tangan.
+                      </div>
                     </div>
                   </div>
                   {/* <div className="mt-3 bg-sky-500 h-px"></div>
