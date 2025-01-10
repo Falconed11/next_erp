@@ -1709,48 +1709,56 @@ export default function App({ id, versi }) {
                     </div>
                   </div>
                   {/* produk */}
-                  <Table
-                    className="border text-xs py-0 my-0"
-                    classNames={{
-                      wrapper: "my-0 py-0",
-                      base: "my-0 py-0",
-                      thead: "my-0 py-0",
-                      table: "my-0 py-0",
-                      tbody: "my-0 py-0",
-                      th: "text-xs py-0 my-0",
-                      td: "text-xs py-0", // Reduce font size and vertical padding
-                    }}
-                    aria-label="Example table with custom cells"
-                    shadow="none"
-                    topContent={<div className="py-0 my-0">Produk</div>}
-                    bottomContent={
-                      <>
-                        <div className="text-right">
-                          Sub Total Harga :{" "}
-                          {subTotalKustomJual.toLocaleString("id-ID")}
-                        </div>
-                      </>
-                    }
-                  >
-                    <TableHeader className="my-0 py-0" columns={col.penawaran}>
-                      {(column) => (
-                        <TableColumn className="py-0 my-0" key={column.key}>
-                          {column.label}
-                        </TableColumn>
-                      )}
-                    </TableHeader>
-                    <TableBody items={result}>
-                      {(item) => (
-                        <TableRow key={item.no}>
-                          {(columnKey) => (
-                            <TableCell>
-                              {renderCell.penawaran(item, columnKey)}
-                            </TableCell>
-                          )}
-                        </TableRow>
-                      )}
-                    </TableBody>
-                  </Table>
+                  {dataPenawaran.length > 0 ? (
+                    <Table
+                      className="border text-xs py-0 my-0"
+                      classNames={{
+                        wrapper: "my-0 py-0",
+                        base: "my-0 py-0",
+                        thead: "my-0 py-0",
+                        table: "my-0 py-0",
+                        tbody: "my-0 py-0",
+                        th: "text-xs py-0 my-0",
+                        td: "text-xs py-0", // Reduce font size and vertical padding
+                      }}
+                      aria-label="Example table with custom cells"
+                      shadow="none"
+                      topContent={<div className="py-0 my-0">Produk</div>}
+                      bottomContent={
+                        <>
+                          <div className="text-right">
+                            Sub Total Harga :{" "}
+                            {subTotalKustomJual.toLocaleString("id-ID")}
+                          </div>
+                        </>
+                      }
+                    >
+                      <TableHeader
+                        className="my-0 py-0"
+                        columns={col.penawaran}
+                      >
+                        {(column) => (
+                          <TableColumn className="py-0 my-0" key={column.key}>
+                            {column.label}
+                          </TableColumn>
+                        )}
+                      </TableHeader>
+                      <TableBody items={result}>
+                        {(item) => (
+                          <TableRow key={item.no}>
+                            {(columnKey) => (
+                              <TableCell>
+                                {renderCell.penawaran(item, columnKey)}
+                              </TableCell>
+                            )}
+                          </TableRow>
+                        )}
+                      </TableBody>
+                    </Table>
+                  ) : (
+                    <></>
+                  )}
+
                   {/* instalasi */}
                   {dataInstalasi.length > 0 ? (
                     <Table

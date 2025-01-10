@@ -102,8 +102,11 @@ export default function TambahProduk({
         onValueChange={setNama}
       >
         {(item) => (
-          <AutocompleteItem key={item.id} textValue={item.nama}>
-            {item.nama} | {item.nmerek} | {item.nvendor} | {item.tipe} |{" "}
+          <AutocompleteItem
+            key={item.id}
+            textValue={`${item.nama} ${item.nmerek} ${item.tipe} ${item.id}`}
+          >
+            {item.nama} | {item.nmerek} | {item.tipe} |{" "}
             <span className="p-1 bg-black text-white">
               {item.stok} {item.satuan}
             </span>{" "}
@@ -195,7 +198,7 @@ export default function TambahProduk({
         value={form.harga}
         label={
           <>
-            Harga (Ref:{" "}
+            Harga Satuan (Ref:{" "}
             {
               <Harga
                 harga={
@@ -223,7 +226,7 @@ export default function TambahProduk({
           })
         }
       />
-      {disableHargaKustom ? (
+      {/* {disableHargaKustom ? (
         <></>
       ) : (
         <Input
@@ -239,7 +242,7 @@ export default function TambahProduk({
             })
           }
         />
-      )}
+      )} */}
       {customInput ? customInput : <></>}
     </div>
   );
