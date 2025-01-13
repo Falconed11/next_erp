@@ -795,7 +795,7 @@ export default function App({ id, versi }) {
   const selectedVersion = selectVersi.values().next().value;
 
   // console.log(form.selectSubProyek?.values().next().value ?? 0);
-  // console.log(form.selectSubProyek);
+  console.log(dataInstalasi.length);
   return (
     <div>
       <div className="flex flex-row gap-2">
@@ -1540,7 +1540,7 @@ export default function App({ id, versi }) {
                     })
                   }
                 />
-                <Input
+                {/* <Input
                   type="number"
                   value={form.hargakustom}
                   label="Harga Kustom"
@@ -1551,7 +1551,7 @@ export default function App({ id, versi }) {
                       hargakustom: v,
                     })
                   }
-                />
+                /> */}
                 <div>Harga Modal : {form.hargamodal}</div>
                 <div>Harga Jual : {form.harga}</div>
                 <div>Provit : {form.harga - form.hargamodal}</div>
@@ -1859,7 +1859,7 @@ export default function App({ id, versi }) {
                   <div className="flex flex-col mt-3 text-xs">
                     <div className="no-break pb-1">
                       Keterangan <br />
-                      {dataInstalasi.length < 0 ? (
+                      {dataInstalasi.length < 1 ? (
                         <>
                           - Harga belum termasuk instalasi pemasangan. <br />
                         </>
