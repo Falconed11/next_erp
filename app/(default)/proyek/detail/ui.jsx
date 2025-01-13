@@ -405,7 +405,13 @@ export default function App({ id, versi }) {
         case "no":
           return data.jumlah ? data.no : <></>;
         case "jumlah":
-          return data.jumlah ? `${data.jumlah} ${data.satuan ?? ""}` : <></>;
+          return data.jumlah ? (
+            <div className="text-right">
+              {data.jumlah} {data.satuan ?? ""}
+            </div>
+          ) : (
+            <></>
+          );
         case "hargajual":
           return data.jumlah ? (
             <div className="text-right">{harga.toLocaleString("id-ID")}</div>
@@ -649,8 +655,8 @@ export default function App({ id, versi }) {
         label: "Nama Barang",
       },
       {
-        key: "merek",
-        label: "",
+        key: "nmerek",
+        label: "Merek",
       },
       {
         key: "tipe",

@@ -388,8 +388,8 @@ export default function App() {
                 </Select> */}
                 <Input
                   type="text"
-                  label="Nama Instansi"
-                  placeholder="Masukkan nama instansi!"
+                  label="Nama Merek"
+                  placeholder="Masukkan nama merek!"
                   value={form.nama}
                   onValueChange={(val) => setForm({ ...form, nama: val })}
                 />
