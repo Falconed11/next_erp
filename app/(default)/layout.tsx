@@ -129,6 +129,11 @@ export default function RootLayout({ children, }: { children: React.ReactNode })
                     name: "Omset",
                     href: "/omset"
                 },
+                {
+                    key: "produkmasuk",
+                    name: "Produk Masuk",
+                    href: "/produkmasuk"
+                },
             ]
         },)
     if (user?.peran == "super") links.push({ href: "/user", name: "User" },)
