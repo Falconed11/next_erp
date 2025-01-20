@@ -584,7 +584,8 @@ export default function App() {
             </Button>
           </div>
         </div>
-        <div className="bg-white border rounded-lg p-3">
+        {/* Laporan */}
+        {/* <div className="bg-white border rounded-lg p-3">
           <div>Laporan</div>
           <AuthorizationComponent
             roles={["admin", "super"]}
@@ -609,7 +610,7 @@ export default function App() {
           <div>
             Total Provit: <Harga harga={totalJual - totalModal} />
           </div>
-        </div>
+        </div> */}
         <div>
           <TemplateImport
             report={report}

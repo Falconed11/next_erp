@@ -311,7 +311,26 @@ export default function App({ id_instansi }) {
               }`}
               icon={<NoteIcon />}
             />
-            {versi > 0 ? (
+            {peran == "admin" || peran == "super" ? (
+              <Tooltip content="Pengeluaran Proyek">
+                <Link href={`/proyek/detail/proses?id=${data.id}`}>
+                  <span
+                    // onClick={() => detailButtonPress(data)}
+                    role="link"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      window.open(`/proyek/detail/proses?id=${data.id}`);
+                    }}
+                    className="text-lg text-default-400 cursor-pointer active:opacity-50"
+                  >
+                    <ReportMoneyIcon />
+                  </span>
+                </Link>
+              </Tooltip>
+            ) : (
+              <></>
+            )}
+            {/* {versi > 0 ? (
               peran == "admin" || peran == "super" ? (
                 <Tooltip content="Pengeluaran Proyek">
                   <Link href={`/proyek/detail/proses?id=${data.id}`}>
@@ -333,7 +352,7 @@ export default function App({ id_instansi }) {
               )
             ) : (
               <></>
-            )}
+            )} */}
             <Tooltip content="Edit">
               <span
                 onClick={() => editButtonPress(data)}

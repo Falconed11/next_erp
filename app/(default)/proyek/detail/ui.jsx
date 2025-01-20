@@ -1020,7 +1020,7 @@ export default function App({ id, versi }) {
               ) : (
                 <></>
               )}
-              {["admin", "super"].includes(user?.peran) ? (
+              {/* {["admin", "super"].includes(user?.peran) ? (
                 selectedProyek.versi > 0 ? (
                   user?.peran == "admin" || user?.peran == "super" ? (
                     <Link
@@ -1035,7 +1035,11 @@ export default function App({ id, versi }) {
                 )
               ) : (
                 <></>
-              )}
+              )} */}
+              <Link
+                className="text-blue-600 p-3"
+                href={`/proyek/detail/proses?id=${selectedProyek.id}`}
+              >{`Pengeluaran Proyek ==>>`}</Link>
               {/* <div>
             <Button
               onClick={modal.invoice.onOpen}
