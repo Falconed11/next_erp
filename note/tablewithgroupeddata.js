@@ -6,7 +6,7 @@ import {
   TableRow,
   TableCell,
   TableSection,
-} from "@nextui-org/react";
+} from "@heroui/react";
 
 // Assume your data is in this format
 const data = [

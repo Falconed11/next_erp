@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import * as XLSX from "xlsx";
 import { TemplateImport } from "@/components/input";
-import { Button } from "@nextui-org/react";
+import { Button } from "@heroui/react";
 import {
   Modal,
   ModalContent,
@@ -10,7 +10,7 @@ import {
   ModalBody,
   ModalFooter,
   useDisclosure,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import {
   getDate,
   getDateF,

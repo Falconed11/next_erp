@@ -1,5 +1,5 @@
-import { Tooltip } from "@nextui-org/react";
-import { Link } from "@nextui-org/react";
+import { Tooltip } from "@heroui/react";
+import { Link } from "@heroui/react";
 
 const MyChip = ({ text, theme }) => {
   console.log(text, theme);

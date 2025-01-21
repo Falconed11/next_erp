@@ -19,7 +19,7 @@ import {
   Pagination,
   ChipProps,
   getKeyValue,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import {
   Modal,
   ModalContent,
@@ -28,10 +28,10 @@ import {
   ModalFooter,
   Button,
   useDisclosure,
-} from "@nextui-org/react";
-import { Input } from "@nextui-org/react";
-import { Textarea } from "@nextui-org/react";
-import { Select, SelectItem } from "@nextui-org/react";
+} from "@heroui/react";
+import { Input } from "@heroui/react";
+import { Textarea } from "@heroui/react";
+import { Select, SelectItem } from "@heroui/react";
 import Link from "next/link";
 import {
   AddIcon,

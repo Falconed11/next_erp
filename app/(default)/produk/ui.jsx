@@ -4,7 +4,7 @@ import { useSession } from "next-auth/react";
 import { v4 as uuidv4 } from "uuid";
 import * as XLSX from "xlsx";
 import Link from "next/link";
-import { Autocomplete, AutocompleteItem } from "@nextui-org/react";
+import { Autocomplete, AutocompleteItem } from "@heroui/react";
 import {
   Table,
   TableHeader,
@@ -18,8 +18,8 @@ import {
   Pagination,
   ChipProps,
   getKeyValue,
-} from "@nextui-org/react";
-import { Select, SelectItem } from "@nextui-org/react";
+} from "@heroui/react";
+import { Select, SelectItem } from "@heroui/react";
 import {
   AddIcon,
   EditIcon,
@@ -36,16 +36,16 @@ import {
   ModalBody,
   ModalFooter,
   useDisclosure,
-} from "@nextui-org/react";
-import { RadioGroup, Radio } from "@nextui-org/react";
+} from "@heroui/react";
+import { RadioGroup, Radio } from "@heroui/react";
 import Harga from "@/components/harga";
 import { TemplateImport } from "@/components/input";
 import { FilterProduk } from "@/components/filter";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { getApiPath, useClientFetch } from "@/app/utils/apiconfig";
-import { Button } from "@nextui-org/react";
-import { Input, Textarea } from "@nextui-org/react";
+import { Button } from "@heroui/react";
+import { Input, Textarea } from "@heroui/react";
 import { getDate, getDateF, getDateFId } from "@/app/utils/date";
 import { LinkOpenNewTab } from "@/components/mycomponent";
 import { AuthorizationComponent } from "@/components/componentmanipulation";

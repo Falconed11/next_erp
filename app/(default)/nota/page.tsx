@@ -1,4 +1,4 @@
-import { Button } from "@nextui-org/react";
+import { Button } from "@heroui/react";
 import TableNota from "./tabelnota"
 
 export default function app() {

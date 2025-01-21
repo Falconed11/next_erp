@@ -12,7 +12,7 @@ import {
   Tooltip,
   ChipProps,
   getKeyValue,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import {
   AddIcon,
   EditIcon,
@@ -28,11 +28,11 @@ import {
   ModalBody,
   ModalFooter,
   useDisclosure,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { getApiPath, useClientFetch } from "../../utils/apiconfig";
 import { FileUploader } from "@/components/input";
-import { Button } from "@nextui-org/react";
-import { Input } from "@nextui-org/react";
+import { Button } from "@heroui/react";
+import { Input } from "@heroui/react";
 import Link from "next/link";
 
 const apiPath = getApiPath();

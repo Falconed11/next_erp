@@ -1,6 +1,6 @@
 import { useClientFetch } from "@/app/utils/apiconfig";
-import { Select, SelectItem } from "@nextui-org/react";
-import { Input } from "@nextui-org/react";
+import { Select, SelectItem } from "@heroui/react";
+import { Input } from "@heroui/react";
 
 const FilterProduk = ({
   id,

@@ -2,10 +2,10 @@
 import React, { useState, useMemo } from "react";
 import { useSession } from "next-auth/react";
 import * as XLSX from "xlsx";
-import { RadioGroup, Radio } from "@nextui-org/react";
+import { RadioGroup, Radio } from "@heroui/react";
 import { useClientFetch, getApiPath } from "@/app/utils/apiconfig";
 import { fIdProyek } from "@/app/utils/formatid";
-import { Autocomplete, AutocompleteItem } from "@nextui-org/react";
+import { Autocomplete, AutocompleteItem } from "@heroui/react";
 import {
   Table,
   TableHeader,
@@ -19,7 +19,7 @@ import {
   Tooltip,
   ChipProps,
   getKeyValue,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import {
   Modal,
   ModalContent,
@@ -28,10 +28,10 @@ import {
   ModalFooter,
   Button,
   useDisclosure,
-} from "@nextui-org/react";
-import { Input } from "@nextui-org/react";
-import { Textarea } from "@nextui-org/react";
-import { Select, SelectItem } from "@nextui-org/react";
+} from "@heroui/react";
+import { Input } from "@heroui/react";
+import { Textarea } from "@heroui/react";
+import { Select, SelectItem } from "@heroui/react";
 import Link from "next/link";
 import {
   AddIcon,

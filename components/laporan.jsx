@@ -12,8 +12,8 @@ import {
   Tooltip,
   ChipProps,
   getKeyValue,
-} from "@nextui-org/react";
-import { Button } from "@nextui-org/react";
+} from "@heroui/react";
+import { Button } from "@heroui/react";
 import * as XLSX from "xlsx";
 import {
   useClientFetch,

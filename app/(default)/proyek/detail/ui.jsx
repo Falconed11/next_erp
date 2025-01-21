@@ -14,7 +14,7 @@ import {
   Tooltip,
   ChipProps,
   getKeyValue,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import {
   AddIcon,
   EditIcon,
@@ -29,7 +29,7 @@ import {
   ModalBody,
   ModalFooter,
   useDisclosure,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { useReactToPrint } from "react-to-print";
 import {
   getApiPath,
@@ -41,12 +41,12 @@ import { penawaran } from "@/app/utils/formatid";
 import Harga from "@/components/harga";
 import { ConditionalComponent } from "@/components/componentmanipulation";
 import TambahProduk from "@/components/tambahproduk";
-import { Button } from "@nextui-org/react";
-import { Input } from "@nextui-org/react";
-import { Divider } from "@nextui-org/react";
-import { Spacer } from "@nextui-org/react";
-import { Select, SelectItem } from "@nextui-org/react";
-import { CheckboxGroup, Checkbox } from "@nextui-org/react";
+import { Button } from "@heroui/react";
+import { Input } from "@heroui/react";
+import { Divider } from "@heroui/react";
+import { Spacer } from "@heroui/react";
+import { Select, SelectItem } from "@heroui/react";
+import { CheckboxGroup, Checkbox } from "@heroui/react";
 import Link from "next/link";
 import Image from "next/image";
 import logoBks from "@/public/logo-bks.jpeg";

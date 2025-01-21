@@ -1,11 +1,11 @@
 import { useState } from "react";
 import * as XLSX from "xlsx";
 import { useDropzone } from "react-dropzone";
-import { Button } from "@nextui-org/react";
+import { Button } from "@heroui/react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import Link from "next/link";
-import { Input, Textarea } from "@nextui-org/react";
+import { Input, Textarea } from "@heroui/react";
 import { getDate, excelToJSDate } from "@/app/utils/date";
 import { getApiPath } from "@/app/utils/apiconfig";
 

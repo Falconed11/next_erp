@@ -8,14 +8,14 @@ import {
   DropdownMenu,
   DropdownItem,
   Button,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { useRouter } from "next/navigation";
 
 export default function Navigation({ navLinks }) {
   const router = useRouter();
   const pathname = usePathname();
   return (
-    <nav className="mx-3 flex flex-col rounded-lg columns-10 bg-background">
+    (<nav className="mx-3 flex flex-col rounded-lg columns-10 bg-background">
       <ul>
         {navLinks.map((link) => {
           const isActive =
@@ -27,7 +27,7 @@ export default function Navigation({ navLinks }) {
               ? "bg-slate-300 text-black cursor-pointer p-2"
               : "text-black cursor-pointer p-2";
             return (
-              <li key={link.name}>
+              (<li key={link.name}>
                 <div className={customclass}>
                   <Dropdown>
                     <DropdownTrigger>
@@ -46,15 +46,15 @@ export default function Navigation({ navLinks }) {
                       }}
                     >
                       {dropdown.map((item) => (
-                        <DropdownItem textValue={item.name} key={item.key}>
+                        (<DropdownItem textValue={item.name} key={item.key}>
                           {item.name}
-                        </DropdownItem>
+                        </DropdownItem>)
                         //</Link>
                       ))}
                     </DropdownMenu>
                   </Dropdown>
                 </div>
-              </li>
+              </li>)
             );
           }
 
@@ -72,6 +72,6 @@ export default function Navigation({ navLinks }) {
           );
         })}
       </ul>
-    </nav>
+    </nav>)
   );
 }

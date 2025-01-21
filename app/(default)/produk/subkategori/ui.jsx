@@ -12,7 +12,7 @@ import {
   Tooltip,
   ChipProps,
   getKeyValue,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import {
   AddIcon,
   EditIcon,
@@ -27,12 +27,12 @@ import {
   ModalBody,
   ModalFooter,
   useDisclosure,
-} from "@nextui-org/react";
-import { Select, SelectItem } from "@nextui-org/react";
+} from "@heroui/react";
+import { Select, SelectItem } from "@heroui/react";
 import "react-datepicker/dist/react-datepicker.css";
 import { getApiPath, useClientFetch } from "../../../utils/apiconfig";
-import { Button } from "@nextui-org/react";
-import { Input } from "@nextui-org/react";
+import { Button } from "@heroui/react";
+import { Input } from "@heroui/react";
 
 const api_path = getApiPath();
 

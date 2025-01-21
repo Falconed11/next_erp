@@ -16,7 +16,7 @@ import {
   ChipProps,
   getKeyValue,
   Textarea,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import {
   Modal,
   ModalContent,
@@ -24,11 +24,11 @@ import {
   ModalBody,
   ModalFooter,
   useDisclosure,
-} from "@nextui-org/react";
-import { Button } from "@nextui-org/react";
-import { Input } from "@nextui-org/react";
-import { RadioGroup, Radio } from "@nextui-org/react";
-import { Select, SelectItem } from "@nextui-org/react";
+} from "@heroui/react";
+import { Button } from "@heroui/react";
+import { Input } from "@heroui/react";
+import { RadioGroup, Radio } from "@heroui/react";
+import { Select, SelectItem } from "@heroui/react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import {
