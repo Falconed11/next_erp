@@ -42,6 +42,7 @@ import {
   NoteIcon,
   ReportMoneyIcon,
   FileExportIcon,
+  DangerTriangleBrokenIcon,
 } from "@/components/icon";
 import {
   getCurFirstLastDay,
@@ -52,6 +53,7 @@ import {
 import { FileUploader } from "@/components/input";
 import { RangeDate } from "@/components/input";
 import { LinkOpenNewTab } from "@/components/mycomponent";
+import Harga from "@/components/harga";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -286,11 +288,31 @@ export default function App({ id_instansi }) {
       case "swasta":
         return data.swasta ? "swasta" : "negri";
       case "status":
-        return data.versi == -1
-          ? "reject"
-          : data.versi == 0
-          ? "penawaran"
-          : "deal";
+        return data.versi == -1 ? (
+          "reject"
+        ) : data.versi > 0 ? (
+          "deal"
+        ) : data.pengeluaranproyek > 0 ? (
+          <Tooltip
+            color="warning"
+            content="Proyek Berjalan. Belum ada penawaran."
+          >
+            <div
+              // onClick={() => editButtonPress(data)}
+              className="text-4xl text-warning cursor-help active:opacity-50 text-center"
+            >
+              <DangerTriangleBrokenIcon />
+            </div>
+          </Tooltip>
+        ) : (
+          "penawaran"
+        );
+      case "pengeluaranproyek":
+        return (
+          <div className="text-right">
+            <Harga harga={data.pengeluaranproyek} />
+          </div>
+        );
       case "tanggal":
         return data.tanggal ? getDateF(new Date(data.tanggal)) : "";
       case "tanggal_penawaran":
@@ -454,6 +476,10 @@ export default function App({ id_instansi }) {
     {
       key: "status",
       label: "Status",
+    },
+    {
+      key: "pengeluaranproyek",
+      label: "Pengeluaran Proyek",
     },
     {
       key: "tanggal_penawaran",
