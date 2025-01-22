@@ -9,13 +9,14 @@ import {
   DropdownItem,
   Button,
 } from "@heroui/react";
+// import { Badge, Avatar } from "@heroui/react";
 import { useRouter } from "next/navigation";
 
 export default function Navigation({ navLinks }) {
   const router = useRouter();
   const pathname = usePathname();
   return (
-    (<nav className="mx-3 flex flex-col rounded-lg columns-10 bg-background">
+    <nav className="mx-3 flex flex-col rounded-lg columns-10 bg-background">
       <ul>
         {navLinks.map((link) => {
           const isActive =
@@ -27,12 +28,20 @@ export default function Navigation({ navLinks }) {
               ? "bg-slate-300 text-black cursor-pointer p-2"
               : "text-black cursor-pointer p-2";
             return (
-              (<li key={link.name}>
+              <li key={link.name}>
+                {/* <Badge color="warning" content="5"> */}
                 <div className={customclass}>
                   <Dropdown>
                     <DropdownTrigger>
                       <Button className="p-0 m-0 bg-transparent text-left justify-start text-base h-fit">
-                        {link.name}
+                        <div>{link.name}</div>
+                        {link.name == "Proyek" && true ? (
+                          <div className="text-black bg-warning rounded-full px-2">
+                            2
+                          </div>
+                        ) : (
+                          <></>
+                        )}
                       </Button>
                     </DropdownTrigger>
                     <DropdownMenu
@@ -46,15 +55,16 @@ export default function Navigation({ navLinks }) {
                       }}
                     >
                       {dropdown.map((item) => (
-                        (<DropdownItem textValue={item.name} key={item.key}>
+                        <DropdownItem textValue={item.name} key={item.key}>
                           {item.name}
-                        </DropdownItem>)
+                        </DropdownItem>
                         //</Link>
                       ))}
                     </DropdownMenu>
                   </Dropdown>
                 </div>
-              </li>)
+                {/* </Badge> */}
+              </li>
             );
           }
 
@@ -72,6 +82,6 @@ export default function Navigation({ navLinks }) {
           );
         })}
       </ul>
-    </nav>)
+    </nav>
   );
 }
