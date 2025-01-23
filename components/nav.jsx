@@ -11,8 +11,14 @@ import {
 } from "@heroui/react";
 // import { Badge, Avatar } from "@heroui/react";
 import { useRouter } from "next/navigation";
+import { useClientFetch } from "@/app/utils/apiconfig";
 
 export default function Navigation({ navLinks }) {
+  const proyek = useClientFetch(
+    `proyek?${id_instansi ? `id_instansi=${id_instansi}` : ""}${
+      current.startDate ? `&start=${getDate(current.startDate)}` : ""
+    }${current.endDate ? `&end=${getDate(current.endDate)}` : ""}&sort=${sort}`
+  );
   const router = useRouter();
   const pathname = usePathname();
   return (

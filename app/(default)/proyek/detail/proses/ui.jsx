@@ -458,7 +458,10 @@ export default function App({ id }) {
   //   0
   // );
   const biayaProduksi = pengeluaranproyek.data.reduce((total, v) => {
-    return total + v.jumlah * (v.hargakustom ? v.hargakustom : v.hargamodal);
+    return (
+      total +
+      v.jumlah * (v.hargapengeluaran ? v.hargapengeluaran : v.hargamodal)
+    );
   }, 0);
   const omset = pembayaranproyek.data.reduce((total, v) => {
     return total + v.nominal;
