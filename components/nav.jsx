@@ -14,13 +14,14 @@ import { useRouter } from "next/navigation";
 import { useClientFetch } from "@/app/utils/apiconfig";
 
 export default function Navigation({ navLinks }) {
-  const proyek = useClientFetch(
-    `proyek?${id_instansi ? `id_instansi=${id_instansi}` : ""}${
-      current.startDate ? `&start=${getDate(current.startDate)}` : ""
-    }${current.endDate ? `&end=${getDate(current.endDate)}` : ""}&sort=${sort}`
-  );
+  const proyek = useClientFetch(`proyek?countProgressNoOffer=true`);
   const router = useRouter();
   const pathname = usePathname();
+
+  if (proyek.error) return <div>failed to load</div>;
+  if (proyek.isLoading) return <div>loading...</div>;
+
+  const numberProgressNoOffer = proyek.data.length;
   return (
     <nav className="mx-3 flex flex-col rounded-lg columns-10 bg-background">
       <ul>
@@ -41,9 +42,9 @@ export default function Navigation({ navLinks }) {
                     <DropdownTrigger>
                       <Button className="p-0 m-0 bg-transparent text-left justify-start text-base h-fit">
                         <div>{link.name}</div>
-                        {link.name == "Proyek" && true ? (
+                        {link.name == "Proyek" && numberProgressNoOffer > 0 ? (
                           <div className="text-black bg-warning rounded-full px-2">
-                            2
+                            {numberProgressNoOffer}
                           </div>
                         ) : (
                           <></>

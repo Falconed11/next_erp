@@ -1,7 +1,8 @@
 "use client";
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useRef } from "react";
 import * as XLSX from "xlsx";
 import Link from "next/link";
+import { useReactToPrint } from "react-to-print";
 import { Autocomplete, AutocompleteItem } from "@heroui/react";
 import {
   Table,
@@ -47,10 +48,19 @@ import { getDate, getDateFId } from "@/app/utils/date";
 const apiPath = getApiPath();
 
 export default function App({ id_produk }) {
+  const componentRef = {
+    laporanstok: useRef(),
+    invoice: useRef(),
+  };
+  const handlePrintLaporanStok = useReactToPrint({
+    content: () => componentRef.laporanstok.current,
+    pageStyle: "bg-white",
+  });
+
   const [nama, setNama] = useState("");
   const [id, setId] = useState("");
   const produkmasuk = useClientFetch(
-    `produkmasuk?${id_produk ? `id_produk=${id_produk}` : ""}`
+    `produkmasuk?${id_produk ? `id_produk=${id_produk}` : ""}&laporan=true`
   );
   const produk = useClientFetch(`produk?id=${id_produk}`);
   const vendor = useClientFetch(`vendor?columnName=nama`);
@@ -253,35 +263,40 @@ export default function App({ id_produk }) {
 
   const renderCell = React.useCallback((data, columnKey) => {
     const cellValue = data[columnKey];
+    // const hutang = data.jumlah * data.harga - data.terbayar;
     switch (columnKey) {
+      case "stok":
+        return data.jumlah - data.keluar;
       case "tanggal":
-        return getDateFId(new Date(data.tanggal));
-      case "terbayar":
+        return data.tanggal ? getDateFId(new Date(data.tanggal)) : "";
+      case "hutang":
         return (
           <div
             className={`text-right px-1 rounded ${
-              data.jumlah * data.harga > data.terbayar
+              data.hutang > 0
                 ? new Date() >= new Date(data.jatuhtempo)
                   ? "bg-red-200"
                   : "bg-yellow-200"
                 : ""
             }`}
           >
-            <Harga harga={data.terbayar} />
+            <Harga harga={+data.hutang} />
           </div>
         );
       case "jatuhtempo":
         return data.jatuhtempo ? getDateFId(new Date(data.jatuhtempo)) : "";
       case "harga":
-        return (
+        return data.harga ? (
           <div className="text-right">
             <Harga harga={data.harga} />
           </div>
+        ) : (
+          ""
         );
-      case "total":
+      case "sisamodal":
         return (
           <div className="text-right">
-            <Harga harga={data.harga * data.jumlah} />
+            <Harga harga={data.sisamodal} />
           </div>
         );
       case "aksi":
@@ -369,33 +384,29 @@ export default function App({ id_produk }) {
     //   key: "id_kustom",
     //   label: "Id",
     // },
-    // {
-    //   key: "nama",
-    //   label: "Produk",
-    // },
-    // {
-    //   key: "merek",
-    //   label: "Merek",
-    // },
-    // {
-    //   key: "tipe",
-    //   label: "Tipe",
-    // },
+    {
+      key: "kategoriproduk",
+      label: "Kategori",
+    },
+    {
+      key: "nama",
+      label: "Produk",
+    },
+    {
+      key: "merek",
+      label: "Merek",
+    },
+    {
+      key: "tipe",
+      label: "Tipe",
+    },
     {
       key: "vendor",
       label: "Vendor",
     },
-    // {
-    //   key: "stok",
-    //   label: "Stok",
-    // },
     {
-      key: "jumlah",
-      label: "Jumlah",
-    },
-    {
-      key: "keluar",
-      label: "Keluar",
+      key: "sisa",
+      label: "Stok",
     },
     {
       key: "satuan",
@@ -406,29 +417,60 @@ export default function App({ id_produk }) {
       label: "Harga",
     },
     {
-      key: "total",
+      key: "sisamodal",
       label: "Total",
     },
     {
-      key: "terbayar",
-      label: "Terbayar",
+      key: "hutang",
+      label: "Hutang",
     },
     {
       key: "tanggal",
-      label: "Tanggal",
+      label: "Tanggal Masuk",
     },
     {
       key: "jatuhtempo",
       label: "Jatuh Tempo",
     },
-    {
-      key: "aksi",
-      label: "Aksi",
-    },
+    // {
+    //   key: "aksi",
+    //   label: "Aksi",
+    // },
   ];
 
-  const selectedProduk = produk.data[0];
-  console.log(selectedProduk);
+  let uniqeId = -1;
+  const result = Object.values(
+    filteredData
+      // Group by category
+      .reduce((acc, item) => {
+        const { kategoriproduk, sisamodal, hutang } = item;
+        if (!acc[kategoriproduk]) {
+          acc[kategoriproduk] = {
+            items: [],
+            totalsisamodal: 0,
+            totalhutang: 0,
+          };
+        }
+        acc[kategoriproduk].items.push(item);
+        acc[kategoriproduk].totalsisamodal += sisamodal;
+        acc[kategoriproduk].totalhutang += hutang;
+        return acc;
+      }, {})
+  )
+    // Flatten the grouped structure and add total objects
+    .flatMap(({ items, totalsisamodal, totalhutang }) => [
+      {
+        id: uniqeId--,
+        satuan: "Total",
+        sisamodal: totalsisamodal,
+        hutang: totalhutang,
+        // kategoriproduk: items[0].kategoriproduk,
+      },
+      ...items,
+    ]);
+
+  // const selectedProduk = produk.data[0];
+  // console.log(selectedProduk);
   return (
     <div className="flex flex-col gap-2">
       {/* <div className="flex flex-row gap-2">
@@ -448,64 +490,83 @@ export default function App({ id_produk }) {
           Upload Excel
         </Button>
       </div> */}
-      {/* Table Masuk */}
-      <Table
-        isStriped
-        className=""
-        aria-label="Example table with custom cells"
-        topContent={
-          <>
-            <div>Masuk</div>
-          </>
-        }
-        bottomContent={
-          pages > 0 ? (
-            <div className="flex w-full justify-center">
-              <Pagination
-                isCompact
-                showControls
-                showShadow
-                color="primary"
-                page={page}
-                total={pages}
-                onChange={(page) => setPage(page)}
-              />
-            </div>
-          ) : null
-        }
+      {/* Table Laporan Stok */}
+      <div>
+        <Button onPress={handlePrintLaporanStok} color="primary">
+          Cetak
+        </Button>
+      </div>
+      <div
+        className="bg-white m-0 p-0 overflow-x-hidden"
+        ref={componentRef.laporanstok}
       >
-        <TableHeader columns={col}>
-          {(column) => (
-            <TableColumn
-              key={column.key}
-              align={
-                ["stok", "jumlah", "keluar"].includes(column.key)
-                  ? "end"
-                  : "start"
-              }
-            >
-              {column.label}
-            </TableColumn>
-          )}
-        </TableHeader>
-        <TableBody
-          items={
-            filteredData ? filteredData.slice(offset, offset + rowsPerPage) : []
+        <Table
+          isStriped
+          isCompact
+          layout="auto"
+          className="border bg-none text-xs p-0 m-0 overflow-x-hidden"
+          classNames={{
+            wrapper: "my-0 py-0",
+            base: "my-0 py-0",
+            thead: "my-0 py-0",
+            table: "m-0 p-0",
+            tbody: "my-0 py-0",
+            th: "text-xs py-0 my-0",
+            td: "text-xs py-0 align-top", // Reduce font size and vertical padding
+            // tr: "align-top",
+          }}
+          aria-label="Example table with custom cells"
+          topContent={
+            <>
+              <div className="text-sm pt-2">Laporan Stok</div>
+            </>
           }
-          loadingContent={"Loading..."}
-          emptyContent={"Kosong"}
-          loadingState={loadingState}
+          // bottomContent={
+          //   pages > 0 ? (
+          //     <div className="flex w-full justify-center">
+          //       <Pagination
+          //         isCompact
+          //         showControls
+          //         showShadow
+          //         color="primary"
+          //         page={page}
+          //         total={pages}
+          //         onChange={(page) => setPage(page)}
+          //       />
+          //     </div>
+          //   ) : null
+          // }
         >
-          {(item) => (
-            <TableRow key={item.id}>
-              {(columnKey) => (
-                <TableCell>{renderCell(item, columnKey)}</TableCell>
-              )}
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-      <TabelProdukKeluar id_produk={id_produk ?? null} />
+          <TableHeader columns={col}>
+            {(column) => (
+              <TableColumn
+                key={column.key}
+                align={
+                  ["stok", "jumlah", "keluar"].includes(column.key)
+                    ? "end"
+                    : "start"
+                }
+              >
+                {column.label}
+              </TableColumn>
+            )}
+          </TableHeader>
+          <TableBody
+            items={result ? result : []}
+            loadingContent={"Loading..."}
+            emptyContent={"Kosong"}
+            loadingState={loadingState}
+          >
+            {(item) => (
+              <TableRow key={item.id}>
+                {(columnKey) => (
+                  <TableCell>{renderCell(item, columnKey)}</TableCell>
+                )}
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
       <Modal
         isOpen={isOpen}
         onOpenChange={onOpenChange}
@@ -655,378 +716,3 @@ export default function App({ id_produk }) {
     </div>
   );
 }
-
-const TabelProdukKeluar = ({ id_produk }) => {
-  const produkkeluar = useClientFetch(
-    `produkkeluar?${id_produk ? `id_produk=${id_produk}` : ""}`
-  );
-  const metodepengeluaran = useClientFetch("metodepengeluaran");
-  const [page, setPage] = React.useState(1);
-  const [form, setForm] = React.useState({});
-  const rowsPerPage = 25;
-
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
-
-  const saveButtonPress = async (onClose) => {
-    // if (form.nama == "" || !form.selectKategori.size > 0)
-    //   return alert("Nama, dan Kategori wajib diisi!");
-    if (form.selectMetodePengeluaran?.size == 0)
-      return alert(`Metode pengeluaran belum diisi.`);
-    const res = await fetch(`${apiPath}produkkeluar`, {
-      method: form.method,
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify(form),
-    });
-    const json = await res.json();
-    if (res.status == 400) return alert(json.message);
-    onClose();
-    // return alert(json.message);
-  };
-  const deleteButtonPress = async (data) => {
-    if (confirm("Hapus produk keluar?")) {
-      const res = await fetch(`${apiPath}produkkeluar`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          // 'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: JSON.stringify(data),
-      });
-      const json = await res.json();
-      if (res.status == 400) return alert(json.message);
-      // return alert(await res.json().then((json) => json.message));
-    }
-  };
-  const editButtonPress = (data) => {
-    setForm({
-      ...data,
-      method: "PUT",
-      modalmode: "Edit",
-      startdate: new Date(data.tanggal),
-      tanggal: getDate(new Date(data.tanggal)),
-      startdateJatuhtempo: data.jatuhtempo ? new Date(data.jatuhtempo) : null,
-      jatuhtempo: data.jatuhtempo ? getDate(new Date(data.jatuhtempo)) : null,
-      oldJumlah: data.jumlah,
-      oldTerbayar: data.terbayar,
-      oldHarga: data.harga,
-      oldSn: data.sn,
-      selectMetodePengeluaran: new Set([data.metodepengeluaran]),
-      lunas: data.jumlah * data.harga > data.terbayar ? "0" : "1",
-    });
-    onOpen();
-  };
-
-  const renderCell = React.useCallback((data, columnKey) => {
-    const cellValue = data[columnKey];
-    switch (columnKey) {
-      case "tanggal":
-        return getDateFId(new Date(data.tanggal));
-      case "harga":
-        return (
-          <div
-            className={`text-right px-1 rounded ${
-              data.jumlah * data.harga > data.terbayar
-                ? new Date() >= new Date(data.jatuhtempo)
-                  ? "bg-red-200"
-                  : "bg-yellow-200"
-                : ""
-            }`}
-          >
-            <Harga harga={data.harga} />
-          </div>
-        );
-      case "jatuhtempo":
-        return data.jatuhtempo ? getDateFId(new Date(data.jatuhtempo)) : "";
-      case "hargajual":
-        return (
-          <div className="text-right">
-            <Harga harga={data.hargajual} />
-          </div>
-        );
-      case "aksi":
-        return (
-          <div className="relative flex items-center gap-2">
-            {/* <Tooltip content="Details">
-              <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                <EyeIcon />
-              </span>
-            </Tooltip> */}
-            <Tooltip content="Edit">
-              <span
-                onClick={() => editButtonPress(data)}
-                className="text-lg text-default-400 cursor-pointer active:opacity-50"
-              >
-                <EditIcon />
-              </span>
-            </Tooltip>
-            {/* <Tooltip content="Produk Masuk">
-              <span
-                onClick={() => onProdukMasukClick(data)}
-                className="text-lg text-default-400 cursor-pointer active:opacity-50"
-              >
-                <AddIcon />
-              </span>
-            </Tooltip>
-            <Tooltip content="Produk Keluar">
-              <span
-                onClick={() => onProdukKeluarClick(data)}
-                className="text-lg text-default-400 cursor-pointer active:opacity-50"
-              >
-                <MinIcon />
-              </span>
-            </Tooltip> */}
-            <Tooltip color="danger" content="Delete">
-              <span
-                onClick={() => deleteButtonPress(data)}
-                className="text-lg text-danger cursor-pointer active:opacity-50"
-              >
-                <DeleteIcon />
-              </span>
-            </Tooltip>
-          </div>
-        );
-      default:
-        return cellValue;
-    }
-  }, []);
-  const filteredData = produkkeluar?.data;
-  const pages = useMemo(() => {
-    return filteredData ? Math.ceil(filteredData?.length / rowsPerPage) : 0;
-  }, [filteredData, rowsPerPage]);
-  const loadingState = produkkeluar.isLoading ? "loading" : "idle";
-  const offset = (page - 1) * rowsPerPage;
-  if (produkkeluar.error) return <div>failed to load</div>;
-  if (produkkeluar.isLoading) return <div>loading...</div>;
-  if (metodepengeluaran.error) return <div>failed to load</div>;
-  if (metodepengeluaran.isLoading) return <div>loading...</div>;
-
-  const col = [
-    // {
-    //   key: "id_kustom",
-    //   label: "Id",
-    // },
-    // {
-    //   key: "produk",
-    //   label: "Produk",
-    // },
-    // {
-    //   key: "merek",
-    //   label: "Merek",
-    // },
-    // {
-    //   key: "tipe",
-    //   label: "Tipe",
-    // },
-    {
-      key: "vendor",
-      label: "Vendor",
-    },
-    {
-      key: "metodepengeluaran",
-      label: "Metode Pengeluaran",
-    },
-    {
-      key: "sn",
-      label: "SN",
-    },
-    // {
-    //   key: "stok",
-    //   label: "Stok",
-    // },
-    {
-      key: "jumlah",
-      label: "Jumlah",
-    },
-    {
-      key: "satuan",
-      label: "Satuan",
-    },
-    {
-      key: "harga",
-      label: "Harga",
-    },
-    {
-      key: "tanggal",
-      label: "Tanggal",
-    },
-    {
-      key: "aksi",
-      label: "Aksi",
-    },
-  ];
-
-  console.log(form.selectMetodePengeluaran?.size);
-
-  return (
-    <>
-      <Table
-        isStriped
-        className=""
-        aria-label="Example table with custom cells"
-        topContent={
-          <>
-            <div>Keluar</div>
-          </>
-        }
-        bottomContent={
-          pages > 0 ? (
-            <div className="flex w-full justify-center">
-              <Pagination
-                isCompact
-                showControls
-                showShadow
-                color="primary"
-                page={page}
-                total={pages}
-                onChange={(page) => setPage(page)}
-              />
-            </div>
-          ) : null
-        }
-      >
-        <TableHeader columns={col}>
-          {(column) => (
-            <TableColumn
-              key={column.key}
-              align={
-                ["stok", "jumlah", "keluar"].includes(column.key)
-                  ? "end"
-                  : "start"
-              }
-            >
-              {column.label}
-            </TableColumn>
-          )}
-        </TableHeader>
-        <TableBody
-          items={
-            filteredData ? filteredData.slice(offset, offset + rowsPerPage) : []
-          }
-          loadingContent={"Loading..."}
-          emptyContent={"Kosong"}
-          loadingState={loadingState}
-        >
-          {(item) => (
-            <TableRow key={item.id}>
-              {(columnKey) => (
-                <TableCell>{renderCell(item, columnKey)}</TableCell>
-              )}
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-      <Modal
-        isOpen={isOpen}
-        onOpenChange={onOpenChange}
-        scrollBehavior="inside"
-      >
-        <ModalContent>
-          {(onClose) => (
-            <>
-              <ModalHeader className="flex flex-col gap-1">
-                {form.modalmode} Produk Keluar
-              </ModalHeader>
-              <ModalBody>
-                <div>
-                  {form.produk} | {form.merek} | {form.tipe} | {form.vendor}
-                </div>
-                {form.metodepengeluaran != "proyek" ? (
-                  <Select
-                    required
-                    label="Metode Pengeluaran"
-                    placeholder="Pilih metode"
-                    className="max-w-xs"
-                    selectedKeys={form.selectMetodePengeluaran}
-                    onSelectionChange={(val) =>
-                      setForm({
-                        ...form,
-                        selectMetodePengeluaran: val,
-                        metodepengeluaran: new Set(val).values().next().value,
-                      })
-                    }
-                  >
-                    {metodepengeluaran.data.map((item) => (
-                      <SelectItem key={item.nama} value={item.nama}>
-                        {item.nama}
-                      </SelectItem>
-                    ))}
-                  </Select>
-                ) : (
-                  <></>
-                )}
-                {form.jumlah == 1 ? (
-                  <Input
-                    type="text"
-                    label="S/N"
-                    placeholder="Masukkan S/N!"
-                    value={form.sn}
-                    onValueChange={(val) => setForm({ ...form, sn: val })}
-                  />
-                ) : (
-                  <></>
-                )}
-                <Input
-                  type="number"
-                  label={`Harga (${form.oldHarga})`}
-                  placeholder="Masukkan harga!"
-                  value={form.harga}
-                  onValueChange={(val) => setForm({ ...form, harga: val })}
-                />
-                {/* <Autocomplete
-                  label="Vendor"
-                  variant="bordered"
-                  defaultItems={vendor.data}
-                  placeholder="Cari vendor"
-                  className="max-w-xs"
-                  selectedKey={form.id_vendor}
-                  defaultSelectedKey={form.id_vendor}
-                  defaultInputValue={form.vendor}
-                  onSelectionChange={(v) => setForm({ ...form, id_vendor: v })}
-                >
-                  {(item) => (
-                    <AutocompleteItem key={item.id} textValue={item.nama}>
-                      {item.nama}
-                    </AutocompleteItem>
-                  )}
-                </Autocomplete> */}
-                <div className="bg-gray-100 p-3 rounded-lg z-40">
-                  <div>Tanggal</div>
-                  <DatePicker
-                    className="z-40"
-                    placeholderText="Pilih tanggal"
-                    dateFormat="dd/MM/yyyy"
-                    selected={form.startdate}
-                    onChange={(v) =>
-                      setForm({ ...form, startdate: v, tanggal: getDate(v) })
-                    }
-                  />
-                </div>
-                {/* <Textarea
-                  label="Keterangan"
-                  labelPlacement="inside"
-                  placeholder="Masukkan keterangan! (Opsional)"
-                  value={form.keterangan}
-                  onValueChange={(val) => setForm({ ...form, keterangan: val })}
-                /> */}
-              </ModalBody>
-              <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
-                  Batal
-                </Button>
-                <Button
-                  color="primary"
-                  onPress={() => saveButtonPress(onClose)}
-                >
-                  Simpan
-                </Button>
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
-      </Modal>
-    </>
-  );
-};

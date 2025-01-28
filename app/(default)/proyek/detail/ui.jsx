@@ -1904,7 +1904,7 @@ export default function App({ id, versi }) {
                 <Button color="danger" variant="light" onPress={onClose}>
                   Tutup
                 </Button>
-                <Button onClick={handlePrintPenawaran} color="primary">
+                <Button onPress={handlePrintPenawaran} color="primary">
                   Cetak
                 </Button>
               </ModalFooter>
