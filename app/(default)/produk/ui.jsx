@@ -579,7 +579,7 @@ export default function App() {
             Tambah
           </Button>
           <div className="flex flex-row gap-2">
-            <Button color="primary" onClick={exportStok}>
+            <Button color="primary" onPress={exportStok}>
               Export Stok
             </Button>
           </div>

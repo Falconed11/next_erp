@@ -44,6 +44,7 @@ import { getApiPath, useClientFetch } from "@/app/utils/apiconfig";
 import { Button } from "@heroui/react";
 import { Input, Textarea } from "@heroui/react";
 import { getDate, getDateFId } from "@/app/utils/date";
+import { export2excel } from "@/app/utils/export";
 
 const apiPath = getApiPath();
 
@@ -469,8 +470,12 @@ export default function App({ id_produk }) {
       ...items,
     ]);
 
+  const exportButtonPress = () => {
+    export2excel(result, `Laporan Stok`);
+  };
+
   // const selectedProduk = produk.data[0];
-  // console.log(selectedProduk);
+  // console.log(result);
   return (
     <div className="flex flex-col gap-2">
       {/* <div className="flex flex-row gap-2">
@@ -491,9 +496,15 @@ export default function App({ id_produk }) {
         </Button>
       </div> */}
       {/* Table Laporan Stok */}
-      <div>
+      <div className="flex gap-2">
         <Button onPress={handlePrintLaporanStok} color="primary">
           Cetak
+        </Button>
+        <Button
+          onPress={() => export2excel(result, `Laporan Stok`)}
+          color="primary"
+        >
+          Export
         </Button>
       </div>
       <div
@@ -501,18 +512,18 @@ export default function App({ id_produk }) {
         ref={componentRef.laporanstok}
       >
         <Table
+          ref={componentRef.laporanstok}
           isStriped
-          isCompact
-          layout="auto"
           className="border bg-none text-xs p-0 m-0 overflow-x-hidden"
           classNames={{
-            wrapper: "my-0 py-0",
-            base: "my-0 py-0",
-            thead: "my-0 py-0",
-            table: "m-0 p-0",
-            tbody: "my-0 py-0",
-            th: "text-xs py-0 my-0",
-            td: "text-xs py-0 align-top", // Reduce font size and vertical padding
+            // wrapper: "my-0 py-0",
+            // base: "my-0 py-0",
+            // thead: "my-0 py-0",
+            table: "m-0 p-0 bg-white",
+            // tbody: "my-0 py-0",
+            // th: "text-xs py-0 my-0",
+            td: "text-xs py-0 px-1 align-top", // Reduce font size and vertical padding
+            tr: "even:bg-gray-100 m-0 p-0",
             // tr: "align-top",
           }}
           aria-label="Example table with custom cells"

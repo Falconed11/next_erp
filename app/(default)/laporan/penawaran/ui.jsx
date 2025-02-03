@@ -32,14 +32,6 @@ import {
 import { Input } from "@heroui/react";
 import { Textarea } from "@heroui/react";
 import { Select, SelectItem } from "@heroui/react";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerBody,
-  DrawerFooter,
-} from "@heroui/drawer";
-import { Accordion, AccordionItem } from "@heroui/react";
 import Link from "next/link";
 import {
   AddIcon,
@@ -62,7 +54,6 @@ import { FileUploader } from "@/components/input";
 import { RangeDate } from "@/components/input";
 import { LinkOpenNewTab } from "@/components/mycomponent";
 import Harga from "@/components/harga";
-import { ShowHideComponent } from "@/components/componentmanipulation";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -80,30 +71,20 @@ export default function App({ id_instansi }) {
     // startDate,
     // endDate,
   });
-  const [selectkaryawan, setSelectKaryawan] = useState(new Set([]));
-  const [stat, setStat] = useState(0);
   const [page, setPage] = React.useState(1);
   const rowsPerPage = 10;
 
   const [selectProyek, setSelectProyek] = useState({});
   const proyek = useClientFetch(
     `proyek?${id_instansi ? `id_instansi=${id_instansi}` : ""}${
-      selectkaryawan.size > 0
-        ? `id_karyawan=${selectkaryawan.values().next().value}`
-        : ""
-    }${current.startDate ? `&start=${getDate(current.startDate)}` : ""}${
-      current.endDate ? `&end=${getDate(current.endDate)}` : ""
-    }&sort=${sort}`
+      current.startDate ? `&start=${getDate(current.startDate)}` : ""
+    }${current.endDate ? `&end=${getDate(current.endDate)}` : ""}&sort=${sort}`
   );
   const penawaran = useClientFetch(
     `exportpenawaran?start=${getDate(current.startDate)}&end=${getDate(
       current.endDate
     )}`
   );
-
-  const disclosure = {
-    drawer: useDisclosure(),
-  };
 
   const filteredData = proyek?.data;
 
@@ -332,12 +313,6 @@ export default function App({ id_instansi }) {
             <Harga harga={data.pengeluaranproyek} />
           </div>
         );
-      case "totalpenawaran":
-        return (
-          <div className="text-right">
-            <Harga harga={+cellValue} />
-          </div>
-        );
       case "tanggal":
         return data.tanggal ? getDateF(new Date(data.tanggal)) : "";
       case "tanggal_penawaran":
@@ -503,10 +478,6 @@ export default function App({ id_instansi }) {
       label: "Status",
     },
     {
-      key: "totalpenawaran",
-      label: "Penawaran",
-    },
-    {
       key: "pengeluaranproyek",
       label: "Pengeluaran Proyek",
     },
@@ -531,20 +502,6 @@ export default function App({ id_instansi }) {
     { id: 0, nama: "negri" },
     { id: 1, nama: "swasta" },
   ];
-
-  const nPenawaran = proyek.data.length;
-  const summary = proyek.data.reduce(
-    (acc, current) => {
-      const versi = current.versi;
-      if (versi == 0) acc.nOfferingWaiting++;
-      if (versi > 0) acc.nOfferingDeal++;
-      if (versi < 0) acc.nOfferingReject++;
-      return acc;
-    },
-    { nOfferingDeal: 0, nOfferingWaiting: 0, nOfferingReject: 0 }
-  );
-  console.log(selectkaryawan.size);
-
   return (
     <div className="flex flex-col gap-2">
       {id_instansi ? (
@@ -581,153 +538,41 @@ export default function App({ id_instansi }) {
         selectedKeys={selectedKeys}
         onSelectionChange={setSelectedKeys}
         topContent={
-          <div className="flex gap-2">
-            {/* Filter & Report */}
-            <ShowHideComponent
-              stat={stat}
-              setStat={setStat}
-              component={
-                <div className="flex gap-2">
-                  <div className="flex flex-col gap-2">
-                    <div>Filter</div>
-                    <RadioGroup
-                      orientation="horizontal"
-                      value={sort}
-                      onValueChange={setSort}
-                    >
-                      <Radio value="tanggal_penawaran">Penawaran</Radio>
-                      <Radio value="tanggal">Proyek</Radio>
-                    </RadioGroup>
-                    <div className="flex flex-row gap-2">
-                      <div className="flex">
-                        <RangeDate current={current} setCurrent={setCurrent} />
-                      </div>
-                    </div>
-                    <Select
-                      className="max-w-xs"
-                      label="Sales"
-                      placeholder="Pilih sales"
-                      selectedKeys={selectkaryawan}
-                      variant="bordered"
-                      onSelectionChange={setSelectKaryawan}
-                    >
-                      {karyawan.data.map((v) => (
-                        <SelectItem key={v.id}>{v.nama}</SelectItem>
-                      ))}
-                    </Select>
-                    {/* <div className="flex gap-2">
-                    <div className="flex flex-row gap-2">
-                      <Button
-                        color="primary"
-                        onClick={handleButtonExportToExcelPress}
-                      >
-                        Export to Excel
-                      </Button>
-                    </div>
-                    <div className="flex flex-row gap-2">
-                      <Button color="primary" onClick={exportPenawaran}>
-                        Export Penawaran
-                      </Button>
-                    </div>
-                    <FileUploader onFileUpload={handleFileUpload} />
-                    <Button color="primary" onPress={importPenawaran}>
-                      Import Penawaran
-                    </Button>
-                  </div> */}
-                  </div>
-                  <div>
-                    <div>Ringkasan</div>
-                    <div className="flex gap-2">
-                      <div className="text-center text-sm">
-                        <div className="gap-2 flex flex-col">
-                          <div>Penawaran</div>
-                          <div className="px-2 py-1 text-white rounded-large bg-primary">
-                            <div>Total</div>
-                            <div>{nPenawaran}</div>
-                          </div>
-                          <div className="px-2 py-1 rounded-large bg-warning">
-                            <div>Waiting</div>
-                            <div>{summary.nOfferingWaiting}</div>
-                          </div>
-                          <div className="px-2 py-1 rounded-large bg-success">
-                            <div>Deal</div>
-                            <div>{summary.nOfferingDeal}</div>
-                          </div>
-                          <div className="px-2 py-1 text-white rounded-large bg-danger">
-                            <div>Reject</div>
-                            <div>{summary.nOfferingReject}</div>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="text-center text-sm">
-                        <div className="gap-2 flex flex-col">
-                          <div>Modal</div>
-                          <div className="px-2 py-1 text-white rounded-large bg-primary">
-                            <div>Total</div>
-                            <div>X</div>
-                          </div>
-                          <div className="px-2 py-1 rounded-large bg-warning">
-                            <div>Waiting</div>
-                            <div>X</div>
-                          </div>
-                          <div className="px-2 py-1 rounded-large bg-success">
-                            <div>Deal</div>
-                            <div>X</div>
-                          </div>
-                          <div className="px-2 py-1 text-white rounded-large bg-danger">
-                            <div>Reject</div>
-                            <div>X</div>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="text-center text-sm">
-                        <div className="gap-2 flex flex-col">
-                          <div>Omset</div>
-                          <div className="px-2 py-1 text-white rounded-large bg-primary">
-                            <div>Total</div>
-                            <div>X</div>
-                          </div>
-                          <div className="px-2 py-1 rounded-large bg-warning">
-                            <div>Waiting</div>
-                            <div>X</div>
-                          </div>
-                          <div className="px-2 py-1 rounded-large bg-success">
-                            <div>Deal</div>
-                            <div>X</div>
-                          </div>
-                          <div className="px-2 py-1 text-white rounded-large bg-danger">
-                            <div>Reject</div>
-                            <div>X</div>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="text-center text-sm">
-                        <div className="gap-2 flex flex-col">
-                          <div>Provit</div>
-                          <div className="px-2 py-1 text-white rounded-large bg-primary">
-                            <div>Total</div>
-                            <div>X</div>
-                          </div>
-                          <div className="px-2 py-1 rounded-large bg-warning">
-                            <div>Waiting</div>
-                            <div>X</div>
-                          </div>
-                          <div className="px-2 py-1 rounded-large bg-success">
-                            <div>Deal</div>
-                            <div>X</div>
-                          </div>
-                          <div className="px-2 py-1 text-white rounded-large bg-danger">
-                            <div>Reject</div>
-                            <div>X</div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              }
-            />
-          </div>
+          <>
+            <div>Filter</div>
+            <RadioGroup
+              orientation="horizontal"
+              value={sort}
+              onValueChange={setSort}
+            >
+              <Radio value="tanggal_penawaran">Penawaran</Radio>
+              <Radio value="tanggal">Proyek</Radio>
+            </RadioGroup>
+            <div className="flex flex-row gap-2">
+              <div className="flex">
+                <RangeDate current={current} setCurrent={setCurrent} />
+              </div>
+            </div>
+            {/* <div className="flex gap-2">
+              <div className="flex flex-row gap-2">
+                <Button
+                  color="primary"
+                  onClick={handleButtonExportToExcelPress}
+                >
+                  Export to Excel
+                </Button>
+              </div>
+              <div className="flex flex-row gap-2">
+                <Button color="primary" onClick={exportPenawaran}>
+                  Export Penawaran
+                </Button>
+              </div>
+              <FileUploader onFileUpload={handleFileUpload} />
+              <Button color="primary" onPress={importPenawaran}>
+                Import Penawaran
+              </Button>
+            </div> */}
+          </>
         }
         bottomContent={
           pages > 0 ? (
