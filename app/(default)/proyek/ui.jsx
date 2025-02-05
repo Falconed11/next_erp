@@ -536,12 +536,28 @@ export default function App({ id_instansi }) {
   const summary = proyek.data.reduce(
     (acc, current) => {
       const versi = current.versi;
-      if (versi == 0) acc.nOfferingWaiting++;
-      if (versi > 0) acc.nOfferingDeal++;
-      if (versi < 0) acc.nOfferingReject++;
+      if (versi == 0) {
+        acc.nOfferingWaiting++;
+        acc.totalPenawaranWaiting += +current.totalpenawaran;
+      }
+      if (versi > 0) {
+        acc.nOfferingDeal++;
+        acc.totalPenawaranDeal += +current.totalpenawaran;
+      }
+      if (versi < 0) {
+        acc.nOfferingReject++;
+        acc.totalPenawaranReject += +current.totalpenawaran;
+      }
       return acc;
     },
-    { nOfferingDeal: 0, nOfferingWaiting: 0, nOfferingReject: 0 }
+    {
+      nOfferingDeal: 0,
+      nOfferingWaiting: 0,
+      nOfferingReject: 0,
+      totalPenawaranDeal: 0,
+      totalPenawaranReject: 0,
+      totalPenawaranWaiting: 0,
+    }
   );
   console.log(selectkaryawan.size);
 
@@ -682,22 +698,36 @@ export default function App({ id_instansi }) {
                       </div>
                       <div className="text-center text-sm">
                         <div className="gap-2 flex flex-col">
-                          <div>Omset</div>
+                          <div>Nilai Penawaran</div>
                           <div className="px-2 py-1 text-white rounded-large bg-primary">
                             <div>Total</div>
-                            <div>X</div>
+                            <div>
+                              <Harga
+                                harga={
+                                  +summary.totalPenawaranDeal +
+                                  summary.totalPenawaranReject +
+                                  summary.totalPenawaranWaiting
+                                }
+                              />
+                            </div>
                           </div>
                           <div className="px-2 py-1 rounded-large bg-warning">
                             <div>Waiting</div>
-                            <div>X</div>
+                            <div>
+                              <Harga harga={+summary.totalPenawaranWaiting} />
+                            </div>
                           </div>
                           <div className="px-2 py-1 rounded-large bg-success">
                             <div>Deal</div>
-                            <div>X</div>
+                            <div>
+                              <Harga harga={+summary.totalPenawaranDeal} />
+                            </div>
                           </div>
                           <div className="px-2 py-1 text-white rounded-large bg-danger">
                             <div>Reject</div>
-                            <div>X</div>
+                            <div>
+                              <Harga harga={+summary.totalPenawaranReject} />
+                            </div>
                           </div>
                         </div>
                       </div>
