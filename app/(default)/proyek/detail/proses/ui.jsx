@@ -874,6 +874,7 @@ export default function App({ id }) {
                   type="number"
                   label="Jumlah"
                   placeholder="Masukkan jumlah!"
+                  disabled
                   value={form.jumlah}
                   onValueChange={(v) =>
                     setForm({
