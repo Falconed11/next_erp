@@ -290,14 +290,14 @@ export default function App({ id }) {
         case "aksi":
           return (
             <div className="relative flex items-center gap-2">
-              <Tooltip content="Edit">
+              {/* <Tooltip content="Edit">
                 <span
                   onClick={() => editButtonPress(data)}
                   className="text-lg text-default-400 cursor-pointer active:opacity-50"
                 >
                   <EditIcon />
                 </span>
-              </Tooltip>
+              </Tooltip> */}
               <Tooltip color="danger" content="Delete">
                 <span
                   onClick={() => deleteButtonPress(data)}
@@ -883,9 +883,10 @@ export default function App({ id }) {
                     })
                   }
                 />
-                <div>Harga Modal : {form.hargamodal}</div>
+                {/* <div>Harga Modal : {form.hargamodal}</div> */}
                 <Input
                   type="number"
+                  disabled
                   value={form.harga}
                   label="Harga Satuan"
                   placeholder="Masukkan harga!"
