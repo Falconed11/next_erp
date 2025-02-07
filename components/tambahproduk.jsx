@@ -146,7 +146,15 @@ export default function TambahProduk({
         selectProduk?.stok > 0 ? (
           <Checkbox
             isSelected={form.isSelected}
-            onValueChange={(v) => setForm({ ...form, isSelected: v })}
+            onValueChange={(v) => {
+              setForm({
+                ...form,
+                isSelected: v,
+                harga: refHargaModal
+                  ? selectProduk?.hargamodal ?? 0
+                  : selectProduk?.hargajual ?? 0,
+              });
+            }}
           >
             Pakai Stok
           </Checkbox>
@@ -195,6 +203,7 @@ export default function TambahProduk({
       />
       <Input
         type="number"
+        isDisabled={form.isSelected ? 1 : undefined}
         value={form.harga}
         label={
           <>
