@@ -539,14 +539,17 @@ export default function App({ id_instansi }) {
       if (versi == 0) {
         acc.nOfferingWaiting++;
         acc.totalPenawaranWaiting += +current.totalpenawaran;
+        acc.totalModalWaiting += +current.totalmodal;
       }
       if (versi > 0) {
         acc.nOfferingDeal++;
         acc.totalPenawaranDeal += +current.totalpenawaran;
+        acc.totalModalDeal += +current.totalmodal;
       }
       if (versi < 0) {
         acc.nOfferingReject++;
         acc.totalPenawaranReject += +current.totalpenawaran;
+        acc.totalModalReject += +current.totalmodal;
       }
       return acc;
     },
@@ -557,9 +560,21 @@ export default function App({ id_instansi }) {
       totalPenawaranDeal: 0,
       totalPenawaranReject: 0,
       totalPenawaranWaiting: 0,
+      totalModalDeal: 0,
+      totalModalReject: 0,
+      totalModalWaiting: 0,
     }
   );
-  console.log(selectkaryawan.size);
+  summary.totalModal =
+    summary.totalModalDeal +
+    summary.totalModalReject +
+    summary.totalModalWaiting;
+  summary.totalPenawaran =
+    summary.totalPenawaranDeal +
+    summary.totalPenawaranReject +
+    summary.totalPenawaranWaiting;
+  summary.totalProvit = summary.totalPenawaran - summary.totalModal;
+  // console.log(proyek.data);
 
   return (
     <div className="flex flex-col gap-2">
@@ -680,19 +695,27 @@ export default function App({ id_instansi }) {
                           <div>Modal</div>
                           <div className="px-2 py-1 text-white rounded-large bg-primary">
                             <div>Total</div>
-                            <div>X</div>
+                            <div>
+                              <Harga harga={summary.totalModal} />
+                            </div>
                           </div>
                           <div className="px-2 py-1 rounded-large bg-warning">
                             <div>Waiting</div>
-                            <div>X</div>
+                            <div>
+                              <Harga harga={summary.totalModalWaiting} />
+                            </div>
                           </div>
                           <div className="px-2 py-1 rounded-large bg-success">
                             <div>Deal</div>
-                            <div>X</div>
+                            <div>
+                              <Harga harga={summary.totalModalDeal} />
+                            </div>
                           </div>
                           <div className="px-2 py-1 text-white rounded-large bg-danger">
                             <div>Reject</div>
-                            <div>X</div>
+                            <div>
+                              <Harga harga={summary.totalModalReject} />
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -736,19 +759,42 @@ export default function App({ id_instansi }) {
                           <div>Provit</div>
                           <div className="px-2 py-1 text-white rounded-large bg-primary">
                             <div>Total</div>
-                            <div>X</div>
+                            <div>
+                              <Harga harga={summary.totalProvit} />
+                            </div>
                           </div>
                           <div className="px-2 py-1 rounded-large bg-warning">
                             <div>Waiting</div>
-                            <div>X</div>
+                            <div>
+                              <Harga
+                                harga={
+                                  summary.totalPenawaranWaiting -
+                                  summary.totalModalWaiting
+                                }
+                              />
+                            </div>
                           </div>
                           <div className="px-2 py-1 rounded-large bg-success">
                             <div>Deal</div>
-                            <div>X</div>
+                            <div>
+                              <Harga
+                                harga={
+                                  summary.totalPenawaranDeal -
+                                  summary.totalModalDeal
+                                }
+                              />
+                            </div>
                           </div>
                           <div className="px-2 py-1 text-white rounded-large bg-danger">
                             <div>Reject</div>
-                            <div>X</div>
+                            <div>
+                              <Harga
+                                harga={
+                                  summary.totalPenawaranReject -
+                                  summary.totalModalReject
+                                }
+                              />
+                            </div>
                           </div>
                         </div>
                       </div>

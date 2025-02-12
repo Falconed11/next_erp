@@ -16,7 +16,6 @@ import {
   ChipProps,
   getKeyValue,
   Textarea,
-  Divider,
 } from "@heroui/react";
 import {
   Modal,
@@ -58,7 +57,7 @@ export default function App() {
   };
   const handlePrintKwitansi = useReactToPrint({
     content: () => componentRef.kwitansi.current,
-    pageStyle: "p-10",
+    // pageStyle: "p-10",
   });
 
   const [current, setCurrent] = useState({
@@ -231,7 +230,7 @@ export default function App() {
   return (
     <div className="flex flex-col gap-2">
       <div>
-        <Button color="primary" onPress={tambahButtonPress}>
+        <Button color="primary" onClick={tambahButtonPress}>
           Tambah
         </Button>
       </div>
@@ -404,19 +403,193 @@ export default function App() {
                   ref={componentRef.kwitansi}
                   className="bg-white text-black leading-8"
                 >
-                  {selected == "svt" ? <SVTHeader /> : <BKSHeader />}
-                  <Divider className="bg-black" />
-                  <div>{form.id_kustom}</div>
-                  <div>Diterima dari :{form.nama_pembayar}</div>
-                  <div>
-                    Nominal sebesar :{number.nominalToText(form.nominal)} Rupiah
+                  {Logo}
+                  <div className="flex flex-row items-center">
+                    {selected == "bks" ? (
+                      <>
+                        {/* <Image
+                          src={logoBks}
+                          alt="Company Logo"
+                          width={70}
+                          // height={500} automatically provided
+                          // blurDataURL="data:..." automatically provided
+                          // placeholder="blur" // Optional blur-up while loading
+                        /> */}
+                        <div className="flex flex-col pl-2">
+                          <div>Belga Karya Semesta</div>
+                          <div>
+                            General Trading - Mechanical Electrical - Supplies -
+                            Consultant
+                          </div>
+                          <div>
+                            Jogokaryan MJ 3/789, Mantrijeron - Yogyakarta Telp
+                            08121553765
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <></>
+                    )}
+                    {selected == "svt" ? (
+                      <>
+                        {/* <Image
+                          src={logoSvt}
+                          alt="Company Logo"
+                          width={100}
+                          // height={500} automatically provided
+                          // blurDataURL="data:..." automatically provided
+                          // placeholder="blur" // Optional blur-up while loading
+                        /> */}
+                        <div className="flex flex-col pl-2">
+                          <div>Satu Visi Teknikatama</div>
+                          <div>
+                            General Trading - Mechanical Electrical - Supplies -
+                            Consultant
+                          </div>
+                          <div>
+                            Wonosalam RT. 005 / RW. 009, Sukoharjo, Ngaglik
+                            Sleman - Yogyakarta 55581 Telp 08121553765 -
+                            081578861740
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <></>
+                    )}
                   </div>
-                  <div>Guna membayar :{form.keterangan}</div>
-                  <div>{form.id_kustom}</div>
-                  <div>
-                    {" "}
-                    Rp <Harga harga={form.nominal} /> ,00{" "}
-                  </div>
+                  {selected == "normal" ? (
+                    <>
+                      <div className="h-12"></div>
+                      <div className="flex">
+                        <div className="w-36"></div>
+                        <div>
+                          <span className="invisible">a</span>
+                          {form.id_kustom}
+                        </div>
+                      </div>
+                      <div className="h-1"></div>
+                      <div className="flex">
+                        <div className="w-72"></div>
+                        <div>{form.nama_pembayar}</div>
+                      </div>
+                      <div className="h-1"></div>
+                      <div className="flex">
+                        <div className="w-64"></div>
+                        <div>
+                          Rp <Harga harga={form.nominal} />
+                          ,00
+                        </div>
+                      </div>
+                      <div className="flex">
+                        <div className="w-28 h-20"></div>
+                        <div className="w-101 leading-7">
+                          <span className="invisible">aaaaaaaaaaaaaaaaaa</span>
+                          {form.keterangan}
+                        </div>
+                      </div>
+                      <div className="flex">
+                        <div className="w-90"></div>
+                        <div className="w-28">Yogyakarta</div>
+                        <div className="w-32">
+                          {date.getDateFId(new Date(form.tanggal), "dd-month")}
+                        </div>
+                        <div>
+                          {date.getDateFId(new Date(form.tanggal), "yy")}
+                        </div>
+                      </div>
+                      <div className="h-8"></div>
+                      <div className="flex">
+                        <div className="w-64"></div>
+                        <div className="w-80 text-sm leading-4">
+                          {number.nominalToText(form.nominal)} Rupiah
+                        </div>
+                      </div>
+                    </>
+                  ) : selected == "bks" ? (
+                    <>
+                      <div className="h-32"></div>
+                      <div className="h-3"></div>
+                      <div className="flex">
+                        <div className="w-36"></div>
+                        <div className="w-416p">
+                          <div>{form.nama_pembayar}</div>
+                          <div className="text-xs h-6 content-center">
+                            {`${number.nominalToText(form.nominal)} Rupiah`}
+                          </div>
+                          <div className="h-1"></div>
+                          <div className="text-sm leading-8 h-16">
+                            {form.keterangan}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="h-2"></div>
+                      <div className="flex">
+                        <div className="w-548p"></div>
+                        <div className="w-28 text-xs self-center">
+                          {date.getDateFId(new Date(form.tanggal), "dd-month")}
+                        </div>
+                        <div>
+                          {date.getDateFId(new Date(form.tanggal), "yy")}
+                        </div>
+                      </div>
+                      <div className="flex">
+                        <div className="w-24"></div>
+                        <div className="w-96 text-sm leading-4">
+                          <div className="h-4"></div>
+                          <Harga harga={form.nominal} />
+                        </div>
+                        <div className="w-4"></div>
+                        <div>
+                          <div className="h-8"></div>
+                          <div className=" w-40 text-center">
+                            {form.nama_karyawan}
+                          </div>
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="h-32"></div>
+                      <div className="h-3"></div>
+                      <div className="flex">
+                        <div className="w-36"></div>
+                        <div className="w-416p">
+                          <div>{form.nama_pembayar}</div>
+                          <div className="text-xs h-6 content-center">
+                            {`${number.nominalToText(form.nominal)} Rupiah`}
+                          </div>
+                          <div className="text-sm leading-8 h-16">
+                            {form.keterangan}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="h-3"></div>
+                      <div className="flex">
+                        <div className="w-548p"></div>
+                        <div className="w-2"></div>
+                        <div className="w-24 text-xs leading-8">
+                          {date.getDateFId(new Date(form.tanggal), "dd-month")}
+                        </div>
+                        <div>
+                          {date.getDateFId(new Date(form.tanggal), "yy")}
+                        </div>
+                      </div>
+                      <div className="flex">
+                        <div className="w-24"></div>
+                        <div className="w-96 text-sm leading-4">
+                          <div className="h-2"></div>
+                          <Harga harga={form.nominal} />
+                        </div>
+                        <div className="w-4"></div>
+                        <div>
+                          <div className="h-8"></div>
+                          <div className="w-44 text-center">
+                            {form.nama_karyawan}
+                          </div>
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </div>
               </ModalBody>
               <ModalFooter>
@@ -434,26 +607,3 @@ export default function App() {
     </div>
   );
 }
-
-const BKSHeader = () => {
-  return (
-    <div className="flex flex-col">
-      <div>Belga Karya Semesta</div>
-      <div>General Trading - Mechanical Electrical - Supplies - Consultant</div>
-      <div>Jogokaryan MJ 3/789, Mantrijeron - Yogyakarta Telp 08121553765</div>
-    </div>
-  );
-};
-
-const SVTHeader = () => {
-  return (
-    <div className="flex flex-col">
-      <div>Satu Visi Teknikatama</div>
-      <div>General Trading - Mechanical Electrical - Supplies - Consultant</div>
-      <div>
-        Wonosalam RT. 005 / RW. 009, Sukoharjo, Ngaglik Sleman - Yogyakarta
-        55581 Telp 08121553765 - 081578861740
-      </div>
-    </div>
-  );
-};
