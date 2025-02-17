@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useMemo, useRef } from "react";
+import { useSession } from "next-auth/react";
 import * as XLSX from "xlsx";
 import Link from "next/link";
 import { useReactToPrint } from "react-to-print";
@@ -49,6 +50,7 @@ import { export2excel } from "@/app/utils/export";
 const apiPath = getApiPath();
 
 export default function App({ id_produk }) {
+  const session = useSession();
   const componentRef = {
     laporanstok: useRef(),
     invoice: useRef(),
@@ -379,6 +381,10 @@ export default function App({ id_produk }) {
   if (produk.isLoading) return <div>loading...</div>;
   if (vendor.error) return <div>failed to load</div>;
   if (vendor.isLoading) return <div>loading...</div>;
+  if (session.data?.user == undefined) return <div>loading...</div>;
+
+  const user = session.data?.user;
+  console.log(user);
 
   const col = [
     // {
@@ -470,6 +476,18 @@ export default function App({ id_produk }) {
       ...items,
     ]);
 
+  const summary = filteredData.reduce(
+    (acc, cur) => {
+      acc.modal += cur.sisamodal;
+      acc.hutang += cur.hutang;
+      return acc;
+    },
+    {
+      modal: 0,
+      hutang: 0,
+    }
+  );
+
   const exportButtonPress = () => {
     export2excel(result, `Laporan Stok`);
   };
@@ -507,19 +525,16 @@ export default function App({ id_produk }) {
           Export
         </Button>
       </div>
-      <div
-        className="bg-white m-0 p-0 overflow-x-hidden"
-        ref={componentRef.laporanstok}
-      >
+      <div className="m-0 p-0 overflow-x-hidden" ref={componentRef.laporanstok}>
         <Table
-          ref={componentRef.laporanstok}
+          // ref={componentRef.laporanstok}
           isStriped
-          className="border bg-none text-xs p-0 m-0 overflow-x-hidden"
+          className="text-xs p-0 m-0 overflow-x-hidden"
           classNames={{
             // wrapper: "my-0 py-0",
             // base: "my-0 py-0",
             // thead: "my-0 py-0",
-            table: "m-0 p-0 bg-white",
+            table: "m-0 p-0",
             // tbody: "my-0 py-0",
             // th: "text-xs py-0 my-0",
             td: "text-xs py-0 px-1 align-top", // Reduce font size and vertical padding
@@ -529,7 +544,17 @@ export default function App({ id_produk }) {
           aria-label="Example table with custom cells"
           topContent={
             <>
-              <div className="text-sm pt-2">Laporan Stok</div>
+              <div className="flex gap-2">
+                <div>Laporan Stok</div>
+                <div>Tanggal: {getDateFId(new Date())}</div>
+                <div>User: {user.nama}</div>
+              </div>
+              <div className="p-0 m-0">
+                Total Modal: <Harga harga={summary.modal} />
+              </div>
+              <div className="p-0 m-0">
+                Total Hutang: <Harga harga={summary.hutang} />
+              </div>
             </>
           }
           // bottomContent={

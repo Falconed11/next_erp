@@ -104,14 +104,14 @@ export default function TambahProduk({
         {(item) => (
           <AutocompleteItem
             key={item.id}
-            textValue={`${item.nama} ${item.nmerek} ${item.tipe} ${item.id}`}
+            textValue={`${item.nama} ${item.nmerek} ${item.tipe} ${item.keterangan}`}
           >
             {item.nama} | {item.nmerek} | {item.tipe} |{" "}
             <span className="p-1 bg-black text-white">
               {item.stok} {item.satuan}
             </span>{" "}
             | <Harga harga={item.hargamodal} /> |{" "}
-            <Harga harga={item.hargajual} />
+            <Harga harga={item.hargajual} /> | {item.keterangan}
           </AutocompleteItem>
         )}
       </Autocomplete>

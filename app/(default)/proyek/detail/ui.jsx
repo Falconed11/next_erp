@@ -115,6 +115,7 @@ export default function App({ id, versi }) {
         // 'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: JSON.stringify({
+        ...form,
         id_proyek: id,
         id_subproyek: form.selectSubProyek?.values().next().value ?? 0,
         id_produk: form.selectProduk,
@@ -241,7 +242,7 @@ export default function App({ id, versi }) {
     modal.jenisproyek.onOpen();
   };
   const handleButtonSimpanRekapitulasi = async (data, onClose) => {
-    console.log(rekapitulasiProyek.data.length);
+    // console.log(rekapitulasiProyek.data.length);
     const method = rekapitulasiProyek.data.length == 0 ? "POST" : "PUT";
     const res = await fetch(`${api_path}rekapitulasiproyek`, {
       method,
@@ -351,6 +352,8 @@ export default function App({ id, versi }) {
     keranjangproyek: React.useCallback((data, columnKey) => {
       const cellValue = data[columnKey];
       switch (columnKey) {
+        case "nama":
+          return data.keterangan ? data.keterangan : data.nama;
         case "hargamodal":
           return <Harga harga={data.hargamodal} />;
         case "harga":
@@ -402,13 +405,13 @@ export default function App({ id, versi }) {
       const cellValue = data[columnKey];
       let harga = data.hargakustom == null ? data.harga : data.hargakustom;
       switch (columnKey) {
+        case "nama":
+          return data.keterangan ? data.keterangan : data.nama;
         case "no":
           return data.jumlah ? data.no : <></>;
         case "jumlah":
           return data.jumlah ? (
-            <div className="text-right">
-              {data.jumlah} {data.satuan ?? ""}
-            </div>
+            <div className="text-right">{data.jumlah}</div>
           ) : (
             <></>
           );
@@ -559,10 +562,6 @@ export default function App({ id, versi }) {
         label: "Harga Jual",
       },
       {
-        key: "hargakustom",
-        label: "Harga Kustom",
-      },
-      {
         key: "profit",
         label: "Profit",
       },
@@ -625,10 +624,6 @@ export default function App({ id, versi }) {
         label: "Harga Instalasi",
       },
       {
-        key: "hargakustom",
-        label: "Harga Kustom",
-      },
-      {
         key: "profit",
         label: "Profit",
       },
@@ -665,6 +660,10 @@ export default function App({ id, versi }) {
       {
         key: "jumlah",
         label: "Jumlah",
+      },
+      {
+        key: "satuan",
+        label: "",
       },
       {
         key: "hargajual",
@@ -795,7 +794,7 @@ export default function App({ id, versi }) {
   const selectedVersion = selectVersi.values().next().value;
 
   // console.log(form.selectSubProyek?.values().next().value ?? 0);
-  console.log(dataInstalasi.length);
+  // console.log(form);
   return (
     <div>
       <div className="flex flex-row gap-2">
@@ -963,7 +962,7 @@ export default function App({ id, versi }) {
               </div> */}
               <div>
                 <Button
-                  onClick={modal.penawaran.onOpen}
+                  onPress={modal.penawaran.onOpen}
                   color="primary"
                   className="mt-3"
                 >
@@ -1198,31 +1197,51 @@ export default function App({ id, versi }) {
                             disableStok
                             disableVendor
                             customInput={
-                              <Select
-                                label="Sub Proyek"
-                                placeholder="Pilih subproyek! (Opsional)"
-                                className="w-3/12"
-                                selectedKeys={formInstalasi.selectSubProyek}
-                                onSelectionChange={(v) => {
-                                  setFormInstalasi({
-                                    ...formInstalasi,
-                                    selectSubProyek: v,
-                                  });
-                                  //   setSelectProduk(new Set([]));
-                                  //   setSelectKategori(v);
-                                }}
-                              >
-                                {subProyek.data.map((item) => (
-                                  <SelectItem key={item.id} value={item.id}>
-                                    {item.nama}
-                                  </SelectItem>
-                                ))}
-                              </Select>
+                              <>
+                                <Input
+                                  type="text"
+                                  value={formInstalasi.keterangan}
+                                  label="Nama Kustom"
+                                  // placeholder="Masukkan jumlah!"
+                                  className="w-3/12"
+                                  endContent={
+                                    <div className="pointer-events-none flex items-center">
+                                      <span className="text-default-400 text-small"></span>
+                                    </div>
+                                  }
+                                  onValueChange={(v) =>
+                                    setFormInstalasi({
+                                      ...formInstalasi,
+                                      keterangan: v,
+                                    })
+                                  }
+                                />
+                                <Select
+                                  label="Sub Proyek"
+                                  placeholder="Pilih subproyek! (Opsional)"
+                                  className="w-3/12"
+                                  selectedKeys={formInstalasi.selectSubProyek}
+                                  onSelectionChange={(v) => {
+                                    setFormInstalasi({
+                                      ...formInstalasi,
+                                      selectSubProyek: v,
+                                    });
+                                    //   setSelectProduk(new Set([]));
+                                    //   setSelectKategori(v);
+                                  }}
+                                >
+                                  {subProyek.data.map((item) => (
+                                    <SelectItem key={item.id} value={item.id}>
+                                      {item.nama}
+                                    </SelectItem>
+                                  ))}
+                                </Select>
+                              </>
                             }
                           />
                           <div>
                             <Button
-                              onClick={() => {
+                              onPress={() => {
                                 tambahButtonPress(
                                   {
                                     ...formInstalasi,
@@ -1346,6 +1365,14 @@ export default function App({ id, versi }) {
                 </div>
                 <Input
                   type="number"
+                  isInvalid={
+                    formRekapitulasi.diskon > maksDiskon ? true : false
+                  }
+                  errorMessage={
+                    formRekapitulasi.diskon > maksDiskon
+                      ? "Diskon melebihi batas"
+                      : undefined
+                  }
                   value={formRekapitulasi.diskon}
                   label="Diskon"
                   placeholder="Masukkan diskon!"
@@ -1515,6 +1542,18 @@ export default function App({ id, versi }) {
                   ))}
                 </Select>
                 <div>Nama : {form.nama}</div>
+                <Input
+                  type="text"
+                  label="Nama Kustom (Opsional)"
+                  placeholder="Masukkan nama kustom!"
+                  value={form.keterangan}
+                  onValueChange={(v) =>
+                    setForm({
+                      ...form,
+                      keterangan: v,
+                    })
+                  }
+                />
                 <div>Merek : {form.nmerek}</div>
                 <div>Tipe : {form.tipe}</div>
                 <div>Vendor : {form.nvendor}</div>
@@ -1721,14 +1760,10 @@ export default function App({ id, versi }) {
                   {/* produk */}
                   {dataPenawaran.length > 0 ? (
                     <Table
+                      topContentPlacement="outside"
                       className="border text-xs py-0 my-0"
                       classNames={{
-                        wrapper: "my-0 py-0",
-                        base: "my-0 py-0",
-                        thead: "my-0 py-0",
-                        table: "my-0 py-0",
-                        tbody: "my-0 py-0",
-                        th: "text-xs py-0 my-0",
+                        wrapper: "py-0 px-1",
                         td: "text-xs py-0", // Reduce font size and vertical padding
                       }}
                       aria-label="Example table with custom cells"
@@ -1768,17 +1803,16 @@ export default function App({ id, versi }) {
                   ) : (
                     <></>
                   )}
-
                   {/* instalasi */}
                   {dataInstalasi.length > 0 ? (
                     <Table
+                      isCompact
+                      radius="none"
+                      topContentPlacement="outside"
                       className="mt-0 border text-xs my-0 py-0"
                       classNames={{
-                        base: "py-0 my-0",
-                        wrapper: "py-0 my-0",
+                        wrapper: "py-0 px-1",
                         td: "text-xs py-0",
-                        thead: "py-0 my-0",
-                        th: "py-0 my-0",
                       }}
                       aria-label="Example table with custom cells"
                       shadow="none"
@@ -1822,7 +1856,9 @@ export default function App({ id, versi }) {
                       <div className="basis-2/6">
                         <div>Produk</div>
                         <div>Instalasi</div>
-                        <div>Sub Total</div>
+                        <div>
+                          {rekapDiskon + rekapPajak > 0 ? "Sub Total" : "Total"}
+                        </div>
                         {rekapDiskon > 0 ? (
                           <>
                             <div>Diskon</div>
@@ -1831,8 +1867,14 @@ export default function App({ id, versi }) {
                         ) : (
                           <></>
                         )}
-                        <div>Pajak ({rekapPajak}%)</div>
-                        <div>Harga Setelah Pajak</div>
+                        {rekapPajak > 0 ? (
+                          <>
+                            <div>Pajak ({rekapPajak}%)</div>
+                            <div>Harga Setelah Pajak</div>
+                          </>
+                        ) : (
+                          <></>
+                        )}
                       </div>
                       <div className="basis-1/6 text-right">
                         <div>
@@ -1852,10 +1894,16 @@ export default function App({ id, versi }) {
                         ) : (
                           <></>
                         )}
-                        <div>{<Harga harga={pajakKustom} />}</div>
-                        <div>
-                          <Harga harga={finalKustom} />
-                        </div>
+                        {rekapPajak > 0 ? (
+                          <>
+                            <div>{<Harga harga={pajakKustom} />}</div>
+                            <div>
+                              <Harga harga={finalKustom} />
+                            </div>
+                          </>
+                        ) : (
+                          <></>
+                        )}
                       </div>
                     </div>
                   </div>
