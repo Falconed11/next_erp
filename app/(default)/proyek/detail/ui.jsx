@@ -1039,15 +1039,15 @@ export default function App({ id, versi }) {
                 className="text-blue-600 p-3"
                 href={`/proyek/detail/proses?id=${selectedProyek.id}`}
               >{`Pengeluaran Proyek ==>>`}</Link>
-              {/* <div>
-            <Button
-              onClick={modal.invoice.onOpen}
-              color="primary"
-              className="mt-3"
-            >
-              Invoice
-            </Button>
-          </div> */}
+              <div>
+                <Button
+                  onPress={modal.invoice.onOpen}
+                  color="primary"
+                  className="mt-3"
+                >
+                  Invoice
+                </Button>
+              </div>
             </div>
             <div className="-w-11/12">
               {/* sub proyek */}
@@ -1974,14 +1974,14 @@ export default function App({ id, versi }) {
               <ModalBody>
                 <div ref={componentRef.invoice} className="bg-white text-black">
                   <div className="flex flex-row items-center">
-                    <Image
+                    {/* <Image
                       src={logo}
                       alt="Company Logo"
                       width={70}
                       // height={500} automatically provided
                       // blurDataURL="data:..." automatically provided
                       // placeholder="blur" // Optional blur-up while loading
-                    />
+                    /> */}
                     <div className="flex flex-col">
                       <div>Nama Perusahaan</div>
                       <div>Deskripsi</div>

@@ -67,20 +67,24 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 const apiPath = getApiPath();
-const [startDate, endDate] = getCurFirstLastDay();
 
-export default function App({ id_instansi }) {
+export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
   const [sort, setSort] = React.useState("tanggal_penawaran");
   const [isLoading, setIsLoading] = useState(0);
   const session = useSession();
 
   const [selectedKeys, setSelectedKeys] = React.useState(new Set([]));
-
   const [current, setCurrent] = useState({
-    // startDate,
-    // endDate,
+    startDate: startDate ? new Date(startDate) : null,
+    endDate: endDate ? new Date(endDate) : null,
   });
-  const [selectkaryawan, setSelectKaryawan] = useState(new Set([]));
+  console.log(id_karyawan);
+  const [selectkaryawan, setSelectKaryawan] = useState(
+    new Set([id_karyawan ? id_karyawan : ""])
+    // new Set([])
+  );
+  console.log(selectkaryawan);
+
   const [stat, setStat] = useState(0);
   const [page, setPage] = React.useState(1);
   const rowsPerPage = 10;
@@ -451,6 +455,7 @@ export default function App({ id_instansi }) {
   if (penawaran.isLoading) return <div>loading...</div>;
   if (session.data?.user == undefined) return <div>loading...</div>;
 
+  console.log(proyek.data[0]);
   const user = session.data?.user;
   filteredData.forEach((data) => [(data.peran = user?.peran)]);
 
@@ -574,7 +579,7 @@ export default function App({ id_instansi }) {
     summary.totalPenawaranReject +
     summary.totalPenawaranWaiting;
   summary.totalProvit = summary.totalPenawaran - summary.totalModal;
-  // console.log(proyek.data);
+  console.log(selectkaryawan);
 
   return (
     <div className="flex flex-col gap-2">
