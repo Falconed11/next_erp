@@ -45,6 +45,7 @@ import date, { getDateF, getDate, getCurFirstLastDay } from "@/app/utils/date";
 import number from "@/app/utils/number";
 import Harga from "@/components/harga";
 import { RangeDate } from "@/components/input";
+import { SVTHeader, BKSHeader } from "@/components/mycomponent";
 import Image from "next/image";
 import logoBks from "@/public/logo-bks.jpeg";
 import logoSvt from "@/public/logo-svt.jpeg";
@@ -435,25 +436,25 @@ export default function App() {
   );
 }
 
-const BKSHeader = () => {
-  return (
-    <div className="flex flex-col">
-      <div>Belga Karya Semesta</div>
-      <div>General Trading - Mechanical Electrical - Supplies - Consultant</div>
-      <div>Jogokaryan MJ 3/789, Mantrijeron - Yogyakarta Telp 08121553765</div>
-    </div>
-  );
-};
+// const BKSHeader = () => {
+//   return (
+//     <div className="flex flex-col">
+//       <div>Belga Karya Semesta</div>
+//       <div>General Trading - Mechanical Electrical - Supplies - Consultant</div>
+//       <div>Jogokaryan MJ 3/789, Mantrijeron - Yogyakarta Telp 08121553765</div>
+//     </div>
+//   );
+// };
 
-const SVTHeader = () => {
-  return (
-    <div className="flex flex-col">
-      <div>Satu Visi Teknikatama</div>
-      <div>General Trading - Mechanical Electrical - Supplies - Consultant</div>
-      <div>
-        Wonosalam RT. 005 / RW. 009, Sukoharjo, Ngaglik Sleman - Yogyakarta
-        55581 Telp 08121553765 - 081578861740
-      </div>
-    </div>
-  );
-};
+// const SVTHeader = () => {
+//   return (
+//     <div className="flex flex-col">
+//       <div>Satu Visi Teknikatama</div>
+//       <div>General Trading - Mechanical Electrical - Supplies - Consultant</div>
+//       <div>
+//         Wonosalam RT. 005 / RW. 009, Sukoharjo, Ngaglik Sleman - Yogyakarta
+//         55581 Telp 08121553765 - 081578861740
+//       </div>
+//     </div>
+//   );
+// };

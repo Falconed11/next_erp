@@ -37,4 +37,27 @@ const LinkOpenNewTab = ({ content, link, icon }) => {
   );
 };
 
-export { MyChip, LinkOpenNewTab };
+const BKSHeader = () => {
+  return (
+    <div className="flex flex-col">
+      <div>Belga Karya Semesta</div>
+      <div>General Trading - Mechanical Electrical - Supplies - Consultant</div>
+      <div>Jogokaryan MJ 3/789, Mantrijeron - Yogyakarta Telp 08121553765</div>
+    </div>
+  );
+};
+
+const SVTHeader = () => {
+  return (
+    <div className="flex flex-col">
+      <div>Satu Visi Teknikatama</div>
+      <div>General Trading - Mechanical Electrical - Supplies - Consultant</div>
+      <div>
+        Wonosalam RT. 005 / RW. 009, Sukoharjo, Ngaglik Sleman - Yogyakarta
+        55581 Telp 08121553765 - 081578861740
+      </div>
+    </div>
+  );
+};
+
+export { MyChip, LinkOpenNewTab, BKSHeader, SVTHeader };

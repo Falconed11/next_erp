@@ -363,7 +363,7 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
               icon={<NoteIcon />}
             />
             {peran == "admin" || peran == "super" ? (
-              <Tooltip content="Pengeluaran Proyek">
+              <Tooltip content="Pengeluaran & Pembayaran">
                 <Link href={`/proyek/detail/proses?id=${data.id}`}>
                   <span
                     // onClick={() => detailButtonPress(data)}

@@ -41,6 +41,7 @@ import { penawaran } from "@/app/utils/formatid";
 import Harga from "@/components/harga";
 import { ConditionalComponent } from "@/components/componentmanipulation";
 import TambahProduk from "@/components/tambahproduk";
+import { BKSHeader, SVTHeader } from "@/components/mycomponent";
 import { Button } from "@heroui/react";
 import { Input } from "@heroui/react";
 import { Divider } from "@heroui/react";
@@ -405,6 +406,8 @@ export default function App({ id, versi }) {
       const cellValue = data[columnKey];
       let harga = data.hargakustom == null ? data.harga : data.hargakustom;
       switch (columnKey) {
+        case "nmerek":
+          return columnKey == "NN" ? "" : columnKey;
         case "nama":
           return data.keterangan ? data.keterangan : data.nama;
         case "no":
@@ -436,8 +439,27 @@ export default function App({ id, versi }) {
     invoice: React.useCallback((data, columnKey) => {
       const cellValue = data[columnKey];
       switch (columnKey) {
+        case "deskripsiitem":
+          return (
+            <>
+              {data.keterangan ? data.keterangan : data.nama}{" "}
+              {data.nmerek == "NN" ? "" : data.nmerek} {data.tipe}
+            </>
+          );
+        case "jumlah":
+          return <div className="text-right">{cellValue}</div>;
         case "total":
-          return data.jumlah * data.harga;
+          return (
+            <div className="text-right">
+              <Harga harga={data.jumlah * data.harga} />
+            </div>
+          );
+        case "harga":
+          return (
+            <div className="text-right">
+              <Harga harga={data.harga} />
+            </div>
+          );
         default:
           return cellValue;
       }
@@ -476,8 +498,6 @@ export default function App({ id, versi }) {
     }
     result.push(item);
   });
-  // console.log(dataPenawaran);
-  // console.log(result);
 
   const dataInstalasi = keranjangProyekInstalasi?.data
     ?.sort((a, b) => a.subproyek?.localeCompare(b?.subproyek))
@@ -514,6 +534,11 @@ export default function App({ id, versi }) {
   if (subProyek.isLoading) return <div>loading...</div>;
 
   const selectedProyek = proyek.data[0];
+  const invoiceData = [
+    ...keranjangProyek.data,
+    ...keranjangProyekInstalasi.data,
+  ].map((v, i) => ({ ...v, no: i + 1 }));
+  console.log(invoiceData);
 
   const col = {
     keranjangproyek: [
@@ -680,16 +705,17 @@ export default function App({ id, versi }) {
         label: "#",
       },
       {
-        key: "deskripsi",
+        key: "deskripsiitem",
         label: "Deskripsi Item",
-      },
-      {
-        key: "harga",
-        label: "Harga",
       },
       {
         key: "jumlah",
         label: "Jumlah",
+      },
+      { key: "satuan" },
+      {
+        key: "harga",
+        label: "Harga",
       },
       {
         key: "total",
@@ -794,7 +820,7 @@ export default function App({ id, versi }) {
   const selectedVersion = selectVersi.values().next().value;
 
   // console.log(form.selectSubProyek?.values().next().value ?? 0);
-  // console.log(form);
+  console.log(proyek.data);
   return (
     <div>
       <div className="flex flex-row gap-2">
@@ -1035,10 +1061,6 @@ export default function App({ id, versi }) {
               ) : (
                 <></>
               )} */}
-              <Link
-                className="text-blue-600 p-3"
-                href={`/proyek/detail/proses?id=${selectedProyek.id}`}
-              >{`Pengeluaran Proyek ==>>`}</Link>
               <div>
                 <Button
                   onPress={modal.invoice.onOpen}
@@ -1048,6 +1070,10 @@ export default function App({ id, versi }) {
                   Invoice
                 </Button>
               </div>
+              <Link
+                className="text-blue-600 p-3"
+                href={`/proyek/detail/proses?id=${selectedProyek.id}`}
+              >{`Pengeluaran Proyek ==>>`}</Link>
             </div>
             <div className="-w-11/12">
               {/* sub proyek */}
@@ -1972,7 +1998,10 @@ export default function App({ id, versi }) {
             <>
               <ModalHeader className="flex flex-col gap-1">Invoice</ModalHeader>
               <ModalBody>
-                <div ref={componentRef.invoice} className="bg-white text-black">
+                <div
+                  ref={componentRef.invoice}
+                  className="bg-white text-black leading-none"
+                >
                   <div className="flex flex-row items-center">
                     {/* <Image
                       src={logo}
@@ -1983,22 +2012,25 @@ export default function App({ id, versi }) {
                       // placeholder="blur" // Optional blur-up while loading
                     /> */}
                     <div className="flex flex-col">
-                      <div>Nama Perusahaan</div>
-                      <div>Deskripsi</div>
+                      {selectedProyek.namaperusahaan == "bks" ? (
+                        <BKSHeader />
+                      ) : (
+                        <SVTHeader />
+                      )}
                     </div>
                   </div>
                   <div className="flex flex-row items-center">
-                    <div className="basis-1/2 bg-sky-500 h-4"></div>
-                    <div className="basis-1/4 text-4xl font-bold text-center inline-block align-middle items-center">
+                    <div className="basis-1/2 bg-sky-500 h-2"></div>
+                    <div className="basis-1/4 text-2xl font-bold text-center inline-block align-middle items-center">
                       Invoice
                     </div>
-                    <div className="basis-1/4 bg-sky-500 h-4"></div>
+                    <div className="basis-1/4 bg-sky-500 h-2"></div>
                   </div>
-                  <div className="pt-3 flex flex-row">
+                  <div className="flex flex-row">
                     <div className="basis-1/2">
                       <div>Invoice kepada :</div>
-                      <div>Nama client</div>
-                      <div>Deskripsi</div>
+                      <div>{selectedProyek.klien}</div>
+                      <div>{selectedProyek.instansi}</div>
                     </div>
                     <div className="basis-1/2 text-end">
                       <div>Id : ASD21903SAD</div>
@@ -2009,6 +2041,7 @@ export default function App({ id, versi }) {
                     className="mt-3 border"
                     aria-label="Example table with custom cells"
                     shadow="none"
+                    isCompact
                   >
                     <TableHeader columns={col.invoice}>
                       {(column) => (
@@ -2020,7 +2053,7 @@ export default function App({ id, versi }) {
                         </TableColumn>
                       )}
                     </TableHeader>
-                    <TableBody items={invoice}>
+                    <TableBody items={invoiceData}>
                       {(item) => (
                         <TableRow key={item.no}>
                           {(columnKey) => (
@@ -2034,41 +2067,79 @@ export default function App({ id, versi }) {
                   </Table>
                   <div className="flex flex-row mt-3">
                     <div className="basis-2/4">
-                      Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                      {/* Lorem ipsum dolor sit amet consectetur adipisicing elit.
                       Natus accusamus cum, adipisci fugit excepturi doloremque
                       tenetur eligendi dolorum? Eaque veniam ea enim corrupti
-                      sint modi officia fugiat totam in commodi.
+                      sint modi officia fugiat totam in commodi. */}
                     </div>
-                    <div className="basis-1/4"></div>
-                    <div className="basis-1/4 pl-3">
-                      <div className="pl-3">
-                        <div>Sub Total : 600000</div>
-                        <div>Pajak : 10%</div>
-                      </div>
-                      <div>
-                        <div className="bg-sky-200 pl-3 font-semibold">
-                          Total : {(600000 * 110) / 100}
+                    <div className="basis-2/4 pl-3">
+                      <div className="flex">
+                        <div className="basis-1/2">
+                          <div>
+                            {rekapDiskon + rekapPajak > 0
+                              ? "Sub Total"
+                              : "Total"}
+                          </div>
+                          {rekapDiskon > 0 ? (
+                            <>
+                              <div>Diskon</div>
+                              <div>Harga Setelah Diskon</div>
+                            </>
+                          ) : (
+                            <></>
+                          )}
+                          {rekapPajak > 0 ? (
+                            <>
+                              <div>Pajak ({rekapPajak}%)</div>
+                              <div>Harga Setelah Pajak</div>
+                            </>
+                          ) : (
+                            <></>
+                          )}
+                        </div>
+                        <div className="text-right basis-1/2">
+                          <div>
+                            <Harga harga={totalKustom} />
+                          </div>
+                          {rekapDiskon > 0 ? (
+                            <>
+                              <div>{<Harga harga={rekapDiskon} />}</div>
+                              <div>{<Harga harga={kustomDiskon} />}</div>
+                            </>
+                          ) : (
+                            <></>
+                          )}
+                          {rekapPajak > 0 ? (
+                            <>
+                              <div>{<Harga harga={pajakKustom} />}</div>
+                              <div>
+                                <Harga harga={finalKustom} />
+                              </div>
+                            </>
+                          ) : (
+                            <></>
+                          )}
                         </div>
                       </div>
-                      <div className="py-3 text-center">TTD</div>
-                      <div>Nama</div>
+                      {/* <div className="py-3 text-center">TTD</div>
+                      <div>Nama</div> */}
                     </div>
                   </div>
-                  <div className="mt-3 bg-sky-500 h-px"></div>
+                  {/* <div className="mt-3 bg-sky-500 h-px"></div>
                   <div className="flex items-center space-x-4">
                     <div># Telepon</div>
                     <Divider orientation="vertical" />
                     <div>Alamat</div>
                     <Divider orientation="vertical" />
                     <div>Website</div>
-                  </div>
+                  </div> */}
                 </div>
               </ModalBody>
               <ModalFooter>
                 <Button color="danger" variant="light" onPress={onClose}>
                   Batal
                 </Button>
-                <Button onClick={handlePrintInvoice} color="primary">
+                <Button onPress={handlePrintInvoice} color="primary">
                   Cetak
                 </Button>
               </ModalFooter>
