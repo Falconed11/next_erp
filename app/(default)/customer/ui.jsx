@@ -257,8 +257,7 @@ export default function App() {
   const pages = useMemo(() => {
     return data ? Math.ceil(data?.length / rowsPerPage) : 0;
   }, [data, rowsPerPage]);
-  const loadingState =
-    customer.isLoading || data?.length === 0 ? "loading" : "idle";
+  const loadingState = customer.isLoading ? "loading" : "idle";
   const offset = (page - 1) * rowsPerPage;
 
   const columns = [
@@ -366,6 +365,7 @@ export default function App() {
           items={data ? data.slice(offset, offset + rowsPerPage) : []}
           loadingContent={"Loading..."}
           loadingState={loadingState}
+          emptyContent={"Kosong"}
         >
           {(item) => (
             <TableRow key={item.id}>

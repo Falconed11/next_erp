@@ -38,6 +38,7 @@ import {
 } from "@/app/utils/apiconfig";
 import { getDate, getDateF, getDateFId } from "@/app/utils/date";
 import { penawaran } from "@/app/utils/formatid";
+import { removePrefixIfMatchIgnoreCase } from "@/app/utils/stringmanipulation";
 import Harga from "@/components/harga";
 import { ConditionalComponent } from "@/components/componentmanipulation";
 import TambahProduk from "@/components/tambahproduk";
@@ -407,7 +408,11 @@ export default function App({ id, versi }) {
       let harga = data.hargakustom == null ? data.harga : data.hargakustom;
       switch (columnKey) {
         case "nmerek":
-          return columnKey == "NN" ? "" : columnKey;
+          return cellValue == "NN" ? "" : cellValue;
+        case "tipe":
+          return cellValue
+            ? removePrefixIfMatchIgnoreCase(new String(cellValue), "svt-")
+            : "";
         case "nama":
           return data.keterangan ? data.keterangan : data.nama;
         case "no":
@@ -472,14 +477,6 @@ export default function App({ id, versi }) {
     rekapitulasi: useDisclosure(),
     jenisproyek: useDisclosure(),
   };
-  const invoice = [
-    {
-      no: 1,
-      deskripsi: "CCTV",
-      jumlah: 2,
-      harga: 300000,
-    },
-  ];
 
   const dataPenawaran = keranjangProyek?.data
     ?.sort((a, b) => a.subproyek?.localeCompare(b?.subproyek))
@@ -504,7 +501,7 @@ export default function App({ id, versi }) {
     .map((produk, i) => {
       return { ...produk, no: i + 1 };
     });
-
+  console.log(result);
   // Step 2: Insert rows before each group
   const resultInstalasi = [];
   let currentGroupInstalasi = null;
@@ -818,6 +815,13 @@ export default function App({ id, versi }) {
   const finalHarga = hargaDiskon + pajak;
   const finalKustom = kustomDiskon + pajakKustom;
   const selectedVersion = selectVersi.values().next().value;
+  const provit = hargaDiskon - totalModal;
+  const persenProvit = (provit / totalModal) * 100;
+
+  const formatTable = {
+    wrapper: "py-0 px-1",
+    td: "text-xs py-0 align-top", // Reduce font size and vertical padding
+  };
 
   // console.log(form.selectSubProyek?.values().next().value ?? 0);
   console.log(proyek.data);
@@ -897,50 +901,51 @@ export default function App({ id, versi }) {
           component={
             <>
               {/* rekapitulasi */}
-              <div className="bg-white rounded-lg p-3 w-1/3">
+              <div className="bg-white rounded-lg p-3 w- text-nowrap">
                 <div>Rekapitulasi</div>
-                <div className="flex">
-                  <div className="basis-2/4">
+                <div className="flex gap-2">
+                  <div className="basis-">
+                    <div>Sub Total Modal</div>
                     <div>Sub Total Harga</div>
                     <div>Maks Diskon</div>
                     <div>Diskon</div>
                     <div>Harga Setelah Diskon</div>
-                    <div>Pajak ({selectedProyek.pajak}%)</div>
+                    <div>Pajak ({selectedRekapitulasiProyek?.pajak}%)</div>
                     <div>Harga Setelah Pajak</div>
+                    <div>Estimasi Provit</div>
                   </div>
-                  <div className="basis-2/4">
+                  <div className="basis- text-right">
                     <div>
-                      : <Harga harga={totalHarga} />
+                      <Harga harga={totalModal} />
                     </div>
                     <div>
-                      :{" "}
-                      <Harga
-                        label={``}
-                        harga={maksDiskon}
-                        endContent={`(${maksDiskonPersen.toFixed(2)}%)`}
-                      />
+                      <Harga harga={totalHarga} />
                     </div>
                     <div>
-                      :{" "}
-                      <Harga
-                        harga={rekapDiskon}
-                        endContent={`(${diskonPersen.toFixed(2)}%)`}
-                      />
+                      ({maksDiskonPersen.toFixed(2)}%){" "}
+                      <Harga label={``} harga={maksDiskon} />
                     </div>
                     <div>
-                      : <Harga harga={hargaDiskon} />
+                      ({diskonPersen.toFixed(2)}%){" "}
+                      <Harga harga={rekapDiskon} endContent={``} />
                     </div>
                     <div>
-                      : <Harga harga={pajak} />
+                      <Harga harga={hargaDiskon} />
                     </div>
                     <div>
-                      : <Harga harga={finalHarga} />
+                      <Harga harga={pajak} />
+                    </div>
+                    <div>
+                      <Harga harga={finalHarga} />
+                    </div>
+                    <div>
+                      ({persenProvit.toFixed(2)}%) <Harga harga={provit} />
                     </div>
                     <ConditionalComponent
                       condition={selectedProyek.versi == 0}
                       component={
                         <Button
-                          onClick={handleButtonEdit}
+                          onPress={handleButtonEdit}
                           color="primary"
                           className="float-right mt-3"
                         >
@@ -1786,12 +1791,10 @@ export default function App({ id, versi }) {
                   {/* produk */}
                   {dataPenawaran.length > 0 ? (
                     <Table
+                      isStriped
                       topContentPlacement="outside"
                       className="border text-xs py-0 my-0"
-                      classNames={{
-                        wrapper: "py-0 px-1",
-                        td: "text-xs py-0", // Reduce font size and vertical padding
-                      }}
+                      classNames={formatTable}
                       aria-label="Example table with custom cells"
                       shadow="none"
                       topContent={<div className="py-0 my-0">Produk</div>}
@@ -1832,14 +1835,11 @@ export default function App({ id, versi }) {
                   {/* instalasi */}
                   {dataInstalasi.length > 0 ? (
                     <Table
-                      isCompact
+                      isStriped
                       radius="none"
                       topContentPlacement="outside"
                       className="mt-0 border text-xs my-0 py-0"
-                      classNames={{
-                        wrapper: "py-0 px-1",
-                        td: "text-xs py-0",
-                      }}
+                      classNames={formatTable}
                       aria-label="Example table with custom cells"
                       shadow="none"
                       topContent={<>Instalasi</>}
