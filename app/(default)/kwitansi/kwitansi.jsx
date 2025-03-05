@@ -39,9 +39,15 @@ import {
   EyeIcon,
   UserIcon,
   PrinterIcon,
+  NoteIcon,
 } from "@/components/icon";
 import { useClientFetch, getApiPath } from "@/app/utils/apiconfig";
-import date, { getDateF, getDate, getCurFirstLastDay } from "@/app/utils/date";
+import date, {
+  getDateF,
+  getDate,
+  getCurFirstLastDay,
+  getDateFId,
+} from "@/app/utils/date";
 import number from "@/app/utils/number";
 import Harga from "@/components/harga";
 import { RangeDate } from "@/components/input";
@@ -73,7 +79,7 @@ export default function App() {
     )}`
   );
   const karyawan = useClientFetch("karyawan");
-  const [selected, setSelected] = React.useState("normal");
+  const [selected, setSelected] = React.useState("bks");
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const modal = {
     kwitansi: useDisclosure(),
@@ -155,13 +161,13 @@ export default function App() {
       case "aksi":
         return (
           <div className="relative flex items-center gap-2">
-            <Tooltip content="Print">
+            <Tooltip content="Kwitansi">
               <span
                 onClick={() => printButtonPress(data)}
                 // onClick={() => detailButtonPress(data)}
                 className="text-lg text-default-400 cursor-pointer active:opacity-50"
               >
-                <PrinterIcon />
+                <NoteIcon />
               </span>
             </Tooltip>
             <Tooltip content="Edit">
@@ -228,6 +234,12 @@ export default function App() {
       label: "Aksi",
     },
   ];
+  const content = [
+    { col: "Diterima dari", val: form.nama_pembayar },
+    { col: "Nominal sebesar", val: number.nominalToText(form.nominal) },
+    { col: "Guna membayar", val: form.keterangan },
+  ];
+
   const a = "f";
   return (
     <div className="flex flex-col gap-2">
@@ -397,26 +409,54 @@ export default function App() {
                   value={selected}
                   onValueChange={setSelected}
                 >
-                  <Radio value="normal">Normal</Radio>
+                  {/* <Radio value="normal">Normal</Radio> */}
                   <Radio value="bks">BKS</Radio>
                   <Radio value="svt">SVT</Radio>
                 </RadioGroup>
                 <div
                   ref={componentRef.kwitansi}
-                  className="bg-white text-black leading-8"
+                  className="bg-white text-black flex flex-col gap-2 leading-none"
                 >
-                  {selected == "svt" ? <SVTHeader /> : <BKSHeader />}
+                  <div className="flex">
+                    <div className="basis-2/3">
+                      {selected == "svt" ? <SVTHeader /> : <BKSHeader />}
+                    </div>
+                    <div className="text-center basis-1/3">
+                      <div className="">KWITANSI</div>
+                      <div className="flex gap-2">
+                        <div className="basis-1/3">No.</div>
+                        <div className="basis-2/4 border border-black">
+                          {form.id_custom}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <Divider className="bg-black" />
+                  {/* <div>{form.id_kustom}</div> */}
+                  <ul className="">
+                    {content.map((v, i) => (
+                      <li key={i} className="flex">
+                        <div className="basis-1/4">{v.col}</div>
+                        <div>: {v.val}</div>
+                      </li>
+                    ))}
+                  </ul>
                   <Divider className="bg-black" />
                   <div>{form.id_kustom}</div>
-                  <div>Diterima dari :{form.nama_pembayar}</div>
-                  <div>
-                    Nominal sebesar :{number.nominalToText(form.nominal)} Rupiah
-                  </div>
-                  <div>Guna membayar :{form.keterangan}</div>
-                  <div>{form.id_kustom}</div>
-                  <div>
-                    {" "}
-                    Rp <Harga harga={form.nominal} /> ,00{" "}
+                  <div className="flex">
+                    <div className="basis-1/2">
+                      Terbilang :{" "}
+                      <span className="border border-black p-1">
+                        Rp <Harga harga={form.nominal} />
+                        ,00
+                      </span>
+                    </div>
+                    <div className="text-right basis-1/2">
+                      <div>
+                        Yogyakarta, {getDateFId(new Date(form.tanggal))}
+                      </div>
+                      <div>{form.nama_karyawan}</div>
+                    </div>
                   </div>
                 </div>
               </ModalBody>

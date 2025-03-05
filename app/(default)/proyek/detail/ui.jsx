@@ -356,10 +356,30 @@ export default function App({ id, versi }) {
       switch (columnKey) {
         case "nama":
           return data.keterangan ? data.keterangan : data.nama;
+        case "stok":
+          return (
+            <div
+              className={`text-right px-1 ${
+                data.jumlah > data.stok ? "text-white bg-danger rounded" : ""
+              }`}
+            >
+              {cellValue}
+            </div>
+          );
+        case "jumlah":
+          return <div className="text-right">{cellValue}</div>;
         case "hargamodal":
-          return <Harga harga={data.hargamodal} />;
+          return (
+            <div className="text-right">
+              <Harga harga={data.hargamodal} />
+            </div>
+          );
         case "harga":
-          return <Harga harga={data.harga} />;
+          return (
+            <div className="text-right">
+              <Harga harga={data.harga} />
+            </div>
+          );
         case "hargakustom":
           return data.hargakustom != null ? (
             <Harga harga={data.hargakustom} />
@@ -367,16 +387,30 @@ export default function App({ id, versi }) {
             ""
           );
         case "totalharga-modal":
-          return <Harga harga={data.jumlah * data.hargamodal} />;
+          return (
+            <div className="text-right">
+              <Harga harga={data.jumlah * data.hargamodal} />
+            </div>
+          );
         case "totalharga-jual":
-          return <Harga harga={data.jumlah * data.harga} />;
+          return (
+            <div className="text-right">
+              <Harga harga={data.jumlah * data.harga} />
+            </div>
+          );
         case "profit":
-          return <Harga harga={data.harga - data.hargamodal} />;
+          return (
+            <div className="text-right">
+              <Harga harga={data.harga - data.hargamodal} />
+            </div>
+          );
         case "totalprofit":
           return (
-            <Harga
-              harga={data.jumlah * data.harga - data.jumlah * data.hargamodal}
-            />
+            <div className="text-right">
+              <Harga
+                harga={data.jumlah * data.harga - data.jumlah * data.hargamodal}
+              />
+            </div>
           );
         case "aksi":
           return (
@@ -828,7 +862,7 @@ export default function App({ id, versi }) {
   return (
     <div>
       <div className="flex flex-row gap-2">
-        {/*Detail  */}
+        {/* detail  */}
         <div className="bg-white rounded-lg p-3">
           <div>Detail</div>
           {versiKeranjangProyek.data.length > 1 ? (
@@ -895,7 +929,7 @@ export default function App({ id, versi }) {
             </div>
           </div>
         </div>
-        {/* {Rekapitulasi} */}
+        {/* rekapitulasi */}
         <ConditionalComponent
           condition={selectVersi.size}
           component={
@@ -976,6 +1010,7 @@ export default function App({ id, versi }) {
           }
         />
       </div>
+      {/* keranjang penawaran */}
       <ConditionalComponent
         condition={selectVersi.size}
         component={
@@ -1085,7 +1120,8 @@ export default function App({ id, versi }) {
               <SubProyek id={id} selectedProyek={selectedProyek} />
               {/* tabel produk */}
               <Table
-                selectionMode="single"
+                isStriped
+                isCompact
                 className="pt-3"
                 topContent={
                   <>
@@ -1213,8 +1249,8 @@ export default function App({ id, versi }) {
               </Table>
               {/* tabel instalasi */}
               <Table
-                selectionMode="single"
                 isStriped
+                isCompact
                 topContent={
                   <>
                     <div>Instalasi</div>
