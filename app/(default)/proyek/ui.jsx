@@ -420,14 +420,18 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
                 <FileExportIcon />
               </span>
             </Tooltip> */}
-            <Tooltip color="danger" content="Delete">
-              <span
-                onClick={() => deleteButtonPress(data.id)}
-                className="text-lg text-danger cursor-pointer active:opacity-50"
-              >
-                <DeleteIcon />
-              </span>
-            </Tooltip>
+            {["super"].includes(peran) ? (
+              <Tooltip color="danger" content="Delete">
+                <span
+                  onClick={() => deleteButtonPress(data.id)}
+                  className="text-lg text-danger cursor-pointer active:opacity-50"
+                >
+                  <DeleteIcon />
+                </span>
+              </Tooltip>
+            ) : (
+              <></>
+            )}
           </div>
         );
       default:
