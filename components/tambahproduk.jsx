@@ -56,6 +56,7 @@ export default function TambahProduk({
   );
   fvendor = fvendor.slice(0, 100);
   const selectProduk = produk.data.filter((v) => v.id == form.selectProduk)[0];
+  // console.log(disableStok);
   return (
     <div className="w-max flex flex-wrap gap-3">
       <Select
@@ -91,6 +92,7 @@ export default function TambahProduk({
           setForm({
             ...form,
             selectProduk: v,
+            hargamodal: selectedProduk?.hargamodal,
             harga: refHargaModal
               ? selectedProduk?.hargamodal ?? 0
               : selectedProduk?.hargajual ?? 0,
@@ -189,6 +191,12 @@ export default function TambahProduk({
         label="Jumlah"
         placeholder="Masukkan jumlah!"
         className="w-3/12"
+        validate={(value) => {
+          if (value > form.stok && form.isSelected) {
+            return "Stok tidak mencukupi!";
+          }
+          if (value < 1) return "Jumlah minimal 1";
+        }}
         endContent={
           <div className="pointer-events-none flex items-center">
             <span className="text-default-400 text-small"></span>
@@ -201,13 +209,33 @@ export default function TambahProduk({
           })
         }
       />
+      {disableStok ? (
+        <Input
+          type="number"
+          isDisabled={form.isSelected ? 1 : undefined}
+          value={form.hargamodal}
+          label={
+            <>Harga Modal (Ref: {<Harga harga={selectProduk?.hargamodal} />})</>
+          }
+          placeholder="Masukkan harga!"
+          className="w-3/12"
+          onValueChange={(v) =>
+            setForm({
+              ...form,
+              hargamodal: v,
+            })
+          }
+        />
+      ) : (
+        <></>
+      )}
       <Input
         type="number"
         isDisabled={form.isSelected ? 1 : undefined}
         value={form.harga}
         label={
           <>
-            Harga Satuan (Ref:{" "}
+            Harga {disableStok ? "Jual" : "Satuan"} (Ref:{" "}
             {
               <Harga
                 harga={

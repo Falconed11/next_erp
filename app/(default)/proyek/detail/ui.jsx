@@ -37,7 +37,7 @@ import {
   useClientFetchNoInterval,
 } from "@/app/utils/apiconfig";
 import { getDate, getDateF, getDateFId } from "@/app/utils/date";
-import { penawaran } from "@/app/utils/formatid";
+import { invoice, penawaran } from "@/app/utils/formatid";
 import { removePrefixIfMatchIgnoreCase } from "@/app/utils/stringmanipulation";
 import Harga from "@/components/harga";
 import { ConditionalComponent } from "@/components/componentmanipulation";
@@ -535,7 +535,7 @@ export default function App({ id, versi }) {
     .map((produk, i) => {
       return { ...produk, no: i + 1 };
     });
-  console.log(result);
+  // console.log(result);
   // Step 2: Insert rows before each group
   const resultInstalasi = [];
   let currentGroupInstalasi = null;
@@ -569,7 +569,7 @@ export default function App({ id, versi }) {
     ...keranjangProyek.data,
     ...keranjangProyekInstalasi.data,
   ].map((v, i) => ({ ...v, no: i + 1 }));
-  console.log(invoiceData);
+  // console.log(invoiceData);
 
   const col = {
     keranjangproyek: [
@@ -850,7 +850,8 @@ export default function App({ id, versi }) {
   const finalKustom = kustomDiskon + pajakKustom;
   const selectedVersion = selectVersi.values().next().value;
   const provit = hargaDiskon - totalModal;
-  const persenProvit = (provit / totalModal) * 100;
+  // const persenProvit = (provit / totalModal) * 100;
+  const persenProvit = (provit / hargaDiskon) * 100;
 
   const formatTable = {
     wrapper: "py-0 px-1",
@@ -858,7 +859,7 @@ export default function App({ id, versi }) {
   };
 
   // console.log(form.selectSubProyek?.values().next().value ?? 0);
-  console.log(proyek.data);
+  // console.log(proyek.data);
   return (
     <div>
       <div className="flex flex-row gap-2">
@@ -1160,7 +1161,7 @@ export default function App({ id, versi }) {
                           />
                           <div>
                             <Button
-                              onClick={() => {
+                              onPress={() => {
                                 tambahButtonPress(form, setForm);
                               }}
                               color="primary"
@@ -2069,8 +2070,17 @@ export default function App({ id, versi }) {
                       <div>{selectedProyek.instansi}</div>
                     </div>
                     <div className="basis-1/2 text-end">
-                      <div>Id : ASD21903SAD</div>
-                      <div>Tanggal : 17 Oktober 2023</div>
+                      <div>
+                        Id :{" "}
+                        {invoice(
+                          selectedProyek.id_penawaran,
+                          new Date(selectedProyek.tanggal_penawaran)
+                        )}
+                      </div>
+                      <div>
+                        Tanggal :{" "}
+                        {getDateFId(new Date(selectedProyek.tanggal_penawaran))}
+                      </div>
                     </div>
                   </div>
                   <Table

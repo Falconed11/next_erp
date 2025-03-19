@@ -125,7 +125,7 @@ export default function App({ id }) {
   };
   const tambahButtonPress = async ({ selectProduk, selectKaryawan, form }) => {
     // if (select.size == 0) return alert("Produk belum dipilih.");
-    if (form.isSelected == true && form.stok < form.jumlah)
+    if (form.isSelected && form.stok < form.jumlah)
       return alert("Jumlah melebihi stok.");
     let res;
     if (form.isSelected) {
@@ -732,7 +732,7 @@ export default function App({ id }) {
                 )}
 
                 <Button
-                  onClick={() => {
+                  onPress={() => {
                     tambahButtonPress({ selectProduk, selectKaryawan, form });
                   }}
                   color="primary"
