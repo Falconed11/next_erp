@@ -49,6 +49,7 @@ import { Divider } from "@heroui/react";
 import { Spacer } from "@heroui/react";
 import { Select, SelectItem } from "@heroui/react";
 import { CheckboxGroup, Checkbox } from "@heroui/react";
+import { Form } from "@heroui/form";
 import Link from "next/link";
 import Image from "next/image";
 import logoBks from "@/public/logo-bks.jpeg";
@@ -106,6 +107,8 @@ export default function App({ id, versi }) {
     selectKategori: new Set([]),
   });
   const [formRekapitulasi, setFormRekapitulasi] = useState({ hargadiskon: 0 });
+  const [margin, setMargin] = useState(0);
+  const [inputMargin, setInputMargin] = useState(margin);
 
   const tambahButtonPress = async (form, setForm) => {
     if (!form.selectProduk) return alert("Silahkan pilih produk");
@@ -368,10 +371,16 @@ export default function App({ id, versi }) {
           );
         case "jumlah":
           return <div className="text-right">{cellValue}</div>;
-        case "hargamodal":
+        case "temphargamodal":
           return (
             <div className="text-right">
-              <Harga harga={data.hargamodal} />
+              <Harga harga={cellValue} />
+            </div>
+          );
+        case "refhargajualmargin":
+          return (
+            <div className="text-right">
+              <Harga harga={data.margin} />
             </div>
           );
         case "harga":
@@ -515,7 +524,10 @@ export default function App({ id, versi }) {
   const dataPenawaran = keranjangProyek?.data
     ?.sort((a, b) => a.subproyek?.localeCompare(b?.subproyek))
     .map((produk, i) => {
-      return { ...produk, no: i + 1 };
+      return {
+        ...produk,
+        no: i + 1,
+      };
     });
 
   // Step 2: Insert rows before each group
@@ -533,7 +545,10 @@ export default function App({ id, versi }) {
   const dataInstalasi = keranjangProyekInstalasi?.data
     ?.sort((a, b) => a.subproyek?.localeCompare(b?.subproyek))
     .map((produk, i) => {
-      return { ...produk, no: i + 1 };
+      return {
+        ...produk,
+        no: i + 1,
+      };
     });
   // console.log(result);
   // Step 2: Insert rows before each group
@@ -547,6 +562,7 @@ export default function App({ id, versi }) {
     }
     resultInstalasi.push(item);
   });
+
   // console.log(dataPenawaran);
   // console.log(result);
 
@@ -563,6 +579,15 @@ export default function App({ id, versi }) {
   if (versiKeranjangProyek.isLoading) return <div>loading...</div>;
   if (subProyek.error) return <div>failed to load</div>;
   if (subProyek.isLoading) return <div>loading...</div>;
+
+  const keranjangProduk = keranjangProyek?.data.map((item) => ({
+    ...item,
+    margin: Math.ceil(item.hargamodal / (margin <= 0 ? 1 : 1 - margin / 100)),
+  }));
+  const keranjangIntalasi = keranjangProyekInstalasi?.data.map((item) => ({
+    ...item,
+    margin: Math.ceil(item.hargamodal / (margin <= 0 ? 1 : 1 - margin / 100)),
+  }));
 
   const selectedProyek = proyek.data[0];
   const invoiceData = [
@@ -610,8 +635,12 @@ export default function App({ id, versi }) {
         label: "Satuan",
       },
       {
-        key: "hargamodal",
+        key: "temphargamodal",
         label: "Harga Modal",
+      },
+      {
+        key: "refhargajualmargin",
+        label: `Ref. Harga Jual Margin (${margin}%)`,
       },
       {
         key: "harga",
@@ -672,8 +701,12 @@ export default function App({ id, versi }) {
         label: "Satuan",
       },
       {
-        key: "hargamodal",
+        key: "temphargamodal",
         label: "Harga Modal",
+      },
+      {
+        key: "refhargajualmargin",
+        label: `Ref. Harga Jual Margin (${margin}%)`,
       },
       {
         key: "harga",
@@ -860,6 +893,7 @@ export default function App({ id, versi }) {
 
   // console.log(form.selectSubProyek?.values().next().value ?? 0);
   // console.log(proyek.data);
+  console.log({ dataPenawaran, dataInstalasi });
   return (
     <div>
       <div className="flex flex-row gap-2">
@@ -929,6 +963,29 @@ export default function App({ id, versi }) {
               </div>
             </div>
           </div>
+        </div>
+        {/* alat */}
+        <div className="bg-white rounded-lg p-3 flex flex-col gap-2">
+          <div>Alat</div>
+          <Form
+            onSubmit={(e) => {
+              e.preventDefault();
+              setMargin(+inputMargin);
+            }}
+          >
+            <Input
+              label="Provit Margin (%)"
+              type="text"
+              placeholder="Masukkan persen provit margin"
+              value={inputMargin}
+              onValueChange={setInputMargin}
+            />
+            <div>
+              <Button type="submit" color="primary">
+                Terapkan
+              </Button>
+            </div>
+          </Form>
         </div>
         {/* rekapitulasi */}
         <ConditionalComponent
@@ -1236,7 +1293,7 @@ export default function App({ id, versi }) {
                     </TableColumn>
                   )}
                 </TableHeader>
-                <TableBody items={keranjangProyek.data}>
+                <TableBody items={keranjangProduk}>
                   {(item) => (
                     <TableRow key={item.id_keranjangproyek}>
                       {(columnKey) => (
@@ -1391,7 +1448,7 @@ export default function App({ id, versi }) {
                     </TableColumn>
                   )}
                 </TableHeader>
-                <TableBody items={keranjangProyekInstalasi.data}>
+                <TableBody items={keranjangIntalasi}>
                   {(item) => (
                     <TableRow key={item.id_keranjangproyek}>
                       {(columnKey) => (
@@ -1663,6 +1720,7 @@ export default function App({ id, versi }) {
                     })
                   }
                 /> */}
+                <div>Ref. Harga Jual Margin : {form.margin}</div>
                 <div>Harga Modal : {form.hargamodal}</div>
                 <div>Harga Jual : {form.harga}</div>
                 <div>Provit : {form.harga - form.hargamodal}</div>
