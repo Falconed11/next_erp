@@ -252,7 +252,13 @@ export default function TambahProduk({
           disableStok ? (
             `(${
               Math.round(
-                ((form.harga - form.temphargamodal) / form.harga) * 100 * 100
+                ((form.harga -
+                  (form.temphargamodal
+                    ? form.temphargamodal
+                    : form.hargamodal)) /
+                  form.harga) *
+                  100 *
+                  100
               ) / 100
             }%)`
           ) : (
