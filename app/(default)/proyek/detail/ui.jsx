@@ -211,11 +211,34 @@ export default function App({ id, versi }) {
       body: JSON.stringify({
         ...data,
         id_subproyek: form.selectSubProyek?.values().next().value ?? 0,
+        hargamodal: form.temphargamodal,
       }),
     });
     const json = await res.json();
     if (res.status == 400) return alert(json.message);
     onClose();
+    // console.log(json.message);
+    //return alert(json.message);
+  };
+  const terapkanButtonPress = async (e) => {
+    e.preventDefault();
+    // console.log({ id_proyek: id, provitmarginpersen: inputMargin });
+    if (inputMargin <= 0 || inputMargin > 99)
+      return alert("Provit margin tidak valid.");
+    // if (data.jumlah <= 0) return alert("Jumlah belum diisi");
+    const res = await fetch(`${api_path}keranjangproyekupdatehargamargin`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        // 'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: JSON.stringify({
+        id_proyek: id,
+        provitmarginpersen: inputMargin,
+      }),
+    });
+    const json = await res.json();
+    if (res.status == 400) return alert(json.message);
     // console.log(json.message);
     //return alert(json.message);
   };
@@ -412,6 +435,12 @@ export default function App({ id, versi }) {
             <div className="text-right">
               <Harga harga={data.harga - data.hargamodal} />
             </div>
+          );
+        case "provitmarginpersen":
+          return (
+            Math.round(
+              ((data.harga - data.hargamodal) / data.harga) * 100 * 100
+            ) / 100
           );
         case "totalprofit":
           return (
@@ -638,10 +667,10 @@ export default function App({ id, versi }) {
         key: "temphargamodal",
         label: "Harga Modal",
       },
-      {
-        key: "refhargajualmargin",
-        label: `Ref. Harga Jual Margin (${margin}%)`,
-      },
+      // {
+      //   key: "refhargajualmargin",
+      //   label: `Ref. Harga Jual Margin (${margin}%)`,
+      // },
       {
         key: "harga",
         label: "Harga Jual",
@@ -649,6 +678,10 @@ export default function App({ id, versi }) {
       {
         key: "profit",
         label: "Profit",
+      },
+      {
+        key: "provitmarginpersen",
+        label: "%",
       },
       {
         key: "totalharga-modal",
@@ -704,10 +737,10 @@ export default function App({ id, versi }) {
         key: "temphargamodal",
         label: "Harga Modal",
       },
-      {
-        key: "refhargajualmargin",
-        label: `Ref. Harga Jual Margin (${margin}%)`,
-      },
+      // {
+      //   key: "refhargajualmargin",
+      //   label: `Ref. Harga Jual Margin (${margin}%)`,
+      // },
       {
         key: "harga",
         label: "Harga Instalasi",
@@ -715,6 +748,10 @@ export default function App({ id, versi }) {
       {
         key: "profit",
         label: "Profit",
+      },
+      {
+        key: "provitmarginpersen",
+        label: "%",
       },
       {
         key: "totalharga-modal",
@@ -893,7 +930,7 @@ export default function App({ id, versi }) {
 
   // console.log(form.selectSubProyek?.values().next().value ?? 0);
   // console.log(proyek.data);
-  console.log({ dataPenawaran, dataInstalasi });
+  // console.log({ dataPenawaran, dataInstalasi });
   return (
     <div>
       <div className="flex flex-row gap-2">
@@ -967,12 +1004,7 @@ export default function App({ id, versi }) {
         {/* alat */}
         <div className="bg-white rounded-lg p-3 flex flex-col gap-2">
           <div>Alat</div>
-          <Form
-            onSubmit={(e) => {
-              e.preventDefault();
-              setMargin(+inputMargin);
-            }}
-          >
+          <Form onSubmit={terapkanButtonPress}>
             <Input
               label="Provit Margin (%)"
               type="text"
@@ -1667,18 +1699,23 @@ export default function App({ id, versi }) {
                   ))}
                 </Select>
                 <div>Nama : {form.nama}</div>
-                <Input
-                  type="text"
-                  label="Nama Kustom (Opsional)"
-                  placeholder="Masukkan nama kustom!"
-                  value={form.keterangan}
-                  onValueChange={(v) =>
-                    setForm({
-                      ...form,
-                      keterangan: v,
-                    })
-                  }
-                />
+                {form.instalasi ? (
+                  <Input
+                    type="text"
+                    label="Nama Kustom (Opsional)"
+                    placeholder="Masukkan nama kustom!"
+                    value={form.keterangan}
+                    onValueChange={(v) =>
+                      setForm({
+                        ...form,
+                        keterangan: v,
+                      })
+                    }
+                  />
+                ) : (
+                  <></>
+                )}
+
                 <div>Merek : {form.nmerek}</div>
                 <div>Tipe : {form.tipe}</div>
                 <div>Vendor : {form.nvendor}</div>
@@ -1698,8 +1735,21 @@ export default function App({ id, versi }) {
                 />
                 <Input
                   type="number"
+                  value={form.temphargamodal}
+                  label={`Harga Modal (Ref: ${form.hargamodal})`}
+                  placeholder="Masukkan harga!"
+                  onValueChange={(v) =>
+                    setForm({
+                      ...form,
+                      temphargamodal: v,
+                    })
+                  }
+                />
+                <Input
+                  type="number"
                   value={form.harga}
-                  label={`Harga Jual (Ref: ${form.refHarga})`}
+                  // label={`Harga Jual (Ref: ${form.refHarga})`}
+                  label={`Harga Jual (Ref: ${form.harga})`}
                   placeholder="Masukkan harga!"
                   onValueChange={(v) =>
                     setForm({
@@ -1720,10 +1770,22 @@ export default function App({ id, versi }) {
                     })
                   }
                 /> */}
-                <div>Ref. Harga Jual Margin : {form.margin}</div>
+                {/* <div>
+                  Ref. Harga Jual Margin (
+                  {Math.round(
+                    ((form.harga - form.hargamodal) / form.harga) * 100 * 100
+                  ) / 100}
+                  %) : {form.margin}
+                </div> */}
                 <div>Harga Modal : {form.hargamodal}</div>
                 <div>Harga Jual : {form.harga}</div>
-                <div>Provit : {form.harga - form.hargamodal}</div>
+                <div>
+                  Provit : {form.harga - form.hargamodal} (
+                  {Math.round(
+                    ((form.harga - form.hargamodal) / form.harga) * 100 * 100
+                  ) / 100}
+                  %)
+                </div>
                 {/* <div>
                   <div>Harga Jual : </div>
                   <div>

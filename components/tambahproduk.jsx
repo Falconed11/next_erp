@@ -248,6 +248,17 @@ export default function TambahProduk({
             )
           </>
         }
+        endContent={
+          disableStok ? (
+            `(${
+              Math.round(
+                ((form.harga - form.temphargamodal) / form.harga) * 100 * 100
+              ) / 100
+            }%)`
+          ) : (
+            <></>
+          )
+        }
         // label={`Harga (Ref:
         //   ${
         //     produk.data.filter((v) => v.id == form.selectProduk)[0]
