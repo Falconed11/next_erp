@@ -59,7 +59,8 @@ export default function App({ id }) {
   const [selectKategori, setSelectKategori] = useState(new Set([]));
   const [selectProduk, setSelectProduk] = useState(new Set([]));
   const karyawan = useClientFetch(`karyawan`);
-  const [selectKaryawan, setSelectKaryawan] = useState(new Set([]));
+  const [selectKaryawan, setSelectKaryawan] = useState("");
+  console.log(typeof selectKaryawan);
   const [form, setForm] = useState({
     startdate: new Date(),
     selectKategori: new Set([]),
@@ -77,7 +78,7 @@ export default function App({ id }) {
   );
 
   const editButtonPress = (data) => {
-    const startdate = new Date(data.tanggal);
+    const startdate = new Date(data.tanggalpengeluaran);
     setForm({
       ...form,
       ...data,
@@ -125,6 +126,7 @@ export default function App({ id }) {
   };
   const tambahButtonPress = async ({ selectProduk, selectKaryawan, form }) => {
     // if (select.size == 0) return alert("Produk belum dipilih.");
+    if (!selectKaryawan) return alert("Karyawan belum dipilih");
     if (form.isSelected && form.stok < form.jumlah)
       return alert("Jumlah melebihi stok.");
     let res;
@@ -139,7 +141,7 @@ export default function App({ id }) {
           ...form,
           id_proyek: id,
           id_produk: form.selectProduk,
-          id_karyawan: selectKaryawan.values().next().value ?? 0,
+          id_karyawan: selectKaryawan ?? 0,
           tanggal: form.startdate ? getDate(form.startdate) : "",
           jumlah: form.jumlah,
           harga: form.harga,
@@ -172,9 +174,12 @@ export default function App({ id }) {
     const json = await res.json();
     if (res.status == 400) return alert(json.message);
     setForm({
+      ...form,
+      stok: 0,
+      satuan: "",
+      jumlah: 0,
       selectKategori: new Set([]),
       selectProduk: new Set([]),
-      selectKaryawan: new Set([]),
     });
     // return alert(json.message);
   };
@@ -669,8 +674,8 @@ export default function App({ id }) {
                   label="Karyawan"
                   placeholder="Pilih karyawan!"
                   className="w-2/12"
-                  selectedKeys={selectKaryawan}
-                  onSelectionChange={setSelectKaryawan}
+                  selectedKeys={[selectKaryawan]}
+                  onChange={(e) => setSelectKaryawan(e.target.value)}
                 >
                   {karyawan.data.map((item) => (
                     <SelectItem key={item.id} value={item.id}>
