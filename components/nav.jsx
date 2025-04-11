@@ -42,13 +42,10 @@ export default function Navigation({ navLinks }) {
                     <DropdownTrigger>
                       <Button className="p-0 m-0 bg-transparent text-left justify-start text-base h-fit">
                         <div>{link.name}</div>
-                        {link.name == "Proyek" && numberProgressNoOffer > 0 ? (
-                          <div className="text-black bg-warning rounded-full px-2">
-                            {numberProgressNoOffer}
-                          </div>
-                        ) : (
-                          <></>
-                        )}
+                        <ProgressNoOfferNotification
+                          link={link}
+                          numberProgressNoOffer={numberProgressNoOffer}
+                        />
                       </Button>
                     </DropdownTrigger>
                     <DropdownMenu
@@ -81,8 +78,12 @@ export default function Navigation({ navLinks }) {
                 className={isActive ? "p-2 bg-slate-300" : "p-2"}
                 key={link.name}
               >
-                <Link className="text-black" href={link.href}>
-                  {link.name}
+                <Link className="text-black flex gap-2" href={link.href}>
+                  <div>{link.name}</div>
+                  <ProgressNoOfferNotification
+                    link={link}
+                    numberProgressNoOffer={numberProgressNoOffer}
+                  />
                 </Link>
               </div>
             </li>
@@ -92,3 +93,17 @@ export default function Navigation({ navLinks }) {
     </nav>
   );
 }
+
+const ProgressNoOfferNotification = ({ link, numberProgressNoOffer }) => {
+  return (
+    <>
+      {link.name == "Proyek" && numberProgressNoOffer > 0 ? (
+        <div className="text-black bg-warning rounded-full px-2">
+          {numberProgressNoOffer}
+        </div>
+      ) : (
+        <></>
+      )}
+    </>
+  );
+};

@@ -60,7 +60,6 @@ export default function App({ id }) {
   const [selectProduk, setSelectProduk] = useState(new Set([]));
   const karyawan = useClientFetch(`karyawan`);
   const [selectKaryawan, setSelectKaryawan] = useState("");
-  console.log(typeof selectKaryawan);
   const [form, setForm] = useState({
     startdate: new Date(),
     selectKategori: new Set([]),
@@ -119,7 +118,10 @@ export default function App({ id }) {
             id_produk: data.id,
           }),
         });
+        console.log(res);
+        console.log(res.status);
         const json = await res.json();
+        console.log(json);
         if (res.status == 400) return alert(json.message);
       }
     }
@@ -170,7 +172,8 @@ export default function App({ id }) {
         }),
       });
     }
-
+    console.log(res);
+    console.log(res.status);
     const json = await res.json();
     if (res.status == 400) return alert(json.message);
     setForm({
@@ -184,6 +187,10 @@ export default function App({ id }) {
     // return alert(json.message);
   };
   const simpanButtonPress = async (data, onClose) => {
+    if (data.id_produkkeluar) {
+      console.log("ada");
+      return;
+    }
     const res = await fetch(`${api_path}pengeluaranproyek`, {
       method: "PUT",
       headers: {
@@ -879,7 +886,6 @@ export default function App({ id }) {
                   type="number"
                   label="Jumlah"
                   placeholder="Masukkan jumlah!"
-                  disabled
                   value={form.jumlah}
                   onValueChange={(v) =>
                     setForm({
