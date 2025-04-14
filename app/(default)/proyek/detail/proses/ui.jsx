@@ -81,6 +81,8 @@ export default function App({ id }) {
     setForm({
       ...form,
       ...data,
+      oldJumlah: data.jumlah,
+      oldHarga: data.hargapengeluaran,
       harga: data.hargapengeluaran,
       modalmode: "Edit",
       tanggal: getDate(startdate),
@@ -162,7 +164,7 @@ export default function App({ id }) {
           ...form,
           id_proyek: id,
           id_produk: form.selectProduk,
-          id_karyawan: selectKaryawan.values().next().value,
+          id_karyawan: selectKaryawan ?? 0,
           id_vendor: form.selectVendor,
           tanggal: form.startdate ? getDate(form.startdate) : "",
           jumlah: form.jumlah,
@@ -187,24 +189,46 @@ export default function App({ id }) {
     // return alert(json.message);
   };
   const simpanButtonPress = async (data, onClose) => {
+    // return console.log({ form, id });
+    let res;
     if (data.id_produkkeluar) {
-      console.log("ada");
-      return;
-    }
-    const res = await fetch(`${api_path}pengeluaranproyek`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify({
-        ...data,
-        id: data.id_pengeluaranproyek,
-        keterangan: data.keterangan ? data.keterangan : "",
-        tanggal: getDate(new Date(data.startdate)),
-        // harga: data.hargajual,
-      }),
-    });
+      res = await fetch(`${api_path}produkkeluar`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify({
+          ...data,
+          id: data.id_produkkeluar,
+          metodepengeluaran: "proyek",
+          id_produk: data.id,
+
+          id_proyek: id,
+          // id_produk: form.selectProduk,
+          // id_karyawan: selectKaryawan ?? 0,
+          tanggal: form.startdate ? getDate(form.startdate) : "",
+          jumlah: form.jumlah,
+          harga: form.harga,
+          keterangan: form.keterangan ? form.keterangan : "",
+          status: form.status ? form.status : "",
+        }),
+      });
+    } else
+      res = await fetch(`${api_path}pengeluaranproyek`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify({
+          ...data,
+          id: data.id_pengeluaranproyek,
+          keterangan: data.keterangan ? data.keterangan : "",
+          tanggal: getDate(new Date(data.startdate)),
+          // harga: data.hargajual,
+        }),
+      });
     const json = await res.json();
     if (res.status == 400) return alert(json.message);
     onClose();
@@ -884,7 +908,10 @@ export default function App({ id }) {
                 <div>Tipe : {form.tipe}</div>
                 <Input
                   type="number"
-                  label="Jumlah"
+                  label={`Jumlah ${
+                    form.id_produkkeluar &&
+                    `(Maks : ${form.stok + form.oldJumlah})`
+                  }`}
                   placeholder="Masukkan jumlah!"
                   value={form.jumlah}
                   onValueChange={(v) =>
@@ -899,7 +926,7 @@ export default function App({ id }) {
                   type="number"
                   disabled
                   value={form.harga}
-                  label="Harga Satuan"
+                  label={`Harga Satuan (${form.oldHarga})`}
                   placeholder="Masukkan harga!"
                   className=""
                   onValueChange={(v) =>
@@ -927,28 +954,32 @@ export default function App({ id }) {
                     })
                   }
                 /> */}
-                <Select
-                  label="Status"
-                  placeholder="Pilih status!"
-                  className=""
-                  selectedKeys={form.selectStatus}
-                  onSelectionChange={(v) =>
-                    setForm({
-                      ...form,
-                      selectStatus: v,
-                      status: v.values().next().value,
-                    })
-                  }
-                >
-                  {[
-                    { id: 0, nama: "Belum Lunas" },
-                    { id: 1, nama: "Lunas" },
-                  ].map((item) => (
-                    <SelectItem key={item.id} value={item.id}>
-                      {item.nama}
-                    </SelectItem>
-                  ))}
-                </Select>
+                {!form.id_produkkeluar ? (
+                  <Select
+                    label="Status"
+                    placeholder="Pilih status!"
+                    className=""
+                    selectedKeys={form.selectStatus}
+                    onSelectionChange={(v) =>
+                      setForm({
+                        ...form,
+                        selectStatus: v,
+                        status: v.values().next().value,
+                      })
+                    }
+                  >
+                    {[
+                      { id: 0, nama: "Belum Lunas" },
+                      { id: 1, nama: "Lunas" },
+                    ].map((item) => (
+                      <SelectItem key={item.id} value={item.id}>
+                        {item.nama}
+                      </SelectItem>
+                    ))}
+                  </Select>
+                ) : (
+                  <></>
+                )}
               </ModalBody>
               <ModalFooter>
                 <Button color="danger" variant="light" onPress={onClose}>

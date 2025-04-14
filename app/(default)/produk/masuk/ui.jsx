@@ -760,38 +760,28 @@ const TabelProdukKeluar = ({ id_produk }) => {
                 <EyeIcon />
               </span>
             </Tooltip> */}
-            <Tooltip content="Edit">
-              <span
-                onClick={() => editButtonPress(data)}
-                className="text-lg text-default-400 cursor-pointer active:opacity-50"
-              >
-                <EditIcon />
-              </span>
-            </Tooltip>
-            {/* <Tooltip content="Produk Masuk">
-              <span
-                onClick={() => onProdukMasukClick(data)}
-                className="text-lg text-default-400 cursor-pointer active:opacity-50"
-              >
-                <AddIcon />
-              </span>
-            </Tooltip>
-            <Tooltip content="Produk Keluar">
-              <span
-                onClick={() => onProdukKeluarClick(data)}
-                className="text-lg text-default-400 cursor-pointer active:opacity-50"
-              >
-                <MinIcon />
-              </span>
-            </Tooltip> */}
-            <Tooltip color="danger" content="Delete">
-              <span
-                onClick={() => deleteButtonPress(data)}
-                className="text-lg text-danger cursor-pointer active:opacity-50"
-              >
-                <DeleteIcon />
-              </span>
-            </Tooltip>
+            {data.metodepengeluaran != "proyek" ? (
+              <>
+                <Tooltip content="Edit">
+                  <span
+                    onClick={() => editButtonPress(data)}
+                    className="text-lg text-default-400 cursor-pointer active:opacity-50"
+                  >
+                    <EditIcon />
+                  </span>
+                </Tooltip>
+                <Tooltip color="danger" content="Delete">
+                  <span
+                    onClick={() => deleteButtonPress(data)}
+                    className="text-lg text-danger cursor-pointer active:opacity-50"
+                  >
+                    <DeleteIcon />
+                  </span>
+                </Tooltip>
+              </>
+            ) : (
+              <></>
+            )}
           </div>
         );
       default:
@@ -976,7 +966,7 @@ const TabelProdukKeluar = ({ id_produk }) => {
                 )}
                 <Input
                   type="number"
-                  label={`Harga (${form.oldHarga})`}
+                  label={`Harga Jual (${form.oldHarga})`}
                   placeholder="Masukkan harga!"
                   value={form.harga}
                   onValueChange={(val) => setForm({ ...form, harga: val })}

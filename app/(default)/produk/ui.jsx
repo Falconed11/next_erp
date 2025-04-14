@@ -1122,7 +1122,7 @@ export default function App() {
                               <Button
                                 color="danger"
                                 variant="light"
-                                onClick={() => removeInput(input.id)}
+                                onPress={() => removeInput(input.id)}
                               >
                                 Hapus
                               </Button>
@@ -1137,7 +1137,7 @@ export default function App() {
                     ))}
                     {inputs.length < form.stok ? (
                       <div>
-                        <Button color="primary" onClick={addInput}>
+                        <Button color="primary" onPress={addInput}>
                           Tambah SN
                         </Button>
                       </div>
@@ -1157,7 +1157,7 @@ export default function App() {
 
                 <Input
                   type="number"
-                  label="Harga"
+                  label={`Harga Jual (Ref: ${form.hargajual})`}
                   placeholder="Masukkan harga!"
                   value={form.harga}
                   onValueChange={(val) => setForm({ ...form, harga: val })}
