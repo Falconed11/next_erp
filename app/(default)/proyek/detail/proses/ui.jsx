@@ -192,6 +192,7 @@ export default function App({ id }) {
     // return console.log({ form, id });
     let res;
     if (data.id_produkkeluar) {
+      console.log(data);
       res = await fetch(`${api_path}produkkeluar`, {
         method: "PUT",
         headers: {
@@ -207,11 +208,11 @@ export default function App({ id }) {
           id_proyek: id,
           // id_produk: form.selectProduk,
           // id_karyawan: selectKaryawan ?? 0,
-          tanggal: form.startdate ? getDate(form.startdate) : "",
-          jumlah: form.jumlah,
-          harga: form.harga,
-          keterangan: form.keterangan ? form.keterangan : "",
-          status: form.status ? form.status : "",
+          tanggal: data.startdate ? getDate(data.startdate) : "",
+          jumlah: data.jumlah,
+          harga: data.harga,
+          keterangan: data.keterangan ? data.keterangan : "",
+          status: data.status ? data.status : "",
         }),
       });
     } else
