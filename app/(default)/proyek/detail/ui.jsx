@@ -1226,26 +1226,32 @@ export default function App({ id, versi }) {
                             disableStok
                             disableVendor
                             customInput={
-                              <Select
-                                label="Sub Proyek"
-                                placeholder="Pilih subproyek! (Opsional)"
-                                className="w-3/12"
-                                selectedKeys={form.selectSubProyek}
-                                onSelectionChange={(v) => {
-                                  setForm({
-                                    ...form,
-                                    selectSubProyek: v,
-                                  });
-                                  //   setSelectProduk(new Set([]));
-                                  //   setSelectKategori(v);
-                                }}
-                              >
-                                {subProyek.data.map((item) => (
-                                  <SelectItem key={item.id} value={item.id}>
-                                    {item.nama}
-                                  </SelectItem>
-                                ))}
-                              </Select>
+                              <>
+                                <InputProvitMargin
+                                  form={form}
+                                  setForm={setForm}
+                                />
+                                <Select
+                                  label="Sub Proyek"
+                                  placeholder="Pilih subproyek! (Opsional)"
+                                  className="w-3/12"
+                                  selectedKeys={form.selectSubProyek}
+                                  onSelectionChange={(v) => {
+                                    setForm({
+                                      ...form,
+                                      selectSubProyek: v,
+                                    });
+                                    //   setSelectProduk(new Set([]));
+                                    //   setSelectKategori(v);
+                                  }}
+                                >
+                                  {subProyek.data.map((item) => (
+                                    <SelectItem key={item.id} value={item.id}>
+                                      {item.nama}
+                                    </SelectItem>
+                                  ))}
+                                </Select>
+                              </>
                             }
                           />
                           <div>
@@ -1736,7 +1742,11 @@ export default function App({ id, versi }) {
                 <Input
                   type="number"
                   value={form.temphargamodal}
-                  label={`Harga Modal (Ref: ${form.hargamodal})`}
+                  label={
+                    <>
+                      Harga Modal (Ref: <Harga harga={form.hargamodal} />)
+                    </>
+                  }
                   placeholder="Masukkan harga!"
                   onValueChange={(v) =>
                     setForm({
@@ -1749,7 +1759,11 @@ export default function App({ id, versi }) {
                   type="number"
                   value={form.harga}
                   // label={`Harga Jual (Ref: ${form.refHarga})`}
-                  label={`Harga Jual (Ref: ${form.harga})`}
+                  label={
+                    <>
+                      Harga Jual (Ref: <Harga harga={+form.harga} />)
+                    </>
+                  }
                   placeholder="Masukkan harga!"
                   onValueChange={(v) =>
                     setForm({
@@ -1777,12 +1791,14 @@ export default function App({ id, versi }) {
                   ) / 100}
                   %) : {form.margin}
                 </div> */}
-                <div>Harga Modal : {form.hargamodal}</div>
-                <div>Harga Jual : {form.harga}</div>
+                {/* <div>Harga Modal : {form.temphargamodal}</div>
+                <div>Harga Jual : {form.harga}</div> */}
                 <div>
-                  Provit : {form.harga - form.hargamodal} (
+                  Provit : <Harga harga={form.harga - form.temphargamodal} /> (
                   {Math.round(
-                    ((form.harga - form.hargamodal) / form.harga) * 100 * 100
+                    ((form.harga - form.temphargamodal) / form.harga) *
+                      100 *
+                      100
                   ) / 100}
                   %)
                 </div>
@@ -1802,8 +1818,13 @@ export default function App({ id, versi }) {
                     />
                   </div>
                 </div> */}
-                <div>Total Harga Modal : {form.hargamodal * form.jumlah}</div>
-                <div>Total Harga Jual : {form.harga * form.jumlah}</div>
+                <div>
+                  Total Harga Modal :{" "}
+                  <Harga harga={form.temphargamodal * form.jumlah} />
+                </div>
+                <div>
+                  Total Harga Jual : <Harga harga={form.harga * form.jumlah} />
+                </div>
                 {/* <div>
                   <div>Profit : </div>
                   <div>
@@ -1821,7 +1842,10 @@ export default function App({ id, versi }) {
                   </div>
                 </div> */}
                 <div>
-                  Total Profit : {(form.harga - form.hargamodal) * form.jumlah}
+                  Total Profit :{" "}
+                  <Harga
+                    harga={(form.harga - form.temphargamodal) * form.jumlah}
+                  />
                 </div>
               </ModalBody>
               <ModalFooter>
@@ -2504,5 +2528,33 @@ const SubProyek = ({ id, selectedProyek }) => {
         </ModalContent>
       </Modal>
     </div>
+  );
+};
+
+const InputProvitMargin = ({ form, setForm }) => {
+  return (
+    <Input
+      type="number"
+      value={
+        form.provitmarginpersen
+        /* Math.round(
+          ((form.harga -
+            (form.temphargamodal ? form.temphargamodal : form.hargamodal)) /
+            form.harga) *
+            100 *
+            100
+        ) / 100 || 0 */
+      }
+      label={"Provit Margin (%)"}
+      placeholder="Masukkan provt margin persen!"
+      className="w-3/12"
+      onValueChange={(v) =>
+        setForm({
+          ...form,
+          harga: Math.ceil(form.hargamodal / (1 - v / 100) / 100) * 100,
+          provitmarginpersen: Math.ceil(v * 100) / 100 || "",
+        })
+      }
+    />
   );
 };

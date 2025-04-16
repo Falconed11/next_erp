@@ -89,14 +89,16 @@ export default function TambahProduk({
         selectedKey={form.selectProduk}
         onSelectionChange={(v) => {
           const selectedProduk = produk.data.filter((p) => p.id == v)[0];
+          const harga = refHargaModal
+            ? selectedProduk?.hargamodal ?? 0
+            : selectedProduk?.hargajual ?? 0;
+          const hargamodal = selectedProduk?.hargamodal;
           setForm({
             ...form,
             selectProduk: v,
-            hargamodal: selectedProduk?.hargamodal,
-            harga: refHargaModal
-              ? selectedProduk?.hargamodal ?? 0
-              : selectedProduk?.hargajual ?? 0,
-            stok: selectedProduk?.stok,
+            hargamodal,
+            harga,
+            provitmarginpersen: countprovitmarginpersen(hargamodal, harga),
             satuan: selectedProduk?.satuan,
             isSelected: false,
           });
@@ -277,6 +279,10 @@ export default function TambahProduk({
           setForm({
             ...form,
             harga: v,
+            provitmarginpersen: countprovitmarginpersen(
+              form.temphargamodal ? form.temphargamodal : form.hargamodal,
+              v
+            ),
           })
         }
       />
@@ -301,3 +307,7 @@ export default function TambahProduk({
     </div>
   );
 }
+
+const countprovitmarginpersen = (hargamodal, hargajual) => {
+  return Math.round(((hargajual - hargamodal) / hargajual) * 100 * 100) / 100;
+};
