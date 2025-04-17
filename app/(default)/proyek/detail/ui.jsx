@@ -56,6 +56,7 @@ import logoBks from "@/public/logo-bks.jpeg";
 import logoSvt from "@/public/logo-svt.jpeg";
 import { useRouter } from "next/navigation";
 import { v4 as uuidv4 } from "uuid";
+import { countProvitMarginPercent } from "@/app/utils/formula";
 
 const api_path = getApiPath();
 
@@ -145,6 +146,7 @@ export default function App({ id, versi }) {
       id: data.id_keranjangproyek,
       profit: data.harga - data.hargamodal,
       refHarga: data.harga,
+      provitmarginpersen: countProvitMarginPercent(data.hargamodal, data.harga),
       selectSubProyek: new Set(data.id_subproyek ? [data.id_subproyek] : [0]),
     });
     modal.produk.onOpen();
@@ -202,6 +204,8 @@ export default function App({ id, versi }) {
   };
   const simpanButtonPress = async (data, onClose) => {
     // if (data.jumlah <= 0) return alert("Jumlah belum diisi");
+    if (data.provitmarginpersen > 99)
+      return alert("Provit margin tidak boleh lebi dari 99.");
     const res = await fetch(`${api_path}keranjangproyek`, {
       method: "PUT",
       headers: {
@@ -1228,6 +1232,7 @@ export default function App({ id, versi }) {
                             customInput={
                               <>
                                 <InputProvitMargin
+                                  classNames="w-3/12"
                                   form={form}
                                   setForm={setForm}
                                 />
@@ -1769,9 +1774,14 @@ export default function App({ id, versi }) {
                     setForm({
                       ...form,
                       harga: v,
+                      provitmarginpersen: countProvitMarginPercent(
+                        form.hargamodal,
+                        v
+                      ),
                     })
                   }
                 />
+                <InputProvitMargin form={form} setForm={setForm} />
                 {/* <Input
                   type="number"
                   value={form.hargakustom}
@@ -2531,10 +2541,11 @@ const SubProyek = ({ id, selectedProyek }) => {
   );
 };
 
-const InputProvitMargin = ({ form, setForm }) => {
+const InputProvitMargin = ({ classNames, form, setForm }) => {
   return (
     <Input
       type="number"
+      max={99}
       value={
         form.provitmarginpersen
         /* Math.round(
@@ -2547,7 +2558,7 @@ const InputProvitMargin = ({ form, setForm }) => {
       }
       label={"Provit Margin (%)"}
       placeholder="Masukkan provt margin persen!"
-      className="w-3/12"
+      className={classNames ?? ""}
       onValueChange={(v) =>
         setForm({
           ...form,

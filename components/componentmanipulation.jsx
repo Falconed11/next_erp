@@ -19,7 +19,7 @@ const ShowHideComponent = ({ stat, setStat, component }) => {
           setStat(stat == 0 ? 1 : 0);
         }}
       >
-        {stat == 0 ? "Open" : "Close"}
+        {stat == 0 ? "Buka" : "Sembunyikan"}
       </Button>
       <div className={`${stat == 0 ? "hidden" : ""}`}>{component}</div>
     </div>

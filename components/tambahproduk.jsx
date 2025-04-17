@@ -6,6 +6,7 @@ import { Input } from "@heroui/react";
 import { Select, SelectItem } from "@heroui/react";
 import { Checkbox } from "@heroui/react";
 import { getApiPath, useClientFetch } from "@/app/utils/apiconfig";
+import { countProvitMarginPercent } from "@/app/utils/formula";
 import Harga from "@/components/harga";
 
 const api_path = getApiPath();
@@ -98,7 +99,7 @@ export default function TambahProduk({
             selectProduk: v,
             hargamodal,
             harga,
-            provitmarginpersen: countprovitmarginpersen(hargamodal, harga),
+            provitmarginpersen: countProvitMarginPercent(hargamodal, harga),
             satuan: selectedProduk?.satuan,
             isSelected: false,
           });
@@ -279,7 +280,7 @@ export default function TambahProduk({
           setForm({
             ...form,
             harga: v,
-            provitmarginpersen: countprovitmarginpersen(
+            provitmarginpersen: countProvitMarginPercent(
               form.temphargamodal ? form.temphargamodal : form.hargamodal,
               v
             ),
@@ -307,7 +308,3 @@ export default function TambahProduk({
     </div>
   );
 }
-
-const countprovitmarginpersen = (hargamodal, hargajual) => {
-  return Math.round(((hargajual - hargamodal) / hargajual) * 100 * 100) / 100;
-};

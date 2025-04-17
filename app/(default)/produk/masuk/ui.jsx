@@ -825,6 +825,14 @@ const TabelProdukKeluar = ({ id_produk }) => {
       label: "Metode Pengeluaran",
     },
     {
+      key: "nama_proyek",
+      label: "Nama Proyek",
+    },
+    {
+      key: "nama_instansi",
+      label: "User",
+    },
+    {
       key: "sn",
       label: "SN",
     },

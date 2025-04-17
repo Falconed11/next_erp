@@ -58,6 +58,7 @@ import {
   getDate,
   getDateF,
 } from "@/app/utils/date";
+import { rolesCheck } from "@/app/utils/tools";
 import { FileUploader } from "@/components/input";
 import { RangeDate } from "@/components/input";
 import { LinkOpenNewTab } from "@/components/mycomponent";
@@ -85,7 +86,7 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
   );
   console.log(selectkaryawan);
 
-  const [stat, setStat] = useState(0);
+  const [stat, setStat] = useState(1);
   const [page, setPage] = React.useState(1);
   const rowsPerPage = 10;
 
@@ -362,7 +363,7 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
               }`}
               icon={<NoteIcon />}
             />
-            {peran == "admin" || peran == "super" ? (
+            {rolesCheck(["super", "admin", "sales"], peran) ? (
               <Tooltip content="Pengeluaran & Pembayaran">
                 <Link href={`/proyek/detail/proses?id=${data.id}`}>
                   <span
@@ -628,6 +629,7 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
               setStat={setStat}
               component={
                 <div className="flex gap-2">
+                  {/* Filter */}
                   <div className="flex flex-col gap-2">
                     <div>Filter</div>
                     <RadioGroup
@@ -675,6 +677,7 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
                     </Button>
                   </div> */}
                   </div>
+                  {/* Ringkasan */}
                   <div>
                     <div>Ringkasan</div>
                     <div className="flex gap-2">
