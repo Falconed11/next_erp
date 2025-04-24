@@ -12,11 +12,18 @@ import {
 // import { Badge, Avatar } from "@heroui/react";
 import { useRouter } from "next/navigation";
 import { useClientFetch } from "@/app/utils/apiconfig";
+import { useEffect } from "react";
 
 export default function Navigation({ navLinks }) {
   const proyek = useClientFetch(`proyek?countProgressNoOffer=true`);
   const router = useRouter();
   const pathname = usePathname();
+
+  useEffect(() => {
+    const split = pathname.split("/");
+    const title = split.at(-1);
+    document.title = title;
+  }, [pathname]);
 
   if (proyek.error) return <div>failed to load</div>;
   if (proyek.isLoading) return <div>loading...</div>;

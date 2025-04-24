@@ -57,7 +57,7 @@ export default function TambahProduk({
   );
   fvendor = fvendor.slice(0, 100);
   const selectProduk = produk.data.filter((v) => v.id == form.selectProduk)[0];
-  // console.log(disableStok);
+  // console.log(data);
   return (
     <div className="w-max flex flex-wrap gap-3">
       <Select
@@ -100,6 +100,7 @@ export default function TambahProduk({
             hargamodal,
             harga,
             provitmarginpersen: countProvitMarginPercent(hargamodal, harga),
+            stok: selectedProduk?.stok,
             satuan: selectedProduk?.satuan,
             isSelected: false,
           });
@@ -171,7 +172,7 @@ export default function TambahProduk({
       )}
       <Input
         type="text"
-        value={`${form.stok ?? ""} ${form.satuan ?? ""}`}
+        value={`${form.stok ? form.stok : ""} ${form.satuan ?? ""}`}
         disabled
         label="Stok"
         // placeholder="Masukkan jumlah!"

@@ -425,7 +425,7 @@ export default function App({ id, versi }) {
         case "totalharga-modal":
           return (
             <div className="text-right">
-              <Harga harga={data.jumlah * data.hargamodal} />
+              <Harga harga={data.jumlah * data.temphargamodal} />
             </div>
           );
         case "totalharga-jual":
@@ -437,7 +437,7 @@ export default function App({ id, versi }) {
         case "profit":
           return (
             <div className="text-right">
-              <Harga harga={data.harga - data.hargamodal} />
+              <Harga harga={data.harga - data.temphargamodal} />
             </div>
           );
         case "provitmarginpersen":
@@ -450,7 +450,9 @@ export default function App({ id, versi }) {
           return (
             <div className="text-right">
               <Harga
-                harga={data.jumlah * data.harga - data.jumlah * data.hargamodal}
+                harga={
+                  data.jumlah * data.harga - data.jumlah * data.temphargamodal
+                }
               />
             </div>
           );
@@ -857,14 +859,14 @@ export default function App({ id, versi }) {
   let totalModalProduk = 0;
   if (keranjangProyek.data.length > 0) {
     totalModalProduk = keranjangProyek.data.reduce((total, harga) => {
-      return total + harga.jumlah * harga.hargamodal;
+      return total + harga.jumlah * harga.temphargamodal;
     }, 0);
   }
   let totalModalInstalasi = 0;
   if (keranjangProyekInstalasi.data.length > 0) {
     totalModalInstalasi = keranjangProyekInstalasi.data.reduce(
       (total, harga) => {
-        return total + harga.jumlah * harga.hargamodal;
+        return total + harga.jumlah * harga.temphargamodal;
       },
       0
     );

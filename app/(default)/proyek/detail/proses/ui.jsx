@@ -569,6 +569,7 @@ export default function App({ id }) {
       />
     </>
   );
+  // console.log(form);
   return (
     <div className="flex flex-col w-full">
       <h1>Proses</h1>

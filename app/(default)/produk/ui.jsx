@@ -973,8 +973,8 @@ export default function App() {
                 />
                 <Input
                   type="number"
-                  label="Harga"
-                  placeholder="Masukkan harga!"
+                  label="Harga Modal"
+                  placeholder="Masukkan harga modal!"
                   value={form.harga}
                   onValueChange={(val) => setForm({ ...form, harga: val })}
                 />
