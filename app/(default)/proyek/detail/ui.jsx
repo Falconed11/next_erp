@@ -135,18 +135,29 @@ export default function App({ id, versi }) {
     const json = await res.json();
     if (res.status == 400) return alert(json.message);
     if (form.instalasi)
-      setFormInstalasi({ selectProduk: "", jumlah: "", harga: "" });
+      setFormInstalasi({
+        selectProduk: "",
+        jumlah: "",
+        harga: "",
+        keterangan: "",
+      });
     else setForm({ selectProduk: "", jumlah: "", harga: "" });
     // console.log(json.message);
     // return alert(json.message);
   };
   const editButtonPress = (data) => {
+    console.log({ data });
     setForm({
       ...data,
       id: data.id_keranjangproyek,
-      profit: data.harga - data.hargamodal,
+      profit: data.harga - data.temphargamodal,
+      oldHargaModal: data.temphargamodal,
       refHarga: data.harga,
-      provitmarginpersen: countProvitMarginPercent(data.hargamodal, data.harga),
+      oldHarga: data.harga,
+      provitmarginpersen: countProvitMarginPercent(
+        data.temphargamodal,
+        data.harga
+      ),
       selectSubProyek: new Set(data.id_subproyek ? [data.id_subproyek] : [0]),
     });
     modal.produk.onOpen();
@@ -385,7 +396,9 @@ export default function App({ id, versi }) {
       const cellValue = data[columnKey];
       switch (columnKey) {
         case "nama":
-          return data.keterangan ? data.keterangan : data.nama;
+          return data.keterangan
+            ? `${data.nama} (${data.keterangan})`
+            : data.nama;
         case "stok":
           return (
             <div
@@ -443,7 +456,7 @@ export default function App({ id, versi }) {
         case "provitmarginpersen":
           return (
             Math.round(
-              ((data.harga - data.hargamodal) / data.harga) * 100 * 100
+              ((data.harga - data.temphargamodal) / data.harga) * 100 * 100
             ) / 100
           );
         case "totalprofit":
@@ -489,7 +502,9 @@ export default function App({ id, versi }) {
           return cellValue == "NN" ? "" : cellValue;
         case "tipe":
           return cellValue
-            ? removePrefixIfMatchIgnoreCase(new String(cellValue), "svt-")
+            ? cellValue == "NN"
+              ? ""
+              : removePrefixIfMatchIgnoreCase(new String(cellValue), "svt-")
             : "";
         case "nama":
           return data.keterangan ? data.keterangan : data.nama;
@@ -1368,6 +1383,11 @@ export default function App({ id, versi }) {
                             disableVendor
                             customInput={
                               <>
+                                <InputProvitMargin
+                                  classNames="w-3/12"
+                                  form={formInstalasi}
+                                  setForm={setFormInstalasi}
+                                />
                                 <Input
                                   type="text"
                                   value={formInstalasi.keterangan}
@@ -1751,24 +1771,29 @@ export default function App({ id, versi }) {
                   value={form.temphargamodal}
                   label={
                     <>
-                      Harga Modal (Ref: <Harga harga={form.hargamodal} />)
+                      Harga Modal (Ref: <Harga harga={form.oldHargaModal} />)
                     </>
                   }
                   placeholder="Masukkan harga!"
                   onValueChange={(v) =>
                     setForm({
                       ...form,
+                      provitmarginpersen: countProvitMarginPercent(
+                        v,
+                        form.harga
+                      ),
                       temphargamodal: v,
                     })
                   }
                 />
+                <InputProvitMargin form={form} setForm={setForm} />
                 <Input
                   type="number"
                   value={form.harga}
                   // label={`Harga Jual (Ref: ${form.refHarga})`}
                   label={
                     <>
-                      Harga Jual (Ref: <Harga harga={+form.harga} />)
+                      Harga Jual (Ref: <Harga harga={+form.oldHarga} />)
                     </>
                   }
                   placeholder="Masukkan harga!"
@@ -1777,13 +1802,12 @@ export default function App({ id, versi }) {
                       ...form,
                       harga: v,
                       provitmarginpersen: countProvitMarginPercent(
-                        form.hargamodal,
+                        form.temphargamodal,
                         v
                       ),
                     })
                   }
                 />
-                <InputProvitMargin form={form} setForm={setForm} />
                 {/* <Input
                   type="number"
                   value={form.hargakustom}
@@ -2559,12 +2583,14 @@ const InputProvitMargin = ({ classNames, form, setForm }) => {
         ) / 100 || 0 */
       }
       label={"Provit Margin (%)"}
-      placeholder="Masukkan provt margin persen!"
+      placeholder="Masukkan provit margin persen!"
       className={classNames ?? ""}
       onValueChange={(v) =>
         setForm({
           ...form,
-          harga: Math.ceil(form.hargamodal / (1 - v / 100) / 100) * 100,
+          harga: Math.ceil(
+            (form.temphargamodal || form.hargamodal) / (1 - v / 100)
+          ),
           provitmarginpersen: Math.ceil(v * 100) / 100 || "",
         })
       }

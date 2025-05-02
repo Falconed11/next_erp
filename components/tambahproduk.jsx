@@ -44,7 +44,7 @@ export default function TambahProduk({
   data = data.filter(
     (animal) =>
       animal.nama.toLowerCase().includes(nama.toLowerCase()) ||
-      animal.nmerek.toLowerCase().includes(nama.toLowerCase()) ||
+      (animal.nmerek || "").toLowerCase().includes(nama.toLowerCase()) ||
       animal.tipe.toLowerCase().includes(nama.toLowerCase()) ||
       animal.id.toString().includes(nama.toLowerCase()) ||
       animal.keterangan.toLowerCase().includes(nama.toLowerCase())
@@ -97,6 +97,7 @@ export default function TambahProduk({
           setForm({
             ...form,
             selectProduk: v,
+            oldHargaModal: hargamodal,
             hargamodal,
             harga,
             provitmarginpersen: countProvitMarginPercent(hargamodal, harga),
@@ -218,14 +219,13 @@ export default function TambahProduk({
           type="number"
           isDisabled={form.isSelected ? 1 : undefined}
           value={form.hargamodal}
-          label={
-            <>Harga Modal (Ref: {<Harga harga={selectProduk?.hargamodal} />})</>
-          }
+          label={<>Harga Modal (Ref: {<Harga harga={form.oldHargaModal} />})</>}
           placeholder="Masukkan harga!"
           className="w-3/12"
           onValueChange={(v) =>
             setForm({
               ...form,
+              provitmarginpersen: countProvitMarginPercent(v, form.harga),
               hargamodal: v,
             })
           }
@@ -280,11 +280,8 @@ export default function TambahProduk({
         onValueChange={(v) =>
           setForm({
             ...form,
+            provitmarginpersen: countProvitMarginPercent(form.hargamodal, v),
             harga: v,
-            provitmarginpersen: countProvitMarginPercent(
-              form.temphargamodal ? form.temphargamodal : form.hargamodal,
-              v
-            ),
           })
         }
       />

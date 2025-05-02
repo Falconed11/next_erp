@@ -264,11 +264,13 @@ export default function App() {
   };
 
   const onProdukMasukClick = (data) => {
+    console.log(data);
     setForm({
       ...data,
       startdate: new Date(),
       tanggal: getDate(new Date()),
       id_produk: data.id,
+      harga: data.hargamodal,
       lunas: "1",
     });
     modal.masuk.onOpen();
@@ -973,7 +975,11 @@ export default function App() {
                 />
                 <Input
                   type="number"
-                  label="Harga Modal"
+                  label={
+                    <>
+                      Harga Modal (Ref: <Harga harga={form.hargamodal} />)
+                    </>
+                  }
                   placeholder="Masukkan harga modal!"
                   value={form.harga}
                   onValueChange={(val) => setForm({ ...form, harga: val })}
