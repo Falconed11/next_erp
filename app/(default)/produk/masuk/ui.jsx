@@ -752,6 +752,30 @@ const TabelProdukKeluar = ({ id_produk }) => {
             <Harga harga={data.hargajual} />
           </div>
         );
+      case "nama_proyek":
+        return data.id_proyek ? (
+          <Link
+            className="text-blue-600 underline"
+            href={`/proyek/detail/proses?id=${data.id_proyek}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {/* <span
+              // onClick={() => detailButtonPress(data)}
+              role="link"
+              onClick={(e) => {
+                e.preventDefault();
+                window.open(`/proyek/detail/proses?id=${data.id}`);
+              }}
+              className="text-lg text-default-400 cursor-pointer active:opacity-50"
+            >
+              <ReportMoneyIcon />
+            </span> */}
+            {data.nama_proyek}
+          </Link>
+        ) : (
+          ""
+        );
       case "aksi":
         return (
           <div className="relative flex items-center gap-2">
