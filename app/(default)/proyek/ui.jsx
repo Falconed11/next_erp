@@ -316,7 +316,7 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
           "reject"
         ) : data.versi > 0 ? (
           "deal"
-        ) : data.pengeluaranproyek > 0 ? (
+        ) : data.jumlahbarangkeluar > 0 ? (
           <Tooltip
             color="warning"
             content="Proyek Berjalan. Belum ada penawaran."
