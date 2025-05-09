@@ -194,6 +194,8 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
         body: JSON.stringify({ id }),
       });
       // return alert(await res.json().then((json) => json.message));
+      const json = await res.json();
+      if (res.status == 400) return alert(json.message);
     }
   };
 
