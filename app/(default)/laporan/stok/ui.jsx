@@ -44,7 +44,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { getApiPath, useClientFetch } from "@/app/utils/apiconfig";
 import { Button } from "@heroui/react";
 import { Input, Textarea } from "@heroui/react";
-import { getDate, getDateFId } from "@/app/utils/date";
+import { getDate, getDateFId, getTime } from "@/app/utils/date";
 import { export2excel } from "@/app/utils/export";
 
 const apiPath = getApiPath();
@@ -384,7 +384,6 @@ export default function App({ id_produk }) {
   if (session.data?.user == undefined) return <div>loading...</div>;
 
   const user = session.data?.user;
-  console.log(user);
 
   const col = [
     // {
@@ -493,7 +492,7 @@ export default function App({ id_produk }) {
   };
 
   // const selectedProduk = produk.data[0];
-  // console.log(result);
+  // console.log(user);
   return (
     <div className="flex flex-col gap-2">
       {/* <div className="flex flex-row gap-2">
@@ -519,7 +518,42 @@ export default function App({ id_produk }) {
           Cetak
         </Button>
         <Button
-          onPress={() => export2excel(result, `Laporan Stok`)}
+          onPress={() => {
+            const date = new Date();
+            const format = result.map((i) => ({
+              id: i.id,
+              kategori: i.kategoriproduk,
+              nama: i.nama,
+              tipe: i.tipe,
+              merek: i.merek,
+              vendor: i.vendor,
+              masuk: i.jumlah,
+              keluar: i.keluar,
+              sisa: i.sisa,
+              stok: i.stok,
+              satuan: i.satuan,
+              harga: i.harga,
+              sisamodal: i.sisamodal,
+              totalharga: i.harga ? i.jumlah * i.harga : "",
+              terbayar: i.terbayar,
+              hutang: i.hutang,
+              tanggalmasuk: i.tanggal ? getDate(new Date(i.tanggal)) : "",
+              jatuhtempo: i.jatuhtempo ? getDate(new Date(i.jatuhtempo)) : "",
+            }));
+            const data = [
+              {
+                TOTAL_MODAL: format.reduce(
+                  (acc, cur) => acc + (cur.id > 0 ? cur.sisamodal : 0),
+                  0
+                ),
+              },
+              ...format,
+            ];
+            return export2excel(
+              data,
+              `Laporan Stok_${getDate(date)}_${getTime(date)}_${user.nama}`
+            );
+          }}
           color="primary"
         >
           Export

@@ -21,6 +21,13 @@ const getDate = (date) => {
   return `${year}-${month}-${day}`;
 };
 
+const getTime = (date) => {
+  const pad = (n) => n.toString().padStart(2, "0");
+  const hours = pad(date.getHours());
+  const minutes = pad(date.getMinutes());
+  return `${hours}-${minutes}`;
+};
+
 const getDateF = (date) => {
   const year = date.getFullYear();
   const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Note that months are zero-based
@@ -84,6 +91,7 @@ const excelToJSDate = (excelDate) => {
 module.exports = {
   excelToJSDate,
   getDate,
+  getTime,
   getDateF,
   getDateFId,
   getMonthYear,

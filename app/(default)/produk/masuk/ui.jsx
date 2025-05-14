@@ -555,7 +555,7 @@ export default function App({ id_produk }) {
                 />
                 <Input
                   type="number"
-                  label="Harga"
+                  label={<>Harga (Ref. {<Harga harga={form.hargamodal} />})</>}
                   placeholder="Masukkan harga!"
                   value={form.harga}
                   onValueChange={(val) => setForm({ ...form, harga: val })}
