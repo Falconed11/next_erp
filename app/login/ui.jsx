@@ -11,7 +11,7 @@ export default function App() {
 
   return (
     <div className="fixed top-0 left-0 w-screen h-screen flex items-center justify-center">
-      <div className="border border-white bg-white/25 rounded-lg p-5 shadow-lg backdrop-blur-sm">
+      <div className="border border-white bg-white/25 rounded-lg p-5 shadow-lg backdrop-blur-xs">
         <div>
           <Input label="Username" placeholder="Masukkan username" />
         </div>
@@ -21,7 +21,7 @@ export default function App() {
             placeholder="Massukan password"
             endContent={
               <button
-                className="focus:outline-none"
+                className="focus:outline-hidden"
                 type="button"
                 onClick={toggleVisibility}
               >

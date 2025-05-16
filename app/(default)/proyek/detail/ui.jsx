@@ -403,7 +403,7 @@ export default function App({ id, versi }) {
           return (
             <div
               className={`text-right px-1 ${
-                data.jumlah > data.stok ? "text-white bg-danger rounded" : ""
+                data.jumlah > data.stok ? "text-white bg-danger rounded-sm" : ""
               }`}
             >
               {cellValue}
@@ -1008,11 +1008,11 @@ export default function App({ id, versi }) {
               <div>
                 :{" "}
                 {selectedProyek.versi == -1 ? (
-                  <span className="bg-red-600 text-white p-1 rounded font-bold">
+                  <span className="bg-red-600 text-white p-1 rounded-sm font-bold">
                     REJECT
                   </span>
                 ) : selectedProyek.versi == selectedVersion ? (
-                  <span className="bg-green-400 text-white p-1 rounded font-bold">
+                  <span className="bg-green-400 text-white p-1 rounded-sm font-bold">
                     DEAL
                   </span>
                 ) : (

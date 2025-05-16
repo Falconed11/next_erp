@@ -56,11 +56,13 @@ const RangeDate = ({ current, setCurrent }) => {
     e.preventDefault();
     setCurrent(filter);
   };
+  const theme = "bg-white";
   return (
     <div className="flex flex-col bg-gray-100 p-3 rounded-lg gap-1">
       <div>Periode</div>
       <form onSubmit={cariOnPress} className="flex flex-col gap-2">
         <DatePicker
+          className={theme}
           dateFormat="dd/MM/yyyy"
           selected={filter.startDate}
           onChange={(date) => setFilter({ ...filter, startDate: date })}
@@ -77,6 +79,7 @@ const RangeDate = ({ current, setCurrent }) => {
           }}
         />
         <DatePicker
+          className={theme}
           dateFormat="dd/MM/yyyy"
           selected={filter.endDate}
           onChange={(date) => setFilter({ ...filter, endDate: date })}

@@ -8,7 +8,7 @@ const [firstDayOfCurrentMonth, lastDayOfCurrentMonth] = getCurFirstLastDay();
 export default function UI() {
   return (
     <>
-      <div className="bg-white rounded p-3">
+      <div className="bg-white rounded-sm p-3">
         <div>Laporan Bulanan Proyek</div>
         <BulananProyek
           start={firstDayOfCurrentMonth}
