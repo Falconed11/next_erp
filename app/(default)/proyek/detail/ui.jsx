@@ -2092,61 +2092,82 @@ export default function App({ id, versi }) {
                     <></>
                   )}
                   {/* Rekapitulasi */}
-                  <div className="mt-0 px-3 border no-break text-xs">
-                    {/* <div>Rekapitulasi</div> */}
-                    <div className="flex">
-                      <div className="basis-3/6">Rekapitulasi</div>
-                      <div className="basis-2/6">
-                        <div>Produk</div>
-                        <div>Instalasi</div>
-                        <div>
-                          {rekapDiskon + rekapPajak > 0 ? "Sub Total" : "Total"}
+                  <div className="mt-0 border no-break text-xs">
+                    <div className="px-3">
+                      {/* <div>Rekapitulasi</div> */}
+                      <div className="flex">
+                        <div className="basis-3/6">Rekapitulasi</div>
+                        <div className="basis-2/6">
+                          <div>Produk</div>
+                          <div>Instalasi</div>
+                          {rekapDiskon + rekapPajak > 0 ? (
+                            <div>Sub Total</div>
+                          ) : (
+                            <></>
+                          )}
+                          {rekapDiskon > 0 ? (
+                            <>
+                              <div>Diskon</div>
+                              {rekapPajak > 0 ? (
+                                <div>Harga Setelah Diskon</div>
+                              ) : (
+                                <></>
+                              )}
+                            </>
+                          ) : (
+                            <></>
+                          )}
+                          {rekapPajak > 0 ? (
+                            <>
+                              <div>Pajak ({rekapPajak}%)</div>
+                            </>
+                          ) : (
+                            <></>
+                          )}
                         </div>
-                        {rekapDiskon > 0 ? (
-                          <>
-                            <div>Diskon</div>
-                            <div>Harga Setelah Diskon</div>
-                          </>
-                        ) : (
-                          <></>
-                        )}
-                        {rekapPajak > 0 ? (
-                          <>
-                            <div>Pajak ({rekapPajak}%)</div>
-                            <div>Harga Setelah Pajak</div>
-                          </>
-                        ) : (
-                          <></>
-                        )}
-                      </div>
-                      <div className="basis-1/6 text-right">
-                        <div>
-                          <Harga harga={subTotalKustomJual} />
-                        </div>
-                        <div>
-                          <Harga harga={subTotalKustomInstalasi} />
-                        </div>
-                        <div>
-                          <Harga harga={totalKustom} />
-                        </div>
-                        {rekapDiskon > 0 ? (
-                          <>
-                            <div>{<Harga harga={rekapDiskon} />}</div>
-                            <div>{<Harga harga={kustomDiskon} />}</div>
-                          </>
-                        ) : (
-                          <></>
-                        )}
-                        {rekapPajak > 0 ? (
-                          <>
-                            <div>{<Harga harga={pajakKustom} />}</div>
+                        <div className="basis-1/6 text-right">
+                          <div>
+                            <Harga harga={subTotalKustomJual} />
+                          </div>
+                          <div>
+                            <Harga harga={subTotalKustomInstalasi} />
+                          </div>
+                          {rekapDiskon + rekapPajak > 0 ? (
                             <div>
-                              <Harga harga={finalKustom} />
+                              <Harga harga={totalKustom} />
                             </div>
-                          </>
-                        ) : (
-                          <></>
-                        )}
+                          ) : (
+                            <></>
+                          )}
+                          {rekapDiskon > 0 ? (
+                            <>
+                              <div>{<Harga harga={rekapDiskon} />}</div>
+                              {rekapPajak ? (
+                                <div>{<Harga harga={kustomDiskon} />}</div>
+                              ) : (
+                                <></>
+                              )}
+                            </>
+                          ) : (
+                            <></>
+                          )}
+                          {rekapPajak > 0 ? (
+                            <>
+                              <div>{<Harga harga={pajakKustom} />}</div>
+                              {/* <div>
+                                <Harga harga={finalKustom} />
+                              </div> */}
+                            </>
+                          ) : (
+                            <></>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex justify-end text-sm font-semibold leading-0">
+                      <div className="basis-2/6 text-left">Total Harga</div>
+                      <div className="px-1 basis-1/6 text-right">
+                        <Harga harga={finalKustom} />
                       </div>
                     </div>
                   </div>
