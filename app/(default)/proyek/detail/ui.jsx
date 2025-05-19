@@ -2164,7 +2164,7 @@ export default function App({ id, versi }) {
                         </div>
                       </div>
                     </div>
-                    <div className="flex justify-end text-sm font-semibold leading-0">
+                    <div className="flex justify-end text-sm font-semibold leading-3 pb-1">
                       <div className="basis-2/6 text-left">Total Harga</div>
                       <div className="px-1 basis-1/6 text-right">
                         <Harga harga={finalKustom} />
