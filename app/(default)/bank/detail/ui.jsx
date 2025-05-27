@@ -89,7 +89,7 @@ export default function App({ id }) {
       selectKategori.values().next().value ?? ""
     }`
   );
-  const metodepembayaran = useClientFetch(`bank?id=${id}`);
+  const metodepembayaran = useClientFetch(`metodepembayaran?id=${id}`);
 
   const [form, setForm] = useState({
     selectProduk: new Set([]),

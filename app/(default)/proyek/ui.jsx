@@ -653,7 +653,10 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
                       placeholder="Pilih sales"
                       selectedKeys={selectkaryawan}
                       variant="bordered"
-                      onSelectionChange={setSelectKaryawan}
+                      onSelectionChange={(v) => {
+                        setSelectKaryawan(v);
+                        setPage(1);
+                      }}
                     >
                       {karyawan.data.map((v) => (
                         <SelectItem key={v.id}>{v.nama}</SelectItem>
