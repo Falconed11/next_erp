@@ -120,7 +120,7 @@ export default function App() {
   };
   const deleteButtonPress = async (id) => {
     if (confirm("Hapus metode pembayaran?")) {
-      setIsLoading(true);
+      // setIsLoading(true);
       const res = await fetch(`${apiPath}metodepembayaran`, {
         method: "DELETE",
         headers: {
@@ -131,7 +131,7 @@ export default function App() {
       });
       const json = await res.json();
       if (res.status == 400) return alert(json.message);
-      setIsLoading(false);
+      // setIsLoading(false);
       // return alert(await res.json().then((json) => json.message));
     }
   };

@@ -19,11 +19,11 @@ export default function Navigation({ navLinks }) {
   const router = useRouter();
   const pathname = usePathname();
 
+  const split = pathname.split("/");
+  const title = split.at(-1);
   useEffect(() => {
-    const split = pathname.split("/");
-    const title = split.at(-1);
     document.title = title;
-  }, [pathname]);
+  }, [title]);
 
   if (proyek.error) return <div>failed to load</div>;
   if (proyek.isLoading) return <div>loading...</div>;

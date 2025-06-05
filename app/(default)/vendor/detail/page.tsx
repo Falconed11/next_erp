@@ -1,8 +1,11 @@
 import UI from "./ui"
 
-export default async function app({ searchParams }: {
-    searchParams: { [key: string]: string | string[] | undefined }
-}) {
+export default async function app(
+    props: {
+        searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+    }
+) {
+    const searchParams = await props.searchParams;
     const id = searchParams.id
     return <>
         <UI id={id} />

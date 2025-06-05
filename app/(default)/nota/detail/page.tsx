@@ -3,9 +3,12 @@ import DetailNota from "./detailnota"
 
 const api_path = getApiPath()
 
-export default async function app({ searchParams }: {
-    searchParams: { [key: string]: string | string[] | undefined }
-}) {
+export default async function app(
+    props: {
+        searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+    }
+) {
+    const searchParams = await props.searchParams;
     const id = searchParams.id
     return <>
         <DetailNota id={id} />
