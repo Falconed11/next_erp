@@ -71,7 +71,7 @@ export default function App({ id }) {
   const pengeluaranproyek = useClientFetch(`pengeluaranproyek?id_proyek=${id}`);
   const pembayaranproyek = useClientFetch(`pembayaranproyek?id_proyek=${id}`);
   const kategori = useClientFetch(`kategoriproduk`);
-  const bank = useClientFetch(`bank`);
+  const metodepembayaran = useClientFetch(`metodepembayaran`);
   const produk = useClientFetch(
     `produk?kategori=${selectKategori.values().next().value}`
   );
@@ -302,7 +302,7 @@ export default function App({ id }) {
   const renderCell = {
     pengeluaranproyek: React.useCallback((data, columnKey) => {
       const cellValue = data[columnKey];
-      const harga = data.hargapengeluaran;
+      const harga = data.hargaprodukmasuk || data.hargapengeluaran;
       switch (columnKey) {
         case "status":
           return data.status == 1 ? "Lunas" : "Belum Lunas";
@@ -312,18 +312,6 @@ export default function App({ id }) {
           return <Harga harga={harga} />;
         case "totalharga":
           return <Harga harga={data.jumlah * harga} />;
-        case "totalharga-jual":
-          return <Harga harga={data.jumlah * data.hargajual} />;
-        case "profit":
-          return <Harga harga={data.hargajual - data.hargamodal} />;
-        case "totalprofit":
-          return (
-            <Harga
-              harga={
-                data.jumlah * data.hargajual - data.jumlah * data.hargamodal
-              }
-            />
-          );
         case "aksi":
           return (
             <div className="relative flex items-center gap-2">
@@ -475,8 +463,8 @@ export default function App({ id }) {
   if (produk.isLoading) return <div>loading...</div>;
   if (karyawan.error) return <div>failed to load</div>;
   if (karyawan.isLoading) return <div>loading...</div>;
-  if (bank.error) return <div>failed to load</div>;
-  if (bank.isLoading) return <div>loading...</div>;
+  if (metodepembayaran.error) return <div>failed to load</div>;
+  if (metodepembayaran.isLoading) return <div>loading...</div>;
 
   const selectedProyek = proyek.data[0];
   // const subTotalHargaJual = keranjangNota.data.reduce((total, currentValue) => {
@@ -548,7 +536,7 @@ export default function App({ id }) {
           });
         }}
       >
-        {bank.data.map((item) => (
+        {metodepembayaran.data.map((item) => (
           <SelectItem key={item.id} value={item.id}>
             {item.nama}
           </SelectItem>

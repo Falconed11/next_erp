@@ -284,7 +284,6 @@ export default function App({ id }) {
       <div className="-w-11/12">
         <Table
           isStriped
-          className="pt-3"
           aria-label="Example table with custom cells"
           topContent={
             <>

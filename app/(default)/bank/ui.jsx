@@ -57,9 +57,10 @@ export default function App() {
   const bank = useClientFetch("bank");
   const metodepembayaran = useClientFetch("metodepembayaran");
   const [form, setForm] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
 
   const saveButtonPress = async (onClose) => {
-    // if (form.isSwasta.size == 0) return alert("Swasta/Negri belum diisi");
+    if (!form.id_bank) return alert("Bank belum dipilih!");
     const res = await fetch(`${apiPath}metodepembayaran`, {
       method: form.method,
       headers: {
@@ -104,6 +105,7 @@ export default function App() {
     // const startdate = new Date(data.tanggal);
     setForm({
       ...data,
+      selectbank: new Set([String(data.id_bank)]),
       method: "PUT",
       title: "Edit",
     });
@@ -117,7 +119,8 @@ export default function App() {
     transfer.onOpen();
   };
   const deleteButtonPress = async (id) => {
-    if (confirm("Hapus proyek?")) {
+    if (confirm("Hapus metode pembayaran?")) {
+      setIsLoading(true);
       const res = await fetch(`${apiPath}metodepembayaran`, {
         method: "DELETE",
         headers: {
@@ -126,6 +129,9 @@ export default function App() {
         },
         body: JSON.stringify({ id }),
       });
+      const json = await res.json();
+      if (res.status == 400) return alert(json.message);
+      setIsLoading(false);
       // return alert(await res.json().then((json) => json.message));
     }
   };
@@ -254,6 +260,7 @@ export default function App() {
   // if (metodepembayaran.isLoading) return <div>loading...</div>;
   // if (bank.error) return <div>failed to load</div>;
   // if (bank.isLoading) return <div>loading...</div>;
+  if (isLoading) return <div>loading...</div>;
   const sources = [bank, metodepembayaran];
   if (sources.some((o) => o.error)) return <div>failed to load</div>;
   if (sources.some((o) => o.isLoading)) return <div>loading...</div>;
@@ -263,7 +270,7 @@ export default function App() {
       label: "Id",
     },
     {
-      key: "bank",
+      key: "namabank",
       label: "Bank",
     },
     {
@@ -287,6 +294,7 @@ export default function App() {
       label: "Aksi",
     },
   ];
+  console.log(form.selectbank?.size);
   return (
     <div className="flex gap-2">
       <Bank bank={bank} />
@@ -371,6 +379,20 @@ export default function App() {
                   type="text"
                   label="Atas Nama"
                   placeholder="Masukkan nama!"
+                  value={form.atasnama}
+                  onValueChange={(val) => setForm({ ...form, atasnama: val })}
+                />
+                <Input
+                  type="text"
+                  label="No. Rekening"
+                  placeholder="Masukkan no. rekening!"
+                  value={form.norekening}
+                  onValueChange={(val) => setForm({ ...form, norekening: val })}
+                />
+                <Input
+                  type="text"
+                  label="Keterangan (Opsional)"
+                  placeholder="Masukkan keterangan!"
                   value={form.nama}
                   onValueChange={(val) => setForm({ ...form, nama: val })}
                 />
@@ -648,23 +670,19 @@ const Bank = ({ bank }) => {
       >
         <ModalContent>
           {(onClose) => (
-            <Form
-              className="flex flex-col"
-              onSubmit={(e) => onSubmit(e, onClose)}
-            >
-              <ModalHeader className="flex flex-col gap-1">
-                {form.title} Bank
-              </ModalHeader>
-              <ModalBody>
+            <Form onSubmit={(e) => onSubmit(e, onClose)}>
+              <ModalHeader className="">{form.title} Bank</ModalHeader>
+              <ModalBody className="w-full">
                 <Input
                   type="text"
                   label="Nama"
+                  className=""
                   placeholder="Masukkan nama!"
                   value={form.nama}
                   onValueChange={(val) => setForm({ ...form, nama: val })}
                 />
               </ModalBody>
-              <ModalFooter>
+              <ModalFooter className="w-full">
                 <Button color="danger" variant="light" onPress={onClose}>
                   Batal
                 </Button>

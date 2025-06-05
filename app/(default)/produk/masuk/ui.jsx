@@ -365,10 +365,10 @@ export default function App({ id_produk }) {
   if (vendor.isLoading) return <div>loading...</div>;
 
   const col = [
-    // {
-    //   key: "id_kustom",
-    //   label: "Id",
-    // },
+    {
+      key: "id",
+      label: "Id",
+    },
     // {
     //   key: "nama",
     //   label: "Produk",
@@ -824,10 +824,10 @@ const TabelProdukKeluar = ({ id_produk }) => {
   if (metodepengeluaran.isLoading) return <div>loading...</div>;
 
   const col = [
-    // {
-    //   key: "id_kustom",
-    //   label: "Id",
-    // },
+    {
+      key: "id_produkmasuk",
+      label: "Id Produk Masuk",
+    },
     // {
     //   key: "produk",
     //   label: "Produk",
