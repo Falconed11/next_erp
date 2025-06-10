@@ -153,34 +153,6 @@ export default function App({ id_instansi }) {
     setJson(jsonData);
     // console.log(json);
   };
-  const importPenawaran = async () => {
-    if (json.length == 0) return alert("File belum dipilih");
-    setIsLoading(1);
-    setReportList([]);
-    try {
-      const responses = await Promise.all(
-        json.map((v) =>
-          fetch(`${apiPath}importpenawaran`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              // 'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: JSON.stringify(v),
-          })
-        )
-      );
-      const dataArray = await Promise.all(
-        responses.map((response) => response.json())
-      );
-      setReportList(dataArray.map((v, i) => `${i + 1}. ${v.message}`));
-    } catch (e) {
-      console.error(e);
-    }
-    setJson([]);
-    setIsLoading(0);
-    report.onOpen();
-  };
   const handleButtonUploadExcelPress = async () => {
     if (json.length == 0) return alert("File belum dipilih");
     setReportList([]);
