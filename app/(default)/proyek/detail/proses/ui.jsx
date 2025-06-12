@@ -44,6 +44,7 @@ import Image from "next/image";
 import logo from "@/public/logofinal.jpg";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { NavLinkNewTab } from "@/components/mycomponent";
 
 const api_path = getApiPath();
 
@@ -559,7 +560,7 @@ export default function App({ id }) {
   );
   // console.log(form);
   return (
-    <div className="flex flex-col w-full">
+    <div className="flex flex-col gap-2 w-full">
       <h1>Proses</h1>
       <div className="flex flex-row gap-2">
         {/*Detail  */}
@@ -595,6 +596,15 @@ export default function App({ id }) {
           </div>
         </div>
       </div>
+      <div className="flex gap-2">
+        <NavLinkNewTab
+          href={`/proyek/detail?id=${selectedProyek.id}&versi=${
+            selectedProyek.versi <= 0 ? "1" : selectedProyek.versi
+          }`}
+        >
+          {"Penawaran ==>>"}
+        </NavLinkNewTab>
+      </div>
       {/* tombol print */}
       {/* <div className="flex flex-row gap-2">
         <div>
@@ -605,7 +615,7 @@ export default function App({ id }) {
       </div> */}
       {/* tabel pengeluaran proyek */}
       <Table
-        className="pt-3"
+        className=""
         aria-label="Example table with custom cells"
         topContent={
           <>
@@ -804,7 +814,7 @@ export default function App({ id }) {
       </Table>
       {/* tabel pembayaranproyek */}
       <Table
-        className="pt-3"
+        className=""
         aria-label="Example table with custom cells"
         topContent={
           <>

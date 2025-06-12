@@ -7,6 +7,7 @@ import { Select, SelectItem } from "@heroui/react";
 import { Checkbox } from "@heroui/react";
 import { getApiPath, useClientFetch } from "@/app/utils/apiconfig";
 import { countProvitMarginPercent } from "@/app/utils/formula";
+import { getDateF, getDateFId } from "@/app/utils/date";
 import Harga from "@/components/harga";
 
 const api_path = getApiPath();
@@ -118,7 +119,8 @@ export default function TambahProduk({
               {item.stok} {item.satuan}
             </span>{" "}
             | <Harga harga={item.hargamodal} /> |{" "}
-            <Harga harga={item.hargajual} /> | {item.keterangan}
+            <Harga harga={item.hargajual} /> | {item.keterangan} |{" "}
+            {getDateFId(item.tanggal)}
           </AutocompleteItem>
         )}
       </Autocomplete>

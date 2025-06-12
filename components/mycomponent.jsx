@@ -37,6 +37,14 @@ const LinkOpenNewTab = ({ content, link, icon }) => {
   );
 };
 
+const NavLinkNewTab = ({ href, children }) => {
+  return (
+    <Link href={href} target="_blank" rel="noopener noreferrer">
+      {children}
+    </Link>
+  );
+};
+
 const BKSHeader = () => {
   return (
     <div className="flex flex-col">
@@ -60,4 +68,4 @@ const SVTHeader = () => {
   );
 };
 
-export { MyChip, LinkOpenNewTab, BKSHeader, SVTHeader };
+export { MyChip, LinkOpenNewTab, NavLinkNewTab, BKSHeader, SVTHeader };

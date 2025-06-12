@@ -22,6 +22,7 @@ const getDate = (date) => {
 };
 
 const getTime = (date) => {
+  date = new Date(date);
   const pad = (n) => n.toString().padStart(2, "0");
   const hours = pad(date.getHours());
   const minutes = pad(date.getMinutes());
@@ -29,6 +30,7 @@ const getTime = (date) => {
 };
 
 const getDateF = (date) => {
+  date = new Date(date);
   const year = date.getFullYear();
   const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Note that months are zero-based
   const day = date.getDate().toString().padStart(2, "0");
@@ -36,6 +38,7 @@ const getDateF = (date) => {
 };
 
 const getDateFId = (date, format) => {
+  date = new Date(date);
   const year = date.getFullYear();
   const month = date.getMonth();
   const monthNameIndonesian = monthNamesIndonesian[month];

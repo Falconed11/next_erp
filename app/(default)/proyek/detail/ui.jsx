@@ -42,7 +42,7 @@ import { removePrefixIfMatchIgnoreCase } from "@/app/utils/stringmanipulation";
 import Harga from "@/components/harga";
 import { ConditionalComponent } from "@/components/componentmanipulation";
 import TambahProduk from "@/components/tambahproduk";
-import { BKSHeader, SVTHeader } from "@/components/mycomponent";
+import { BKSHeader, NavLinkNewTab, SVTHeader } from "@/components/mycomponent";
 import { Button } from "@heroui/react";
 import { Input } from "@heroui/react";
 import { Divider } from "@heroui/react";
@@ -1221,10 +1221,11 @@ export default function App({ id, versi }) {
                   Invoice
                 </Button>
               </div>
-              <Link
-                className="text-blue-600 p-3"
+              <NavLinkNewTab
                 href={`/proyek/detail/proses?id=${selectedProyek.id}`}
-              >{`Pengeluaran Proyek ==>>`}</Link>
+              >
+                {"Pengeluaran Proyek ==>>"}
+              </NavLinkNewTab>
             </div>
             <div className="-w-11/12">
               {/* sub proyek */}
@@ -2594,7 +2595,7 @@ const InputProvitMargin = ({ classNames, form, setForm }) => {
       type="number"
       max={99}
       value={
-        form.provitmarginpersen
+        form.provitmarginpersen || 0
         /* Math.round(
           ((form.harga -
             (form.temphargamodal ? form.temphargamodal : form.hargamodal)) /
@@ -2610,7 +2611,7 @@ const InputProvitMargin = ({ classNames, form, setForm }) => {
         setForm({
           ...form,
           harga: Math.ceil(
-            (form.temphargamodal || form.hargamodal) / (1 - v / 100)
+            (form.temphargamodal || form.hargamodal || 0) / (1 - v / 100)
           ),
           provitmarginpersen: Math.ceil(v * 100) / 100 || "",
         })
