@@ -1,10 +1,10 @@
 "use client";
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { v4 as uuidv4 } from "uuid";
 import * as XLSX from "xlsx";
 import Link from "next/link";
-import { Autocomplete, AutocompleteItem } from "@heroui/react";
+import { Autocomplete, AutocompleteItem, Form } from "@heroui/react";
 import {
   Table,
   TableHeader,
@@ -49,12 +49,17 @@ import { Input, Textarea } from "@heroui/react";
 import { getDate, getDateF, getDateFId } from "@/app/utils/date";
 import { LinkOpenNewTab } from "@/components/mycomponent";
 import { AuthorizationComponent } from "@/components/componentmanipulation";
+import {
+  countPriceByProvitMarginPercent,
+  countProvitMarginPercent,
+} from "@/app/utils/formula";
 
 const apiPath = getApiPath();
 
 export default function App() {
   const session = useSession();
   // dynamic input
+  const terapkanButton = useRef();
   const [inputs, setInputs] = useState([{ id: uuidv4(), value: "" }]);
   const handleChange = (id, value) => {
     setInputs((prevInputs) =>
@@ -97,14 +102,16 @@ export default function App() {
     vendor: "",
     stok: "",
     satuan: "",
-    hargamodal: "",
-    hargajual: "",
+    hargamodal: 0,
+    hargajual: 0,
     selectedKategori: new Set([]),
     select_subkategori: new Set([]),
     select_merek: new Set([]),
     filteredsubkategori: [],
     keterangan: "",
   });
+  const [persenProvitMargin, setPersenProvitMargin] = useState(30);
+  const provitMargin = +form.hargajual - +form.hargamodal;
   const [json, setJson] = useState([]);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [isLoading, setIsLoading] = useState(0);
@@ -574,7 +581,9 @@ export default function App() {
   // }
 
   // console.log({ id_vendor: form.id_vendor ? true : false });
-
+  console.log(form);
+  console.log(provitMargin);
+  console.log(persenProvitMargin);
   return (
     <div className="">
       <div className="flex flex-col gap-2">
@@ -820,8 +829,56 @@ export default function App() {
                   type="text"
                   label="Harga Jual"
                   placeholder="Masukkan harga jual!"
-                  value={form.hargajual}
+                  value={form.hargajual || 0}
                   onValueChange={(val) => setForm({ ...form, hargajual: val })}
+                />
+                <Input
+                  type="text"
+                  label={`Provit Margin (${countProvitMarginPercent(
+                    form.hargamodal || 0,
+                    form.hargajual || 0
+                  )}%)`}
+                  placeholder="Masukkan Provit Margin!"
+                  value={provitMargin}
+                  onValueChange={(val) =>
+                    setForm({ ...form, hargajual: +form.hargamodal + +val })
+                  }
+                />
+                <Input
+                  type="text"
+                  label="Persen Provit Margin"
+                  placeholder="Masukkan Persen Provit Margin!"
+                  value={persenProvitMargin || 30}
+                  endContent={
+                    <Button
+                      ref={terapkanButton}
+                      size="sm"
+                      color="primary"
+                      type="button"
+                      onPress={() => {
+                        alert(
+                          countPriceByProvitMarginPercent(
+                            form.hargamodal,
+                            form.persenProvitMargin
+                          )
+                        );
+                        setForm({
+                          ...form,
+                          hargajual: countPriceByProvitMarginPercent(
+                            form.hargamodal,
+                            persenProvitMargin
+                          ),
+                        });
+                      }}
+                    >
+                      Terapkan
+                    </Button>
+                  }
+                  onKeyDown={(e) => {
+                    e.preventDefault();
+                    terapkanButton.current?.click();
+                  }}
+                  onValueChange={setPersenProvitMargin}
                 />
                 <div className="bg-gray-100 p-3 rounded-lg z-40">
                   <div>Tanggal</div>
