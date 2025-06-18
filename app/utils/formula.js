@@ -3,7 +3,7 @@ const countProvitMarginPercent = (hargamodal, hargajual) => {
   return Math.round(((hargajual - hargamodal) / hargajual) * 100 * 100) / 100;
 };
 const countPriceByProvitMarginPercent = (hargaModal, provitMarginPercent) => {
-  return hargaModal / (1 - provitMarginPercent);
+  return Math.ceil(hargaModal / (1 - provitMarginPercent / 100));
 };
 
 export { countProvitMarginPercent, countPriceByProvitMarginPercent };

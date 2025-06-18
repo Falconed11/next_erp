@@ -581,9 +581,6 @@ export default function App() {
   // }
 
   // console.log({ id_vendor: form.id_vendor ? true : false });
-  console.log(form);
-  console.log(provitMargin);
-  console.log(persenProvitMargin);
   return (
     <div className="">
       <div className="flex flex-col gap-2">
@@ -819,21 +816,21 @@ export default function App() {
                   onValueChange={(val) => setForm({ ...form, satuan: val })}
                 />
                 <Input
-                  type="text"
+                  type="number"
                   label="Harga Modal"
                   placeholder="Masukkan harga modal!"
                   value={form.hargamodal}
                   onValueChange={(val) => setForm({ ...form, hargamodal: val })}
                 />
                 <Input
-                  type="text"
+                  type="number"
                   label="Harga Jual"
                   placeholder="Masukkan harga jual!"
                   value={form.hargajual || 0}
                   onValueChange={(val) => setForm({ ...form, hargajual: val })}
                 />
                 <Input
-                  type="text"
+                  type="number"
                   label={`Provit Margin (${countProvitMarginPercent(
                     form.hargamodal || 0,
                     form.hargajual || 0
@@ -845,10 +842,10 @@ export default function App() {
                   }
                 />
                 <Input
-                  type="text"
+                  type="number"
                   label="Persen Provit Margin"
                   placeholder="Masukkan Persen Provit Margin!"
-                  value={persenProvitMargin || 30}
+                  value={persenProvitMargin}
                   endContent={
                     <Button
                       ref={terapkanButton}
@@ -856,12 +853,15 @@ export default function App() {
                       color="primary"
                       type="button"
                       onPress={() => {
-                        alert(
-                          countPriceByProvitMarginPercent(
-                            form.hargamodal,
-                            form.persenProvitMargin
-                          )
-                        );
+                        // console.log({
+                        //   hargamodal: form.hargamodal,
+                        //   hargajual: form.hargajual,
+                        //   provitmarginpersen: persenProvitMargin,
+                        //   hargjualbaru: countPriceByProvitMarginPercent(
+                        //     form.hargamodal,
+                        //     persenProvitMargin
+                        //   ),
+                        // });
                         setForm({
                           ...form,
                           hargajual: countPriceByProvitMarginPercent(
@@ -875,8 +875,10 @@ export default function App() {
                     </Button>
                   }
                   onKeyDown={(e) => {
-                    e.preventDefault();
-                    terapkanButton.current?.click();
+                    if (e.key == "Enter") {
+                      e.preventDefault();
+                      terapkanButton.current?.click();
+                    }
                   }}
                   onValueChange={setPersenProvitMargin}
                 />
