@@ -310,9 +310,17 @@ export default function App({ id }) {
         case "tanggal":
           return getDateF(new Date(data.tanggalpengeluaran));
         case "harga":
-          return <Harga harga={harga} />;
+          return (
+            <div className="text-right">
+              <Harga harga={harga} />
+            </div>
+          );
         case "totalharga":
-          return <Harga harga={data.jumlah * harga} />;
+          return (
+            <div className="text-right">
+              <Harga harga={data.jumlah * harga} />
+            </div>
+          );
         case "aksi":
           return (
             <div className="relative flex items-center gap-2">
