@@ -65,7 +65,7 @@ export default function App({ id, versi }) {
   const user = session.data?.user;
   const router = useRouter();
   const componentRef = {
-    penawaran: useRef(),
+    penawaran: useRef(null),
     invoice: useRef(),
   };
   const handlePrintInvoice = useReactToPrint({
@@ -73,7 +73,7 @@ export default function App({ id, versi }) {
     bodyClass: "m-12",
   });
   const handlePrintPenawaran = useReactToPrint({
-    content: () => componentRef.penawaran.current,
+    contentRef: componentRef.penawaran,
     pageStyle: "p-10 block",
   });
 
@@ -1916,7 +1916,7 @@ export default function App({ id, versi }) {
               <ModalBody>
                 <div
                   ref={componentRef.penawaran}
-                  className="bg-white text-black"
+                  className="bg-white text-black overflow-x-hidden"
                 >
                   {/* {Logo} */}
                   <div className="flex flex-row items-center">

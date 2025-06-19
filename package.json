@@ -18,7 +18,7 @@
     "react-datepicker": "^4.25.0",
     "react-dom": "^19.1.0",
     "react-dropzone": "^14.2.3",
-    "react-to-print": "^2.14.15",
+    "react-to-print": "^3.1.0",
     "swr": "^2.3.3",
     "uuid": "^9.0.1",
     "xlsx": "^0.18.5"
