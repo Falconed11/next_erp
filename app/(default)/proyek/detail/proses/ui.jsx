@@ -476,21 +476,6 @@ export default function App({ id }) {
   if (metodepembayaran.isLoading) return <div>loading...</div>;
 
   const selectedProyek = proyek.data[0];
-  // const subTotalHargaJual = keranjangNota.data.reduce((total, currentValue) => {
-  //   return total + currentValue.jumlah * currentValue.hargajual;
-  // }, 0);
-  // const subTotalKustomJual = keranjangNota.data.reduce(
-  //   (total, currentValue) => {
-  //     return (
-  //       total +
-  //       currentValue.jumlah *
-  //         (currentValue.hargakustom
-  //           ? currentValue.hargakustom
-  //           : currentValue.hargajual)
-  //     );
-  //   },
-  //   0
-  // );
   const biayaProduksi = pengeluaranproyek.data.reduce((total, v) => {
     return (
       total +
@@ -630,68 +615,6 @@ export default function App({ id }) {
             <div>Pengeluaran Proyek</div>
             <div className="flex-col gap-2">
               <div className="flex flex-row gap-2">
-                {/* <Select
-                  label="Kategori"
-                  placeholder="Pilih kategori!"
-                  className="w-2/12"
-                  selectedKeys={selectKategori}
-                  onSelectionChange={setSelectKategori}
-                >
-                  {kategori.data.map((item) => (
-                    <SelectItem key={item.kategori} value={item.kategori}>
-                      {item.kategori}
-                    </SelectItem>
-                  ))}
-                </Select>
-                <Select
-                  label="Produk"
-                  placeholder="Pilih produk!"
-                  className="w-5/12 pl-2"
-                  selectedKeys={selectProduk}
-                  onSelectionChange={setSelectProduk}
-                >
-                  {produk.data.map((item) => (
-                    <SelectItem
-                      key={item.id}
-                      value={item.id}
-                      textValue={`${item.nama}`}
-                    >
-                      {item.nama} | {item.merek} | {item.tipe} | {item.stok} |{" "}
-                      {item.satuan} | {item.hargamodal} | {item.hargajual}
-                    </SelectItem>
-                  ))}
-                </Select>
-                <Input
-                  type="number"
-                  value={form.jumlah}
-                  label="Jumlah"
-                  placeholder="Masukkan jumlah!"
-                  className="w-2/12 pl-2"
-                  endContent={
-                    <div className="pointer-events-none flex items-center">
-                      <span className="text-default-400 text-small"></span>
-                    </div>
-                  }
-                  onValueChange={(v) =>
-                    setForm({
-                      ...form,
-                      jumlah: v,
-                    })
-                  }
-                />
-                <Input
-                  type="number"
-                  value={form.harga}
-                  label="Harga Kustom"
-                  placeholder="Masukkan harga!"
-                  className="w-2/12 pl-2"
-                  onValueChange={(v) =>
-                    setForm({
-                      ...form,
-                      harga: v,
-                    })
-                  }
-                /> */}
                 <TambahProduk
                   form={form}
                   setForm={setForm}
@@ -699,8 +622,8 @@ export default function App({ id }) {
                   refHargaModal
                 />
               </div>
-              <div className="flex flex-row gap-2 mt-3 z-40">
-                <div className="bg-gray-100 p-3 rounded-lg">
+              <div className="flex flex-row gap-2 mt-3">
+                <div className="bg-gray-100 p-3 rounded-lg z-50">
                   <div>Tanggal</div>
                   <DatePicker
                     placeholderText="Pilih tanggal"

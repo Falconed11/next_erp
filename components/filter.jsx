@@ -1,5 +1,6 @@
 import { useClientFetch } from "@/app/utils/apiconfig";
 import { Select, SelectItem } from "@heroui/react";
+import { Checkbox } from "@heroui/react";
 import { Input } from "@heroui/react";
 
 const FilterProduk = ({
@@ -11,12 +12,23 @@ const FilterProduk = ({
   setSelectKategori,
   page,
   setPage,
+  isReadyStock,
+  setIsReadyStock,
   kategori,
 }) => {
   return (
     <>
       <div>Filter</div>
       <div className="flex gap-3">
+        <Checkbox
+          isSelected={isReadyStock}
+          onValueChange={(v) => {
+            setIsReadyStock(v);
+            setPage(1);
+          }}
+        >
+          Stok Siap
+        </Checkbox>
         <Select
           label="Kategori"
           variant="bordered"
@@ -41,7 +53,10 @@ const FilterProduk = ({
           placeholder="Cari produk"
           className="max-w-xs"
           value={nama}
-          onValueChange={setNama}
+          onValueChange={(v) => {
+            setNama(v);
+            setPage(1);
+          }}
         />
         <Input
           isClearable

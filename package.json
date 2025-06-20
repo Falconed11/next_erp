@@ -15,7 +15,7 @@
     "next": "^15.3.3",
     "next-auth": "^4.24.7",
     "react": "^19.1.0",
-    "react-datepicker": "^4.25.0",
+    "react-datepicker": "^8.4.0",
     "react-dom": "^19.1.0",
     "react-dropzone": "^14.2.3",
     "react-to-print": "^3.1.0",

@@ -56,7 +56,10 @@ import logoBks from "@/public/logo-bks.jpeg";
 import logoSvt from "@/public/logo-svt.jpeg";
 import { useRouter } from "next/navigation";
 import { v4 as uuidv4 } from "uuid";
-import { countProvitMarginPercent } from "@/app/utils/formula";
+import {
+  countPercentProvit,
+  countProvitMarginPercent,
+} from "@/app/utils/formula";
 
 const api_path = getApiPath();
 
@@ -108,8 +111,12 @@ export default function App({ id, versi }) {
     selectKategori: new Set([]),
   });
   const [formRekapitulasi, setFormRekapitulasi] = useState({ hargadiskon: 0 });
-  const [margin, setMargin] = useState(0);
-  const [inputMargin, setInputMargin] = useState(margin);
+  const PERSEN_PROVIT = 30;
+  const [inputPersenProvit, setInputPersenProvit] = useState(PERSEN_PROVIT);
+  const persenprovit =
+    Math.round(
+      countPercentProvit(form.temphargamodal || 0, form.harga || 0) * 100
+    ) / 100;
 
   const tambahButtonPress = async (form, setForm) => {
     if (!form.selectProduk) return alert("Silahkan pilih produk");
@@ -238,20 +245,22 @@ export default function App({ id, versi }) {
   const terapkanButtonPress = async (e) => {
     e.preventDefault();
     // console.log({ id_proyek: id, provitmarginpersen: inputMargin });
-    if (inputMargin <= 0 || inputMargin > 99)
-      return alert("Provit margin tidak valid.");
+    if (inputPersenProvit < 0) return alert("Persen provit tidak valid.");
     // if (data.jumlah <= 0) return alert("Jumlah belum diisi");
-    const res = await fetch(`${api_path}keranjangproyekupdatehargamargin`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify({
-        id_proyek: id,
-        provitmarginpersen: inputMargin,
-      }),
-    });
+    const res = await fetch(
+      `${api_path}keranjangproyekupdatehargabypersenprovit`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify({
+          id_proyek: id,
+          persenProvit,
+        }),
+      }
+    );
     const json = await res.json();
     if (res.status == 400) return alert(json.message);
     // console.log(json.message);
@@ -457,6 +466,12 @@ export default function App({ id, versi }) {
           return (
             Math.round(
               ((data.harga - data.temphargamodal) / data.harga) * 100 * 100
+            ) / 100
+          );
+        case "persenprovit":
+          return (
+            Math.round(
+              countPercentProvit(data.temphargamodal, data.harga) * 100
             ) / 100
           );
         case "totalprofit":
@@ -701,7 +716,7 @@ export default function App({ id, versi }) {
         label: "Profit",
       },
       {
-        key: "provitmarginpersen",
+        key: "persenprovit",
         label: "%",
       },
       {
@@ -771,7 +786,7 @@ export default function App({ id, versi }) {
         label: "Profit",
       },
       {
-        key: "provitmarginpersen",
+        key: "persenprovit",
         label: "%",
       },
       {
@@ -941,8 +956,8 @@ export default function App({ id, versi }) {
   const finalKustom = kustomDiskon + pajakKustom;
   const selectedVersion = selectVersi.values().next().value;
   const provit = hargaDiskon - totalModal;
-  // const persenProvit = (provit / totalModal) * 100;
-  const persenProvit = (provit / hargaDiskon) * 100;
+  const persenProvit = (provit / totalModal) * 100;
+  // const persenProvit = (provit / hargaDiskon) * 100;
 
   const formatTable = {
     wrapper: "py-0 px-1",
@@ -1027,11 +1042,11 @@ export default function App({ id, versi }) {
           <div>Alat</div>
           <Form onSubmit={terapkanButtonPress}>
             <Input
-              label="Provit Margin (%)"
+              label="Persen Provit"
               type="text"
-              placeholder="Masukkan persen provit margin"
-              value={inputMargin}
-              onValueChange={setInputMargin}
+              placeholder="Masukkan persen provit"
+              value={inputPersenProvit}
+              onValueChange={setInputPersenProvit}
             />
             <div>
               <Button type="submit" color="primary">
@@ -1779,15 +1794,11 @@ export default function App({ id, versi }) {
                   onValueChange={(v) =>
                     setForm({
                       ...form,
-                      provitmarginpersen: countProvitMarginPercent(
-                        v,
-                        form.harga
-                      ),
                       temphargamodal: v,
                     })
                   }
                 />
-                <InputProvitMargin form={form} setForm={setForm} />
+                {/* <InputProvitMargin form={form} setForm={setForm} /> */}
                 <Input
                   type="number"
                   value={form.harga}
@@ -1802,10 +1813,42 @@ export default function App({ id, versi }) {
                     setForm({
                       ...form,
                       harga: v,
-                      provitmarginpersen: countProvitMarginPercent(
-                        form.temphargamodal,
-                        v
-                      ),
+                    })
+                  }
+                />
+                <Input
+                  type="number"
+                  value={form.harga - form.temphargamodal}
+                  // label={`Harga Jual (Ref: ${form.refHarga})`}
+                  label={
+                    <>
+                      Provit
+                      {/* (Ref: <Harga harga={+form.oldHarga} />) */}
+                    </>
+                  }
+                  placeholder="Masukkan harga!"
+                  onValueChange={(v) =>
+                    setForm({
+                      ...form,
+                      harga: +form.temphargamodal + +v,
+                    })
+                  }
+                />
+                <Input
+                  type="number"
+                  value={persenprovit}
+                  // label={`Harga Jual (Ref: ${form.refHarga})`}
+                  label={
+                    <>
+                      Persen Provit
+                      {/* (Ref: <Harga harga={+form.oldHarga} />) */}
+                    </>
+                  }
+                  placeholder="Masukkan harga!"
+                  onValueChange={(v) =>
+                    setForm({
+                      ...form,
+                      harga: form.temphargamodal * (1 + v / 100),
                     })
                   }
                 />
@@ -1830,7 +1873,7 @@ export default function App({ id, versi }) {
                 </div> */}
                 {/* <div>Harga Modal : {form.temphargamodal}</div>
                 <div>Harga Jual : {form.harga}</div> */}
-                <div>
+                {/* <div>
                   Provit : <Harga harga={form.harga - form.temphargamodal} /> (
                   {Math.round(
                     ((form.harga - form.temphargamodal) / form.harga) *
@@ -1838,7 +1881,7 @@ export default function App({ id, versi }) {
                       100
                   ) / 100}
                   %)
-                </div>
+                </div> */}
                 {/* <div>
                   <div>Harga Jual : </div>
                   <div>

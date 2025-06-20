@@ -4,7 +4,7 @@ import { useSession } from "next-auth/react";
 import { v4 as uuidv4 } from "uuid";
 import * as XLSX from "xlsx";
 import Link from "next/link";
-import { Autocomplete, AutocompleteItem, Form } from "@heroui/react";
+import { Autocomplete, AutocompleteItem, Checkbox, Form } from "@heroui/react";
 import {
   Table,
   TableHeader,
@@ -80,10 +80,13 @@ export default function App() {
   const [id, setId] = useState("");
   const [selectKategori, setSelectKategori] = useState([]);
   const [page, setPage] = React.useState(1);
+  const [isReadyStock, setIsReadyStock] = useState(false);
   const rowsPerPage = 10;
 
   const produk = useClientFetch(
-    `produk?kategori=${selectKategori.values().next().value ?? ""}`
+    `produk?kategori=${selectKategori.values().next().value ?? ""}${
+      isReadyStock ? `&isReadyStock=${isReadyStock}` : ""
+    }`
   );
   const merek = useClientFetch("merek");
   const vendor = useClientFetch("vendor?columnName=nama");
@@ -581,6 +584,8 @@ export default function App() {
   // }
 
   // console.log({ id_vendor: form.id_vendor ? true : false });
+
+  console.log(isReadyStock);
   return (
     <div className="">
       <div className="flex flex-col gap-2">
@@ -621,17 +626,25 @@ export default function App() {
             Total Provit: <Harga harga={totalJual - totalModal} />
           </div>
         </div> */}
-        <div>
-          <TemplateImport
-            report={report}
-            setReportList={setReportList}
-            name={"Import Produk"}
-            apiendpoint={"importproduk"}
-            isLoading={isLoading}
-            setIsLoading={setIsLoading}
-            formatLink={"/produk.xlsx"}
-          />
-        </div>
+        <AuthorizationComponent
+          roles={("super", "admin")}
+          user={user}
+          component={
+            <>
+              <div>
+                <TemplateImport
+                  report={report}
+                  setReportList={setReportList}
+                  name={"Import Produk"}
+                  apiendpoint={"importproduk"}
+                  isLoading={isLoading}
+                  setIsLoading={setIsLoading}
+                  formatLink={"/produk.xlsx"}
+                />
+              </div>
+            </>
+          }
+        />
       </div>
       <Table
         isStriped
@@ -648,6 +661,8 @@ export default function App() {
               setSelectKategori={setSelectKategori}
               page={page}
               setPage={setPage}
+              isReadyStock={isReadyStock}
+              setIsReadyStock={setIsReadyStock}
               kategori={kategori}
             />
             {/* <div className="flex flex-row gap-2">

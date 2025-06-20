@@ -58,7 +58,7 @@ const RangeDate = ({ current, setCurrent }) => {
   };
   const theme = "bg-white";
   return (
-    <div className="flex flex-col bg-gray-100 p-3 rounded-lg gap-1">
+    <div className="flex flex-col bg-gray-100 p-3 rounded-lg gap-1 z-50">
       <div>Periode</div>
       <form onSubmit={cariOnPress} className="flex flex-col gap-2">
         <DatePicker
