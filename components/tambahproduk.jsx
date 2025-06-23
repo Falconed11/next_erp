@@ -6,7 +6,10 @@ import { Input } from "@heroui/react";
 import { Select, SelectItem } from "@heroui/react";
 import { Checkbox } from "@heroui/react";
 import { getApiPath, useClientFetch } from "@/app/utils/apiconfig";
-import { countProvitMarginPercent } from "@/app/utils/formula";
+import {
+  countPercentProvit,
+  countProvitMarginPercent,
+} from "@/app/utils/formula";
 import { getDateF, getDateFId } from "@/app/utils/date";
 import Harga from "@/components/harga";
 
@@ -101,7 +104,7 @@ export default function TambahProduk({
             oldHargaModal: hargamodal,
             hargamodal,
             harga,
-            provitmarginpersen: countProvitMarginPercent(hargamodal, harga),
+            // provitmarginpersen: countProvitMarginPercent(hargamodal, harga),
             stok: selectedProduk?.stok,
             satuan: selectedProduk?.satuan,
             isSelected: false,
@@ -175,7 +178,7 @@ export default function TambahProduk({
       )}
       <Input
         type="text"
-        value={`${form.stok ? form.stok : ""} ${form.satuan ?? ""}`}
+        value={`${form.stok ? form.stok : 0} ${form.satuan ?? ""}`}
         disabled
         label="Stok"
         // placeholder="Masukkan jumlah!"
@@ -227,7 +230,7 @@ export default function TambahProduk({
           onValueChange={(v) =>
             setForm({
               ...form,
-              provitmarginpersen: countProvitMarginPercent(v, form.harga),
+              // provitmarginpersen: countProvitMarginPercent(v, form.harga),
               hargamodal: v,
             })
           }
@@ -258,13 +261,7 @@ export default function TambahProduk({
           disableStok ? (
             `(${
               Math.round(
-                ((form.harga -
-                  (form.temphargamodal
-                    ? form.temphargamodal
-                    : form.hargamodal)) /
-                  form.harga) *
-                  100 *
-                  100
+                countPercentProvit(form.hargamodal, form.harga) * 100
               ) / 100
             }%)`
           ) : (
@@ -282,7 +279,7 @@ export default function TambahProduk({
         onValueChange={(v) =>
           setForm({
             ...form,
-            provitmarginpersen: countProvitMarginPercent(form.hargamodal, v),
+            // provitmarginpersen: countProvitMarginPercent(form.hargamodal, v),
             harga: v,
           })
         }

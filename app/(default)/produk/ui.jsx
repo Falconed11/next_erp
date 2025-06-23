@@ -4,7 +4,13 @@ import { useSession } from "next-auth/react";
 import { v4 as uuidv4 } from "uuid";
 import * as XLSX from "xlsx";
 import Link from "next/link";
-import { Autocomplete, AutocompleteItem, Checkbox, Form } from "@heroui/react";
+import {
+  Autocomplete,
+  AutocompleteItem,
+  Checkbox,
+  Form,
+  NumberInput,
+} from "@heroui/react";
 import {
   Table,
   TableHeader,
@@ -50,6 +56,8 @@ import { getDate, getDateF, getDateFId } from "@/app/utils/date";
 import { LinkOpenNewTab } from "@/components/mycomponent";
 import { AuthorizationComponent } from "@/components/componentmanipulation";
 import {
+  countPercentProvit,
+  countPriceByPercentProfit,
   countPriceByProvitMarginPercent,
   countProvitMarginPercent,
 } from "@/app/utils/formula";
@@ -113,8 +121,8 @@ export default function App() {
     filteredsubkategori: [],
     keterangan: "",
   });
-  const [persenProvitMargin, setPersenProvitMargin] = useState(30);
-  const provitMargin = +form.hargajual - +form.hargamodal;
+  const [persenProvit, setPersenProvit] = useState(30);
+  const provit = (form.hargajual || 0) - (form.hargamodal || 0);
   const [json, setJson] = useState([]);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [isLoading, setIsLoading] = useState(0);
@@ -841,26 +849,38 @@ export default function App() {
                   type="number"
                   label="Harga Jual"
                   placeholder="Masukkan harga jual!"
-                  value={form.hargajual || 0}
+                  value={form.hargajual}
                   onValueChange={(val) => setForm({ ...form, hargajual: val })}
                 />
-                <Input
-                  type="number"
-                  label={`Provit Margin (${countProvitMarginPercent(
-                    form.hargamodal || 0,
-                    form.hargajual || 0
-                  )}%)`}
-                  placeholder="Masukkan Provit Margin!"
-                  value={provitMargin}
-                  onValueChange={(val) =>
-                    setForm({ ...form, hargajual: +form.hargamodal + +val })
+                <NumberInput
+                  hideStepper
+                  isWheelDisabled
+                  formatOptions={{
+                    useGrouping: false,
+                  }}
+                  label={`Provit (${
+                    Math.round(
+                      countPercentProvit(
+                        form.hargamodal || 0,
+                        form.hargajual || 0
+                      ) * 100
+                    ) / 100
+                  }%)`}
+                  placeholder="Masukkan Provit!"
+                  value={provit}
+                  onValueChange={(v) =>
+                    setForm({
+                      ...form,
+                      hargajual: (+form.hargamodal || 0) + (+v || 0),
+                    })
                   }
                 />
-                <Input
-                  type="number"
-                  label="Persen Provit Margin"
-                  placeholder="Masukkan Persen Provit Margin!"
-                  value={persenProvitMargin}
+                <NumberInput
+                  hideStepper
+                  isWheelDisabled
+                  label="Persen Provit"
+                  placeholder="Masukkan Persen Provit!"
+                  value={persenProvit}
                   endContent={
                     <Button
                       ref={terapkanButton}
@@ -868,20 +888,13 @@ export default function App() {
                       color="primary"
                       type="button"
                       onPress={() => {
-                        // console.log({
-                        //   hargamodal: form.hargamodal,
-                        //   hargajual: form.hargajual,
-                        //   provitmarginpersen: persenProvitMargin,
-                        //   hargjualbaru: countPriceByProvitMarginPercent(
-                        //     form.hargamodal,
-                        //     persenProvitMargin
-                        //   ),
-                        // });
                         setForm({
                           ...form,
-                          hargajual: countPriceByProvitMarginPercent(
-                            form.hargamodal,
-                            persenProvitMargin
+                          hargajual: Math.ceil(
+                            countPriceByPercentProfit(
+                              form.hargamodal,
+                              persenProvit
+                            )
                           ),
                         });
                       }}
@@ -895,7 +908,7 @@ export default function App() {
                       terapkanButton.current?.click();
                     }
                   }}
-                  onValueChange={setPersenProvitMargin}
+                  onValueChange={setPersenProvit}
                 />
                 <div className="bg-gray-100 p-3 rounded-lg z-40">
                   <div>Tanggal</div>

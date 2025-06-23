@@ -8,9 +8,13 @@ const countPriceByProvitMarginPercent = (hargaModal, provitMarginPercent) => {
 const countPercentProvit = (hargaModal, hargaJual) => {
   return ((hargaJual - hargaModal) / hargaModal) * 100;
 };
+const countPriceByPercentProfit = (hargaModal, provitPercent) => {
+  return hargaModal * (1 + provitPercent / 100);
+};
 
 export {
   countProvitMarginPercent,
   countPriceByProvitMarginPercent,
   countPercentProvit,
+  countPriceByPercentProfit,
 };

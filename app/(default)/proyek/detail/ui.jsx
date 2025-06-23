@@ -14,6 +14,7 @@ import {
   Tooltip,
   ChipProps,
   getKeyValue,
+  NumberInput,
 } from "@heroui/react";
 import {
   AddIcon,
@@ -257,14 +258,15 @@ export default function App({ id, versi }) {
         },
         body: JSON.stringify({
           id_proyek: id,
-          persenProvit,
+          persenProvit: inputPersenProvit,
         }),
       }
     );
     const json = await res.json();
-    if (res.status == 400) return alert(json.message);
-    // console.log(json.message);
-    //return alert(json.message);
+    if (res.status >= 400 && res.status < 500) return alert(json.message);
+    // alert(json);
+    // console.log(json);
+    return alert(json.message);
   };
   const handleButtonEdit = () => {
     // setFormRekapitulasi({
@@ -647,11 +649,11 @@ export default function App({ id, versi }) {
 
   const keranjangProduk = keranjangProyek?.data.map((item) => ({
     ...item,
-    margin: Math.ceil(item.hargamodal / (margin <= 0 ? 1 : 1 - margin / 100)),
+    // margin: Math.ceil(item.hargamodal / (margin <= 0 ? 1 : 1 - margin / 100)),
   }));
   const keranjangIntalasi = keranjangProyekInstalasi?.data.map((item) => ({
     ...item,
-    margin: Math.ceil(item.hargamodal / (margin <= 0 ? 1 : 1 - margin / 100)),
+    // margin: Math.ceil(item.hargamodal / (margin <= 0 ? 1 : 1 - margin / 100)),
   }));
 
   const selectedProyek = proyek.data[0];
@@ -1264,10 +1266,11 @@ export default function App({ id, versi }) {
                             disableVendor
                             customInput={
                               <>
-                                <InputProvitMargin
+                                <InputProvit
                                   classNames="w-3/12"
                                   form={form}
                                   setForm={setForm}
+                                  defPersenProvit={PERSEN_PROVIT}
                                 />
                                 <Select
                                   label="Sub Proyek"
@@ -1316,7 +1319,8 @@ export default function App({ id, versi }) {
                             (total, currentValue) => {
                               return (
                                 total +
-                                currentValue.jumlah * currentValue.hargamodal
+                                currentValue.jumlah *
+                                  currentValue.temphargamodal
                               );
                             },
                             0
@@ -1338,7 +1342,8 @@ export default function App({ id, versi }) {
                               return (
                                 total +
                                 currentValue.jumlah *
-                                  (currentValue.harga - currentValue.hargamodal)
+                                  (currentValue.harga -
+                                    currentValue.temphargamodal)
                               );
                             },
                             0
@@ -1475,7 +1480,8 @@ export default function App({ id, versi }) {
                             (total, currentValue) => {
                               return (
                                 total +
-                                currentValue.jumlah * currentValue.hargamodal
+                                currentValue.jumlah *
+                                  currentValue.temphargamodal
                               );
                             },
                             0
@@ -1497,7 +1503,8 @@ export default function App({ id, versi }) {
                               return (
                                 total +
                                 currentValue.jumlah *
-                                  (currentValue.harga - currentValue.hargamodal)
+                                  (currentValue.harga -
+                                    currentValue.temphargamodal)
                               );
                             },
                             0
@@ -2629,6 +2636,53 @@ const SubProyek = ({ id, selectedProyek }) => {
         </ModalContent>
       </Modal>
     </div>
+  );
+};
+
+const InputProvit = ({ classNames, form, setForm, defPersenProvit }) => {
+  const [persenProvit, setPersenProvit] = useState(defPersenProvit);
+  const terapkanButtonRef = useRef(null);
+  // const persenProvit =
+  //   Math.ceil(countPercentProvit(form.hargamodal || 0, form.harga) * 100) / 100;
+  return (
+    <NumberInput
+      hideStepper
+      isWheelDisabled
+      value={persenProvit}
+      label={"Provit (%)"}
+      placeholder="Masukkan provit!"
+      className={classNames || ""}
+      endContent={
+        <Button
+          ref={terapkanButtonRef}
+          color="primary"
+          size="sm"
+          onPress={() => {
+            setForm({
+              ...form,
+              harga: Math.ceil(
+                (form.hargamodal || 0) * (1 + (persenProvit || 0) / 100)
+              ),
+            });
+          }}
+        >
+          Terapkan
+        </Button>
+      }
+      onKeyDown={(e) => {
+        if (e.key == "Enter") {
+          e.preventDefault();
+          terapkanButtonRef.current?.click();
+        }
+      }}
+      onValueChange={(v) => {
+        // setForm({
+        //   ...form,
+        //   harga: Math.ceil((form.hargamodal || 0) * (1 + v / 100)),
+        // });
+        setPersenProvit(v);
+      }}
+    />
   );
 };
 
