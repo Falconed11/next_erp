@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Autocomplete, AutocompleteItem } from "@heroui/react";
 import { useFilter } from "@react-aria/i18n";
-import { Input } from "@heroui/react";
+import { Input, NumberInput } from "@heroui/react";
 import { Select, SelectItem } from "@heroui/react";
 import { Checkbox } from "@heroui/react";
 import { getApiPath, useClientFetch } from "@/app/utils/apiconfig";
@@ -86,6 +86,9 @@ export default function TambahProduk({
         ))}
       </Select>
       <Autocomplete
+        popoverProps={{
+          shouldCloseOnScroll: false,
+        }}
         label="Produk"
         variant="bordered"
         defaultItems={data}
@@ -195,8 +198,12 @@ export default function TambahProduk({
           })
         }
       />
-      <Input
-        type="number"
+      <NumberInput
+        hideStepper
+        isWheelDisabled
+        formatOptions={{
+          useGrouping: false,
+        }}
         value={form.jumlah}
         label="Jumlah"
         placeholder="Masukkan jumlah!"
@@ -220,8 +227,12 @@ export default function TambahProduk({
         }
       />
       {disableStok ? (
-        <Input
-          type="number"
+        <NumberInput
+          hideStepper
+          isWheelDisabled
+          formatOptions={{
+            useGrouping: false,
+          }}
           isDisabled={form.isSelected ? 1 : undefined}
           value={form.hargamodal}
           label={<>Harga Modal (Ref: {<Harga harga={form.oldHargaModal} />})</>}
@@ -238,8 +249,12 @@ export default function TambahProduk({
       ) : (
         <></>
       )}
-      <Input
-        type="number"
+      <NumberInput
+        hideStepper
+        isWheelDisabled
+        formatOptions={{
+          useGrouping: false,
+        }}
         isDisabled={form.isSelected ? 1 : undefined}
         value={form.harga}
         label={
@@ -257,17 +272,17 @@ export default function TambahProduk({
             )
           </>
         }
-        endContent={
-          disableStok ? (
-            `(${
-              Math.round(
-                countPercentProvit(form.hargamodal, form.harga) * 100
-              ) / 100
-            }%)`
-          ) : (
-            <></>
-          )
-        }
+        // endContent={
+        //   disableStok ? (
+        //     `(${
+        //       Math.round(
+        //         countPercentProvit(form.hargamodal, form.harga) * 100
+        //       ) / 100
+        //     }%)`
+        //   ) : (
+        //     <></>
+        //   )
+        // }
         // label={`Harga (Ref:
         //   ${
         //     produk.data.filter((v) => v.id == form.selectProduk)[0]

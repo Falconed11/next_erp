@@ -796,8 +796,12 @@ export default function App() {
                 />
                 {form.modalmode == "Tambah" ? (
                   <>
-                    <Input
-                      type="number"
+                    <NumberInput
+                      hideStepper
+                      isWheelDisabled
+                      formatOptions={{
+                        useGrouping: false,
+                      }}
                       label="Stok"
                       placeholder="Masukkan stok!"
                       isReadOnly={form.modalmode == "Edit" ? true : undefined}
@@ -838,15 +842,23 @@ export default function App() {
                   value={form.satuan}
                   onValueChange={(val) => setForm({ ...form, satuan: val })}
                 />
-                <Input
-                  type="number"
+                <NumberInput
+                  hideStepper
+                  isWheelDisabled
+                  formatOptions={{
+                    useGrouping: false,
+                  }}
                   label="Harga Modal"
                   placeholder="Masukkan harga modal!"
                   value={form.hargamodal}
                   onValueChange={(val) => setForm({ ...form, hargamodal: val })}
                 />
-                <Input
-                  type="number"
+                <NumberInput
+                  hideStepper
+                  isWheelDisabled
+                  formatOptions={{
+                    useGrouping: false,
+                  }}
                   label="Harga Jual"
                   placeholder="Masukkan harga jual!"
                   value={form.hargajual}

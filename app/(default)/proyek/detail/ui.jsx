@@ -59,6 +59,7 @@ import { useRouter } from "next/navigation";
 import { v4 as uuidv4 } from "uuid";
 import {
   countPercentProvit,
+  countPriceByPercentProfit,
   countProvitMarginPercent,
 } from "@/app/utils/formula";
 
@@ -245,6 +246,7 @@ export default function App({ id, versi }) {
   };
   const terapkanButtonPress = async (e) => {
     e.preventDefault();
+    if (!confirm("Anda yakin untuk merubah seluruh harga jual?")) return;
     // console.log({ id_proyek: id, provitmarginpersen: inputMargin });
     if (inputPersenProvit < 0) return alert("Persen provit tidak valid.");
     // if (data.jumlah <= 0) return alert("Jumlah belum diisi");
@@ -1040,23 +1042,28 @@ export default function App({ id, versi }) {
           </div>
         </div>
         {/* alat */}
-        <div className="bg-white rounded-lg p-3 flex flex-col gap-2">
-          <div>Alat</div>
-          <Form onSubmit={terapkanButtonPress}>
-            <Input
-              label="Persen Provit"
-              type="text"
-              placeholder="Masukkan persen provit"
-              value={inputPersenProvit}
-              onValueChange={setInputPersenProvit}
-            />
-            <div>
-              <Button type="submit" color="primary">
-                Terapkan
-              </Button>
-            </div>
-          </Form>
-        </div>
+        {selectedProyek.versi == 0 ? (
+          <div className="bg-white rounded-lg p-3 flex flex-col gap-2">
+            <div>Alat</div>
+            <Form onSubmit={terapkanButtonPress}>
+              <Input
+                label="Persen Provit"
+                type="text"
+                placeholder="Masukkan persen provit"
+                value={inputPersenProvit}
+                onValueChange={setInputPersenProvit}
+              />
+              <div>
+                <Button type="submit" color="primary">
+                  Terapkan
+                </Button>
+              </div>
+            </Form>
+          </div>
+        ) : (
+          <></>
+        )}
+
         {/* rekapitulasi */}
         <ConditionalComponent
           condition={selectVersi.size}
@@ -1213,22 +1220,6 @@ export default function App({ id, versi }) {
               ) : (
                 <></>
               )}
-              {/* {["admin", "super"].includes(user?.peran) ? (
-                selectedProyek.versi > 0 ? (
-                  user?.peran == "admin" || user?.peran == "super" ? (
-                    <Link
-                      className="text-blue-600 p-3"
-                      href={`/proyek/detail/proses?id=${selectedProyek.id}`}
-                    >{`Pengeluaran Proyek ==>>`}</Link>
-                  ) : (
-                    <></>
-                  )
-                ) : (
-                  <></>
-                )
-              ) : (
-                <></>
-              )} */}
               <div>
                 <Button
                   onPress={modal.invoice.onOpen}
@@ -1266,12 +1257,59 @@ export default function App({ id, versi }) {
                             disableVendor
                             customInput={
                               <>
-                                <InputProvit
+                                <NumberInput
+                                  hideStepper
+                                  isWheelDisabled
+                                  formatOptions={{
+                                    useGrouping: false,
+                                  }}
+                                  className="w-3/12"
+                                  value={form.harga - form.hargamodal || ""}
+                                  label={"Provit"}
+                                  placeholder="Masukkan provit!"
+                                  onValueChange={(v) => {
+                                    setForm({
+                                      ...form,
+                                      harga: form.hargamodal + v || "",
+                                    });
+                                  }}
+                                />
+                                <NumberInput
+                                  hideStepper
+                                  isWheelDisabled
+                                  formatOptions={{
+                                    useGrouping: false,
+                                  }}
+                                  className="w-3/12"
+                                  value={
+                                    Math.round(
+                                      countPercentProvit(
+                                        form.hargamodal,
+                                        form.harga
+                                      ) * 100
+                                    ) / 100 || ""
+                                  }
+                                  label={"Provit (%)"}
+                                  placeholder="Masukkan provit %!"
+                                  onValueChange={(v) => {
+                                    setForm({
+                                      ...form,
+                                      harga:
+                                        Math.round(
+                                          countPriceByPercentProfit(
+                                            form.hargamodal,
+                                            v
+                                          )
+                                        ) || "",
+                                    });
+                                  }}
+                                />
+                                {/* <InputProvit
                                   classNames="w-3/12"
                                   form={form}
                                   setForm={setForm}
                                   defPersenProvit={PERSEN_PROVIT}
-                                />
+                                /> */}
                                 <Select
                                   label="Sub Proyek"
                                   placeholder="Pilih subproyek! (Opsional)"
@@ -1404,10 +1442,55 @@ export default function App({ id, versi }) {
                             disableVendor
                             customInput={
                               <>
-                                <InputProvitMargin
-                                  classNames="w-3/12"
-                                  form={formInstalasi}
-                                  setForm={setFormInstalasi}
+                                <NumberInput
+                                  hideStepper
+                                  isWheelDisabled
+                                  formatOptions={{
+                                    useGrouping: false,
+                                  }}
+                                  className="w-3/12"
+                                  value={
+                                    formInstalasi.harga -
+                                      formInstalasi.hargamodal || ""
+                                  }
+                                  label={"Provit"}
+                                  placeholder="Masukkan provit!"
+                                  onValueChange={(v) => {
+                                    setFormInstalasi({
+                                      ...formInstalasi,
+                                      harga: formInstalasi.hargamodal + v || "",
+                                    });
+                                  }}
+                                />
+                                <NumberInput
+                                  hideStepper
+                                  isWheelDisabled
+                                  formatOptions={{
+                                    useGrouping: false,
+                                  }}
+                                  className="w-3/12"
+                                  value={
+                                    Math.round(
+                                      countPercentProvit(
+                                        formInstalasi.hargamodal,
+                                        formInstalasi.harga
+                                      ) * 100
+                                    ) / 100 || ""
+                                  }
+                                  label={"Provit (%)"}
+                                  placeholder="Masukkan provit %!"
+                                  onValueChange={(v) => {
+                                    setFormInstalasi({
+                                      ...formInstalasi,
+                                      harga:
+                                        Math.round(
+                                          countPriceByPercentProfit(
+                                            formInstalasi.hargamodal,
+                                            v
+                                          )
+                                        ) || "",
+                                    });
+                                  }}
                                 />
                                 <Input
                                   type="text"
@@ -1777,8 +1860,12 @@ export default function App({ id, versi }) {
                 <div>Vendor : {form.nvendor}</div>
                 <div>Satuan : {form.satuan}</div>
                 <div>Stok : {form.stok}</div>
-                <Input
-                  type="number"
+                <NumberInput
+                  hideStepper
+                  isWheelDisabled
+                  formatOptions={{
+                    useGrouping: false,
+                  }}
                   label="Jumlah"
                   placeholder="Masukkan jumlah!"
                   value={form.jumlah}
@@ -1789,8 +1876,12 @@ export default function App({ id, versi }) {
                     })
                   }
                 />
-                <Input
-                  type="number"
+                <NumberInput
+                  hideStepper
+                  isWheelDisabled
+                  formatOptions={{
+                    useGrouping: false,
+                  }}
                   value={form.temphargamodal}
                   label={
                     <>
@@ -1806,8 +1897,12 @@ export default function App({ id, versi }) {
                   }
                 />
                 {/* <InputProvitMargin form={form} setForm={setForm} /> */}
-                <Input
-                  type="number"
+                <NumberInput
+                  hideStepper
+                  isWheelDisabled
+                  formatOptions={{
+                    useGrouping: false,
+                  }}
                   value={form.harga}
                   // label={`Harga Jual (Ref: ${form.refHarga})`}
                   label={
@@ -1823,9 +1918,13 @@ export default function App({ id, versi }) {
                     })
                   }
                 />
-                <Input
-                  type="number"
-                  value={form.harga - form.temphargamodal}
+                <NumberInput
+                  hideStepper
+                  isWheelDisabled
+                  formatOptions={{
+                    useGrouping: false,
+                  }}
+                  value={form.harga - form.temphargamodal || ""}
                   // label={`Harga Jual (Ref: ${form.refHarga})`}
                   label={
                     <>
@@ -1841,21 +1940,32 @@ export default function App({ id, versi }) {
                     })
                   }
                 />
-                <Input
-                  type="number"
-                  value={persenprovit}
+                <NumberInput
+                  hideStepper
+                  isWheelDisabled
+                  formatOptions={{
+                    useGrouping: false,
+                  }}
+                  value={
+                    Math.round(
+                      countPercentProvit(
+                        form.temphargamodal || 0,
+                        form.harga || 0
+                      ) * 100
+                    ) / 100 || ""
+                  }
                   // label={`Harga Jual (Ref: ${form.refHarga})`}
                   label={
                     <>
-                      Persen Provit
+                      Persen Provit (%)
                       {/* (Ref: <Harga harga={+form.oldHarga} />) */}
                     </>
                   }
-                  placeholder="Masukkan harga!"
+                  placeholder="Masukkan persen provit!"
                   onValueChange={(v) =>
                     setForm({
                       ...form,
-                      harga: form.temphargamodal * (1 + v / 100),
+                      harga: Math.round(form.temphargamodal * (1 + v / 100)),
                     })
                   }
                 />
@@ -2648,6 +2758,9 @@ const InputProvit = ({ classNames, form, setForm, defPersenProvit }) => {
     <NumberInput
       hideStepper
       isWheelDisabled
+      formatOptions={{
+        useGrouping: false,
+      }}
       value={persenProvit}
       label={"Provit (%)"}
       placeholder="Masukkan provit!"
