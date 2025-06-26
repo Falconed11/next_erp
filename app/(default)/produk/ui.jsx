@@ -723,7 +723,7 @@ export default function App() {
           )}
         </TableBody>
       </Table>
-      {/* Produk */}
+      {/* Tambah Edit Produk */}
       <Modal
         isOpen={isOpen}
         onOpenChange={onOpenChange}
@@ -870,16 +870,17 @@ export default function App() {
                   formatOptions={{
                     useGrouping: false,
                   }}
-                  label={`Provit (${
-                    Math.round(
-                      countPercentProvit(
-                        form.hargamodal || 0,
-                        form.hargajual || 0
-                      ) * 100
-                    ) / 100
-                  }%)`}
+                  label="Provit"
+                  // label={`Provit (${
+                  //   Math.round(
+                  //     countPercentProvit(
+                  //       form.hargamodal || 0,
+                  //       form.hargajual || 0
+                  //     ) * 100
+                  //   ) / 100
+                  // }%)`}
                   placeholder="Masukkan Provit!"
-                  value={provit}
+                  value={form.hargajual - form.hargamodal}
                   onValueChange={(v) =>
                     setForm({
                       ...form,
@@ -888,6 +889,28 @@ export default function App() {
                   }
                 />
                 <NumberInput
+                  hideStepper
+                  isWheelDisabled
+                  formatOptions={{
+                    useGrouping: false,
+                  }}
+                  label="Persen Provit (%)"
+                  placeholder="Masukkan persen provit!"
+                  value={
+                    Math.round(
+                      countPercentProvit(form.hargamodal, form.hargajual) * 100
+                    ) / 100
+                  }
+                  onValueChange={(v) =>
+                    setForm({
+                      ...form,
+                      hargajual: Math.round(
+                        countPriceByPercentProfit(form.hargamodal, v)
+                      ),
+                    })
+                  }
+                />
+                {/* <NumberInput
                   hideStepper
                   isWheelDisabled
                   label="Persen Provit"
@@ -921,7 +944,7 @@ export default function App() {
                     }
                   }}
                   onValueChange={setPersenProvit}
-                />
+                /> */}
                 <div className="bg-gray-100 p-3 rounded-lg z-40">
                   <div>Tanggal</div>
                   <DatePicker
