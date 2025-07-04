@@ -36,6 +36,7 @@ export default function TambahProduk({
   );
   const vendor = useClientFetch("vendor");
   // const pilihProduk = useClientFetch(`produk`)
+  const errorsJumlah = [];
 
   if (kategori.error) return <div>failed to load</div>;
   if (kategori.isLoading) return <div>loading...</div>;
@@ -43,6 +44,11 @@ export default function TambahProduk({
   if (produk.isLoading) return <div>loading...</div>;
   if (vendor.error) return <div>failed to load</div>;
   if (vendor.isLoading) return <div>loading...</div>;
+
+  if ((form.jumlah < 1 || !form.jumlah) && form.selectProduk?.length > 0)
+    errorsJumlah.push("Jumlah minimal 1");
+  if (form.jumlah > form.stok && form.isSelected)
+    errorsJumlah.push("Stok tidak cukup");
 
   let data = produk.data;
   data = data.filter(
@@ -61,7 +67,8 @@ export default function TambahProduk({
   );
   fvendor = fvendor.slice(0, 100);
   const selectProduk = produk.data.filter((v) => v.id == form.selectProduk)[0];
-  // console.log(data);
+  console.log(form.selectProduk);
+  console.log({ nama });
   return (
     <div className="w-max flex flex-wrap gap-3">
       <Select
@@ -204,16 +211,18 @@ export default function TambahProduk({
         formatOptions={{
           useGrouping: false,
         }}
+        errorMessage={
+          <ul>
+            {errorsJumlah.map((error, i) => (
+              <li key={i}>{error}</li>
+            ))}
+          </ul>
+        }
+        isInvalid={errorsJumlah.length > 0}
         value={form.jumlah}
         label="Jumlah"
         placeholder="Masukkan jumlah!"
         className="w-3/12"
-        validate={(value) => {
-          if (value > form.stok && form.isSelected) {
-            return "Stok tidak mencukupi!";
-          }
-          if (value < 1) return "Jumlah minimal 1";
-        }}
         endContent={
           <div className="pointer-events-none flex items-center">
             <span className="text-default-400 text-small"></span>

@@ -730,7 +730,7 @@ const TabelProdukKeluar = ({ id_produk }) => {
     switch (columnKey) {
       case "tanggal":
         return getDateFId(new Date(data.tanggal));
-      case "harga":
+      case "hargaprodukmasuk":
         return (
           <div
             className={`text-right px-1 rounded ${
@@ -741,7 +741,7 @@ const TabelProdukKeluar = ({ id_produk }) => {
                 : ""
             }`}
           >
-            <Harga harga={data.harga} />
+            <Harga harga={data.hargaprodukmasuk} />
           </div>
         );
       case "jatuhtempo":
@@ -873,7 +873,7 @@ const TabelProdukKeluar = ({ id_produk }) => {
       label: "Satuan",
     },
     {
-      key: "harga",
+      key: "hargaprodukmasuk",
       label: "Harga",
     },
     {

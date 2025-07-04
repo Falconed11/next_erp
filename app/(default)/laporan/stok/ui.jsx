@@ -52,12 +52,11 @@ const apiPath = getApiPath();
 export default function App({ id_produk }) {
   const session = useSession();
   const componentRef = {
-    laporanstok: useRef(),
-    invoice: useRef(),
+    laporanstok: useRef(null),
   };
   const handlePrintLaporanStok = useReactToPrint({
-    content: () => componentRef.laporanstok.current,
-    pageStyle: "bg-white",
+    contentRef: componentRef.laporanstok,
+    pageStyle: "bg-white block",
   });
 
   const [nama, setNama] = useState("");
@@ -559,9 +558,12 @@ export default function App({ id_produk }) {
           Export
         </Button>
       </div>
-      <div className="m-0 p-0 overflow-x-hidden" ref={componentRef.laporanstok}>
+      <div
+        className="m-0 p-0 overflow-x-hidden"
+        // ref={componentRef.laporanstok}
+      >
         <Table
-          // ref={componentRef.laporanstok}
+          ref={componentRef.laporanstok}
           isStriped
           className="text-xs p-0 m-0 overflow-x-hidden"
           classNames={{
