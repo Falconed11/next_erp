@@ -90,6 +90,7 @@ export default function App({ id, versi }) {
       selectVersi.values().next().value
     }`
   );
+  const keteranganPenawaran = useClientFetch(`keteranganpenawaran`);
   const keranjangProyekInstalasi = useClientFetch(
     `keranjangproyek?id_proyek=${id}&instalasi=1&versi=${
       selectVersi.values().next().value
@@ -581,6 +582,34 @@ export default function App({ id, versi }) {
           return cellValue;
       }
     }, []),
+    keteranganpenawaran: React.useCallback((data, columnKey) => {
+      const cellValue = data[columnKey];
+      switch (columnKey) {
+        case "deskripsiitem":
+          return (
+            <>
+              {data.keterangan ? data.keterangan : data.nama}{" "}
+              {data.nmerek == "NN" ? "" : data.nmerek} {data.tipe}
+            </>
+          );
+        case "jumlah":
+          return <div className="text-right">{cellValue}</div>;
+        case "total":
+          return (
+            <div className="text-right">
+              <Harga harga={data.jumlah * data.harga} />
+            </div>
+          );
+        case "harga":
+          return (
+            <div className="text-right">
+              <Harga harga={data.harga} />
+            </div>
+          );
+        default:
+          return cellValue;
+      }
+    }, []),
   };
   const modal = {
     produk: useDisclosure(),
@@ -648,6 +677,8 @@ export default function App({ id, versi }) {
   if (versiKeranjangProyek.isLoading) return <div>loading...</div>;
   if (subProyek.error) return <div>failed to load</div>;
   if (subProyek.isLoading) return <div>loading...</div>;
+  if (keteranganPenawaran.error) return <div>failed to load</div>;
+  if (keteranganPenawaran.isLoading) return <div>loading...</div>;
 
   const keranjangProduk = keranjangProyek?.data.map((item) => ({
     ...item,
@@ -863,6 +894,20 @@ export default function App({ id, versi }) {
         label: "Total",
       },
     ],
+    keteranganpenawaran: [
+      {
+        key: "keterangan",
+        label: "Keterangan",
+      },
+      {
+        key: "aktif",
+        label: "Aktif",
+      },
+      {
+        key: "aksi",
+        label: "Aksi",
+      },
+    ],
   };
 
   if (selectedProyek.versi == 0) {
@@ -875,6 +920,7 @@ export default function App({ id, versi }) {
       label: "Aksi",
     });
   }
+
   const selectedRekapitulasiProyek = rekapitulasiProyek.data[0];
   const kategoriProyek = [];
   if (selectedRekapitulasiProyek) {
@@ -1063,7 +1109,6 @@ export default function App({ id, versi }) {
         ) : (
           <></>
         )}
-
         {/* rekapitulasi */}
         <ConditionalComponent
           condition={selectVersi.size}
@@ -1144,6 +1189,10 @@ export default function App({ id, versi }) {
             </>
           }
         />
+        {/* tabel keterangan penawaran */}
+        <div>
+          <KeteranganPenawaran keteranganPenawaran={keteranganPenawaran.data} />
+        </div>
       </div>
       {/* keranjang penawaran */}
       <ConditionalComponent
@@ -1174,7 +1223,7 @@ export default function App({ id, versi }) {
                 selectedProyek.versi <= 0 ? (
                   <div>
                     <Button
-                      onClick={handleButtonSetAsDealClick}
+                      onPress={handleButtonSetAsDealClick}
                       color="primary"
                       className="mt-3"
                     >
@@ -1184,7 +1233,7 @@ export default function App({ id, versi }) {
                 ) : (
                   <div>
                     <Button
-                      onClick={handleButtonCancelDealClick}
+                      onPress={handleButtonCancelDealClick}
                       color="primary"
                       className="mt-3"
                     >
@@ -2651,7 +2700,7 @@ const SubProyek = ({ id, selectedProyek }) => {
           />
           <div>
             <Button
-              onClick={() => {
+              onPress={() => {
                 tambahSubProyekButtonPress();
               }}
               color="primary"
@@ -2789,6 +2838,7 @@ const InputProvit = ({ classNames, form, setForm, defPersenProvit }) => {
         }
       }}
       onValueChange={(v) => {
+        ``;
         // setForm({
         //   ...form,
         //   harga: Math.ceil((form.hargamodal || 0) * (1 + v / 100)),
@@ -2827,5 +2877,191 @@ const InputProvitMargin = ({ classNames, form, setForm }) => {
         })
       }
     />
+  );
+};
+
+const KeteranganPenawaran = ({ keteranganPenawaran }) => {
+  const [form, setForm] = useState();
+  const simpanButtonPress = async (data, onClose) => {
+    // if (data.jumlah <= 0) return alert("Jumlah belum diisi");
+    if (!data.keterangan) return alert("Keterangan belum diisi.");
+    const res = await fetch(`${api_path}keteranganpenawaran`, {
+      method: data.mode == "Tambah" ? "POST" : "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        // 'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: JSON.stringify({
+        ...data,
+      }),
+    });
+    const json = await res.json();
+    if (res.status == 400) return alert(json.message);
+    onClose();
+    // console.log(json.message);
+    //return alert(json.message);
+  };
+  const renderCell = React.useCallback((data, columnKey) => {
+    const cellValue = data[columnKey];
+    switch (columnKey) {
+      case "stok":
+        return (
+          <div
+            className={`text-right px-1 ${
+              data.jumlah > data.stok ? "text-white bg-danger rounded-sm" : ""
+            }`}
+          >
+            {cellValue}
+          </div>
+        );
+      case "status":
+        return "";
+      case "aksi":
+        return (
+          <div className="relative flex items-center gap-2">
+            <Tooltip content="Edit">
+              <span
+                onClick={() => {
+                  setForm({
+                    ...form,
+                    mode: "Edit",
+                    id: data.id,
+                    keterangan: data.keterangan,
+                  });
+                  onOpen();
+                }}
+                className="text-lg text-default-400 cursor-pointer active:opacity-50"
+              >
+                <EditIcon />
+              </span>
+            </Tooltip>
+            <Tooltip color="danger" content="Delete">
+              <span
+                onClick={async () => {
+                  if (confirm("Hapus keterangan?")) {
+                    const res = await fetch(`${api_path}keteranganpenawaran`, {
+                      method: "DELETE",
+                      headers: {
+                        "Content-Type": "application/json",
+                        // 'Content-Type': 'application/x-www-form-urlencoded',
+                      },
+                      body: JSON.stringify({ id: data.id }),
+                    });
+                    const json = await res.json();
+                    return;
+                    // return alert(json.message);
+                  }
+                }}
+                className="text-lg text-danger cursor-pointer active:opacity-50"
+              >
+                <DeleteIcon />
+              </span>
+            </Tooltip>
+          </div>
+        );
+      default:
+        return cellValue;
+    }
+  }, []);
+
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
+  const cols = [
+    {
+      key: "keterangan",
+      label: "Keterangan",
+    },
+    {
+      key: "status",
+      label: "Status",
+    },
+    {
+      key: "aksi",
+      label: "Aksi",
+    },
+  ];
+
+  return (
+    <>
+      <Table
+        isStriped
+        isCompact
+        className=""
+        topContent={
+          <div>
+            <Button
+              color="primary"
+              onPress={() => {
+                setForm({ ...form, mode: "Tambah" });
+                onOpen();
+              }}
+            >
+              Tambah
+            </Button>
+          </div>
+        }
+        // bottomContent={}
+        aria-label="Example table with custom cells"
+      >
+        <TableHeader columns={cols}>
+          {(column) => (
+            <TableColumn
+              key={column.key}
+              align={column.key === "aksi" ? "center" : "start"}
+            >
+              {column.label}
+            </TableColumn>
+          )}
+        </TableHeader>
+        <TableBody items={keteranganPenawaran}>
+          {(item) => (
+            <TableRow key={item.id}>
+              {(columnKey) => (
+                <TableCell>{renderCell(item, columnKey)}</TableCell>
+              )}
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+      <Modal
+        scrollBehavior="inside"
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">
+                {form.mode} Keterangan
+              </ModalHeader>
+              <ModalBody>
+                <Input
+                  label="Keterangan"
+                  placeholder="Masukkan keterangan!"
+                  value={form.keterangan}
+                  onValueChange={(v) =>
+                    setForm({
+                      ...form,
+                      keterangan: v,
+                    })
+                  }
+                />
+              </ModalBody>
+              <ModalFooter>
+                <Button color="danger" variant="light" onPress={onClose}>
+                  Batal
+                </Button>
+                <Button
+                  color="primary"
+                  onPress={() => simpanButtonPress(form, onClose)}
+                >
+                  Simpan
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+    </>
   );
 };
