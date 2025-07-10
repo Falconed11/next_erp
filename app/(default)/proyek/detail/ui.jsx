@@ -90,7 +90,9 @@ export default function App({ id, versi }) {
       selectVersi.values().next().value
     }`
   );
-  const keteranganPenawaran = useClientFetch(`keteranganpenawaran`);
+  const keteranganPenawaran = useClientFetch(
+    `keteranganpenawaran?idProyek=${id}`
+  );
   const keranjangProyekInstalasi = useClientFetch(
     `keranjangproyek?id_proyek=${id}&instalasi=1&versi=${
       selectVersi.values().next().value
@@ -272,12 +274,6 @@ export default function App({ id, versi }) {
     return alert(json.message);
   };
   const handleButtonEdit = () => {
-    // setFormRekapitulasi({
-    //   hargaDiskon: totalHarga - diskon,
-    //   diskon,
-    //   pajak,
-    // });
-    // console.log(formRekapitulasi);
     setFormRekapitulasi({
       ...formRekapitulasi,
       id,
@@ -289,12 +285,6 @@ export default function App({ id, versi }) {
     modal.rekapitulasi.onOpen();
   };
   const handleButtonEditJenisProyek = () => {
-    // setFormRekapitulasi({
-    //   hargaDiskon: totalHarga - diskon,
-    //   diskon,
-    //   pajak,
-    // });
-    // console.log(formRekapitulasi);
     setSelected(kategoriProyek);
     modal.jenisproyek.onOpen();
   };
@@ -648,8 +638,7 @@ export default function App({ id, versi }) {
         no: i + 1,
       };
     });
-  // console.log(result);
-  // Step 2: Insert rows before each group
+
   const resultInstalasi = [];
   let currentGroupInstalasi = null;
 
@@ -682,11 +671,9 @@ export default function App({ id, versi }) {
 
   const keranjangProduk = keranjangProyek?.data.map((item) => ({
     ...item,
-    // margin: Math.ceil(item.hargamodal / (margin <= 0 ? 1 : 1 - margin / 100)),
   }));
   const keranjangIntalasi = keranjangProyekInstalasi?.data.map((item) => ({
     ...item,
-    // margin: Math.ceil(item.hargamodal / (margin <= 0 ? 1 : 1 - margin / 100)),
   }));
 
   const selectedProyek = proyek.data[0];
@@ -694,7 +681,6 @@ export default function App({ id, versi }) {
     ...keranjangProyek.data,
     ...keranjangProyekInstalasi.data,
   ].map((v, i) => ({ ...v, no: i + 1 }));
-  // console.log(invoiceData);
 
   const col = {
     keranjangproyek: [
@@ -1007,16 +993,11 @@ export default function App({ id, versi }) {
   const selectedVersion = selectVersi.values().next().value;
   const provit = hargaDiskon - totalModal;
   const persenProvit = (provit / totalModal) * 100;
-  // const persenProvit = (provit / hargaDiskon) * 100;
 
   const formatTable = {
     wrapper: "py-0 px-1",
     td: "text-xs py-0 align-top", // Reduce font size and vertical padding
   };
-
-  // console.log(form.selectSubProyek?.values().next().value ?? 0);
-  // console.log(proyek.data);
-  // console.log({ dataPenawaran, dataInstalasi });
   return (
     <div>
       <div className="flex flex-row gap-2">
@@ -1170,28 +1151,15 @@ export default function App({ id, versi }) {
                   </div>
                 </div>
               </div>
-              {/* jenis proyek */}
-              {/* <div className="bg-white rounded-lg p-3">
-                <div>Jenis Proyek</div>
-                <div>{kategoriProyek.join(", ")}</div>
-                <ConditionalComponent
-                  condition={selectedProyek.versi == 0}
-                  component={
-                    <Button
-                      onClick={handleButtonEditJenisProyek}
-                      color="primary"
-                    >
-                      Edit
-                    </Button>
-                  }
-                />
-              </div> */}
             </>
           }
         />
         {/* tabel keterangan penawaran */}
         <div>
-          <KeteranganPenawaran keteranganPenawaran={keteranganPenawaran.data} />
+          <KeteranganPenawaran
+            keteranganPenawaran={keteranganPenawaran.data}
+            idProyek={selectedProyek.id}
+          />
         </div>
       </div>
       {/* keranjang penawaran */}
@@ -1248,7 +1216,7 @@ export default function App({ id, versi }) {
                 selectedProyek.versi != -1 ? (
                   <div>
                     <Button
-                      onClick={handleButtonSetAsRejectClick}
+                      onPress={handleButtonSetAsRejectClick}
                       color="primary"
                       className="mt-3"
                     >
@@ -1258,7 +1226,7 @@ export default function App({ id, versi }) {
                 ) : (
                   <div>
                     <Button
-                      onClick={handleButtonCancelRejectClick}
+                      onPress={handleButtonCancelRejectClick}
                       color="primary"
                       className="mt-3"
                     >
@@ -1353,12 +1321,6 @@ export default function App({ id, versi }) {
                                     });
                                   }}
                                 />
-                                {/* <InputProvit
-                                  classNames="w-3/12"
-                                  form={form}
-                                  setForm={setForm}
-                                  defPersenProvit={PERSEN_PROVIT}
-                                /> */}
                                 <Select
                                   label="Sub Proyek"
                                   placeholder="Pilih subproyek! (Opsional)"
@@ -1369,8 +1331,6 @@ export default function App({ id, versi }) {
                                       ...form,
                                       selectSubProyek: v,
                                     });
-                                    //   setSelectProduk(new Set([]));
-                                    //   setSelectKategori(v);
                                   }}
                                 >
                                   {subProyek.data.map((item) => (
@@ -1437,15 +1397,6 @@ export default function App({ id, versi }) {
                           )}
                         />
                       </div>
-                      {/* <div>
-              <Harga
-                label="Maks Diskon :"
-                harga={maksDiskon}
-                endContent={`(${maksDiskonPersen.toFixed(2)}%)`}
-              />
-            </div>
-            <div>Diskon : {proyek.data[0].diskon}</div>
-            <div>Pajak : {proyek.data[0].pajak}%</div> */}
                     </div>
                   </>
                 }
@@ -1569,8 +1520,6 @@ export default function App({ id, versi }) {
                                       ...formInstalasi,
                                       selectSubProyek: v,
                                     });
-                                    //   setSelectProduk(new Set([]));
-                                    //   setSelectKategori(v);
                                   }}
                                 >
                                   {subProyek.data.map((item) => (
@@ -1643,15 +1592,6 @@ export default function App({ id, versi }) {
                           )}
                         />
                       </div>
-                      {/* <div>
-              <Harga
-                label="Maks Diskon :"
-                harga={maksDiskonInstalasi}
-                endContent={`(${maksDiskonPersenInstalasi.toFixed(2)}%)`}
-              />
-            </div>
-            <div>Diskon : {proyek.data[0].diskon}</div>
-            <div>Pajak : {proyek.data[0].pajak}%</div> */}
                     </div>
                   </>
                 }
@@ -2018,52 +1958,6 @@ export default function App({ id, versi }) {
                     })
                   }
                 />
-                {/* <Input
-                  type="number"
-                  value={form.hargakustom}
-                  label="Harga Kustom"
-                  placeholder="Hanya ditampilkan pada penawaran"
-                  onValueChange={(v) =>
-                    setForm({
-                      ...form,
-                      hargakustom: v,
-                    })
-                  }
-                /> */}
-                {/* <div>
-                  Ref. Harga Jual Margin (
-                  {Math.round(
-                    ((form.harga - form.hargamodal) / form.harga) * 100 * 100
-                  ) / 100}
-                  %) : {form.margin}
-                </div> */}
-                {/* <div>Harga Modal : {form.temphargamodal}</div>
-                <div>Harga Jual : {form.harga}</div> */}
-                {/* <div>
-                  Provit : <Harga harga={form.harga - form.temphargamodal} /> (
-                  {Math.round(
-                    ((form.harga - form.temphargamodal) / form.harga) *
-                      100 *
-                      100
-                  ) / 100}
-                  %)
-                </div> */}
-                {/* <div>
-                  <div>Harga Jual : </div>
-                  <div>
-                    <Input
-                      type="number"
-                      value={form.hargajual}
-                      onValueChange={(v) =>
-                        setForm({
-                          ...form,
-                          hargajual: v,
-                          profit: parseInt(v) - form.hargamodal,
-                        })
-                      }
-                    />
-                  </div>
-                </div> */}
                 <div>
                   Total Harga Modal :{" "}
                   <Harga harga={form.temphargamodal * form.jumlah} />
@@ -2071,22 +1965,6 @@ export default function App({ id, versi }) {
                 <div>
                   Total Harga Jual : <Harga harga={form.harga * form.jumlah} />
                 </div>
-                {/* <div>
-                  <div>Profit : </div>
-                  <div>
-                    <Input
-                      type="number"
-                      value={form.profit}
-                      onValueChange={(v) =>
-                        setForm({
-                          ...form,
-                          profit: v,
-                          hargajual: form.hargamodal + parseInt(v),
-                        })
-                      }
-                    />
-                  </div>
-                </div> */}
                 <div>
                   Total Profit :{" "}
                   <Harga
@@ -2131,14 +2009,7 @@ export default function App({ id, versi }) {
                   <div className="flex flex-row items-center">
                     {selectedProyek.id_perusahaan == 1 ? (
                       <>
-                        <Image
-                          src={logoBks}
-                          alt="Company Logo"
-                          width={40}
-                          // height={500} automatically provided
-                          // blurDataURL="data:..." automatically provided
-                          // placeholder="blur" // Optional blur-up while loading
-                        />
+                        <Image src={logoBks} alt="Company Logo" width={40} />
                         <div className="flex flex-col pl-2 text-xs">
                           <div>Belga Karya Semesta</div>
                           <div>
@@ -2153,14 +2024,7 @@ export default function App({ id, versi }) {
                       </>
                     ) : (
                       <>
-                        <Image
-                          src={logoSvt}
-                          alt="Company Logo"
-                          width={40}
-                          // height={500} automatically provided
-                          // blurDataURL="data:..." automatically provided
-                          // placeholder="blur" // Optional blur-up while loading
-                        />
+                        <Image src={logoSvt} alt="Company Logo" width={40} />
                         <div className="flex flex-col pl-2 text-xs">
                           <div>Satu Visi Teknikatama</div>
                           <div>
@@ -2204,10 +2068,6 @@ export default function App({ id, versi }) {
                         </div>
                       </div>
                     </div>
-                    {/* <div className="basis-1/2 text-end">
-                      <div>Id : ASD21903SAD</div>
-                      <div>Tanggal : 17 Oktober 2023</div>
-                    </div> */}
                     <div className="pt-1">Dengan Hormat,</div>
                     <div>
                       Sehubungan dengan adanya permintaan Bapak/Ibu, bersama ini
@@ -2398,6 +2258,10 @@ export default function App({ id, versi }) {
                       - Waktu penyerahan barang sesuai jadwal yang disepakati
                       bersama. <br />- Harga tidak terikat dan dapat berubah
                       sewaktu-waktu.
+                      {keteranganPenawaran.data.map((v) => {
+                        if (v.id_proyek)
+                          return <div id={v.id}>- {v.keterangan}</div>;
+                      })}
                     </div>
                     <div className="no-break">
                       <div>
@@ -2412,14 +2276,6 @@ export default function App({ id, versi }) {
                       </div>
                     </div>
                   </div>
-                  {/* <div className="mt-3 bg-sky-500 h-px"></div>
-                  <div className="flex items-center space-x-4">
-                    <div># Telepon</div>
-                    <Divider orientation="vertical" />
-                    <div>Alamat</div>
-                    <Divider orientation="vertical" />
-                    <div>Website</div>
-                  </div> */}
                 </div>
               </ModalBody>
               <ModalFooter>
@@ -2523,12 +2379,7 @@ export default function App({ id, versi }) {
                     </TableBody>
                   </Table>
                   <div className="flex flex-row mt-3">
-                    <div className="basis-2/4">
-                      {/* Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                      Natus accusamus cum, adipisci fugit excepturi doloremque
-                      tenetur eligendi dolorum? Eaque veniam ea enim corrupti
-                      sint modi officia fugiat totam in commodi. */}
-                    </div>
+                    <div className="basis-2/4"></div>
                     <div className="basis-2/4 pl-3">
                       <div className="flex">
                         <div className="basis-1/2">
@@ -2578,18 +2429,8 @@ export default function App({ id, versi }) {
                           )}
                         </div>
                       </div>
-                      {/* <div className="py-3 text-center">TTD</div>
-                      <div>Nama</div> */}
                     </div>
                   </div>
-                  {/* <div className="mt-3 bg-sky-500 h-px"></div>
-                  <div className="flex items-center space-x-4">
-                    <div># Telepon</div>
-                    <Divider orientation="vertical" />
-                    <div>Alamat</div>
-                    <Divider orientation="vertical" />
-                    <div>Website</div>
-                  </div> */}
                 </div>
               </ModalBody>
               <ModalFooter>
@@ -2880,7 +2721,7 @@ const InputProvitMargin = ({ classNames, form, setForm }) => {
   );
 };
 
-const KeteranganPenawaran = ({ keteranganPenawaran }) => {
+const KeteranganPenawaran = ({ keteranganPenawaran, idProyek }) => {
   const [form, setForm] = useState();
   const simpanButtonPress = async (data, onClose) => {
     // if (data.jumlah <= 0) return alert("Jumlah belum diisi");
@@ -2915,7 +2756,29 @@ const KeteranganPenawaran = ({ keteranganPenawaran }) => {
           </div>
         );
       case "status":
-        return "";
+        return (
+          <Checkbox
+            isSelected={data.id_proyek ?? false}
+            onValueChange={async (v) => {
+              const res = await fetch(`${api_path}proyek_keteranganpenawaran`, {
+                method: v ? "POST" : "DELETE",
+                headers: {
+                  "Content-Type": "application/json",
+                  // 'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: JSON.stringify({
+                  idProyek,
+                  idKeteranganPenawaran: data.id,
+                }),
+              });
+              const json = await res.json();
+              // if (res.status == 400) console.log(json.message);
+              // if (res.status == 400) return alert(json.message);
+              // console.log(json.message);
+              //return alert(json.message);
+            }}
+          ></Checkbox>
+        );
       case "aksi":
         return (
           <div className="relative flex items-center gap-2">

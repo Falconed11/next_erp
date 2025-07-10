@@ -67,8 +67,8 @@ export default function TambahProduk({
   );
   fvendor = fvendor.slice(0, 100);
   const selectProduk = produk.data.filter((v) => v.id == form.selectProduk)[0];
-  console.log(form.selectProduk);
-  console.log({ nama });
+  // console.log(form.selectProduk);
+  // console.log({ nama });
   return (
     <div className="w-max flex flex-wrap gap-3">
       <Select
