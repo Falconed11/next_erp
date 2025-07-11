@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import {
   Table,
@@ -15,6 +15,7 @@ import {
   ChipProps,
   getKeyValue,
   NumberInput,
+  Spinner,
 } from "@heroui/react";
 import {
   AddIcon,
@@ -2260,7 +2261,7 @@ export default function App({ id, versi }) {
                       sewaktu-waktu.
                       {keteranganPenawaran.data.map((v) => {
                         if (v.id_proyek)
-                          return <div id={v.id}>- {v.keterangan}</div>;
+                          return <div key={v.id}>- {v.keterangan}</div>;
                       })}
                     </div>
                     <div className="no-break">
@@ -2723,6 +2724,7 @@ const InputProvitMargin = ({ classNames, form, setForm }) => {
 
 const KeteranganPenawaran = ({ keteranganPenawaran, idProyek }) => {
   const [form, setForm] = useState();
+
   const simpanButtonPress = async (data, onClose) => {
     // if (data.jumlah <= 0) return alert("Jumlah belum diisi");
     if (!data.keterangan) return alert("Keterangan belum diisi.");
@@ -2742,24 +2744,17 @@ const KeteranganPenawaran = ({ keteranganPenawaran, idProyek }) => {
     // console.log(json.message);
     //return alert(json.message);
   };
+
   const renderCell = React.useCallback((data, columnKey) => {
     const cellValue = data[columnKey];
     switch (columnKey) {
-      case "stok":
-        return (
-          <div
-            className={`text-right px-1 ${
-              data.jumlah > data.stok ? "text-white bg-danger rounded-sm" : ""
-            }`}
-          >
-            {cellValue}
-          </div>
-        );
       case "status":
+        const isChecked = !!data.id_proyek;
         return (
           <Checkbox
-            isSelected={data.id_proyek ?? false}
+            isSelected={isChecked}
             onValueChange={async (v) => {
+              if (v === isChecked) return;
               const res = await fetch(`${api_path}proyek_keteranganpenawaran`, {
                 method: v ? "POST" : "DELETE",
                 headers: {
@@ -2776,6 +2771,7 @@ const KeteranganPenawaran = ({ keteranganPenawaran, idProyek }) => {
               // if (res.status == 400) return alert(json.message);
               // console.log(json.message);
               //return alert(json.message);
+              await new Promise((resolve) => setTimeout(resolve, 3000));
             }}
           ></Checkbox>
         );
@@ -2802,6 +2798,7 @@ const KeteranganPenawaran = ({ keteranganPenawaran, idProyek }) => {
               <span
                 onClick={async () => {
                   if (confirm("Hapus keterangan?")) {
+                    console.log(data.id);
                     const res = await fetch(`${api_path}keteranganpenawaran`, {
                       method: "DELETE",
                       headers: {
@@ -2811,6 +2808,7 @@ const KeteranganPenawaran = ({ keteranganPenawaran, idProyek }) => {
                       body: JSON.stringify({ id: data.id }),
                     });
                     const json = await res.json();
+                    if (res.status == 400) return alert(json.message);
                     return;
                     // return alert(json.message);
                   }
