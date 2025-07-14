@@ -16,6 +16,7 @@ import {
   getKeyValue,
   NumberInput,
   Spinner,
+  Switch,
 } from "@heroui/react";
 import {
   AddIcon,
@@ -399,6 +400,11 @@ export default function App({ id, versi }) {
   const renderCell = {
     keranjangproyek: React.useCallback((data, columnKey) => {
       const cellValue = data[columnKey];
+      const isChecked = (v) => {
+        return !!v;
+      };
+      const showMerek = isChecked(data.showmerek);
+      const showTipe = isChecked(data.showtipe);
       switch (columnKey) {
         case "nama":
           return data.keterangan
@@ -479,6 +485,33 @@ export default function App({ id, versi }) {
                 }
               />
             </div>
+          );
+        case "showmerek":
+          return (
+            <Switch
+              size="sm"
+              isSelected={showMerek}
+              onValueChange={async (v) => {
+                if (v === showMerek) return;
+                const res = await fetch(`${api_path}keranjangproyek`, {
+                  method: "PUT",
+                  headers: {
+                    "Content-Type": "application/json",
+                    // 'Content-Type': 'application/x-www-form-urlencoded',
+                  },
+                  body: JSON.stringify({
+                    id: data.id_keranjangproyek,
+                    showmerek: v ? 1 : 0,
+                  }),
+                });
+                const json = await res.json();
+                // if (res.status == 400) console.log(json.message);
+                // if (res.status == 400) return alert(json.message);
+                // console.log(json.message);
+                //return alert(json.message);
+                keranjangProyek.mutate();
+              }}
+            ></Switch>
           );
         case "aksi":
           return (
@@ -700,6 +733,10 @@ export default function App({ id, versi }) {
       {
         key: "nmerek",
         label: "Merek",
+      },
+      {
+        key: "showmerek",
+        label: "",
       },
       {
         key: "tipe",
@@ -1158,7 +1195,7 @@ export default function App({ id, versi }) {
         {/* tabel keterangan penawaran */}
         <div>
           <KeteranganPenawaran
-            keteranganPenawaran={keteranganPenawaran.data}
+            keteranganPenawaran={keteranganPenawaran}
             idProyek={selectedProyek.id}
           />
         </div>
@@ -2724,6 +2761,7 @@ const InputProvitMargin = ({ classNames, form, setForm }) => {
 
 const KeteranganPenawaran = ({ keteranganPenawaran, idProyek }) => {
   const [form, setForm] = useState();
+  const data = keteranganPenawaran.data;
 
   const simpanButtonPress = async (data, onClose) => {
     // if (data.jumlah <= 0) return alert("Jumlah belum diisi");
@@ -2771,7 +2809,7 @@ const KeteranganPenawaran = ({ keteranganPenawaran, idProyek }) => {
               // if (res.status == 400) return alert(json.message);
               // console.log(json.message);
               //return alert(json.message);
-              await new Promise((resolve) => setTimeout(resolve, 3000));
+              keteranganPenawaran.mutate();
             }}
           ></Checkbox>
         );
@@ -2874,7 +2912,7 @@ const KeteranganPenawaran = ({ keteranganPenawaran, idProyek }) => {
             </TableColumn>
           )}
         </TableHeader>
-        <TableBody items={keteranganPenawaran}>
+        <TableBody items={data}>
           {(item) => (
             <TableRow key={item.id}>
               {(columnKey) => (
@@ -2925,4 +2963,8 @@ const KeteranganPenawaran = ({ keteranganPenawaran, idProyek }) => {
       </Modal>
     </>
   );
+};
+
+const TestComp = () => {
+  return <div>This is test comp ...</div>;
 };
