@@ -64,6 +64,7 @@ import {
   countPriceByPercentProfit,
   countProvitMarginPercent,
 } from "@/app/utils/formula";
+import { updateSwitch } from "@/app/utils/tools";
 
 const api_path = getApiPath();
 
@@ -155,7 +156,7 @@ export default function App({ id, versi }) {
         harga: "",
         keterangan: "",
       });
-    else setForm({ selectProduk: "", jumlah: "", harga: "" });
+    else setForm({ selectProduk: "", jumlah: "", harga: "", keterangan: "" });
     // console.log(json.message);
     // return alert(json.message);
   };
@@ -407,9 +408,8 @@ export default function App({ id, versi }) {
       const showTipe = isChecked(data.showtipe);
       switch (columnKey) {
         case "nama":
-          return data.keterangan
-            ? `${data.nama} (${data.keterangan})`
-            : data.nama;
+          return `${data.nama}${data.keterangan ? `(${data.keterangan})` : ""}`;
+          data.keterangan ? `${data.nama} (${data.keterangan})` : data.nama;
         case "stok":
           return (
             <div
@@ -492,24 +492,37 @@ export default function App({ id, versi }) {
               size="sm"
               isSelected={showMerek}
               onValueChange={async (v) => {
-                if (v === showMerek) return;
-                const res = await fetch(`${api_path}keranjangproyek`, {
-                  method: "PUT",
-                  headers: {
-                    "Content-Type": "application/json",
-                    // 'Content-Type': 'application/x-www-form-urlencoded',
-                  },
-                  body: JSON.stringify({
+                await updateSwitch(
+                  v,
+                  showMerek,
+                  "keranjangproyek",
+                  "PUT",
+                  {
                     id: data.id_keranjangproyek,
                     showmerek: v ? 1 : 0,
-                  }),
-                });
-                const json = await res.json();
-                // if (res.status == 400) console.log(json.message);
-                // if (res.status == 400) return alert(json.message);
-                // console.log(json.message);
-                //return alert(json.message);
-                keranjangProyek.mutate();
+                  },
+                  [keranjangProyek, keranjangProyekInstalasi]
+                );
+              }}
+            ></Switch>
+          );
+        case "showtipe":
+          return (
+            <Switch
+              size="sm"
+              isSelected={showTipe}
+              onValueChange={async (v) => {
+                await updateSwitch(
+                  v,
+                  showTipe,
+                  "keranjangproyek",
+                  "PUT",
+                  {
+                    id: data.id_keranjangproyek,
+                    showtipe: v ? 1 : 0,
+                  },
+                  [keranjangProyek, keranjangProyekInstalasi]
+                );
               }}
             ></Switch>
           );
@@ -543,13 +556,16 @@ export default function App({ id, versi }) {
       let harga = data.hargakustom == null ? data.harga : data.hargakustom;
       switch (columnKey) {
         case "nmerek":
-          return cellValue == "NN" ? "" : cellValue;
+          return cellValue == "NN" || !data.showmerek ? "" : cellValue;
         case "tipe":
-          return cellValue
-            ? cellValue == "NN"
-              ? ""
-              : removePrefixIfMatchIgnoreCase(new String(cellValue), "svt-")
-            : "";
+          return !data.showtipe
+            ? ""
+            : removePrefixIfMatchIgnoreCase(new String(cellValue), "svt-");
+        // return cellValue
+        //   ? cellValue == "NN" || !data.showmerek
+        //     ? ""
+        //     : removePrefixIfMatchIgnoreCase(new String(cellValue), "svt-")
+        //   : "";
         case "nama":
           return data.keterangan ? data.keterangan : data.nama;
         case "no":
@@ -743,6 +759,10 @@ export default function App({ id, versi }) {
         label: "Tipe",
       },
       {
+        key: "showtipe",
+        label: "",
+      },
+      {
         key: "nvendor",
         label: "Vendor",
       },
@@ -809,8 +829,16 @@ export default function App({ id, versi }) {
         label: "Merek",
       },
       {
+        key: "showmerek",
+        label: "",
+      },
+      {
         key: "tipe",
         label: "Tipe",
+      },
+      {
+        key: "showtipe",
+        label: "",
       },
       {
         key: "nvendor",
@@ -1359,6 +1387,20 @@ export default function App({ id, versi }) {
                                     });
                                   }}
                                 />
+                                <Input
+                                  type="text"
+                                  value={formInstalasi.keterangan}
+                                  label="Nama Kustom"
+                                  placeholder="Masukkan nama kustom! (Opsional)"
+                                  // placeholder="Masukkan jumlah!"
+                                  className="w-3/12"
+                                  onValueChange={(v) =>
+                                    setForm({
+                                      ...form,
+                                      keterangan: v,
+                                    })
+                                  }
+                                />
                                 <Select
                                   label="Sub Proyek"
                                   placeholder="Pilih subproyek! (Opsional)"
@@ -1534,13 +1576,9 @@ export default function App({ id, versi }) {
                                   type="text"
                                   value={formInstalasi.keterangan}
                                   label="Nama Kustom"
+                                  placeholder="Masukkan nama kustom! (Opsional)"
                                   // placeholder="Masukkan jumlah!"
                                   className="w-3/12"
-                                  endContent={
-                                    <div className="pointer-events-none flex items-center">
-                                      <span className="text-default-400 text-small"></span>
-                                    </div>
-                                  }
                                   onValueChange={(v) =>
                                     setFormInstalasi({
                                       ...formInstalasi,
@@ -1686,8 +1724,12 @@ export default function App({ id, versi }) {
                     endContent={`(${maksDiskonPersen.toFixed(2)}%)`}
                   />
                 </div>
-                <Input
-                  type="number"
+                <NumberInput
+                  hideStepper
+                  isWheelDisabled
+                  formatOptions={{
+                    useGrouping: false,
+                  }}
                   isInvalid={
                     formRekapitulasi.diskon > maksDiskon ? true : false
                   }
@@ -1718,8 +1760,12 @@ export default function App({ id, versi }) {
                     })
                   }
                 />
-                <Input
-                  type="number"
+                <NumberInput
+                  hideStepper
+                  isWheelDisabled
+                  formatOptions={{
+                    useGrouping: false,
+                  }}
                   value={formRekapitulasi.hargadiskon}
                   label="Harga Setelah Diskon"
                   placeholder="Masukkan harga diskon!"
@@ -1738,8 +1784,12 @@ export default function App({ id, versi }) {
                     })
                   }
                 />
-                <Input
-                  type="number"
+                <NumberInput
+                  hideStepper
+                  isWheelDisabled
+                  formatOptions={{
+                    useGrouping: false,
+                  }}
                   value={formRekapitulasi.pajak}
                   label="Pajak (%)"
                   placeholder="Masukkan pajak!"
@@ -1844,7 +1894,7 @@ export default function App({ id, versi }) {
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                Edit Produk
+                Edit {form.instalasi ? "Instalasi" : "Produk"}
               </ModalHeader>
               <ModalBody>
                 <Select
@@ -1865,23 +1915,18 @@ export default function App({ id, versi }) {
                   ))}
                 </Select>
                 <div>Nama : {form.nama}</div>
-                {form.instalasi ? (
-                  <Input
-                    type="text"
-                    label="Nama Kustom (Opsional)"
-                    placeholder="Masukkan nama kustom!"
-                    value={form.keterangan}
-                    onValueChange={(v) =>
-                      setForm({
-                        ...form,
-                        keterangan: v,
-                      })
-                    }
-                  />
-                ) : (
-                  <></>
-                )}
-
+                <Input
+                  type="text"
+                  label="Nama Kustom (Opsional)"
+                  placeholder="Masukkan nama kustom!"
+                  value={form.keterangan}
+                  onValueChange={(v) =>
+                    setForm({
+                      ...form,
+                      keterangan: v,
+                    })
+                  }
+                />
                 <div>Merek : {form.nmerek}</div>
                 <div>Tipe : {form.tipe}</div>
                 <div>Vendor : {form.nvendor}</div>
@@ -2963,8 +3008,4 @@ const KeteranganPenawaran = ({ keteranganPenawaran, idProyek }) => {
       </Modal>
     </>
   );
-};
-
-const TestComp = () => {
-  return <div>This is test comp ...</div>;
 };
