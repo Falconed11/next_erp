@@ -558,14 +558,9 @@ export default function App({ id, versi }) {
         case "nmerek":
           return cellValue == "NN" || !data.showmerek ? "" : cellValue;
         case "tipe":
-          return !data.showtipe
+          return cellValue == "NN" || !data.showtipe
             ? ""
             : removePrefixIfMatchIgnoreCase(new String(cellValue), "svt-");
-        // return cellValue
-        //   ? cellValue == "NN" || !data.showmerek
-        //     ? ""
-        //     : removePrefixIfMatchIgnoreCase(new String(cellValue), "svt-")
-        //   : "";
         case "nama":
           return data.keterangan ? data.keterangan : data.nama;
         case "no":
