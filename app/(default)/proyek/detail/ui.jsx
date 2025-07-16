@@ -65,6 +65,7 @@ import {
   countProvitMarginPercent,
 } from "@/app/utils/formula";
 import { updateSwitch } from "@/app/utils/tools";
+import { nominalToText } from "@/app/utils/number";
 
 const api_path = getApiPath();
 
@@ -74,11 +75,11 @@ export default function App({ id, versi }) {
   const router = useRouter();
   const componentRef = {
     penawaran: useRef(null),
-    invoice: useRef(),
+    invoice: useRef(null),
   };
   const handlePrintInvoice = useReactToPrint({
-    content: () => componentRef.invoice.current,
-    bodyClass: "m-12",
+    contentRef: componentRef.invoice,
+    pageStyle: "p-10 block",
   });
   const handlePrintPenawaran = useReactToPrint({
     contentRef: componentRef.penawaran,
@@ -596,7 +597,8 @@ export default function App({ id, versi }) {
           return (
             <>
               {data.keterangan ? data.keterangan : data.nama}{" "}
-              {data.nmerek == "NN" ? "" : data.nmerek} {data.tipe}
+              {data.nmerek == "NN" || !data.showmerek ? "" : data.nmerek}{" "}
+              {data.tipe == "NN" || !data.showtipe ? "" : data.tipe}
             </>
           );
         case "jumlah":
@@ -695,9 +697,6 @@ export default function App({ id, versi }) {
     resultInstalasi.push(item);
   });
 
-  // console.log(dataPenawaran);
-  // console.log(result);
-
   if (proyek.error) return <div>failed to load</div>;
   if (proyek.isLoading) return <div>loading...</div>;
   if (keranjangProyek.error) return <div>failed to load keranjang proyek</div>;
@@ -777,10 +776,6 @@ export default function App({ id, versi }) {
         key: "temphargamodal",
         label: "Harga Modal",
       },
-      // {
-      //   key: "refhargajualmargin",
-      //   label: `Ref. Harga Jual Margin (${margin}%)`,
-      // },
       {
         key: "harga",
         label: "Harga Jual",
@@ -855,10 +850,6 @@ export default function App({ id, versi }) {
         key: "temphargamodal",
         label: "Harga Modal",
       },
-      // {
-      //   key: "refhargajualmargin",
-      //   label: `Ref. Harga Jual Margin (${margin}%)`,
-      // },
       {
         key: "harga",
         label: "Harga Instalasi",
@@ -2385,14 +2376,6 @@ export default function App({ id, versi }) {
                   className="bg-white text-black leading-none"
                 >
                   <div className="flex flex-row items-center">
-                    {/* <Image
-                      src={logo}
-                      alt="Company Logo"
-                      width={70}
-                      // height={500} automatically provided
-                      // blurDataURL="data:..." automatically provided
-                      // placeholder="blur" // Optional blur-up while loading
-                    /> */}
                     <div className="flex flex-col">
                       {selectedProyek.namaperusahaan == "bks" ? (
                         <BKSHeader />
@@ -2408,105 +2391,128 @@ export default function App({ id, versi }) {
                     </div>
                     <div className="basis-1/4 bg-sky-500 h-2"></div>
                   </div>
-                  <div className="flex flex-row">
-                    <div className="basis-1/2">
-                      <div>Invoice kepada :</div>
-                      <div>{selectedProyek.klien}</div>
-                      <div>{selectedProyek.instansi}</div>
+                  <div className="flex flex-col gap-2">
+                    <div className="flex flex-row">
+                      <div className="basis-1/2">
+                        <div>Invoice kepada :</div>
+                        <div>{selectedProyek.klien}</div>
+                        <div>{selectedProyek.instansi}</div>
+                      </div>
+                      <div className="basis-1/2 text-end">
+                        <div>
+                          Id :{" "}
+                          {invoice(
+                            selectedProyek.id_penawaran,
+                            new Date(selectedProyek.tanggal_penawaran)
+                          )}
+                        </div>
+                        <div>
+                          Tanggal :{" "}
+                          {getDateFId(
+                            new Date(selectedProyek.tanggal_penawaran)
+                          )}
+                        </div>
+                      </div>
                     </div>
-                    <div className="basis-1/2 text-end">
-                      <div>
-                        Id :{" "}
-                        {invoice(
-                          selectedProyek.id_penawaran,
-                          new Date(selectedProyek.tanggal_penawaran)
+                    <Table
+                      className="border"
+                      aria-label="Example table with custom cells"
+                      shadow="none"
+                      isCompact
+                    >
+                      <TableHeader columns={col.invoice}>
+                        {(column) => (
+                          <TableColumn
+                            key={column.key}
+                            align={column.key === "aksi" ? "center" : "start"}
+                          >
+                            {column.label}
+                          </TableColumn>
                         )}
+                      </TableHeader>
+                      <TableBody items={invoiceData}>
+                        {(item) => (
+                          <TableRow key={item.no}>
+                            {(columnKey) => (
+                              <TableCell>
+                                {renderCell.invoice(item, columnKey)}
+                              </TableCell>
+                            )}
+                          </TableRow>
+                        )}
+                      </TableBody>
+                    </Table>
+                    <div className="flex flex-row">
+                      <div className="basis-2/4 content-end">
+                        {`***   `}
+                        {nominalToText(finalKustom)}
                       </div>
-                      <div>
-                        Tanggal :{" "}
-                        {getDateFId(new Date(selectedProyek.tanggal_penawaran))}
+                      <div className="basis-2/4 pl-3">
+                        <div className="flex">
+                          <div className="basis-1/2">
+                            <div>
+                              {rekapDiskon + rekapPajak > 0
+                                ? "Sub Total"
+                                : "Total"}
+                            </div>
+                            {rekapDiskon > 0 ? (
+                              <>
+                                <div>Diskon</div>
+                                <div>Harga Setelah Diskon</div>
+                              </>
+                            ) : (
+                              <></>
+                            )}
+                            {rekapPajak > 0 ? (
+                              <>
+                                <div>Pajak ({rekapPajak}%)</div>
+                                <div>Harga Setelah Pajak</div>
+                              </>
+                            ) : (
+                              <></>
+                            )}
+                          </div>
+                          <div className="text-right basis-1/2">
+                            <div>
+                              <Harga harga={totalKustom} />
+                            </div>
+                            {rekapDiskon > 0 ? (
+                              <>
+                                <div>{<Harga harga={rekapDiskon} />}</div>
+                                <div>{<Harga harga={kustomDiskon} />}</div>
+                              </>
+                            ) : (
+                              <></>
+                            )}
+                            {rekapPajak > 0 ? (
+                              <>
+                                <div>
+                                  <Harga harga={pajakKustom} />
+                                </div>
+                                <div>
+                                  <Harga harga={finalKustom} />
+                                </div>
+                              </>
+                            ) : (
+                              <></>
+                            )}
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <Table
-                    className="mt-3 border"
-                    aria-label="Example table with custom cells"
-                    shadow="none"
-                    isCompact
-                  >
-                    <TableHeader columns={col.invoice}>
-                      {(column) => (
-                        <TableColumn
-                          key={column.key}
-                          align={column.key === "aksi" ? "center" : "start"}
-                        >
-                          {column.label}
-                        </TableColumn>
-                      )}
-                    </TableHeader>
-                    <TableBody items={invoiceData}>
-                      {(item) => (
-                        <TableRow key={item.no}>
-                          {(columnKey) => (
-                            <TableCell>
-                              {renderCell.invoice(item, columnKey)}
-                            </TableCell>
-                          )}
-                        </TableRow>
-                      )}
-                    </TableBody>
-                  </Table>
-                  <div className="flex flex-row mt-3">
-                    <div className="basis-2/4"></div>
-                    <div className="basis-2/4 pl-3">
-                      <div className="flex">
-                        <div className="basis-1/2">
-                          <div>
-                            {rekapDiskon + rekapPajak > 0
-                              ? "Sub Total"
-                              : "Total"}
-                          </div>
-                          {rekapDiskon > 0 ? (
-                            <>
-                              <div>Diskon</div>
-                              <div>Harga Setelah Diskon</div>
-                            </>
-                          ) : (
-                            <></>
-                          )}
-                          {rekapPajak > 0 ? (
-                            <>
-                              <div>Pajak ({rekapPajak}%)</div>
-                              <div>Harga Setelah Pajak</div>
-                            </>
-                          ) : (
-                            <></>
-                          )}
-                        </div>
-                        <div className="text-right basis-1/2">
-                          <div>
-                            <Harga harga={totalKustom} />
-                          </div>
-                          {rekapDiskon > 0 ? (
-                            <>
-                              <div>{<Harga harga={rekapDiskon} />}</div>
-                              <div>{<Harga harga={kustomDiskon} />}</div>
-                            </>
-                          ) : (
-                            <></>
-                          )}
-                          {rekapPajak > 0 ? (
-                            <>
-                              <div>{<Harga harga={pajakKustom} />}</div>
-                              <div>
-                                <Harga harga={finalKustom} />
-                              </div>
-                            </>
-                          ) : (
-                            <></>
-                          )}
-                        </div>
+                    <div className="flex flex-row">
+                      <div className="basis-2/4">Pembayaran melalui</div>
+                      <div className="basis-2/4">An.</div>
+                    </div>
+                    <div className="flex">
+                      <div className="basis-3/4 border border-black">
+                        Catatan
                       </div>
+                    </div>
+                    <div>
+                      {selectedProyek.id_perusahaan == 1
+                        ? "Belga Karya Semesta"
+                        : "Satu Visi Teknikatama"}
                     </div>
                   </div>
                 </div>
@@ -2714,88 +2720,6 @@ const SubProyek = ({ id, selectedProyek }) => {
         </ModalContent>
       </Modal>
     </div>
-  );
-};
-
-const InputProvit = ({ classNames, form, setForm, defPersenProvit }) => {
-  const [persenProvit, setPersenProvit] = useState(defPersenProvit);
-  const terapkanButtonRef = useRef(null);
-  // const persenProvit =
-  //   Math.ceil(countPercentProvit(form.hargamodal || 0, form.harga) * 100) / 100;
-  return (
-    <NumberInput
-      hideStepper
-      isWheelDisabled
-      formatOptions={{
-        useGrouping: false,
-      }}
-      value={persenProvit}
-      label={"Provit (%)"}
-      placeholder="Masukkan provit!"
-      className={classNames || ""}
-      endContent={
-        <Button
-          ref={terapkanButtonRef}
-          color="primary"
-          size="sm"
-          onPress={() => {
-            setForm({
-              ...form,
-              harga: Math.ceil(
-                (form.hargamodal || 0) * (1 + (persenProvit || 0) / 100)
-              ),
-            });
-          }}
-        >
-          Terapkan
-        </Button>
-      }
-      onKeyDown={(e) => {
-        if (e.key == "Enter") {
-          e.preventDefault();
-          terapkanButtonRef.current?.click();
-        }
-      }}
-      onValueChange={(v) => {
-        ``;
-        // setForm({
-        //   ...form,
-        //   harga: Math.ceil((form.hargamodal || 0) * (1 + v / 100)),
-        // });
-        setPersenProvit(v);
-      }}
-    />
-  );
-};
-
-const InputProvitMargin = ({ classNames, form, setForm }) => {
-  return (
-    <Input
-      type="number"
-      max={99}
-      value={
-        form.provitmarginpersen || 0
-        /* Math.round(
-          ((form.harga -
-            (form.temphargamodal ? form.temphargamodal : form.hargamodal)) /
-            form.harga) *
-            100 *
-            100
-        ) / 100 || 0 */
-      }
-      label={"Provit Margin (%)"}
-      placeholder="Masukkan provit margin persen!"
-      className={classNames ?? ""}
-      onValueChange={(v) =>
-        setForm({
-          ...form,
-          harga: Math.ceil(
-            (form.temphargamodal || form.hargamodal || 0) / (1 - v / 100)
-          ),
-          provitmarginpersen: Math.ceil(v * 100) / 100 || "",
-        })
-      }
-    />
   );
 };
 
