@@ -45,6 +45,7 @@ import logo from "@/public/logofinal.jpg";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { NavLinkNewTab } from "@/components/mycomponent";
+import PembayaranProyek from "./pembayaranproyek";
 
 const api_path = getApiPath();
 
@@ -487,70 +488,6 @@ export default function App({ id }) {
   }, 0);
   const provit = omset - biayaProduksi;
 
-  const PembayaranProyek = (
-    <>
-      <div className="bg-gray-100 p-3 rounded-lg">
-        <div>Tanggal</div>
-        <DatePicker
-          placeholderText="Pilih tanggal"
-          dateFormat="dd/MM/yyyy"
-          selected={formPembayaran.startdate}
-          onChange={(v) => {
-            setFormPembayaran({
-              ...formPembayaran,
-              startdate: v,
-              tanggal: getDate(v),
-            });
-          }}
-        />
-      </div>
-      <Input
-        type="number"
-        label="Nominal"
-        value={formPembayaran.nominal}
-        placeholder="Masukkan nominal!"
-        className=""
-        onValueChange={(v) =>
-          setFormPembayaran({
-            ...formPembayaran,
-            nominal: v,
-          })
-        }
-      />
-      <Select
-        label="Metode Pembayaran"
-        placeholder="Pilih metode pembayaran!"
-        className=""
-        selectedKeys={formPembayaran.selectMetodePembayaran}
-        onSelectionChange={(v) => {
-          setFormPembayaran({
-            ...formPembayaran,
-            selectMetodePembayaran: v,
-            id_metodepembayaran: new Set(v).values().next().value,
-          });
-        }}
-      >
-        {metodepembayaran.data.map((item) => (
-          <SelectItem key={item.id} value={item.id}>
-            {item.nama}
-          </SelectItem>
-        ))}
-      </Select>
-      <Input
-        type="text"
-        label="Keterangan"
-        placeholder="Masukkan keterangan!"
-        value={formPembayaran.keterangan}
-        className=""
-        onValueChange={(v) =>
-          setFormPembayaran({
-            ...formPembayaran,
-            keterangan: v,
-          })
-        }
-      />
-    </>
-  );
   // console.log(form);
   return (
     <div className="flex flex-col gap-2 w-full">
@@ -608,7 +545,7 @@ export default function App({ id }) {
       </div> */}
       {/* tabel pengeluaran proyek */}
       <Table
-        className=""
+        className="z-10"
         aria-label="Example table with custom cells"
         topContent={
           <>
@@ -711,15 +648,6 @@ export default function App({ id }) {
             </div>
           </>
         }
-        // bottomContent={
-        //   <>
-        //     <div className="text-right">
-        //       <div>
-        //         <Harga label="Sub Total Harga Jual :" harga={0} />
-        //       </div>
-        //     </div>
-        //   </>
-        // }
       >
         <TableHeader columns={col.pengeluaranproyek}>
           {(column) => (
@@ -745,16 +673,22 @@ export default function App({ id }) {
       </Table>
       {/* tabel pembayaranproyek */}
       <Table
-        className=""
+        className="z-10"
         aria-label="Example table with custom cells"
         topContent={
           <>
             <div>Pembayaran Proyek</div>
             <div className="flex-col gap-2">
               <div className="flex flex-row gap-2 mt-3">
-                {PembayaranProyek}
+                {
+                  <PembayaranProyek
+                    form={formPembayaran}
+                    setForm={setFormPembayaran}
+                    metodepembayaran={metodepembayaran}
+                  />
+                }
                 <Button
-                  onClick={() => {
+                  onPress={() => {
                     tambahButtonPressPembayaran(formPembayaran);
                   }}
                   color="primary"
@@ -766,15 +700,6 @@ export default function App({ id }) {
             </div>
           </>
         }
-        // bottomContent={
-        //   <>
-        //     <div className="text-right">
-        //       <div>
-        //         <Harga label="Sub Total Harga Jual :" harga={0} />
-        //       </div>
-        //     </div>
-        //   </>
-        // }
       >
         <TableHeader columns={col.pembayaranproyek}>
           {(column) => (
@@ -786,7 +711,7 @@ export default function App({ id }) {
             </TableColumn>
           )}
         </TableHeader>
-        <TableBody items={pembayaranproyek.data}>
+        <TableBody emptyContent={"Kosong"} items={pembayaranproyek.data}>
           {(item) => (
             <TableRow key={item.id}>
               {(columnKey) => (
