@@ -28,6 +28,7 @@ import { nominalToText } from "@/app/utils/number";
 import { BKSHeader, SVTHeader } from "@/components/mycomponent";
 import { EditIcon, DeleteIcon } from "@/components/icon";
 import Harga from "@/components/harga";
+import Image from "next/image";
 
 const api_path = getApiPath();
 
@@ -40,9 +41,10 @@ export default function Invoice({
   totalKustom,
   kustomDiskon,
   pajakKustom,
+  className,
 }) {
   const pembayaranProyek = useClientFetch(
-    `pembayaranProyek?id_proyek=${proyek.id}`
+    `pembayaranProyek?id_proyek=${proyek.id}&asc=1`
   );
   const componentRef = useRef(null);
   const handlePrintInvoice = useReactToPrint({
@@ -128,7 +130,7 @@ export default function Invoice({
               <ModalBody>
                 <div
                   ref={componentRef}
-                  className="bg-white text-black leading-none"
+                  className="bg-white text-black leading-none text-sm"
                 >
                   <div className="flex flex-row items-center">
                     <div className="flex flex-col">
@@ -169,10 +171,12 @@ export default function Invoice({
                       </div>
                     </div>
                     <Table
-                      className="border"
+                      className={`border border-black p-2`}
+                      classNames={className}
                       aria-label="Example table with custom cells"
                       shadow="none"
                       isCompact
+                      isStriped
                     >
                       <TableHeader columns={col}>
                         {(column) => (
@@ -197,7 +201,7 @@ export default function Invoice({
                       </TableBody>
                     </Table>
                     {/* Rekap */}
-                    <div className="flex flex-row">
+                    <div className="flex flex-row pb-1 border-b border-black">
                       <div className="basis-2/4 content-end">
                         {`***   `}
                         {nominalToText(total)}
@@ -213,14 +217,19 @@ export default function Invoice({
                                   : "font-bold"
                               }
                             >
-                              {rekapDiskon + rekapPajak || dataPembayaran.length
-                                ? "Sub"
-                                : "Total"}
+                              {rekapDiskon + rekapPajak ||
+                              dataPembayaran.length ? (
+                                <br />
+                              ) : (
+                                "Total"
+                              )}
                             </div>
                             {rekapDiskon > 0 ? (
                               <>
                                 <div>Diskon</div>
-                                <div>Harga Setelah Diskon</div>
+                                <div className="border-b border-black">
+                                  Harga Setelah Diskon
+                                </div>
                               </>
                             ) : (
                               <></>
@@ -228,14 +237,22 @@ export default function Invoice({
                             {rekapPajak > 0 ? (
                               <>
                                 <div>Pajak ({rekapPajak}%)</div>
-                                <div>Harga Setelah Pajak</div>
+                                <div className="border-b border-black">
+                                  Harga Setelah Pajak
+                                </div>
                               </>
                             ) : (
                               <></>
                             )}
                             {dataPembayaran.length ? (
                               <>
-                                <div>Uang Muka</div>
+                                {dataPembayaran.map((v, i) =>
+                                  i ? (
+                                    <br key={i} />
+                                  ) : (
+                                    <div key={i}>Uang Muka</div>
+                                  )
+                                )}
                                 <div className="font-bold">TOTAL</div>
                               </>
                             ) : (
@@ -249,7 +266,9 @@ export default function Invoice({
                             {rekapDiskon > 0 ? (
                               <>
                                 <div>{<Harga harga={rekapDiskon} />}</div>
-                                <div>{<Harga harga={kustomDiskon} />}</div>
+                                <div className="border-b border-black">
+                                  {<Harga harga={kustomDiskon} />}
+                                </div>
                               </>
                             ) : (
                               <></>
@@ -259,7 +278,7 @@ export default function Invoice({
                                 <div>
                                   <Harga harga={pajakKustom} />
                                 </div>
-                                <div>
+                                <div className="border-b border-black">
                                   <Harga harga={finalKustom} />
                                 </div>
                               </>
@@ -268,9 +287,11 @@ export default function Invoice({
                             )}
                             {dataPembayaran.length ? (
                               <>
-                                <div>
-                                  <Harga harga={dataPembayaran[0].nominal} />
-                                </div>
+                                {dataPembayaran.map((v, i) => (
+                                  <div key={i}>
+                                    <Harga harga={v.nominal} />
+                                  </div>
+                                ))}
                                 <div className="font-bold">
                                   <Harga harga={total} />
                                 </div>
@@ -283,19 +304,53 @@ export default function Invoice({
                       </div>
                     </div>
                     <div className="flex flex-row">
-                      <div className="basis-2/4">Pembayaran melalui</div>
-                      <div className="basis-2/4">An.</div>
-                    </div>
-                    <div className="flex">
-                      <div className="basis-3/4 border border-black">
-                        Catatan :
+                      <div className="basis-2/4">
+                        Pembayaran melalui : Rek. {dataPembayaran[0].nama_bank}{" "}
+                        : {dataPembayaran[0].norekening}
+                      </div>
+                      <div className="basis-2/4">
+                        An. {dataPembayaran[0].atasnama}
                       </div>
                     </div>
-                    <div>
-                      {proyek.id_perusahaan == 1
-                        ? "Belga Karya Semesta"
-                        : "Satu Visi Teknikatama"}
+                    <div className="flex flex-col">
+                      <div className="flex">
+                        <div className="basis-3/4 p-1 border border-black">
+                          Catatan :
+                        </div>
+                      </div>
+                      <div className="flex">
+                        <div className="basis-3/4 p-1 border border-black">
+                          Lorem ipsum dolor sit amet consectetur adipisicing
+                          elit. Quae, architecto. Ipsa illum asperiores,
+                          corrupti nostrum corporis mollitia. Id, aspernatur
+                          dolorem nisi maiores sequi laborum animi, cupiditate
+                          deleniti alias atque quidem.
+                        </div>
+                      </div>
                     </div>
+                    {proyek.id_perusahaan == 1 ? (
+                      <div>
+                        <div>Belga Karya Semesta</div>
+                        <Image
+                          src="/sample_signature.png"
+                          alt="signature"
+                          width={200}
+                          height={200}
+                        />
+                        <div className="underline">Aslkdn Kksladj Lksdj</div>
+                      </div>
+                    ) : (
+                      <div>
+                        <div>Satu Visi Teknikatama</div>
+                        <Image
+                          src="/sample_signature.png"
+                          alt="signature"
+                          width={200}
+                          height={200}
+                        />
+                        <div className="underline">Aslkdn Kksladj Lksdj</div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </ModalBody>

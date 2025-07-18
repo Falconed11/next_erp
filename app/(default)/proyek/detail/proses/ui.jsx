@@ -279,6 +279,7 @@ export default function App({ id }) {
     const json = await res.json();
     if (res.status == 400) return alert(json.message);
     setFormPembayaran({
+      ...formPembayaran,
       nominal: 0,
     });
   };
@@ -449,6 +450,18 @@ export default function App({ id }) {
       {
         key: "metodepembayaran",
         label: "Metode Pembayaran",
+      },
+      {
+        key: "nama_bank",
+        label: "Bank",
+      },
+      {
+        key: "norekening",
+        label: "Nomore Rekening",
+      },
+      {
+        key: "atasnama",
+        label: "Atas Nama",
       },
       {
         key: "keterangan",
@@ -864,7 +877,13 @@ export default function App({ id }) {
               <ModalHeader className="flex flex-col gap-1">
                 Edit Pembayaran Proyek
               </ModalHeader>
-              <ModalBody>{PembayaranProyek}</ModalBody>
+              <ModalBody>
+                <PembayaranProyek
+                  form={formPembayaran}
+                  setForm={setFormPembayaran}
+                  metodepembayaran={metodepembayaran}
+                />
+              </ModalBody>
               <ModalFooter>
                 <Button color="danger" variant="light" onPress={onClose}>
                   Batal

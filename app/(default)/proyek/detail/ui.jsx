@@ -1183,7 +1183,6 @@ export default function App({ id, versi }) {
           />
         </div>
       </div>
-      {/* keranjang penawaran */}
       <ConditionalComponent
         condition={selectVersi.size}
         component={
@@ -1269,6 +1268,7 @@ export default function App({ id, versi }) {
                   rekapDiskon={rekapDiskon}
                   rekapPajak={rekapPajak}
                   totalKustom={totalKustom}
+                  className={formatTable}
                 />
               </div>
               <NavLinkNewTab

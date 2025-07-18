@@ -1,5 +1,5 @@
 import DatePicker from "react-datepicker";
-import { Input, Select, SelectItem } from "@heroui/react";
+import { Input, NumberInput, Select, SelectItem } from "@heroui/react";
 import { getDate } from "@/app/utils/date";
 
 export default function PembayaranProyek({ form, setForm, metodepembayaran }) {
@@ -21,8 +21,12 @@ export default function PembayaranProyek({ form, setForm, metodepembayaran }) {
           }}
         />
       </div>
-      <Input
-        type="number"
+      <NumberInput
+        hideStepper
+        isWheelDisabled
+        formatOptions={{
+          useGrouping: false,
+        }}
         label="Nominal"
         value={form.nominal}
         placeholder="Masukkan nominal!"
@@ -48,8 +52,12 @@ export default function PembayaranProyek({ form, setForm, metodepembayaran }) {
         }}
       >
         {metodepembayaran.data.map((item) => (
-          <SelectItem key={item.id} value={item.id}>
-            {item.nama}
+          <SelectItem
+            key={item.id}
+            value={item.id}
+            textValue={`${item.nama} ${item.namabank} ${item.norekening} ${item.atasnama}`}
+          >
+            {item.nama} {item.namabank} {item.norekening} {item.atasnama}
           </SelectItem>
         ))}
       </Select>
