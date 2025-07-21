@@ -158,16 +158,13 @@ export default function Invoice({
                       </div>
                       <div className="basis-1/2 text-end">
                         <div>
-                          Id :{" "}
-                          {invoice(
-                            proyek.id_penawaran,
-                            new Date(proyek.tanggal_penawaran)
-                          )}
+                          No. Invoice :{" "}
+                          {invoice(proyek.id_kustom, new Date(proyek.tanggal))}
                         </div>
                         <div>
-                          Tanggal :{" "}
-                          {getDateFId(new Date(proyek.tanggal_penawaran))}
+                          Tanggal : {getDateFId(new Date(proyek.tanggal))}
                         </div>
+                        <div>No. PO : {proyek.id_po}</div>
                       </div>
                     </div>
                     <Table
@@ -305,11 +302,11 @@ export default function Invoice({
                     </div>
                     <div className="flex flex-row">
                       <div className="basis-2/4">
-                        Pembayaran melalui : Rek. {dataPembayaran[0].nama_bank}{" "}
-                        : {dataPembayaran[0].norekening}
+                        Pembayaran melalui : Rek. {dataPembayaran[0]?.nama_bank}{" "}
+                        : {dataPembayaran[0]?.norekening}
                       </div>
                       <div className="basis-2/4">
-                        An. {dataPembayaran[0].atasnama}
+                        An. {dataPembayaran[0]?.atasnama}
                       </div>
                     </div>
                     <div className="flex flex-col">

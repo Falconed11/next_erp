@@ -133,8 +133,6 @@ export default function SubProyek({ id, selectedProyek }) {
         {subProyek.data.map((data, i) => (
           <Chip
             key={i}
-            // onClose={() => handleClose(sP)}
-            variant="flat"
             endContent={
               selectedProyek.versi == 0 ? (
                 <div className="flex gap-2">
@@ -156,7 +154,7 @@ export default function SubProyek({ id, selectedProyek }) {
                   </Tooltip>
                 </div>
               ) : (
-                <></>
+                <div></div>
               )
             }
           >

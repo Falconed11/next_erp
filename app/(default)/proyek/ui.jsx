@@ -479,6 +479,10 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
       label: "Kota",
     },
     {
+      key: "id_po",
+      label: "No. PO",
+    },
+    {
       key: "namakaryawan",
       label: "Sales",
     },
@@ -970,6 +974,13 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
                   placeholder="Masukkan klien! Contoh : Bapak Adi"
                   value={form.klien}
                   onValueChange={(val) => setForm({ ...form, klien: val })}
+                />
+                <Input
+                  type="text"
+                  label="No PO"
+                  placeholder="Masukkan no. PO!"
+                  value={form.id_po}
+                  onValueChange={(val) => setForm({ ...form, id_po: val })}
                 />
                 {/* <Input
                   type="text"
