@@ -11,10 +11,36 @@ const countPercentProvit = (hargaModal, hargaJual) => {
 const countPriceByPercentProfit = (hargaModal, provitPercent) => {
   return hargaModal * (1 + provitPercent / 100);
 };
+const countRecapitulation = (data, diskon, pajakpersen) => {
+  const { modal, jual } = data.reduce(
+    ({ modal, jual }, v) => ({
+      modal: modal + v.hargamodal * v.jumlah,
+      jual: jual + v.harga * v.jumlah,
+    }),
+    { modal: 0, jual: 0 }
+  );
+  const maksDiskon = jual - modal;
+  const maksDiskonPersen = (maksDiskon / jual) * 100;
+  const hargaDiskon = jual - diskon;
+  const persenDiskon = (diskon / jual) * 100;
+  const pajak = hargaDiskon * (pajakpersen / 100);
+  const hargaPajak = hargaDiskon + pajak;
+  return {
+    modal,
+    jual,
+    maksDiskon,
+    maksDiskonPersen,
+    hargaDiskon,
+    persenDiskon,
+    pajak,
+    hargaPajak,
+  };
+};
 
 export {
   countProvitMarginPercent,
   countPriceByProvitMarginPercent,
   countPercentProvit,
   countPriceByPercentProfit,
+  countRecapitulation,
 };

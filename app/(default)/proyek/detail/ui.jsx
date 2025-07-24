@@ -49,11 +49,9 @@ import { BKSHeader, NavLinkNewTab, SVTHeader } from "@/components/mycomponent";
 import { Button } from "@heroui/react";
 import { Input } from "@heroui/react";
 import { Divider } from "@heroui/react";
-import { Spacer } from "@heroui/react";
 import { Select, SelectItem } from "@heroui/react";
 import { CheckboxGroup, Checkbox } from "@heroui/react";
 import { Form } from "@heroui/form";
-import Link from "next/link";
 import Image from "next/image";
 import logoBks from "@/public/logo-bks.jpeg";
 import logoSvt from "@/public/logo-svt.jpeg";
@@ -63,9 +61,9 @@ import {
   countPercentProvit,
   countPriceByPercentProfit,
   countProvitMarginPercent,
+  countRecapitulation,
 } from "@/app/utils/formula";
 import { updateSwitch } from "@/app/utils/tools";
-import { nominalToText } from "@/app/utils/number";
 import KeteranganPenawaran from "./keteranganpenawaran";
 import SubProyek from "./subproyek";
 import Invoice from "./invoice";
@@ -280,8 +278,8 @@ export default function App({ id, versi }) {
       ...formRekapitulasi,
       id,
       diskon: rekapDiskon,
-      hargadiskon: totalHarga - rekapDiskon,
-      pajak: rekapPajak,
+      hargadiskon: rekapProduk.hargaDiskon,
+      pajak: rekapitulasi.pajak,
       versi: selectedVersion,
     });
     modal.rekapitulasi.onOpen();
@@ -682,12 +680,9 @@ export default function App({ id, versi }) {
   if (keteranganPenawaran.error) return <div>failed to load</div>;
   if (keteranganPenawaran.isLoading) return <div>loading...</div>;
 
-  const keranjangProduk = keranjangProyek?.data.map((item) => ({
-    ...item,
-  }));
-  const keranjangIntalasi = keranjangProyekInstalasi?.data.map((item) => ({
-    ...item,
-  }));
+  const keranjangProduk = keranjangProyek.data;
+  const keranjangIntalasi = keranjangProyekInstalasi.data;
+  const rekapitulasi = rekapitulasiProyek.data[0];
 
   const selectedProyek = proyek.data[0];
   const invoiceData = [
@@ -1014,6 +1009,19 @@ export default function App({ id, versi }) {
   const selectedVersion = selectVersi.values().next().value;
   const provit = hargaDiskon - totalModal;
   const persenProvit = (provit / totalModal) * 100;
+
+  const rekapProduk = countRecapitulation(
+    keranjangProduk,
+    rekapitulasi.diskon,
+    rekapitulasi.pajak
+  );
+  const rekapInstalasi = countRecapitulation(
+    keranjangIntalasi,
+    rekapitulasi.diskoninstalasi,
+    0
+  );
+
+  console.log({ rekapProduk, rekapInstalasi });
 
   const formatTable = {
     wrapper: "py-0 px-1",
@@ -1672,15 +1680,16 @@ export default function App({ id, versi }) {
                 Edit Rekapitulasi
               </ModalHeader>
               <ModalBody>
+                <div className="font-bold">Peralatan</div>
                 <div>
-                  Sub Total Harga : <Harga harga={totalHarga} />
+                  Sub Total Harga : <Harga harga={rekapProduk.jual} />
                 </div>
                 <div>
                   Maks Diskon :{" "}
                   <Harga
                     label={``}
-                    harga={maksDiskon}
-                    endContent={`(${maksDiskonPersen.toFixed(2)}%)`}
+                    harga={rekapProduk.maksDiskon}
+                    endContent={`(${rekapProduk.maksDiskonPersen.toFixed(2)}%)`}
                   />
                 </div>
                 <NumberInput
@@ -1690,10 +1699,12 @@ export default function App({ id, versi }) {
                     useGrouping: false,
                   }}
                   isInvalid={
-                    formRekapitulasi.diskon > maksDiskon ? true : false
+                    formRekapitulasi.diskon > rekapProduk.maksDiskon
+                      ? true
+                      : false
                   }
                   errorMessage={
-                    formRekapitulasi.diskon > maksDiskon
+                    formRekapitulasi.diskon > rekapProduk.maksDiskon
                       ? "Diskon melebihi batas"
                       : undefined
                   }
@@ -1715,7 +1726,7 @@ export default function App({ id, versi }) {
                     setFormRekapitulasi({
                       ...formRekapitulasi,
                       diskon: v,
-                      hargadiskon: totalHarga - v,
+                      hargadiskon: rekapProduk.jual - v,
                     })
                   }
                 />
@@ -1758,7 +1769,7 @@ export default function App({ id, versi }) {
                         <Harga
                           harga={
                             (formRekapitulasi.pajak *
-                              (totalHarga - formRekapitulasi.diskon)) /
+                              (rekapProduk.jual - formRekapitulasi.diskon)) /
                             100
                           }
                         />
