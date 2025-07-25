@@ -14,7 +14,7 @@ export default function Rekapitulasi({ peralatan, instalasi, rekapitulasi }) {
     rekapitulasi.diskoninstalasi,
     0
   );
-  const createRecapTable = (rekap, pajak) => {
+  const createRecapTable = (rekap, diskon, pajak) => {
     return [
       { key: "Sub Total Modal", val: rekap.modal, info: null },
       { key: "Sub Total Harga", val: rekap.jual, info: null },
@@ -25,7 +25,7 @@ export default function Rekapitulasi({ peralatan, instalasi, rekapitulasi }) {
       },
       {
         key: "Diskon",
-        val: rekap.diskon,
+        val: diskon,
         info: rekap.diskonPersen,
       },
       {
@@ -44,21 +44,21 @@ export default function Rekapitulasi({ peralatan, instalasi, rekapitulasi }) {
   };
   const dataTabelPeralatan = createRecapTable(
     rekapPeralatan,
+    rekapitulasi.diskon,
     rekapitulasi.pajak
+  );
+  const dataTabelInstalasi = createRecapTable(
+    rekapInstalasi,
+    rekapitulasi.diskoninstalasi,
+    0
   );
   return (
     <div className="bg-white rounded-lg p-3 w- text-nowrap">
       <div>Rekapitulasi</div>
-      <div>Peralatan</div>
-      {dataTabelPeralatan.map((v, i) => (
-        <div key={i} className="flex pl-2">
-          <div className="basis-1/2">{v.key}</div>
-          <div className="basis-1/2 text-right">
-            {v.info ? `(${v.info}%) ` : ""}
-            <Harga harga={v.val} />
-          </div>
-        </div>
-      ))}
+      <div className="flex gap-2">
+        <RecapTable title={"Peralatan"} tableData={dataTabelPeralatan} />
+        <RecapTable title={"Instalasi"} tableData={dataTabelInstalasi} />
+      </div>
     </div>
   );
 }
@@ -163,5 +163,22 @@ const RekapHarga = () => {
         />
       </div>
     </>
+  );
+};
+
+const RecapTable = ({ title, tableData }) => {
+  return (
+    <div>
+      <div>{title}</div>
+      {tableData.map((v, i) => (
+        <div key={i} className="grid grid-cols-2 gap- pl-2">
+          <div className="basis-1/2-">{v.key}</div>
+          <div className="basis-1/2- text-right">
+            {v.info ? `(${v.info}%) ` : ""}
+            <Harga harga={v.val} />
+          </div>
+        </div>
+      ))}
+    </div>
   );
 };

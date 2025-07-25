@@ -954,7 +954,6 @@ export default function App({ id, versi }) {
       0
     );
   }
-  const totalModal = totalModalProduk + totalModalInstalasi;
   const subTotalHargaJual = keranjangProyek.data.reduce(
     (total, currentValue) => {
       return total + currentValue.jumlah * currentValue.harga;
@@ -987,29 +986,10 @@ export default function App({ id, versi }) {
   );
   const totalHarga = subTotalHargaJual + subTotalHargaInstalasi;
   const totalKustom = subTotalKustomJual + subTotalKustomInstalasi;
-  const maksDiskon = totalHarga - totalModal;
-  const maksDiskonPersen = (maksDiskon / totalHarga) * 100;
-  const maksDiskonInstalasi = keranjangProyekInstalasi.data.reduce(
-    (total, currentValue) => {
-      return (
-        total +
-        currentValue.jumlah * (currentValue.hargajual - currentValue.hargamodal)
-      );
-    },
-    0
-  );
-  const maksDiskonPersenInstalasi =
-    (maksDiskonInstalasi / subTotalHargaInstalasi) * 100;
-  const diskonPersen = (rekapDiskon / totalHarga) * 100;
-  const hargaDiskon = totalHarga - rekapDiskon;
   const kustomDiskon = totalKustom - rekapDiskon;
-  const pajak = (hargaDiskon * rekapPajak) / 100;
   const pajakKustom = (kustomDiskon * rekapPajak) / 100;
-  const finalHarga = hargaDiskon + pajak;
   const finalKustom = kustomDiskon + pajakKustom;
   const selectedVersion = selectVersi.values().next().value;
-  const provit = hargaDiskon - totalModal;
-  const persenProvit = (provit / totalModal) * 100;
 
   const rekapProduk = countRecapitulation(
     keranjangProduk,
@@ -1021,8 +1001,6 @@ export default function App({ id, versi }) {
     rekapitulasi.diskoninstalasi,
     0
   );
-
-  console.log({ rekapProduk, rekapInstalasi });
 
   const formatTable = {
     wrapper: "py-0 px-1",
@@ -1121,75 +1099,12 @@ export default function App({ id, versi }) {
           <></>
         )}
         {/* rekapitulasi */}
-        <ConditionalComponent
-          condition={selectVersi.size}
-          component={
-            <>
-              {/* rekapitulasi */}
-              <div className="bg-white rounded-lg p-3 w- text-nowrap">
-                <div>Rekapitulasi</div>
-                <div className="flex gap-2">
-                  <div className="basis-">
-                    <div>Sub Total Modal</div>
-                    <div>Sub Total Harga</div>
-                    <div>Maks Diskon</div>
-                    <div>Diskon</div>
-                    <div>Harga Setelah Diskon</div>
-                    <div>Pajak ({selectedRekapitulasiProyek?.pajak}%)</div>
-                    <div>Harga Setelah Pajak</div>
-                    <div>Estimasi Provit</div>
-                  </div>
-                  <div className="basis- text-right">
-                    <div>
-                      <Harga harga={totalModal} />
-                    </div>
-                    <div>
-                      <Harga harga={totalHarga} />
-                    </div>
-                    <div>
-                      ({maksDiskonPersen.toFixed(2)}%){" "}
-                      <Harga label={``} harga={maksDiskon} />
-                    </div>
-                    <div>
-                      ({diskonPersen.toFixed(2)}%){" "}
-                      <Harga harga={rekapDiskon} endContent={``} />
-                    </div>
-                    <div>
-                      <Harga harga={hargaDiskon} />
-                    </div>
-                    <div>
-                      <Harga harga={pajak} />
-                    </div>
-                    <div>
-                      <Harga harga={finalHarga} />
-                    </div>
-                    <div>
-                      ({persenProvit.toFixed(2)}%) <Harga harga={provit} />
-                    </div>
-                    <ConditionalComponent
-                      condition={selectedProyek.versi == 0}
-                      component={
-                        <Button
-                          onPress={handleButtonEdit}
-                          color="primary"
-                          className="float-right mt-3"
-                        >
-                          Edit
-                        </Button>
-                      }
-                    />
-                  </div>
-                </div>
-              </div>
-            </>
-          }
-        />
-        {/* tabel keterangan penawaran */}
         <Rekapitulasi
           peralatan={keranjangProduk}
           instalasi={keranjangIntalasi}
           rekapitulasi={rekapitulasi}
         />
+        {/* tabel keterangan penawaran */}
         <div>
           <KeteranganPenawaran
             keteranganPenawaran={keteranganPenawaran}
