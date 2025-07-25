@@ -64,9 +64,10 @@ import {
   countRecapitulation,
 } from "@/app/utils/formula";
 import { updateSwitch } from "@/app/utils/tools";
-import KeteranganPenawaran from "./keteranganpenawaran";
-import SubProyek from "./subproyek";
 import Invoice from "./invoice";
+import KeteranganPenawaran from "./keteranganpenawaran";
+import Rekapitulasi from "./rekapitulasi";
+import SubProyek from "./subproyek";
 
 const api_path = getApiPath();
 
@@ -1184,6 +1185,11 @@ export default function App({ id, versi }) {
           }
         />
         {/* tabel keterangan penawaran */}
+        <Rekapitulasi
+          peralatan={keranjangProduk}
+          instalasi={keranjangIntalasi}
+          rekapitulasi={rekapitulasi}
+        />
         <div>
           <KeteranganPenawaran
             keteranganPenawaran={keteranganPenawaran}
