@@ -1,7 +1,6 @@
 "use client";
 import React, { useState } from "react";
 import { Autocomplete, AutocompleteItem } from "@heroui/react";
-import { useFilter } from "@react-aria/i18n";
 import { Input, NumberInput } from "@heroui/react";
 import { Select, SelectItem } from "@heroui/react";
 import { Checkbox } from "@heroui/react";

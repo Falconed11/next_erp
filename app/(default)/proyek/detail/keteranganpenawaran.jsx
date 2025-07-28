@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, Checkbox, Tooltip } from "@heroui/react";
+import { Button, Checkbox, Input, Tooltip } from "@heroui/react";
 import { EditIcon, DeleteIcon } from "@/components/icon";
 import {
   Table,

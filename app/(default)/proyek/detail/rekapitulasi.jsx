@@ -1,9 +1,42 @@
 import { useState } from "react";
 import Harga from "@/components/harga";
-import { countRecapitulation } from "@/app/utils/formula";
+import { countPercentProvit, countRecapitulation } from "@/app/utils/formula";
+import {
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Button,
+  useDisclosure,
+} from "@heroui/react";
+import { NumberInput } from "@heroui/react";
 
 export default function Rekapitulasi({ peralatan, instalasi, rekapitulasi }) {
-  const [form, setForm] = useState({});
+  const [formPeralatan, setFormPeralatan] = useState({});
+  const [formInstalasi, setFormInstalasi] = useState({});
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const editButtonPress = () => {
+    setFormPeralatan({
+      ...formPeralatan,
+      modal: rekapPeralatan.modal,
+      jual: rekapPeralatan.jual,
+      maksDiskon: rekapPeralatan.maksDiskon,
+      maksDiskonPersen: rekapPeralatan.maksDiskonPersen,
+      diskon: rekapitulasi.diskon,
+      pajakpersen: rekapitulasi.pajak,
+    });
+    setFormInstalasi({
+      ...formInstalasi,
+      modal: rekapInstalasi.modal,
+      jual: rekapInstalasi.jual,
+      maksDiskon: rekapInstalasi.maksDiskon,
+      maksDiskonPersen: rekapInstalasi.maksDiskonPersen,
+      diskon: rekapitulasi.diskonInstalasi,
+      pajakpersen: 0,
+    });
+    onOpen();
+  };
   const rekapPeralatan = countRecapitulation(
     peralatan,
     rekapitulasi.diskon,
@@ -15,7 +48,7 @@ export default function Rekapitulasi({ peralatan, instalasi, rekapitulasi }) {
     0
   );
   const createRecapTable = (rekap, diskon, pajak) => {
-    return [
+    const tableData = [
       { key: "Sub Total Modal", val: rekap.modal, info: null },
       { key: "Sub Total Harga", val: rekap.jual, info: null },
       {
@@ -23,24 +56,31 @@ export default function Rekapitulasi({ peralatan, instalasi, rekapitulasi }) {
         val: rekap.maksDiskon,
         info: rekap.maksDiskonPersen,
       },
-      {
-        key: "Diskon",
-        val: diskon,
-        info: rekap.diskonPersen,
-      },
-      {
-        key: "Harga Setelah Diskon",
-        val: rekap.hargaDiskon,
-        info: null,
-      },
-      { key: "Pajak", val: rekap.pajak, info: pajak },
-      { key: "Harga Setelah Pajak", val: rekap.hargaPajak, info: null },
-      {
-        key: "Estimasi Provit",
-        val: rekap.provit,
-        info: rekap.provitPersen,
-      },
     ];
+    if (diskon)
+      tableData.push(
+        {
+          key: "Diskon",
+          val: diskon,
+          info: rekap.diskonPersen,
+        },
+        {
+          key: "Harga Setelah Diskon",
+          val: rekap.hargaDiskon,
+          info: null,
+        }
+      );
+    if (pajak)
+      tableData.push(
+        { key: "Pajak", val: rekap.pajak, info: pajak },
+        { key: "Harga Setelah Pajak", val: rekap.hargaPajak, info: null }
+      );
+    tableData.push({
+      key: "Estimasi Provit",
+      val: rekap.provit,
+      info: rekap.provitPersen,
+    });
+    return tableData;
   };
   const dataTabelPeralatan = createRecapTable(
     rekapPeralatan,
@@ -52,52 +92,126 @@ export default function Rekapitulasi({ peralatan, instalasi, rekapitulasi }) {
     rekapitulasi.diskoninstalasi,
     0
   );
+  const totalModal = rekapPeralatan.modal + rekapInstalasi.modal;
+  const totalJual = rekapPeralatan.hargaDiskon + rekapInstalasi.hargaDiskon;
+  const dataTabelTotal = [
+    { key: "Harga Modal", val: totalModal },
+    {
+      key: "Harga Jual",
+      val: totalJual,
+    },
+  ];
+  if (rekapPeralatan.pajak)
+    dataTabelTotal.push(
+      {
+        key: "Pajak Peralatan",
+        val: rekapPeralatan.pajak,
+      },
+      {
+        key: "Harga Setelah Pajak",
+        val: totalJual + rekapPeralatan.pajak,
+      }
+    );
+  dataTabelTotal.push({
+    key: "Estimasi Provit",
+    val: rekapPeralatan.provit + rekapInstalasi.provit,
+    info: countPercentProvit(totalModal, totalJual).toFixed(2),
+  });
   return (
-    <div className="bg-white rounded-lg p-3 w- text-nowrap">
-      <div>Rekapitulasi</div>
-      <div className="flex gap-2">
-        <RecapTable title={"Peralatan"} tableData={dataTabelPeralatan} />
-        <RecapTable title={"Instalasi"} tableData={dataTabelInstalasi} />
+    <>
+      <div className="bg-white rounded-lg p-3 w- text-nowrap">
+        <div>Rekapitulasi</div>
+        <div className="flex gap-2">
+          <RecapTable title={"Peralatan"} tableData={dataTabelPeralatan} />
+          <RecapTable title={"Instalasi"} tableData={dataTabelInstalasi} />
+        </div>
+        <RecapTable title={"Total"} tableData={dataTabelTotal} />
+        <div className="text-right">
+          <Button color="primary" onPress={editButtonPress}>
+            Edit
+          </Button>
+        </div>
       </div>
-    </div>
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">
+                Edit Rekapitulasi
+              </ModalHeader>
+              <ModalBody>
+                <RekapHarga
+                  title={"Peralatan"}
+                  form={formPeralatan}
+                  setForm={setFormPeralatan}
+                />
+                <RekapHarga
+                  title={"Instalasi"}
+                  form={formInstalasi}
+                  setForm={setFormInstalasi}
+                  disablePajak
+                />
+              </ModalBody>
+              <ModalFooter>
+                <Button color="danger" variant="light" onPress={onClose}>
+                  Batal
+                </Button>
+                <Button color="primary" onPress={onClose}>
+                  Simpan
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+    </>
   );
 }
 
-const RekapHarga = () => {
+const RekapHarga = ({ title, form, setForm, disablePajak }) => {
+  const hargaDiskon = form.jual - form.diskon;
+  const pajak = (hargaDiskon * form.pajakpersen) / 100;
+  const totalHarga = hargaDiskon + pajak;
   return (
     <>
+      <div className="font-bold">{title}</div>
+      <div>
+        Harga Modal : <Harga harga={form.modal} />
+      </div>
+      <div>
+        Harga Jual : <Harga harga={form.jual} />
+      </div>
+      <div>
+        Maks. Diskon : <Harga harga={form.maksDiskon} /> (
+        {form.maksDiskonPersen}%)
+      </div>
       <NumberInput
         hideStepper
         isWheelDisabled
         formatOptions={{
           useGrouping: false,
         }}
-        isInvalid={
-          formRekapitulasi.diskon > rekapProduk.maksDiskon ? true : false
-        }
+        isInvalid={form.diskon > form.maksDiskon ? true : false}
         errorMessage={
-          formRekapitulasi.diskon > rekapProduk.maksDiskon
-            ? "Diskon melebihi batas"
-            : undefined
+          form.diskon > form.maksDiskon ? "Diskon melebihi batas" : undefined
         }
-        value={formRekapitulasi.diskon}
+        value={form.diskon}
         label="Diskon"
         placeholder="Masukkan diskon!"
         endContent={
           <div className="pointer-events-none flex items-center">
             <span className="text-default-400 text-small">
-              ({((formRekapitulasi.diskon / totalHarga) * 100).toFixed(2)}
+              ({((form.diskon / form.jual) * 100).toFixed(2)}
               %)
             </span>
           </div>
         }
-        onValueChange={(v) =>
-          setFormRekapitulasi({
-            ...formRekapitulasi,
+        onValueChange={(v) => {
+          setForm({
+            ...form,
             diskon: v,
-            hargadiskon: rekapProduk.jual - v,
-          })
-        }
+          });
+        }}
       />
       <NumberInput
         hideStepper
@@ -105,62 +219,52 @@ const RekapHarga = () => {
         formatOptions={{
           useGrouping: false,
         }}
-        value={formRekapitulasi.hargadiskon}
+        value={hargaDiskon}
         label="Harga Setelah Diskon"
         placeholder="Masukkan harga diskon!"
         endContent={
           <div className="pointer-events-none flex items-center">
             <span className="text-default-400 text-small">
-              <Harga harga={formRekapitulasi.hargadiskon} />
+              <Harga harga={hargaDiskon} />
             </span>
           </div>
         }
-        onValueChange={(v) =>
-          setFormRekapitulasi({
-            ...formRekapitulasi,
-            hargadiskon: v,
+        onValueChange={(v) => {
+          setForm({
+            ...form,
             diskon: totalHarga - v,
-          })
-        }
-      />
-      <NumberInput
-        hideStepper
-        isWheelDisabled
-        formatOptions={{
-          useGrouping: false,
+          });
         }}
-        value={formRekapitulasi.pajak}
-        label="Pajak (%)"
-        placeholder="Masukkan pajak!"
-        endContent={
-          <div className="pointer-events-none flex items-center">
-            <span className="text-default-400 text-small">
-              <Harga
-                harga={
-                  (formRekapitulasi.pajak *
-                    (rekapProduk.jual - formRekapitulasi.diskon)) /
-                  100
-                }
-              />
-            </span>
-          </div>
-        }
-        onValueChange={(v) =>
-          setFormRekapitulasi({
-            ...formRekapitulasi,
-            pajak: v,
-          })
-        }
       />
-      <div>
-        Total Harga :{" "}
-        <Harga
-          harga={
-            (formRekapitulasi.hargadiskon *
-              (100 + parseInt(formRekapitulasi.pajak))) /
-            100
+      {disablePajak ? (
+        <></>
+      ) : (
+        <NumberInput
+          hideStepper
+          isWheelDisabled
+          formatOptions={{
+            useGrouping: false,
+          }}
+          value={form.pajakpersen}
+          label="Pajak (%)"
+          placeholder="Masukkan pajak!"
+          endContent={
+            <div className="pointer-events-none flex items-center">
+              <span className="text-default-400 text-small">
+                <Harga harga={pajak} />
+              </span>
+            </div>
+          }
+          onValueChange={(v) =>
+            setForm({
+              ...form,
+              pajakpersen: v,
+            })
           }
         />
+      )}
+      <div>
+        Total Harga : <Harga harga={totalHarga} />
       </div>
     </>
   );

@@ -1081,9 +1081,13 @@ export default function App({ id, versi }) {
           <div className="bg-white rounded-lg p-3 flex flex-col gap-2">
             <div>Alat</div>
             <Form onSubmit={terapkanButtonPress}>
-              <Input
+              <NumberInput
+                hideStepper
+                isWheelDisabled
+                formatOptions={{
+                  useGrouping: false,
+                }}
                 label="Persen Provit"
-                type="text"
                 placeholder="Masukkan persen provit"
                 value={inputPersenProvit}
                 onValueChange={setInputPersenProvit}
