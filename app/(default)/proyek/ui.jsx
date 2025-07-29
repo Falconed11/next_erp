@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import * as XLSX from "xlsx";
 import { RadioGroup, Radio } from "@heroui/react";
@@ -79,18 +79,15 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
     startDate: startDate ? new Date(startDate) : null,
     endDate: endDate ? new Date(endDate) : null,
   });
-  console.log(id_karyawan);
   const [selectkaryawan, setSelectKaryawan] = useState(
     new Set([id_karyawan ? id_karyawan : ""])
     // new Set([])
   );
-  console.log(selectkaryawan);
-
   const [stat, setStat] = useState(1);
   const [page, setPage] = React.useState(1);
   const rowsPerPage = 10;
-
   const [selectProyek, setSelectProyek] = useState({});
+  const [filteredData, setFilteredData] = useState([]);
   const proyek = useClientFetch(
     `proyek?${id_instansi ? `id_instansi=${id_instansi}` : ""}${
       selectkaryawan.size > 0
@@ -105,19 +102,21 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
       current.endDate
     )}`
   );
-
   const disclosure = {
     drawer: useDisclosure(),
   };
-
-  const filteredData = proyek?.data;
-
+  const user = session.data?.user;
+  // filteredData = proyek?.data;
+  // filteredData.forEach((data) => [(data.peran = user?.peran)]);
+  useEffect(() => {
+    const updated = proyek?.data?.map((d) => ({ ...d, peran: user?.peran }));
+    setFilteredData(updated);
+  }, [proyek?.data, user?.peran]);
   const pages = useMemo(() => {
     return filteredData ? Math.ceil(filteredData?.length / rowsPerPage) : 0;
   }, [filteredData?.length, rowsPerPage]);
   const loadingState = proyek.isLoading ? "loading" : "idle";
   const offset = (page - 1) * rowsPerPage;
-
   const perusahaan = useClientFetch("perusahaan");
   const karyawan = useClientFetch("karyawan");
   const statusproyek = useClientFetch("statusproyek");
@@ -128,7 +127,6 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
   const [form, setForm] = useState({});
   const [method, setMethod] = useState("POST");
   const [json, setJson] = useState([]);
-
   const saveButtonPress = async (onClose) => {
     // if (form.isSwasta.size == 0) return alert("Swasta/Negri belum diisi");
     const res = await fetch(`${apiPath}proyek`, {
@@ -198,7 +196,6 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
       if (res.status == 400) return alert(json.message);
     }
   };
-
   const handleFileUpload = (jsonData) => {
     // console.log(jsonData);
     // Do something with the converted JSON object, e.g., send it to an API
@@ -274,7 +271,6 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
       compression: true,
     });
   };
-
   const renderCell = React.useCallback((data, columnKey) => {
     const cellValue = data[columnKey];
     const date = new Date(data.tanggal);
@@ -416,7 +412,6 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [reportList, setReportList] = useState([]);
   const report = useDisclosure();
-
   if (isLoading) return <div>loading...</div>;
   if (proyek.error) return <div>failed to load</div>;
   if (proyek.isLoading) return <div>loading...</div>;
@@ -433,11 +428,6 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
   if (penawaran.error) return <div>failed to load</div>;
   if (penawaran.isLoading) return <div>loading...</div>;
   if (session.data?.user == undefined) return <div>loading...</div>;
-
-  console.log(proyek.data[0]);
-  const user = session.data?.user;
-  filteredData.forEach((data) => [(data.peran = user?.peran)]);
-
   const columns = [
     // {
     //   key: "id",
@@ -519,7 +509,6 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
     { id: 0, nama: "negri" },
     { id: 1, nama: "swasta" },
   ];
-
   const nPenawaran = proyek.data.length;
   const summary = proyek.data.reduce(
     (acc, current) => {
@@ -562,8 +551,7 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
     summary.totalPenawaranReject +
     summary.totalPenawaranWaiting;
   summary.totalProvit = summary.totalPenawaran - summary.totalModal;
-  console.log(selectkaryawan);
-
+  console.log("render");
   return (
     <div className="flex flex-col gap-2">
       {id_instansi ? (
@@ -579,18 +567,6 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
         <Button color="primary" onPress={tambahButtonPress}>
           Tambah
         </Button>
-        {/* <div>
-          <Link
-            className="bg-primary text-white p-2 rounded-lg inline-block"
-            href={"/proyek.xlsx"}
-          >
-            Download Format
-          </Link>
-        </div>
-        <FileUploader onFileUpload={handleFileUpload} />
-        <Button color="primary" onPress={handleButtonUploadExcelPress}>
-          Upload Excel
-        </Button> */}
       </div>
       <Table
         isStriped
@@ -635,28 +611,11 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
                       }}
                     >
                       {karyawan.data.map((v) => (
-                        <SelectItem key={v.id}>{v.nama}</SelectItem>
+                        <SelectItem key={v.id} textValue={v.nama || "NN"}>
+                          {v.nama || "NN"}
+                        </SelectItem>
                       ))}
                     </Select>
-                    {/* <div className="flex gap-2">
-                    <div className="flex flex-row gap-2">
-                      <Button
-                        color="primary"
-                        onClick={handleButtonExportToExcelPress}
-                      >
-                        Export to Excel
-                      </Button>
-                    </div>
-                    <div className="flex flex-row gap-2">
-                      <Button color="primary" onClick={exportPenawaran}>
-                        Export Penawaran
-                      </Button>
-                    </div>
-                    <FileUploader onFileUpload={handleFileUpload} />
-                    <Button color="primary" onPress={importPenawaran}>
-                      Import Penawaran
-                    </Button>
-                  </div> */}
                   </div>
                   {/* Ringkasan */}
                   <div>
@@ -873,74 +832,6 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
                     </SelectItem>
                   ))}
                 </Select>
-                {/* <Select
-                  label="Swasta/Negri"
-                  variant="bordered"
-                  placeholder="Pilih swasta/negri!"
-                  selectedKeys={form.isSwasta}
-                  className="max-w-xs"
-                  onSelectionChange={(val) => {
-                    setForm({
-                      ...form,
-                      isSwasta: val,
-                      swasta: new Set(val).values().next().value,
-                    });
-                  }}
-                >
-                  {isSwasta.map((item) => (
-                    <SelectItem key={item.id} value={item.id}>
-                      {item.nama}
-                    </SelectItem>
-                  ))}
-                </Select> */}
-                {/* <Select
-                  label="Kategori Proyek"
-                  variant="bordered"
-                  placeholder="Pilih kategori proyek!"
-                  selectedKeys={form.selectkategoriproyek}
-                  className="max-w-xs"
-                  onSelectionChange={(val) => {
-                    setForm({
-                      ...form,
-                      selectkategoriproyek: val,
-                      id_kategoriproyek: new Set(val).values().next().value,
-                    });
-                  }}
-                >
-                  {kategoriproyek.data.map((item) => (
-                    <SelectItem key={item.id} value={item.id}>
-                      {item.nama}
-                    </SelectItem>
-                  ))}
-                </Select> */}
-                {/* <Select
-                  label="Customer"
-                  variant="bordered"
-                  placeholder="Pilih customer!"
-                  selectedKeys={form.selectcustomer}
-                  className="max-w-xs"
-                  onSelectionChange={(val) => {
-                    const id_instansi = new Set(val).values().next().value;
-                    setForm({
-                      ...form,
-                      selectcustomer: val,
-                      id_instansi,
-                      kota: customer.data.filter((v) => v.id == id_instansi)[0]
-                        ?.kota,
-                    });
-                  }}
-                >
-                  {customer.data.map((item) => (
-                    <SelectItem
-                      key={item.id}
-                      value={item.id}
-                      textValue={item.nama}
-                    >
-                      {item.nama} | {item.swasta ? "Swasta" : "Negri"} |{" "}
-                      {item.kota}
-                    </SelectItem>
-                  ))}
-                </Select> */}
                 <Autocomplete
                   label="Customer"
                   variant="bordered"
@@ -982,13 +873,6 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
                   value={form.id_po}
                   onValueChange={(val) => setForm({ ...form, id_po: val })}
                 />
-                {/* <Input
-                  type="text"
-                  label="Kota"
-                  placeholder="Masukkan kota!"
-                  value={form.kota}
-                  onValueChange={(val) => setForm({ ...form, kota: val })}
-                /> */}
                 <Select
                   label="Sales"
                   variant="bordered"
@@ -1005,31 +889,15 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
                   }}
                 >
                   {karyawan.data.map((item) => (
-                    <SelectItem key={item.id} value={item.id}>
-                      {item.nama}
+                    <SelectItem
+                      key={item.id}
+                      value={item.id}
+                      textValue={item.nama || "NN"}
+                    >
+                      {item.nama || "NN"}
                     </SelectItem>
                   ))}
                 </Select>
-                {/* <Select
-                  label="Status"
-                  variant="bordered"
-                  placeholder="Pilih status!"
-                  selectedKeys={form.selectstatus}
-                  className="max-w-xs"
-                  onSelectionChange={(val) => {
-                    setForm({
-                      ...form,
-                      selectstatus: val,
-                      id_statusproyek: new Set(val).values().next().value,
-                    });
-                  }}
-                >
-                  {statusproyek.data.map((item) => (
-                    <SelectItem key={item.id} value={item.id}>
-                      {item.nama}
-                    </SelectItem>
-                  ))}
-                </Select> */}
                 <div className="bg-gray-100 p-3 rounded-lg">
                   <div>Tanggal Penawaran</div>
                   <DatePicker

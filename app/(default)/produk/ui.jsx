@@ -445,27 +445,26 @@ export default function App() {
         return cellValue;
     }
   }, []);
-
-  let data = produk?.data;
-  // data = data?.filter(
-  //   (row) =>
-  //     (row.nama.toLowerCase().includes(nama.toLowerCase()) ||
-  //       row.nmerek?.toLowerCase().includes(nama.toLowerCase()) ||
-  //       row.tipe?.toLowerCase().includes(nama.toLowerCase()) ||
-  //       row.vendor?.toLowerCase().includes(nama.toLowerCase())) &&
-  //     row.id_kustom.toLowerCase().includes(id.toLocaleLowerCase())
-  // );
-  // data = data?.slice(0, 10);
-  const filteredData = produk?.data?.filter(
-    (row) =>
-      (row.nama.toLowerCase().includes(nama.toLowerCase()) ||
-        row.nmerek?.toLowerCase().includes(nama.toLowerCase()) ||
-        row.tipe?.toLowerCase().includes(nama.toLowerCase()) ||
-        row.vendor?.toLowerCase().includes(nama.toLowerCase()) ||
-        row.keterangan?.toLowerCase().includes(nama.toLowerCase())) &&
-      row.id_kustom.toLowerCase().includes(id.toLocaleLowerCase())
-  );
-
+  const filteredData = useMemo(() => {
+    if (!produk?.data) return [];
+    return produk.data.filter(
+      (row) =>
+        (row.nama.toLowerCase().includes(nama.toLowerCase()) ||
+          row.nmerek?.toLowerCase().includes(nama.toLowerCase()) ||
+          row.tipe?.toLowerCase().includes(nama.toLowerCase()) ||
+          row.vendor?.toLowerCase().includes(nama.toLowerCase()) ||
+          row.keterangan?.toLowerCase().includes(nama.toLowerCase())) &&
+        row.id_kustom.toLowerCase().includes(id.toLowerCase())
+    );
+  }, [produk?.data, nama, id]);
+  const dataMerek = useMemo(() => {
+    if (!merek?.data) return [];
+    return merek.data
+      .filter((animal) =>
+        animal.nama.toLowerCase().includes(filterMerek.toLowerCase())
+      )
+      .slice(0, 20);
+  }, [merek?.data, filterMerek]);
   const pages = useMemo(() => {
     return filteredData ? Math.ceil(filteredData?.length / rowsPerPage) : 0;
   }, [filteredData?.length, rowsPerPage]);
@@ -486,12 +485,6 @@ export default function App() {
   if (session.data?.user == undefined) return <div>loading...</div>;
 
   const user = session.data?.user;
-
-  let dataMerek = merek.data;
-  dataMerek = dataMerek.filter((animal) =>
-    animal.nama.toLowerCase().includes(filterMerek.toLowerCase())
-  );
-  dataMerek = dataMerek.slice(0, 20);
 
   const col = [
     {
@@ -593,7 +586,7 @@ export default function App() {
 
   // console.log({ id_vendor: form.id_vendor ? true : false });
 
-  console.log(isReadyStock);
+  console.log(form);
   return (
     <div className="">
       <div className="flex flex-col gap-2">

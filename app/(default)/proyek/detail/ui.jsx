@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import { useSession } from "next-auth/react";
 import {
   Table,
@@ -119,10 +119,6 @@ export default function App({ id, versi }) {
   const [formRekapitulasi, setFormRekapitulasi] = useState({ hargadiskon: 0 });
   const PERSEN_PROVIT = 30;
   const [inputPersenProvit, setInputPersenProvit] = useState(PERSEN_PROVIT);
-  const persenprovit =
-    Math.round(
-      countPercentProvit(form.temphargamodal || 0, form.harga || 0) * 100
-    ) / 100;
 
   const tambahButtonPress = async (form, setForm) => {
     if (!form.selectProduk) return alert("Silahkan pilih produk");
@@ -624,14 +620,26 @@ export default function App({ id, versi }) {
     jenisproyek: useDisclosure(),
   };
 
-  const dataPenawaran = keranjangProyek?.data
-    ?.sort((a, b) => a.subproyek?.localeCompare(b?.subproyek))
-    .map((produk, i) => {
-      return {
+  //
+
+  // const dataPenawaran = keranjangProyek?.data
+  //   ?.sort((a, b) => a.subproyek?.localeCompare(b?.subproyek))
+  //   .map((produk, i) => {
+  //     return {
+  //       ...produk,
+  //       no: i + 1,
+  //     };
+  //   });
+
+  const dataPenawaran = useMemo(() => {
+    if (!keranjangProyek?.data) return [];
+    return [...keranjangProyek.data]
+      .sort((a, b) => a.subproyek?.localeCompare(b?.subproyek))
+      .map((produk, i) => ({
         ...produk,
         no: i + 1,
-      };
-    });
+      }));
+  }, [keranjangProyek?.data]);
 
   // Step 2: Insert rows before each group
   const result = [];
@@ -645,14 +653,15 @@ export default function App({ id, versi }) {
     result.push(item);
   });
 
-  const dataInstalasi = keranjangProyekInstalasi?.data
-    ?.sort((a, b) => a.subproyek?.localeCompare(b?.subproyek))
-    .map((produk, i) => {
-      return {
+  const dataInstalasi = useMemo(() => {
+    if (!keranjangProyekInstalasi?.data) return [];
+    return [...keranjangProyekInstalasi.data]
+      .sort((a, b) => a.subproyek?.localeCompare(b?.subproyek))
+      .map((produk, i) => ({
         ...produk,
         no: i + 1,
-      };
-    });
+      }));
+  }, [keranjangProyekInstalasi?.data]);
 
   const resultInstalasi = [];
   let currentGroupInstalasi = null;
@@ -939,21 +948,6 @@ export default function App({ id, versi }) {
     ? selectedRekapitulasiProyek.pajak
     : 0;
   const keteranganPajak = rekapPajak ? "sudah" : "tidak";
-  let totalModalProduk = 0;
-  if (keranjangProyek.data.length > 0) {
-    totalModalProduk = keranjangProyek.data.reduce((total, harga) => {
-      return total + harga.jumlah * harga.temphargamodal;
-    }, 0);
-  }
-  let totalModalInstalasi = 0;
-  if (keranjangProyekInstalasi.data.length > 0) {
-    totalModalInstalasi = keranjangProyekInstalasi.data.reduce(
-      (total, harga) => {
-        return total + harga.jumlah * harga.temphargamodal;
-      },
-      0
-    );
-  }
   const subTotalHargaJual = keranjangProyek.data.reduce(
     (total, currentValue) => {
       return total + currentValue.jumlah * currentValue.harga;
@@ -1001,7 +995,6 @@ export default function App({ id, versi }) {
     rekapitulasi.diskoninstalasi,
     0
   );
-
   const formatTable = {
     wrapper: "py-0 px-1",
     td: "text-xs py-0 align-top", // Reduce font size and vertical padding

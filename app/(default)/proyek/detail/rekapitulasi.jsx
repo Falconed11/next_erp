@@ -32,7 +32,7 @@ export default function Rekapitulasi({ peralatan, instalasi, rekapitulasi }) {
       jual: rekapInstalasi.jual,
       maksDiskon: rekapInstalasi.maksDiskon,
       maksDiskonPersen: rekapInstalasi.maksDiskonPersen,
-      diskon: rekapitulasi.diskonInstalasi,
+      diskon: rekapitulasi.diskoninstalasi,
       pajakpersen: 0,
     });
     onOpen();
@@ -172,6 +172,7 @@ const RekapHarga = ({ title, form, setForm, disablePajak }) => {
   const hargaDiskon = form.jual - form.diskon;
   const pajak = (hargaDiskon * form.pajakpersen) / 100;
   const totalHarga = hargaDiskon + pajak;
+  console.log(totalHarga);
   return (
     <>
       <div className="font-bold">{title}</div>
