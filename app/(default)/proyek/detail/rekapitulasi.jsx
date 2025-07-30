@@ -11,6 +11,9 @@ import {
   useDisclosure,
 } from "@heroui/react";
 import { NumberInput } from "@heroui/react";
+import { getApiPath } from "@/app/utils/apiconfig";
+
+const api_path = getApiPath();
 
 export default function Rekapitulasi({ peralatan, instalasi, rekapitulasi }) {
   const [formPeralatan, setFormPeralatan] = useState({});
@@ -36,6 +39,47 @@ export default function Rekapitulasi({ peralatan, instalasi, rekapitulasi }) {
       pajakpersen: 0,
     });
     onOpen();
+  };
+  const handleButtonSimpan = async (
+    diskon,
+    diskoninstalasi,
+    pajak,
+    rekapitulasi,
+    onClose
+  ) => {
+    console.log(rekapitulasi);
+    const isPresent = rekapitulasi.id;
+    const method = isPresent ? "PUT" : "POST";
+    console.log(method);
+    try {
+      const res = await fetch(`${api_path}rekapitulasiproyek`, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify({
+          ...(isPresent
+            ? { id: rekapitulasi.id }
+            : { id_proyek: rekapitulasi.id_proyek, versi: rekapitulasi.versi }),
+          diskon,
+          diskoninstalasi,
+          pajak,
+        }),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        // Handle specific error messages if available
+        const message = json.message || `Error ${res.status}`;
+        alert(message);
+        return;
+      }
+      onClose();
+      // return alert(json.message);
+    } catch (err) {
+      alert("Network error or server not responding");
+      console.error(err);
+    }
   };
   const rekapPeralatan = countRecapitulation(
     peralatan,
@@ -156,7 +200,18 @@ export default function Rekapitulasi({ peralatan, instalasi, rekapitulasi }) {
                 <Button color="danger" variant="light" onPress={onClose}>
                   Batal
                 </Button>
-                <Button color="primary" onPress={onClose}>
+                <Button
+                  color="primary"
+                  onPress={() =>
+                    handleButtonSimpan(
+                      formPeralatan.diskon,
+                      formInstalasi.diskon,
+                      formPeralatan.pajakpersen,
+                      rekapitulasi,
+                      onClose
+                    )
+                  }
+                >
                   Simpan
                 </Button>
               </ModalFooter>
@@ -172,7 +227,6 @@ const RekapHarga = ({ title, form, setForm, disablePajak }) => {
   const hargaDiskon = form.jual - form.diskon;
   const pajak = (hargaDiskon * form.pajakpersen) / 100;
   const totalHarga = hargaDiskon + pajak;
-  console.log(totalHarga);
   return (
     <>
       <div className="font-bold">{title}</div>

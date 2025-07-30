@@ -270,17 +270,6 @@ export default function App({ id, versi }) {
     // console.log(json);
     return alert(json.message);
   };
-  const handleButtonEdit = () => {
-    setFormRekapitulasi({
-      ...formRekapitulasi,
-      id,
-      diskon: rekapDiskon,
-      hargadiskon: rekapProduk.hargaDiskon,
-      pajak: rekapitulasi.pajak,
-      versi: selectedVersion,
-    });
-    modal.rekapitulasi.onOpen();
-  };
   const handleButtonEditJenisProyek = () => {
     setSelected(kategoriProyek);
     modal.jenisproyek.onOpen();
@@ -288,23 +277,33 @@ export default function App({ id, versi }) {
   const handleButtonSimpanRekapitulasi = async (data, onClose) => {
     // console.log(rekapitulasiProyek.data.length);
     const method = rekapitulasiProyek.data.length == 0 ? "POST" : "PUT";
-    const res = await fetch(`${api_path}rekapitulasiproyek`, {
-      method,
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify({
-        ...data,
-        id: selectedRekapitulasiProyek ? selectedRekapitulasiProyek.id : null,
-        id_proyek: id,
-        versi: selectedVersion,
-      }),
-    });
-    const json = await res.json();
-    if (res.status == 400) return alert(json.message);
-    onClose();
-    // return alert(json.message);
+    try {
+      const res = await fetch(`${api_path}rekapitulasiproyek`, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify({
+          ...data,
+          id: selectedRekapitulasiProyek ? selectedRekapitulasiProyek.id : null,
+          id_proyek: id,
+          versi: selectedVersion,
+        }),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        // Handle specific error messages if available
+        const message = json.message || `Error ${res.status}`;
+        alert(message);
+        return;
+      }
+      onClose();
+      // return alert(json.message);
+    } catch (err) {
+      alert("Network error or server not responding");
+      console.error(err);
+    }
   };
   const handleButtonSimpanJenisProyek = async (data, onClose) => {
     const method = rekapitulasiProyek.data.length == 0 ? "POST" : "PUT";
@@ -619,18 +618,6 @@ export default function App({ id, versi }) {
     rekapitulasi: useDisclosure(),
     jenisproyek: useDisclosure(),
   };
-
-  //
-
-  // const dataPenawaran = keranjangProyek?.data
-  //   ?.sort((a, b) => a.subproyek?.localeCompare(b?.subproyek))
-  //   .map((produk, i) => {
-  //     return {
-  //       ...produk,
-  //       no: i + 1,
-  //     };
-  //   });
-
   const dataPenawaran = useMemo(() => {
     if (!keranjangProyek?.data) return [];
     return [...keranjangProyek.data]
@@ -644,7 +631,6 @@ export default function App({ id, versi }) {
   // Step 2: Insert rows before each group
   const result = [];
   let currentGroup = null;
-
   dataPenawaran?.forEach((item) => {
     if (item.subproyek !== currentGroup) {
       currentGroup = item.subproyek;
@@ -652,7 +638,6 @@ export default function App({ id, versi }) {
     }
     result.push(item);
   });
-
   const dataInstalasi = useMemo(() => {
     if (!keranjangProyekInstalasi?.data) return [];
     return [...keranjangProyekInstalasi.data]
@@ -692,7 +677,13 @@ export default function App({ id, versi }) {
 
   const keranjangProduk = keranjangProyek.data;
   const keranjangIntalasi = keranjangProyekInstalasi.data;
-  const rekapitulasi = rekapitulasiProyek.data[0];
+  const rekapitulasi = rekapitulasiProyek.data[0] || {
+    id_proyek: id,
+    versi,
+    diskon: 0,
+    diskoninstalasi: 0,
+    pajak: 0,
+  };
 
   const selectedProyek = proyek.data[0];
   const invoiceData = [
@@ -984,21 +975,11 @@ export default function App({ id, versi }) {
   const pajakKustom = (kustomDiskon * rekapPajak) / 100;
   const finalKustom = kustomDiskon + pajakKustom;
   const selectedVersion = selectVersi.values().next().value;
-
-  const rekapProduk = countRecapitulation(
-    keranjangProduk,
-    rekapitulasi.diskon,
-    rekapitulasi.pajak
-  );
-  const rekapInstalasi = countRecapitulation(
-    keranjangIntalasi,
-    rekapitulasi.diskoninstalasi,
-    0
-  );
   const formatTable = {
     wrapper: "py-0 px-1",
     td: "text-xs py-0 align-top", // Reduce font size and vertical padding
   };
+  console.log(rekapitulasi);
   return (
     <div>
       <div className="flex flex-row gap-2">
@@ -1100,6 +1081,7 @@ export default function App({ id, versi }) {
           peralatan={keranjangProduk}
           instalasi={keranjangIntalasi}
           rekapitulasi={rekapitulasi}
+          idProyek={id}
         />
         {/* tabel keterangan penawaran */}
         <div>
@@ -1585,150 +1567,6 @@ export default function App({ id, versi }) {
           </>
         }
       />
-      {/* edit rekapitulasi */}
-      <Modal
-        scrollBehavior="inside"
-        isOpen={modal.rekapitulasi.isOpen}
-        onOpenChange={modal.rekapitulasi.onOpenChange}
-      >
-        <ModalContent>
-          {(onClose) => (
-            <>
-              <ModalHeader className="flex flex-col gap-1">
-                Edit Rekapitulasi
-              </ModalHeader>
-              <ModalBody>
-                <div className="font-bold">Peralatan</div>
-                <div>
-                  Sub Total Harga : <Harga harga={rekapProduk.jual} />
-                </div>
-                <div>
-                  Maks Diskon :{" "}
-                  <Harga
-                    label={``}
-                    harga={rekapProduk.maksDiskon}
-                    endContent={`(${rekapProduk.maksDiskonPersen.toFixed(2)}%)`}
-                  />
-                </div>
-                <NumberInput
-                  hideStepper
-                  isWheelDisabled
-                  formatOptions={{
-                    useGrouping: false,
-                  }}
-                  isInvalid={
-                    formRekapitulasi.diskon > rekapProduk.maksDiskon
-                      ? true
-                      : false
-                  }
-                  errorMessage={
-                    formRekapitulasi.diskon > rekapProduk.maksDiskon
-                      ? "Diskon melebihi batas"
-                      : undefined
-                  }
-                  value={formRekapitulasi.diskon}
-                  label="Diskon"
-                  placeholder="Masukkan diskon!"
-                  endContent={
-                    <div className="pointer-events-none flex items-center">
-                      <span className="text-default-400 text-small">
-                        (
-                        {((formRekapitulasi.diskon / totalHarga) * 100).toFixed(
-                          2
-                        )}
-                        %)
-                      </span>
-                    </div>
-                  }
-                  onValueChange={(v) =>
-                    setFormRekapitulasi({
-                      ...formRekapitulasi,
-                      diskon: v,
-                      hargadiskon: rekapProduk.jual - v,
-                    })
-                  }
-                />
-                <NumberInput
-                  hideStepper
-                  isWheelDisabled
-                  formatOptions={{
-                    useGrouping: false,
-                  }}
-                  value={formRekapitulasi.hargadiskon}
-                  label="Harga Setelah Diskon"
-                  placeholder="Masukkan harga diskon!"
-                  endContent={
-                    <div className="pointer-events-none flex items-center">
-                      <span className="text-default-400 text-small">
-                        <Harga harga={formRekapitulasi.hargadiskon} />
-                      </span>
-                    </div>
-                  }
-                  onValueChange={(v) =>
-                    setFormRekapitulasi({
-                      ...formRekapitulasi,
-                      hargadiskon: v,
-                      diskon: totalHarga - v,
-                    })
-                  }
-                />
-                <NumberInput
-                  hideStepper
-                  isWheelDisabled
-                  formatOptions={{
-                    useGrouping: false,
-                  }}
-                  value={formRekapitulasi.pajak}
-                  label="Pajak (%)"
-                  placeholder="Masukkan pajak!"
-                  endContent={
-                    <div className="pointer-events-none flex items-center">
-                      <span className="text-default-400 text-small">
-                        <Harga
-                          harga={
-                            (formRekapitulasi.pajak *
-                              (rekapProduk.jual - formRekapitulasi.diskon)) /
-                            100
-                          }
-                        />
-                      </span>
-                    </div>
-                  }
-                  onValueChange={(v) =>
-                    setFormRekapitulasi({
-                      ...formRekapitulasi,
-                      pajak: v,
-                    })
-                  }
-                />
-                <div>
-                  Total Harga :{" "}
-                  <Harga
-                    harga={
-                      (formRekapitulasi.hargadiskon *
-                        (100 + parseInt(formRekapitulasi.pajak))) /
-                      100
-                    }
-                  />
-                </div>
-              </ModalBody>
-              <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
-                  Batal
-                </Button>
-                <Button
-                  color="primary"
-                  onPress={() =>
-                    handleButtonSimpanRekapitulasi(formRekapitulasi, onClose)
-                  }
-                >
-                  Simpan
-                </Button>
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
-      </Modal>
       {/* edit jenis proyek */}
       <Modal
         scrollBehavior="inside"
