@@ -137,7 +137,9 @@ export default function Rekapitulasi({ peralatan, instalasi, rekapitulasi }) {
     0
   );
   const totalModal = rekapPeralatan.modal + rekapInstalasi.modal;
-  const totalJual = rekapPeralatan.hargaDiskon + rekapInstalasi.hargaDiskon;
+  const totalJual = rekapPeralatan.jual + rekapInstalasi.jual;
+  const totalDiskon = rekapitulasi.diskon + rekapitulasi.diskoninstalasi;
+  const totalHargaDiskon = totalJual - totalDiskon;
   const dataTabelTotal = [
     { key: "Harga Modal", val: totalModal },
     {
@@ -145,6 +147,17 @@ export default function Rekapitulasi({ peralatan, instalasi, rekapitulasi }) {
       val: totalJual,
     },
   ];
+  if (totalDiskon)
+    dataTabelTotal.push(
+      {
+        key: "Diskon",
+        val: totalDiskon,
+      },
+      {
+        key: "Harga Setelah Diskon",
+        val: totalHargaDiskon,
+      }
+    );
   if (rekapPeralatan.pajak)
     dataTabelTotal.push(
       {
@@ -159,8 +172,17 @@ export default function Rekapitulasi({ peralatan, instalasi, rekapitulasi }) {
   dataTabelTotal.push({
     key: "Estimasi Provit",
     val: rekapPeralatan.provit + rekapInstalasi.provit,
-    info: countPercentProvit(totalModal, totalJual).toFixed(2),
+    info: countPercentProvit(totalModal, totalHargaDiskon).toFixed(2),
   });
+  const jual = rekapPeralatan.jual + rekapInstalasi.jual;
+  const diskon = formInstalasi.diskon + formPeralatan.diskon || 0;
+  const hargaDiskon = jual - diskon;
+  const pajak =
+    ((formPeralatan.jual - formPeralatan.diskon) * formPeralatan.pajakpersen) /
+    100;
+  const hargaPajak = hargaDiskon + pajak;
+  const provit = hargaDiskon - totalModal;
+  const provitPersen = countPercentProvit(totalModal, hargaDiskon).toFixed(2);
   return (
     <>
       <div className="bg-white rounded-lg p-3 w- text-nowrap">
@@ -176,7 +198,11 @@ export default function Rekapitulasi({ peralatan, instalasi, rekapitulasi }) {
           </Button>
         </div>
       </div>
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+      <Modal
+        scrollBehavior="inside"
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+      >
         <ModalContent>
           {(onClose) => (
             <>
@@ -195,6 +221,28 @@ export default function Rekapitulasi({ peralatan, instalasi, rekapitulasi }) {
                   setForm={setFormInstalasi}
                   disablePajak
                 />
+                <div className="font-bold">Total</div>
+                <div>
+                  Harga Modal : <Harga harga={totalModal} />
+                </div>
+                <div>
+                  Harga Jual : <Harga harga={jual} />
+                </div>
+                <div>
+                  Diskon : <Harga harga={diskon} />
+                </div>
+                <div>
+                  Harga Setelah Diskon : <Harga harga={hargaDiskon} />
+                </div>
+                <div>
+                  Pajak : <Harga harga={pajak} />
+                </div>
+                <div>
+                  Harga Setelah Pajak : <Harga harga={hargaPajak} />
+                </div>
+                <div>
+                  Provit : <Harga harga={provit} /> ({provitPersen}%)
+                </div>
               </ModalBody>
               <ModalFooter>
                 <Button color="danger" variant="light" onPress={onClose}>
@@ -287,7 +335,7 @@ const RekapHarga = ({ title, form, setForm, disablePajak }) => {
         onValueChange={(v) => {
           setForm({
             ...form,
-            diskon: totalHarga - v,
+            diskon: form.jual - v,
           });
         }}
       />
@@ -319,7 +367,7 @@ const RekapHarga = ({ title, form, setForm, disablePajak }) => {
         />
       )}
       <div>
-        Total Harga : <Harga harga={totalHarga} />
+        Total Harga {title}: <Harga harga={totalHarga} />
       </div>
     </>
   );

@@ -116,7 +116,6 @@ export default function App({ id, versi }) {
     selectProduk: new Set([]),
     selectKategori: new Set([]),
   });
-  const [formRekapitulasi, setFormRekapitulasi] = useState({ hargadiskon: 0 });
   const PERSEN_PROVIT = 30;
   const [inputPersenProvit, setInputPersenProvit] = useState(PERSEN_PROVIT);
 
@@ -273,37 +272,6 @@ export default function App({ id, versi }) {
   const handleButtonEditJenisProyek = () => {
     setSelected(kategoriProyek);
     modal.jenisproyek.onOpen();
-  };
-  const handleButtonSimpanRekapitulasi = async (data, onClose) => {
-    // console.log(rekapitulasiProyek.data.length);
-    const method = rekapitulasiProyek.data.length == 0 ? "POST" : "PUT";
-    try {
-      const res = await fetch(`${api_path}rekapitulasiproyek`, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-          // 'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: JSON.stringify({
-          ...data,
-          id: selectedRekapitulasiProyek ? selectedRekapitulasiProyek.id : null,
-          id_proyek: id,
-          versi: selectedVersion,
-        }),
-      });
-      const json = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        // Handle specific error messages if available
-        const message = json.message || `Error ${res.status}`;
-        alert(message);
-        return;
-      }
-      onClose();
-      // return alert(json.message);
-    } catch (err) {
-      alert("Network error or server not responding");
-      console.error(err);
-    }
   };
   const handleButtonSimpanJenisProyek = async (data, onClose) => {
     const method = rekapitulasiProyek.data.length == 0 ? "POST" : "PUT";
@@ -582,40 +550,11 @@ export default function App({ id, versi }) {
           return cellValue;
       }
     }, []),
-    keteranganpenawaran: React.useCallback((data, columnKey) => {
-      const cellValue = data[columnKey];
-      switch (columnKey) {
-        case "deskripsiitem":
-          return (
-            <>
-              {data.keterangan ? data.keterangan : data.nama}{" "}
-              {data.nmerek == "NN" ? "" : data.nmerek} {data.tipe}
-            </>
-          );
-        case "jumlah":
-          return <div className="text-right">{cellValue}</div>;
-        case "total":
-          return (
-            <div className="text-right">
-              <Harga harga={data.jumlah * data.harga} />
-            </div>
-          );
-        case "harga":
-          return (
-            <div className="text-right">
-              <Harga harga={data.harga} />
-            </div>
-          );
-        default:
-          return cellValue;
-      }
-    }, []),
   };
   const modal = {
     produk: useDisclosure(),
     penawaran: useDisclosure(),
     invoice: useDisclosure(),
-    rekapitulasi: useDisclosure(),
     jenisproyek: useDisclosure(),
   };
   const dataPenawaran = useMemo(() => {
@@ -874,43 +813,6 @@ export default function App({ id, versi }) {
         label: "Total Harga (Rp)",
       },
     ],
-    invoice: [
-      {
-        key: "no",
-        label: "#",
-      },
-      {
-        key: "deskripsiitem",
-        label: "Deskripsi Item",
-      },
-      {
-        key: "jumlah",
-        label: "Jumlah",
-      },
-      { key: "satuan" },
-      {
-        key: "harga",
-        label: "Harga",
-      },
-      {
-        key: "total",
-        label: "Total",
-      },
-    ],
-    keteranganpenawaran: [
-      {
-        key: "keterangan",
-        label: "Keterangan",
-      },
-      {
-        key: "aktif",
-        label: "Aktif",
-      },
-      {
-        key: "aksi",
-        label: "Aksi",
-      },
-    ],
   };
 
   if (selectedProyek.versi == 0) {
@@ -932,9 +834,9 @@ export default function App({ id, versi }) {
     if (selectedRekapitulasiProyek.multimedia)
       kategoriProyek.push("multimedia");
   }
-  const rekapDiskon = selectedRekapitulasiProyek
-    ? selectedRekapitulasiProyek.diskon
-    : 0;
+  const rekapDiskon =
+    selectedRekapitulasiProyek.diskon +
+      selectedRekapitulasiProyek.diskoninstalasi || 0;
   const rekapPajak = selectedRekapitulasiProyek
     ? selectedRekapitulasiProyek.pajak
     : 0;
@@ -979,7 +881,6 @@ export default function App({ id, versi }) {
     wrapper: "py-0 px-1",
     td: "text-xs py-0 align-top", // Reduce font size and vertical padding
   };
-  console.log(rekapitulasi);
   return (
     <div>
       <div className="flex flex-row gap-2">
@@ -1895,12 +1796,33 @@ export default function App({ id, versi }) {
                       shadow="none"
                       topContent={<div className="py-0 my-0">Produk</div>}
                       bottomContent={
-                        <>
-                          <div className="text-right">
+                        <div className="text-right">
+                          <div>
                             Sub Total Harga :{" "}
                             {subTotalKustomJual.toLocaleString("id-ID")}
                           </div>
-                        </>
+                          {selectedRekapitulasiProyek.diskon ? (
+                            <>
+                              <div>
+                                Diskon :{" "}
+                                <Harga
+                                  harga={selectedRekapitulasiProyek.diskon}
+                                />
+                              </div>
+                              <div>
+                                Harga Setelah Diskon :{" "}
+                                <Harga
+                                  harga={
+                                    subTotalKustomJual -
+                                    selectedRekapitulasiProyek.diskon
+                                  }
+                                />
+                              </div>
+                            </>
+                          ) : (
+                            <></>
+                          )}
+                        </div>
                       }
                     >
                       <TableHeader
