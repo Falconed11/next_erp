@@ -1,38 +1,56 @@
-const createRecapTable = (rekap, diskon, pajak, isOffering) => {
+const createRecapTable = (rekap, diskon, pajakPersen, pajak = 0, level) => {
   const tableData = [
-    ...(isOffering
+    ...(level > 1
       ? []
       : [{ key: "Sub Total Modal", val: rekap.modal, info: null }]),
     { key: "Sub Total Harga", val: rekap.jual, info: null },
-    {
-      key: "Maks Diskon",
-      val: rekap.maksDiskon,
-      info: rekap.maksDiskonPersen,
-    },
+    ...(level
+      ? []
+      : [
+          {
+            key: "Maks Diskon",
+            val: rekap.maksDiskon,
+            info: rekap.maksDiskonPersen,
+          },
+        ]),
+    ...(diskon
+      ? [
+          {
+            key: "Diskon",
+            val: diskon,
+            info: rekap.diskonPersen,
+          },
+          {
+            key: "Harga Setelah Diskon",
+            val: rekap.hargaDiskon,
+            info: null,
+          },
+        ]
+      : []),
+    ...(pajakPersen || pajak
+      ? [
+          {
+            key: `Pajak${level ? "" : " Peralatan"}`,
+            val: rekap.pajak,
+            info: pajak ? null : pajakPersen,
+          },
+          {
+            key: "Harga Setelah Pajak",
+            val: pajak ? rekap.hargaDiskon + pajak : rekap.hargaPajak,
+            info: null,
+          },
+        ]
+      : []),
+    ...(level > 1
+      ? []
+      : [
+          {
+            key: "Estimasi Provit",
+            val: rekap.provit,
+            info: rekap.provitPersen,
+          },
+        ]),
   ];
-  if (diskon)
-    tableData.push(
-      {
-        key: "Diskon",
-        val: diskon,
-        info: rekap.diskonPersen,
-      },
-      {
-        key: "Harga Setelah Diskon",
-        val: rekap.hargaDiskon,
-        info: null,
-      }
-    );
-  if (pajak)
-    tableData.push(
-      { key: "Pajak", val: rekap.pajak, info: pajak },
-      { key: "Harga Setelah Pajak", val: rekap.hargaPajak, info: null }
-    );
-  tableData.push({
-    key: "Estimasi Provit",
-    val: rekap.provit,
-    info: rekap.provitPersen,
-  });
   return tableData;
 };
 

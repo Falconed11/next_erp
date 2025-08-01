@@ -68,6 +68,7 @@ import Invoice from "./invoice";
 import KeteranganPenawaran from "./keteranganpenawaran";
 import Rekapitulasi from "./rekapitulasi";
 import SubProyek from "./subproyek";
+import { createRecapTable, createTable } from "./rekap";
 
 const api_path = getApiPath();
 
@@ -881,6 +882,32 @@ export default function App({ id, versi }) {
     wrapper: "py-0 px-1",
     td: "text-xs py-0 align-top", // Reduce font size and vertical padding
   };
+  const { rekapitulasiPeralatan, rekapitulasiInstalasi, rekapitulasiTotal } =
+    countRecapitulation(keranjangProduk, keranjangIntalasi, rekapitulasi);
+  const dataTabelPeralatan = (level) =>
+    createRecapTable(
+      rekapitulasiPeralatan,
+      rekapitulasi.diskon,
+      rekapitulasi.pajak,
+      0,
+      level
+    );
+  const dataTabelInstalasi = (level) =>
+    createRecapTable(
+      rekapitulasiInstalasi,
+      rekapitulasi.diskoninstalasi,
+      0,
+      0,
+      level
+    );
+  const dataTabelTotal = (level) =>
+    createRecapTable(
+      rekapitulasiTotal,
+      rekapitulasi.diskon + rekapitulasi.diskoninstalasi,
+      0,
+      rekapitulasiTotal.pajak,
+      level
+    );
   return (
     <div>
       <div className="flex flex-row gap-2">

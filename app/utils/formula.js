@@ -11,33 +11,63 @@ const countPercentProvit = (hargaModal, hargaJual) => {
 const countPriceByPercentProfit = (hargaModal, provitPercent) => {
   return hargaModal * (1 + provitPercent / 100);
 };
-const countRecapitulation = (data, diskon, pajakPersen) => {
-  const { modal, jual } = data.reduce(
-    ({ modal, jual }, v) => ({
-      modal: modal + v.hargamodal * v.jumlah,
-      jual: jual + v.harga * v.jumlah,
-    }),
-    { modal: 0, jual: 0 }
+const countRecapitulation = (
+  peralatan,
+  instalasi,
+  { diskon, diskoninstalasi, pajak }
+) => {
+  const countModalJual = (data) =>
+    data.reduce(
+      (acc, v) => {
+        acc.modal += v.hargamodal * v.jumlah;
+        acc.jual += v.harga * v.jumlah;
+        return acc;
+      },
+      { modal: 0, jual: 0 }
+    );
+  const countRekap = ({ modal, jual }, diskon, pajakPersen) => {
+    const hargaDiskon = jual - diskon;
+    const pajakNominal = hargaDiskon * (pajakPersen / 100);
+    const hargaPajak = hargaDiskon + pajakNominal;
+    const provit = hargaDiskon - modal;
+    return {
+      maksDiskon: jual - modal,
+      maksDiskonPersen: (((jual - modal) / jual) * 100).toFixed(2),
+      hargaDiskon,
+      diskonPersen: ((diskon / jual) * 100).toFixed(2),
+      pajak: pajakNominal,
+      hargaPajak,
+      provit,
+      provitPersen: countPercentProvit(modal, hargaDiskon).toFixed(2),
+    };
+  };
+  const peralatanTotal = countModalJual(peralatan);
+  const instalasiTotal = countModalJual(instalasi);
+  const total = {
+    modal: peralatanTotal.modal + instalasiTotal.modal,
+    jual: peralatanTotal.jual + instalasiTotal.jual,
+  };
+  const rekapPeralatan = countRekap(peralatanTotal, diskon, pajak);
+  const rekapInstalasi = countRekap(instalasiTotal, diskoninstalasi, 0);
+  const rekapTotal = Object.fromEntries(
+    Object.entries(rekapPeralatan).map(([key, val]) => [
+      key,
+      val + (rekapInstalasi[key] || 0),
+    ])
   );
-  const maksDiskon = jual - modal;
-  const maksDiskonPersen = ((maksDiskon / jual) * 100).toFixed(2);
-  const hargaDiskon = jual - diskon;
-  const diskonPersen = ((diskon / jual) * 100).toFixed(2);
-  const pajak = hargaDiskon * (pajakPersen / 100);
-  const hargaPajak = hargaDiskon + pajak;
-  const provit = hargaDiskon - modal;
-  const provitPersen = countPercentProvit(modal, hargaDiskon).toFixed(2);
   return {
-    modal,
-    jual,
-    maksDiskon,
-    maksDiskonPersen,
-    hargaDiskon,
-    diskonPersen,
-    pajak,
-    hargaPajak,
-    provit,
-    provitPersen,
+    rekapitulasiPeralatan: {
+      ...peralatanTotal,
+      ...rekapPeralatan,
+    },
+    rekapitulasiInstalasi: {
+      ...instalasiTotal,
+      ...rekapInstalasi,
+    },
+    rekapitulasiTotal: {
+      ...total,
+      ...rekapTotal,
+    },
   };
 };
 
