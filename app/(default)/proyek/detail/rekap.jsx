@@ -1,11 +1,25 @@
-import Harga from '@/components/harga'
+import Harga from "@/components/harga";
 
 const createRecapTable = (rekap, diskon, pajakPersen, pajak = 0, level) => {
+  const isHargaFinal = !(diskon + pajakPersen + pajak);
   const tableData = [
     ...(level > 1
       ? []
-      : [{ key: "Sub Total Modal", val: rekap.modal, info: null }]),
-    { key: "Sub Total Harga", val: rekap.jual, info: null },
+      : [
+          {
+            key: `${level == 1 ? "" : "Sub Total"} Modal`,
+            val: rekap.modal,
+            info: null,
+          },
+        ]),
+    {
+      key: `${
+        diskon + pajakPersen + pajak || !(level == 1) ? "Sub Total " : ""
+      }Harga`,
+      val: rekap.jual,
+      info: null,
+      classNames: `${isHargaFinal && level ? "font-bold" : ""}`,
+    },
     ...(level
       ? []
       : [
@@ -61,8 +75,8 @@ const RecapTable = ({ tableData }) => {
     <div>
       {tableData.map((v, i) => (
         <div key={i} className="grid grid-cols-2">
-          <div className="basis-1/2-">{v.key}</div>
-          <div className="basis-1/2- text-right">
+          <div className={`${v.classNames}`}>{v.key}</div>
+          <div className={`text-right ${v.classNames}`}>
             {v.info ? `(${v.info}%) ` : ""}
             <Harga harga={v.val} />
           </div>

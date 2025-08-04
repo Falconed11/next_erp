@@ -68,7 +68,7 @@ import Invoice from "./invoice";
 import KeteranganPenawaran from "./keteranganpenawaran";
 import Rekapitulasi from "./rekapitulasi";
 import SubProyek from "./subproyek";
-import { createRecapTable, createTable } from "./rekap";
+import { createRecapTable, createTable, RecapTable } from "./rekap";
 
 const api_path = getApiPath();
 
@@ -838,8 +838,7 @@ export default function App({ id, versi }) {
   const rekapDiskon =
     selectedRekapitulasiProyek?.diskon +
       selectedRekapitulasiProyek?.diskoninstalasi || 0;
-  const rekapPajak =selectedRekapitulasiProyek?.pajak
-    || 0;
+  const rekapPajak = selectedRekapitulasiProyek?.pajak || 0;
   const keteranganPajak = rekapPajak ? "sudah" : "tidak";
   const subTotalHargaJual = keranjangProyek.data.reduce(
     (total, currentValue) => {
@@ -907,9 +906,9 @@ export default function App({ id, versi }) {
       rekapitulasiTotal.pajak,
       level
     );
-const tabelPeralatan = dataTabelPeralatan(0)
-const tabelInstalasi = dataTabelInstalasi(0)
-const tabelTotal = dataTabelTotal(1)
+  const tabelPeralatan = dataTabelPeralatan(0);
+  const tabelInstalasi = dataTabelInstalasi(0);
+  const tabelTotal = dataTabelTotal(1);
   return (
     <div>
       <div className="flex flex-row gap-2">
@@ -1014,9 +1013,10 @@ const tabelTotal = dataTabelTotal(1)
           total={tabelTotal}
           rekapitulasiPeralatan={rekapitulasiPeralatan}
           rekapitulasiInstalasi={rekapitulasiInstalasi}
-          rekapitulasiTotal={rekapitulasiPeralatan}
+          rekapitulasiTotal={rekapitulasiTotal}
           rekapitulasi={rekapitulasi}
           idProyek={id}
+          versi={versi}
         />
         {/* tabel keterangan penawaran */}
         <div>
@@ -1830,33 +1830,7 @@ const tabelTotal = dataTabelTotal(1)
                       shadow="none"
                       topContent={<div className="py-0 my-0">Produk</div>}
                       bottomContent={
-                        <div className="text-right">
-                          <div>
-                            Sub Total Harga :{" "}
-                            {subTotalKustomJual.toLocaleString("id-ID")}
-                          </div>
-                          {selectedRekapitulasiProyek.diskon ? (
-                            <>
-                              <div>
-                                Diskon :{" "}
-                                <Harga
-                                  harga={selectedRekapitulasiProyek.diskon}
-                                />
-                              </div>
-                              <div>
-                                Harga Setelah Diskon :{" "}
-                                <Harga
-                                  harga={
-                                    subTotalKustomJual -
-                                    selectedRekapitulasiProyek.diskon
-                                  }
-                                />
-                              </div>
-                            </>
-                          ) : (
-                            <></>
-                          )}
-                        </div>
+                        <TableBottom tableData={dataTabelPeralatan(2)} />
                       }
                     >
                       <TableHeader
@@ -1896,12 +1870,7 @@ const tabelTotal = dataTabelTotal(1)
                       shadow="none"
                       topContent={<>Instalasi</>}
                       bottomContent={
-                        <>
-                          <div className="text-right">
-                            Sub Total Harga :{" "}
-                            {subTotalKustomInstalasi.toLocaleString("id-ID")}
-                          </div>
-                        </>
+                        <TableBottom tableData={dataTabelInstalasi(2)} />
                       }
                     >
                       <TableHeader columns={col.penawaran}>
@@ -1928,83 +1897,10 @@ const tabelTotal = dataTabelTotal(1)
                   )}
                   {/* Rekapitulasi */}
                   <div className="mt-0 border no-break text-xs">
-                    <div className="px-3">
-                      {/* <div>Rekapitulasi</div> */}
-                      <div className="flex">
-                        <div className="basis-3/6">Rekapitulasi</div>
-                        <div className="basis-2/6">
-                          <div>Produk</div>
-                          <div>Instalasi</div>
-                          {rekapDiskon + rekapPajak > 0 ? (
-                            <div>Sub Total</div>
-                          ) : (
-                            <></>
-                          )}
-                          {rekapDiskon > 0 ? (
-                            <>
-                              <div>Diskon</div>
-                              {rekapPajak > 0 ? (
-                                <div>Harga Setelah Diskon</div>
-                              ) : (
-                                <></>
-                              )}
-                            </>
-                          ) : (
-                            <></>
-                          )}
-                          {rekapPajak > 0 ? (
-                            <>
-                              <div>Pajak ({rekapPajak}%)</div>
-                            </>
-                          ) : (
-                            <></>
-                          )}
-                        </div>
-                        <div className="basis-1/6 text-right">
-                          <div>
-                            <Harga harga={subTotalKustomJual} />
-                          </div>
-                          <div>
-                            <Harga harga={subTotalKustomInstalasi} />
-                          </div>
-                          {rekapDiskon + rekapPajak > 0 ? (
-                            <div>
-                              <Harga harga={totalKustom} />
-                            </div>
-                          ) : (
-                            <></>
-                          )}
-                          {rekapDiskon > 0 ? (
-                            <>
-                              <div>{<Harga harga={rekapDiskon} />}</div>
-                              {rekapPajak ? (
-                                <div>{<Harga harga={kustomDiskon} />}</div>
-                              ) : (
-                                <></>
-                              )}
-                            </>
-                          ) : (
-                            <></>
-                          )}
-                          {rekapPajak > 0 ? (
-                            <>
-                              <div>{<Harga harga={pajakKustom} />}</div>
-                              {/* <div>
-                                <Harga harga={finalKustom} />
-                              </div> */}
-                            </>
-                          ) : (
-                            <></>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex justify-end text-sm font-semibold leading-3 pb-1">
-                      <div className="basis-2/6 text-left">Total Harga</div>
-                      <div className="px-1 basis-1/6 text-right">
-                        <Harga harga={finalKustom} />
-                      </div>
-                    </div>
+                    <TableBottom
+                      title="Rekapitulasi"
+                      tableData={dataTabelTotal(2)}
+                    />
                   </div>
                   {/* keterangan */}
                   <div className="flex flex-col mt-3 text-xs">
@@ -2058,3 +1954,12 @@ const tabelTotal = dataTabelTotal(1)
     </div>
   );
 }
+
+const TableBottom = ({ title = "", tableData }) => (
+  <div className="grid grid-cols-2">
+    <div>{title}</div>
+    <div>
+      <RecapTable tableData={tableData} />
+    </div>
+  </div>
+);
