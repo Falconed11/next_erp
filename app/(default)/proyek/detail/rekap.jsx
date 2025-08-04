@@ -1,3 +1,5 @@
+import Harga from '@/components/harga'
+
 const createRecapTable = (rekap, diskon, pajakPersen, pajak = 0, level) => {
   const tableData = [
     ...(level > 1
@@ -30,7 +32,7 @@ const createRecapTable = (rekap, diskon, pajakPersen, pajak = 0, level) => {
     ...(pajakPersen || pajak
       ? [
           {
-            key: `Pajak${level ? "" : " Peralatan"}`,
+            key: `Pajak${level ? " Peralatan" : ""}`,
             val: rekap.pajak,
             info: pajak ? null : pajakPersen,
           },

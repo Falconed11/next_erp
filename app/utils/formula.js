@@ -55,6 +55,8 @@ const countRecapitulation = (
       val + (rekapInstalasi[key] || 0),
     ])
   );
+  rekapTotal.diskonPersen = ((diskon+diskoninstalasi)/(total.jual)*100).toFixed(2);
+  rekapTotal.provitPersen = countPercentProvit(total.modal, rekapTotal.hargaDiskon).toFixed(2)
   return {
     rekapitulasiPeralatan: {
       ...peralatanTotal,

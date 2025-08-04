@@ -836,11 +836,10 @@ export default function App({ id, versi }) {
       kategoriProyek.push("multimedia");
   }
   const rekapDiskon =
-    selectedRekapitulasiProyek.diskon +
-      selectedRekapitulasiProyek.diskoninstalasi || 0;
-  const rekapPajak = selectedRekapitulasiProyek
-    ? selectedRekapitulasiProyek.pajak
-    : 0;
+    selectedRekapitulasiProyek?.diskon +
+      selectedRekapitulasiProyek?.diskoninstalasi || 0;
+  const rekapPajak =selectedRekapitulasiProyek?.pajak
+    || 0;
   const keteranganPajak = rekapPajak ? "sudah" : "tidak";
   const subTotalHargaJual = keranjangProyek.data.reduce(
     (total, currentValue) => {
@@ -908,6 +907,9 @@ export default function App({ id, versi }) {
       rekapitulasiTotal.pajak,
       level
     );
+const tabelPeralatan = dataTabelPeralatan(0)
+const tabelInstalasi = dataTabelInstalasi(0)
+const tabelTotal = dataTabelTotal(1)
   return (
     <div>
       <div className="flex flex-row gap-2">
@@ -1005,9 +1007,14 @@ export default function App({ id, versi }) {
           <></>
         )}
         {/* rekapitulasi */}
+        {}
         <Rekapitulasi
-          peralatan={keranjangProduk}
-          instalasi={keranjangIntalasi}
+          peralatan={tabelPeralatan}
+          instalasi={tabelInstalasi}
+          total={tabelTotal}
+          rekapitulasiPeralatan={rekapitulasiPeralatan}
+          rekapitulasiInstalasi={rekapitulasiInstalasi}
+          rekapitulasiTotal={rekapitulasiPeralatan}
           rekapitulasi={rekapitulasi}
           idProyek={id}
         />
@@ -1184,7 +1191,7 @@ export default function App({ id, versi }) {
                                 />
                                 <Input
                                   type="text"
-                                  value={formInstalasi.keterangan}
+                                  value={form.keterangan}
                                   label="Nama Kustom"
                                   placeholder="Masukkan nama kustom! (Opsional)"
                                   // placeholder="Masukkan jumlah!"
