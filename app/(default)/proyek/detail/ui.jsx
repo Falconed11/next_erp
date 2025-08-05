@@ -882,33 +882,36 @@ export default function App({ id, versi }) {
   };
   const { rekapitulasiPeralatan, rekapitulasiInstalasi, rekapitulasiTotal } =
     countRecapitulation(keranjangProduk, keranjangIntalasi, rekapitulasi);
-  const dataTabelPeralatan = (level) =>
+  const dataTabelPeralatan = (isTotal, isPenawaran) =>
     createRecapTable(
       rekapitulasiPeralatan,
       rekapitulasi.diskon,
       rekapitulasi.pajak,
       0,
-      level
+      isTotal,
+      isPenawaran
     );
-  const dataTabelInstalasi = (level) =>
+  const dataTabelInstalasi = (isTotal, isPenawaran) =>
     createRecapTable(
       rekapitulasiInstalasi,
       rekapitulasi.diskoninstalasi,
       0,
       0,
-      level
+      isTotal,
+      isPenawaran
     );
-  const dataTabelTotal = (level) =>
+  const dataTabelTotal = (isTotal, isPenawaran) =>
     createRecapTable(
       rekapitulasiTotal,
       rekapitulasi.diskon + rekapitulasi.diskoninstalasi,
       0,
       rekapitulasiTotal.pajak,
-      level
+      isTotal,
+      isPenawaran
     );
-  const tabelPeralatan = dataTabelPeralatan(0);
-  const tabelInstalasi = dataTabelInstalasi(0);
-  const tabelTotal = dataTabelTotal(1);
+  const tabelPeralatan = dataTabelPeralatan(false, false);
+  const tabelInstalasi = dataTabelInstalasi(false, false);
+  const tabelTotal = dataTabelTotal(true, false);
   return (
     <div>
       <div className="flex flex-row gap-2">
@@ -1112,6 +1115,8 @@ export default function App({ id, versi }) {
                   rekapPajak={rekapPajak}
                   totalKustom={totalKustom}
                   className={formatTable}
+                  peralatan={keranjangProduk}
+                  instalasi={keranjangIntalasi}
                 />
               </div>
               <NavLinkNewTab
@@ -1123,14 +1128,14 @@ export default function App({ id, versi }) {
             <div className="-w-11/12">
               {/* sub proyek */}
               <SubProyek id={id} selectedProyek={selectedProyek} />
-              {/* tabel produk */}
+              {/* tabel peralatan */}
               <Table
                 isStriped
                 isCompact
                 className="pt-3"
                 topContent={
                   <>
-                    <div>Produk</div>
+                    <div>Peralatan</div>
                     <ConditionalComponent
                       condition={selectedProyek.versi == 0}
                       component={
@@ -1819,7 +1824,7 @@ export default function App({ id, versi }) {
                       {selectedProyek.instansi} {selectedProyek.kota}
                     </div>
                   </div>
-                  {/* produk */}
+                  {/* peralatan */}
                   {dataPenawaran.length > 0 ? (
                     <Table
                       isStriped
@@ -1828,9 +1833,11 @@ export default function App({ id, versi }) {
                       classNames={formatTable}
                       aria-label="Example table with custom cells"
                       shadow="none"
-                      topContent={<div className="py-0 my-0">Produk</div>}
+                      topContent={<div className="py-0 my-0">Peralatan</div>}
                       bottomContent={
-                        <TableBottom tableData={dataTabelPeralatan(2)} />
+                        <TableBottom
+                          tableData={dataTabelPeralatan(false, true)}
+                        />
                       }
                     >
                       <TableHeader
@@ -1870,7 +1877,9 @@ export default function App({ id, versi }) {
                       shadow="none"
                       topContent={<>Instalasi</>}
                       bottomContent={
-                        <TableBottom tableData={dataTabelInstalasi(2)} />
+                        <TableBottom
+                          tableData={dataTabelInstalasi(false, true)}
+                        />
                       }
                     >
                       <TableHeader columns={col.penawaran}>
@@ -1899,7 +1908,7 @@ export default function App({ id, versi }) {
                   <div className="mt-0 border no-break text-xs">
                     <TableBottom
                       title="Rekapitulasi"
-                      tableData={dataTabelTotal(2)}
+                      tableData={dataTabelTotal(true, true)}
                     />
                   </div>
                   {/* keterangan */}

@@ -1,26 +1,36 @@
 import Harga from "@/components/harga";
 
-const createRecapTable = (rekap, diskon, pajakPersen, pajak = 0, level) => {
-  const isHargaFinal = !(diskon + pajakPersen + pajak);
+const createRecapTable = (
+  rekap,
+  diskon,
+  pajakPersen,
+  pajak = 0,
+  isTotal,
+  isPenawaran
+) => {
+  const isDiskon = !!diskon;
+  const isPajak = !!(pajak + pajakPersen);
+  const isHargaFinal = !isDiskon && !isPajak;
+  const isDiskonFinal = isDiskon && !isPajak;
   const tableData = [
-    ...(level > 1
+    ...(isPenawaran
       ? []
       : [
           {
-            key: `${level == 1 ? "" : "Sub Total"} Modal`,
+            key: `${isTotal ? "" : "Sub Total"} Modal`,
             val: rekap.modal,
             info: null,
           },
         ]),
     {
       key: `${
-        diskon + pajakPersen + pajak || !(level == 1) ? "Sub Total " : ""
+        isHargaFinal && isTotal ? (isPenawaran ? "Total " : "") : "Sub Total "
       }Harga`,
       val: rekap.jual,
       info: null,
-      classNames: `${isHargaFinal && level ? "font-bold" : ""}`,
+      classNames: `${isHargaFinal ? "font-bold" : ""}`,
     },
-    ...(level
+    ...(isTotal || isPenawaran
       ? []
       : [
           {
@@ -40,13 +50,14 @@ const createRecapTable = (rekap, diskon, pajakPersen, pajak = 0, level) => {
             key: "Harga Setelah Diskon",
             val: rekap.hargaDiskon,
             info: null,
+            classNames: isDiskonFinal ? "font-bold" : "",
           },
         ]
       : []),
     ...(pajakPersen || pajak
       ? [
           {
-            key: `Pajak${level ? " Peralatan" : ""}`,
+            key: `Pajak${isTotal ? " Peralatan" : ""}`,
             val: rekap.pajak,
             info: pajak ? null : pajakPersen,
           },
@@ -54,10 +65,11 @@ const createRecapTable = (rekap, diskon, pajakPersen, pajak = 0, level) => {
             key: "Harga Setelah Pajak",
             val: pajak ? rekap.hargaDiskon + pajak : rekap.hargaPajak,
             info: null,
+            classNames: "font-bold",
           },
         ]
       : []),
-    ...(level > 1
+    ...(isPenawaran
       ? []
       : [
           {

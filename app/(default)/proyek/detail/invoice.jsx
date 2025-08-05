@@ -42,6 +42,8 @@ export default function Invoice({
   kustomDiskon,
   pajakKustom,
   className,
+  peralatan,
+  instalasi,
 }) {
   const pembayaranProyek = useClientFetch(
     `pembayaranProyek?id_proyek=${proyek.id}&asc=1`
@@ -52,60 +54,11 @@ export default function Invoice({
     pageStyle: "p-10 block",
   });
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const renderCell = React.useCallback((data, columnKey) => {
-    const cellValue = data[columnKey];
-    switch (columnKey) {
-      case "deskripsiitem":
-        return (
-          <>
-            {data.keterangan ? data.keterangan : data.nama}{" "}
-            {data.nmerek == "NN" || !data.showmerek ? "" : data.nmerek}{" "}
-            {data.tipe == "NN" || !data.showtipe ? "" : data.tipe}
-          </>
-        );
-      case "jumlah":
-        return <div className="text-right">{cellValue}</div>;
-      case "total":
-        return (
-          <div className="text-right">
-            <Harga harga={data.jumlah * data.harga} />
-          </div>
-        );
-      case "harga":
-        return (
-          <div className="text-right">
-            <Harga harga={data.harga} />
-          </div>
-        );
-      default:
-        return cellValue;
-    }
-  }, []);
   if (pembayaranProyek.error) return <div>failed to load keranjang proyek</div>;
   if (pembayaranProyek.isLoading) return <div>loading...</div>;
-  const col = [
-    {
-      key: "no",
-      label: "#",
-    },
-    {
-      key: "deskripsiitem",
-      label: "Deskripsi Item",
-    },
-    {
-      key: "jumlah",
-      label: "Jumlah",
-    },
-    { key: "satuan" },
-    {
-      key: "harga",
-      label: "Harga",
-    },
-    {
-      key: "total",
-      label: "Total",
-    },
-  ];
+  const addRowNumber = (array) => array.map((v, i) => ({ ...v, no: i + 1 }));
+  const dataPeralatan = addRowNumber(peralatan);
+  const dataInstalasi = addRowNumber(instalasi);
   const dataPembayaran = pembayaranProyek.data;
   const totalPembayaran = dataPembayaran.reduce(
     (acc, v, i) => acc + v.nominal,
@@ -133,20 +86,11 @@ export default function Invoice({
                   className="bg-white text-black leading-none text-sm"
                 >
                   <div className="flex flex-row items-center">
-                    <div className="flex flex-col">
-                      {proyek.namaperusahaan == "bks" ? (
-                        <BKSHeader />
-                      ) : (
-                        <SVTHeader />
-                      )}
-                    </div>
-                  </div>
-                  <div className="flex flex-row items-center">
-                    <div className="basis-1/2 bg-sky-500 h-2"></div>
+                    <div className="basis-1/2 bg-black h-0.5"></div>
                     <div className="basis-1/4 text-2xl font-bold text-center inline-block align-middle items-center">
                       Invoice
                     </div>
-                    <div className="basis-1/4 bg-sky-500 h-2"></div>
+                    <div className="basis-1/4 bg-black h-0.5"></div>
                   </div>
                   {/* Table */}
                   <div className="flex flex-col gap-2">
@@ -167,36 +111,8 @@ export default function Invoice({
                         <div>No. PO : {proyek.id_po}</div>
                       </div>
                     </div>
-                    <Table
-                      className={`border border-black p-2`}
-                      classNames={className}
-                      aria-label="Example table with custom cells"
-                      shadow="none"
-                      isCompact
-                      isStriped
-                    >
-                      <TableHeader columns={col}>
-                        {(column) => (
-                          <TableColumn
-                            key={column.key}
-                            align={column.key === "aksi" ? "center" : "start"}
-                          >
-                            {column.label}
-                          </TableColumn>
-                        )}
-                      </TableHeader>
-                      <TableBody items={data}>
-                        {(item) => (
-                          <TableRow key={item.no}>
-                            {(columnKey) => (
-                              <TableCell>
-                                {renderCell(item, columnKey)}
-                              </TableCell>
-                            )}
-                          </TableRow>
-                        )}
-                      </TableBody>
-                    </Table>
+                    <InvoiceTable title={"Peralatan"} data={dataPeralatan} />
+                    <InvoiceTable title={"Instalasi"} data={dataInstalasi} />
                     {/* Rekap */}
                     <div className="flex flex-row pb-1 border-b border-black">
                       <div className="basis-2/4 content-end">
@@ -325,7 +241,7 @@ export default function Invoice({
                         </div>
                       </div>
                     </div>
-                    {proyek.id_perusahaan == 1 ? (
+                    {/* {proyek.id_perusahaan == 1 ? (
                       <div>
                         <div>Belga Karya Semesta</div>
                         <Image
@@ -347,7 +263,17 @@ export default function Invoice({
                         />
                         <div className="underline">Aslkdn Kksladj Lksdj</div>
                       </div>
-                    )}
+                    )} */}
+                  </div>
+                  <div className="bg-black h-0.5 my-2"></div>
+                  <div className="flex flex-row items-center">
+                    <div className="flex flex-col">
+                      {proyek.namaperusahaan == "bks" ? (
+                        <BKSHeader />
+                      ) : (
+                        <SVTHeader />
+                      )}
+                    </div>
                   </div>
                 </div>
               </ModalBody>
@@ -366,3 +292,112 @@ export default function Invoice({
     </>
   );
 }
+
+const InvoiceTable = ({ title, data }) => {
+  const renderCell = React.useCallback((data, columnKey) => {
+    const cellValue = data[columnKey];
+    switch (columnKey) {
+      case "no":
+        return <div className="text-center">{cellValue}</div>;
+      case "deskripsiitem":
+        return (
+          <>
+            {data.keterangan ? data.keterangan : data.nama}{" "}
+            {data.nmerek == "NN" || !data.showmerek ? "" : data.nmerek}{" "}
+            {data.tipe == "NN" || !data.showtipe ? "" : data.tipe}
+          </>
+        );
+      case "jumlah":
+        return (
+          <div className="grid grid-cols-2">
+            <div className="text-right">{cellValue}</div>
+            <div className="pl-1">{data.satuan}</div>
+          </div>
+        );
+      case "total":
+        return (
+          <div className="text-right">
+            <Harga harga={data.jumlah * data.harga} />
+          </div>
+        );
+      case "harga":
+        return (
+          <div className="text-right">
+            <Harga harga={data.harga} />
+          </div>
+        );
+      default:
+        return cellValue;
+    }
+  }, []);
+  const col = [
+    {
+      key: "no",
+      label: "#",
+    },
+    {
+      key: "deskripsiitem",
+      label: "Deskripsi Item",
+    },
+    {
+      key: "jumlah",
+      label: "Jumlah",
+    },
+    // { key: "satuan" },
+    {
+      key: "harga",
+      label: "Harga",
+    },
+    {
+      key: "total",
+      label: "Total",
+    },
+  ];
+  return (
+    <>
+      <div>{title}</div>
+      <Table
+        className={`m-0 p-0`}
+        classNames={{
+          wrapper: "py-0 px-0 rounded-none",
+          table: "m-0 p-0 border-b-2 border-black border-collapse rounded-none",
+          thead:
+            "border border-black rounded-none bg-transparent [&>tr:last-child]:hidden",
+          th: "border border-black text-black bg-transparent px-1 py-0",
+          td: "border-l-2 border-r-2 border-black px-1 py-0 text-sm align-top",
+          tr: "m-0 p-0",
+          base: "rounded-none shadow-none",
+        }}
+        aria-label="Example table with custom cells"
+        shadow="none"
+        isCompact
+      >
+        <TableHeader columns={col}>
+          {(column) => (
+            <TableColumn
+              key={column.key}
+              align={["aksi", "no"].includes(column.key) ? "center" : "start"}
+              className={
+                { no: "w-[30px]", deskripsiitem: "w-1/2", jumlah: "w-1/10" }[
+                  column.key
+                ]
+              }
+              // className={`${column.key === "no" ? "w-[30px]" : ""}`}
+            >
+              {column.label}
+            </TableColumn>
+          )}
+        </TableHeader>
+        <TableBody items={data}>
+          {(item) => (
+            <TableRow key={item.no}>
+              {(columnKey) => (
+                <TableCell>{renderCell(item, columnKey)}</TableCell>
+              )}
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+    </>
+  );
+};
