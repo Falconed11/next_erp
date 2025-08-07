@@ -5,7 +5,6 @@ const createRecapTable = (
   diskon,
   pajakPersen,
   pajak = 0,
-  isTotal,
   isPenawaran
 ) => {
   const isDiskon = !!diskon;
@@ -17,20 +16,20 @@ const createRecapTable = (
       ? []
       : [
           {
-            key: `${isTotal ? "" : "Sub Total"} Modal`,
+            key: `Sub Total Modal`,
             val: rekap.modal,
             info: null,
           },
         ]),
     {
       key: `${
-        isHargaFinal && isTotal ? (isPenawaran ? "Total " : "") : "Sub Total "
+        isHargaFinal ? (isPenawaran ? "Total " : "") : "Sub Total "
       }Harga`,
       val: rekap.jual,
       info: null,
       classNames: `${isHargaFinal ? "font-bold" : ""}`,
     },
-    ...(isTotal || isPenawaran
+    ...(isPenawaran
       ? []
       : [
           {
@@ -50,22 +49,19 @@ const createRecapTable = (
             key: "Harga Setelah Diskon",
             val: rekap.hargaDiskon,
             info: null,
-            classNames: isDiskonFinal ? "font-bold" : "",
           },
         ]
       : []),
     ...(pajakPersen || pajak
       ? [
           {
-            key: `Pajak${isTotal ? " Peralatan" : ""}`,
+            key: `PPn (${pajakPersen}%)`,
             val: rekap.pajak,
-            info: pajak ? null : pajakPersen,
           },
           {
             key: "Harga Setelah Pajak",
             val: pajak ? rekap.hargaDiskon + pajak : rekap.hargaPajak,
             info: null,
-            classNames: "font-bold",
           },
         ]
       : []),
@@ -77,6 +73,22 @@ const createRecapTable = (
             val: rekap.provit,
             info: rekap.provitPersen,
           },
+        ]),
+  ];
+  return tableData;
+};
+
+const createRecapTableTotal = (data, isPenawaran) => {
+  const tableData = [
+    { key: "Peralatan", val: data.jualPeralatan },
+    { key: "Instalasi", val: data.jualInstalasi },
+    { key: "Grand Total", val: data.hargaPajak, classNames: "font-bold" },
+    ...(isPenawaran
+      ? []
+      : [
+          { key: "Modal", val: data.modal },
+          { key: "Jual", val: data.hargaDiskon },
+          { key: "Estimasi Provit", val: data.provit, info: data.provitPersen },
         ]),
   ];
   return tableData;
@@ -98,4 +110,4 @@ const RecapTable = ({ tableData }) => {
   );
 };
 
-export { createRecapTable, RecapTable };
+export { createRecapTable, createRecapTableTotal, RecapTable };

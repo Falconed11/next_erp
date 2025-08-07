@@ -29,21 +29,18 @@ import { BKSHeader, SVTHeader } from "@/components/mycomponent";
 import { EditIcon, DeleteIcon } from "@/components/icon";
 import Harga from "@/components/harga";
 import Image from "next/image";
+import { RecapTable } from "./rekap";
 
 const api_path = getApiPath();
 
 export default function Invoice({
   proyek,
-  data,
-  finalKustom,
-  rekapDiskon,
-  rekapPajak,
-  totalKustom,
-  kustomDiskon,
-  pajakKustom,
-  className,
   peralatan,
   instalasi,
+  rekapTotal,
+  compRekapPeralatan,
+  compRekapInstalasi,
+  compRekapTotal,
 }) {
   const pembayaranProyek = useClientFetch(
     `pembayaranProyek?id_proyek=${proyek.id}&asc=1`
@@ -56,15 +53,16 @@ export default function Invoice({
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   if (pembayaranProyek.error) return <div>failed to load keranjang proyek</div>;
   if (pembayaranProyek.isLoading) return <div>loading...</div>;
+
   const addRowNumber = (array) => array.map((v, i) => ({ ...v, no: i + 1 }));
   const dataPeralatan = addRowNumber(peralatan);
   const dataInstalasi = addRowNumber(instalasi);
   const dataPembayaran = pembayaranProyek.data;
+  const lengthPembayaran = dataPembayaran.length;
   const totalPembayaran = dataPembayaran.reduce(
     (acc, v, i) => acc + v.nominal,
     0
   );
-  const total = finalKustom - totalPembayaran;
   return (
     <>
       <Button onPress={onOpen} color="primary" className="mt-3">
@@ -81,6 +79,7 @@ export default function Invoice({
             <>
               <ModalHeader className="flex flex-col gap-1">Invoice</ModalHeader>
               <ModalBody>
+                <div>Versi :</div>
                 <div
                   ref={componentRef}
                   className="bg-white text-black leading-none text-sm"
@@ -92,7 +91,6 @@ export default function Invoice({
                     </div>
                     <div className="basis-1/4 bg-black h-0.5"></div>
                   </div>
-                  {/* Table */}
                   <div className="flex flex-col gap-2">
                     <div className="flex flex-row">
                       <div className="basis-1/2">
@@ -111,112 +109,49 @@ export default function Invoice({
                         <div>No. PO : {proyek.id_po}</div>
                       </div>
                     </div>
-                    <InvoiceTable title={"Peralatan"} data={dataPeralatan} />
-                    <InvoiceTable title={"Instalasi"} data={dataInstalasi} />
-                    {/* Rekap */}
-                    <div className="flex flex-row pb-1 border-b border-black">
-                      <div className="basis-2/4 content-end">
-                        {`***   `}
-                        {nominalToText(total)}
-                      </div>
-                      <div className="basis-2/4 pl-3">
-                        <div className="flex">
-                          <div className="basis-1/2">
-                            <div
-                              className={
-                                rekapDiskon + rekapPajak &&
-                                dataPembayaran.length
-                                  ? ""
-                                  : "font-bold"
-                              }
-                            >
-                              {rekapDiskon + rekapPajak ||
-                              dataPembayaran.length ? (
-                                <br />
-                              ) : (
-                                "Total"
-                              )}
-                            </div>
-                            {rekapDiskon > 0 ? (
-                              <>
-                                <div>Diskon</div>
-                                <div className="border-b border-black">
-                                  Harga Setelah Diskon
-                                </div>
-                              </>
-                            ) : (
-                              <></>
-                            )}
-                            {rekapPajak > 0 ? (
-                              <>
-                                <div>Pajak ({rekapPajak}%)</div>
-                                <div className="border-b border-black">
-                                  Harga Setelah Pajak
-                                </div>
-                              </>
-                            ) : (
-                              <></>
-                            )}
-                            {dataPembayaran.length ? (
-                              <>
-                                {dataPembayaran.map((v, i) =>
-                                  i ? (
-                                    <br key={i} />
-                                  ) : (
-                                    <div key={i}>Uang Muka</div>
-                                  )
-                                )}
-                                <div className="font-bold">TOTAL</div>
-                              </>
-                            ) : (
-                              <></>
-                            )}
-                          </div>
-                          <div className="text-right basis-1/2">
-                            <div className="font-bold">
-                              <Harga harga={totalKustom} />
-                            </div>
-                            {rekapDiskon > 0 ? (
-                              <>
-                                <div>{<Harga harga={rekapDiskon} />}</div>
-                                <div className="border-b border-black">
-                                  {<Harga harga={kustomDiskon} />}
-                                </div>
-                              </>
-                            ) : (
-                              <></>
-                            )}
-                            {rekapPajak > 0 ? (
-                              <>
-                                <div>
-                                  <Harga harga={pajakKustom} />
-                                </div>
-                                <div className="border-b border-black">
-                                  <Harga harga={finalKustom} />
-                                </div>
-                              </>
-                            ) : (
-                              <></>
-                            )}
-                            {dataPembayaran.length ? (
-                              <>
-                                {dataPembayaran.map((v, i) => (
-                                  <div key={i}>
-                                    <Harga harga={v.nominal} />
-                                  </div>
-                                ))}
-                                <div className="font-bold">
-                                  <Harga harga={total} />
-                                </div>
-                              </>
-                            ) : (
-                              <></>
-                            )}
-                          </div>
-                        </div>
-                      </div>
+                    {/* Table */}
+                    <div>
+                      <InvoiceTable
+                        title={"Peralatan"}
+                        data={dataPeralatan}
+                        compRecap={compRekapPeralatan}
+                      />
+                      <InvoiceTable
+                        title={"Instalasi"}
+                        data={dataInstalasi}
+                        compRecap={compRekapInstalasi}
+                      />
                     </div>
-                    <div className="flex flex-row">
+                    {/* Rekap */}
+                    {/* <div>{compRekapTotal}</div> */}
+                    <div className="grid grid-cols-2">
+                      <div></div>
+                      <RecapTable
+                        tableData={[
+                          {
+                            key: "",
+                            val: rekapTotal.hargaPajak,
+                            classNames:
+                              lengthPembayaran == 1 && "border-b border-black",
+                          },
+                          ...pembayaranProyek.data.map((v, i) => ({
+                            ...(i == lengthPembayaran - 1
+                              ? { key: "Total", classNames: "font-bold" }
+                              : {
+                                  key: i == 0 ? "Uang Muka" : `Termin ${i + 1}`,
+                                  classNames:
+                                    i + 1 == lengthPembayaran - 1 &&
+                                    "border-b border-black",
+                                }),
+                            val: v.nominal,
+                          })),
+                        ]}
+                      />
+                    </div>
+                    <div className="font-bold border-b border-black">
+                      *** {nominalToText(pembayaranProyek.data.at(-1).nominal)}
+                    </div>
+                    <div className="flex">
                       <div className="basis-2/4">
                         Pembayaran melalui : Rek. {dataPembayaran[0]?.nama_bank}{" "}
                         : {dataPembayaran[0]?.norekening}
@@ -293,7 +228,7 @@ export default function Invoice({
   );
 }
 
-const InvoiceTable = ({ title, data }) => {
+const InvoiceTable = ({ title, data, compRecap }) => {
   const renderCell = React.useCallback((data, columnKey) => {
     const cellValue = data[columnKey];
     switch (columnKey) {
@@ -355,22 +290,23 @@ const InvoiceTable = ({ title, data }) => {
   ];
   return (
     <>
-      <div>{title}</div>
       <Table
-        className={`m-0 p-0`}
+        className={`m-0 p-0 border border-black`}
         classNames={{
-          wrapper: "py-0 px-0 rounded-none",
-          table: "m-0 p-0 border-b-2 border-black border-collapse rounded-none",
+          wrapper: "p-1 rounded-none",
+          table: "m-0 p-0 border-b border-black border-collapse rounded-none",
           thead:
             "border border-black rounded-none bg-transparent [&>tr:last-child]:hidden",
           th: "border border-black text-black bg-transparent px-1 py-0",
-          td: "border-l-2 border-r-2 border-black px-1 py-0 text-sm align-top",
+          td: "border-l border-r border-black px-1 py-0 text-sm align-top",
           tr: "m-0 p-0",
           base: "rounded-none shadow-none",
         }}
         aria-label="Example table with custom cells"
         shadow="none"
         isCompact
+        topContent={title}
+        bottomContent={compRecap}
       >
         <TableHeader columns={col}>
           {(column) => (

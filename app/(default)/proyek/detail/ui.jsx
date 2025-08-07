@@ -68,7 +68,12 @@ import Invoice from "./invoice";
 import KeteranganPenawaran from "./keteranganpenawaran";
 import Rekapitulasi from "./rekapitulasi";
 import SubProyek from "./subproyek";
-import { createRecapTable, createTable, RecapTable } from "./rekap";
+import {
+  createRecapTable,
+  createRecapTableTotal,
+  createTable,
+  RecapTable,
+} from "./rekap";
 
 const api_path = getApiPath();
 
@@ -626,10 +631,6 @@ export default function App({ id, versi }) {
   };
 
   const selectedProyek = proyek.data[0];
-  const invoiceData = [
-    ...keranjangProyek.data,
-    ...keranjangProyekInstalasi.data,
-  ].map((v, i) => ({ ...v, no: i + 1 }));
 
   const col = {
     keranjangproyek: [
@@ -835,23 +836,11 @@ export default function App({ id, versi }) {
     if (selectedRekapitulasiProyek.multimedia)
       kategoriProyek.push("multimedia");
   }
-  const rekapDiskon =
-    selectedRekapitulasiProyek?.diskon +
-      selectedRekapitulasiProyek?.diskoninstalasi || 0;
   const rekapPajak = selectedRekapitulasiProyek?.pajak || 0;
   const keteranganPajak = rekapPajak ? "sudah" : "tidak";
   const subTotalHargaJual = keranjangProyek.data.reduce(
     (total, currentValue) => {
       return total + currentValue.jumlah * currentValue.harga;
-    },
-    0
-  );
-  const subTotalKustomJual = keranjangProyek.data.reduce(
-    (total, currentValue) => {
-      return (
-        total +
-        currentValue.jumlah * (currentValue.hargakustom ?? currentValue.harga)
-      );
     },
     0
   );
@@ -861,20 +850,6 @@ export default function App({ id, versi }) {
     },
     0
   );
-  const subTotalKustomInstalasi = keranjangProyekInstalasi.data.reduce(
-    (total, currentValue) => {
-      return (
-        total +
-        currentValue.jumlah * (currentValue.hargakustom ?? currentValue.harga)
-      );
-    },
-    0
-  );
-  const totalHarga = subTotalHargaJual + subTotalHargaInstalasi;
-  const totalKustom = subTotalKustomJual + subTotalKustomInstalasi;
-  const kustomDiskon = totalKustom - rekapDiskon;
-  const pajakKustom = (kustomDiskon * rekapPajak) / 100;
-  const finalKustom = kustomDiskon + pajakKustom;
   const selectedVersion = selectVersi.values().next().value;
   const formatTable = {
     wrapper: "py-0 px-1",
@@ -882,36 +857,34 @@ export default function App({ id, versi }) {
   };
   const { rekapitulasiPeralatan, rekapitulasiInstalasi, rekapitulasiTotal } =
     countRecapitulation(keranjangProduk, keranjangIntalasi, rekapitulasi);
-  const dataTabelPeralatan = (isTotal, isPenawaran) =>
+  const dataTabelPeralatan = (isPenawaran) =>
     createRecapTable(
       rekapitulasiPeralatan,
       rekapitulasi.diskon,
       rekapitulasi.pajak,
       0,
-      isTotal,
       isPenawaran
     );
-  const dataTabelInstalasi = (isTotal, isPenawaran) =>
+  const dataTabelInstalasi = (isPenawaran) =>
     createRecapTable(
       rekapitulasiInstalasi,
       rekapitulasi.diskoninstalasi,
       0,
       0,
-      isTotal,
       isPenawaran
     );
-  const dataTabelTotal = (isTotal, isPenawaran) =>
-    createRecapTable(
-      rekapitulasiTotal,
-      rekapitulasi.diskon + rekapitulasi.diskoninstalasi,
-      0,
-      rekapitulasiTotal.pajak,
-      isTotal,
-      isPenawaran
-    );
-  const tabelPeralatan = dataTabelPeralatan(false, false);
-  const tabelInstalasi = dataTabelInstalasi(false, false);
-  const tabelTotal = dataTabelTotal(true, false);
+  const dataTabelTotal = (isPenawaran) =>
+    createRecapTableTotal(rekapitulasiTotal, isPenawaran);
+  const tabelPeralatan = dataTabelPeralatan(false);
+  const tabelInstalasi = dataTabelInstalasi(false);
+  const tabelTotal = dataTabelTotal(false);
+  const compRekapPeralatan = (
+    <TableBottom tableData={dataTabelPeralatan(true)} />
+  );
+  const compRekapInstalasi = (
+    <TableBottom tableData={dataTabelInstalasi(true)} />
+  );
+  const compRekapTotal = <TableBottom tableData={dataTabelTotal(true)} />;
   return (
     <div>
       <div className="flex flex-row gap-2">
@@ -1009,7 +982,6 @@ export default function App({ id, versi }) {
           <></>
         )}
         {/* rekapitulasi */}
-        {}
         <Rekapitulasi
           peralatan={tabelPeralatan}
           instalasi={tabelInstalasi}
@@ -1107,16 +1079,13 @@ export default function App({ id, versi }) {
               <div>
                 <Invoice
                   proyek={selectedProyek}
-                  data={invoiceData}
-                  finalKustom={finalKustom}
-                  kustomDiskon={kustomDiskon}
-                  pajakKustom={pajakKustom}
-                  rekapDiskon={rekapDiskon}
-                  rekapPajak={rekapPajak}
-                  totalKustom={totalKustom}
                   className={formatTable}
                   peralatan={keranjangProduk}
                   instalasi={keranjangIntalasi}
+                  rekapTotal={rekapitulasiTotal}
+                  compRekapPeralatan={compRekapPeralatan}
+                  compRekapInstalasi={compRekapInstalasi}
+                  compRekapTotal={compRekapTotal}
                 />
               </div>
               <NavLinkNewTab
@@ -1834,11 +1803,7 @@ export default function App({ id, versi }) {
                       aria-label="Example table with custom cells"
                       shadow="none"
                       topContent={<div className="py-0 my-0">Peralatan</div>}
-                      bottomContent={
-                        <TableBottom
-                          tableData={dataTabelPeralatan(false, true)}
-                        />
-                      }
+                      bottomContent={compRekapPeralatan}
                     >
                       <TableHeader
                         className="my-0 py-0"
@@ -1876,11 +1841,7 @@ export default function App({ id, versi }) {
                       aria-label="Example table with custom cells"
                       shadow="none"
                       topContent={<>Instalasi</>}
-                      bottomContent={
-                        <TableBottom
-                          tableData={dataTabelInstalasi(false, true)}
-                        />
-                      }
+                      bottomContent={compRekapInstalasi}
                     >
                       <TableHeader columns={col.penawaran}>
                         {(column) => (
@@ -1906,10 +1867,7 @@ export default function App({ id, versi }) {
                   )}
                   {/* Rekapitulasi */}
                   <div className="mt-0 border no-break text-xs">
-                    <TableBottom
-                      title="Rekapitulasi"
-                      tableData={dataTabelTotal(true, true)}
-                    />
+                    {compRekapTotal}
                   </div>
                   {/* keterangan */}
                   <div className="flex flex-col mt-3 text-xs">
