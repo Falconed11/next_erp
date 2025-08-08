@@ -104,8 +104,9 @@ export default function RootLayout({ children, }: { children: React.ReactNode })
     ]
     if (user?.peran == 'sales') links.push({ href: "/proyek", name: "Proyek" })
     if (user?.peran == 'admin' || user?.peran == 'super') links.push({ href: "/proyek", name: "Proyek", dropdown: proyek })
-    if (user?.peran == "admin" || user?.peran == "super") links.push({ href: "/nota", name: "Nota" },
-        { href: "/kwitansi", name: "Kwitansi" },
+    if (user?.peran == "admin" || user?.peran == "super") links.push(
+        // { href: "/nota", name: "Nota" },
+        // { href: "/kwitansi", name: "Kwitansi" },
         { href: "/operasionalkantor", name: "Operasional Kantor" },)
     links.push({ href: "/customer", name: "Customer" },)
     if (user?.peran == "admin" || user?.peran == "super") links.push(

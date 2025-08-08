@@ -992,6 +992,7 @@ export default function App({ id, versi }) {
           rekapitulasi={rekapitulasi}
           idProyek={id}
           versi={versi}
+          selectedProyek={selectedProyek}
         />
         {/* tabel keterangan penawaran */}
         <div>
@@ -1091,7 +1092,7 @@ export default function App({ id, versi }) {
               <NavLinkNewTab
                 href={`/proyek/detail/proses?id=${selectedProyek.id}`}
               >
-                {"Pengeluaran Proyek ==>>"}
+                {"Pengeluaran & Pembayaran ==>>"}
               </NavLinkNewTab>
             </div>
             <div className="-w-11/12">

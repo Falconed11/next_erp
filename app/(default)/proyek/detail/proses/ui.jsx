@@ -444,6 +444,10 @@ export default function App({ id }) {
         label: "tanggal",
       },
       {
+        key: "status",
+        label: "Status",
+      },
+      {
         key: "nominal",
         label: "Nominal",
       },
@@ -457,7 +461,7 @@ export default function App({ id }) {
       },
       {
         key: "norekening",
-        label: "Nomore Rekening",
+        label: "Nomor Rekening",
       },
       {
         key: "atasnama",
@@ -503,41 +507,99 @@ export default function App({ id }) {
 
   // console.log(form);
   return (
-    <div className="flex flex-col gap-2 w-full">
-      <h1>Proses</h1>
-      <div className="flex flex-row gap-2">
+    <div className="flex flex-col gap-2 w-full-">
+      <div className="flex gap-2">
         {/*Detail  */}
-        <div className="bg-white rounded-lg p-3">
+        <div className="bg-white rounded-lg p-3 w-1/4">
           <div>Detail</div>
-          <div className="flex">
-            <div>
-              <div>No.</div>
-              <div>Tanggal</div>
-              <div>Klien</div>
-              <div>Instansi</div>
-              <div>Nama Proyek</div>
-              <div>Biaya Produksi</div>
-              <div>Omset</div>
-              <div>Provit</div>
+          {[
+            {
+              key: "Tanggal",
+              comp: getDateFId(new Date(selectedProyek.tanggal)),
+            },
+            {
+              key: "Klien",
+              comp: selectedProyek.klien,
+            },
+            {
+              key: "Instansi",
+              comp: selectedProyek.instansi,
+            },
+            {
+              key: "Nama Proyek",
+              comp: selectedProyek.nama,
+            },
+            {
+              key: "Biaya Produksi",
+              comp: <Harga harga={biayaProduksi} />,
+            },
+            {
+              key: "Omset",
+              comp: <Harga harga={omset} />,
+            },
+            {
+              key: "Provit",
+              comp: <Harga harga={provit} />,
+            },
+          ].map((o, i) => (
+            <div key={i} className="grid grid-cols-2">
+              <div className="">{o.key}</div>
+              <div className=""> : {o.comp}</div>
             </div>
-            <div>
-              <div>: {selectedProyek.id_kustom}</div>
-              <div>: {getDateFId(new Date(selectedProyek.tanggal))} </div>
-              <div>: {selectedProyek.klien} </div>
-              <div>: {selectedProyek.instansi} </div>
-              <div>: {selectedProyek.nama} </div>
-              <div>
-                : <Harga harga={biayaProduksi} />
-              </div>
-              <div>
-                : <Harga harga={omset} />
-              </div>
-              <div>
-                : <Harga harga={provit} />
-              </div>
-            </div>
-          </div>
+          ))}
         </div>
+        {/* tabel pembayaranproyek */}
+        <Table
+          className="z-10"
+          aria-label="Example table with custom cells"
+          topContent={
+            <>
+              <div>Pembayaran Proyek</div>
+              <div className="flex-col gap-2">
+                <div className="flex flex-row gap-2 mt-3">
+                  {
+                    <PembayaranProyek
+                      form={formPembayaran}
+                      setForm={setFormPembayaran}
+                      metodepembayaran={metodepembayaran}
+                    />
+                  }
+                  <Button
+                    onPress={() => {
+                      tambahButtonPressPembayaran(formPembayaran);
+                    }}
+                    color="primary"
+                    className="ml-2"
+                  >
+                    Tambah
+                  </Button>
+                </div>
+              </div>
+            </>
+          }
+        >
+          <TableHeader columns={col.pembayaranproyek}>
+            {(column) => (
+              <TableColumn
+                key={column.key}
+                align={column.key === "aksi" ? "center" : "start"}
+              >
+                {column.label}
+              </TableColumn>
+            )}
+          </TableHeader>
+          <TableBody emptyContent={"Kosong"} items={pembayaranproyek.data}>
+            {(item) => (
+              <TableRow key={item.id}>
+                {(columnKey) => (
+                  <TableCell>
+                    {renderCell.pembayaranproyek(item, columnKey)}
+                  </TableCell>
+                )}
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
       </div>
       <div className="flex gap-2">
         <NavLinkNewTab
@@ -678,58 +740,6 @@ export default function App({ id }) {
               {(columnKey) => (
                 <TableCell>
                   {renderCell.pengeluaranproyek(item, columnKey)}
-                </TableCell>
-              )}
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-      {/* tabel pembayaranproyek */}
-      <Table
-        className="z-10"
-        aria-label="Example table with custom cells"
-        topContent={
-          <>
-            <div>Pembayaran Proyek</div>
-            <div className="flex-col gap-2">
-              <div className="flex flex-row gap-2 mt-3">
-                {
-                  <PembayaranProyek
-                    form={formPembayaran}
-                    setForm={setFormPembayaran}
-                    metodepembayaran={metodepembayaran}
-                  />
-                }
-                <Button
-                  onPress={() => {
-                    tambahButtonPressPembayaran(formPembayaran);
-                  }}
-                  color="primary"
-                  className="ml-2"
-                >
-                  Tambah
-                </Button>
-              </div>
-            </div>
-          </>
-        }
-      >
-        <TableHeader columns={col.pembayaranproyek}>
-          {(column) => (
-            <TableColumn
-              key={column.key}
-              align={column.key === "aksi" ? "center" : "start"}
-            >
-              {column.label}
-            </TableColumn>
-          )}
-        </TableHeader>
-        <TableBody emptyContent={"Kosong"} items={pembayaranproyek.data}>
-          {(item) => (
-            <TableRow key={item.id}>
-              {(columnKey) => (
-                <TableCell>
-                  {renderCell.pembayaranproyek(item, columnKey)}
                 </TableCell>
               )}
             </TableRow>

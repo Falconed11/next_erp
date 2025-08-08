@@ -1,6 +1,14 @@
 import React, { useRef, useState } from "react";
 import { useReactToPrint } from "react-to-print";
-import { Button, Checkbox, Chip, Input, Tooltip } from "@heroui/react";
+import {
+  Button,
+  Checkbox,
+  Chip,
+  Input,
+  Radio,
+  RadioGroup,
+  Tooltip,
+} from "@heroui/react";
 import {
   Table,
   TableHeader,
@@ -50,6 +58,7 @@ export default function Invoice({
     contentRef: componentRef,
     pageStyle: "p-10 block",
   });
+  const [versi, setVersi] = useState(0);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   if (pembayaranProyek.error) return <div>failed to load keranjang proyek</div>;
   if (pembayaranProyek.isLoading) return <div>loading...</div>;
@@ -59,13 +68,22 @@ export default function Invoice({
   const dataInstalasi = addRowNumber(instalasi);
   const dataPembayaran = pembayaranProyek.data;
   const lengthPembayaran = dataPembayaran.length;
+  const dataPembayaranVersi = dataPembayaran.slice(0, versi + 1);
+  const lengthPembayaranVersi = dataPembayaranVersi.length;
   const totalPembayaran = dataPembayaran.reduce(
     (acc, v, i) => acc + v.nominal,
     0
   );
   return (
     <>
-      <Button onPress={onOpen} color="primary" className="mt-3">
+      <Button
+        onPress={() => {
+          setVersi(lengthPembayaran - 1);
+          onOpen();
+        }}
+        color="primary"
+        className="mt-3"
+      >
         Invoice
       </Button>
       <Modal
@@ -79,7 +97,20 @@ export default function Invoice({
             <>
               <ModalHeader className="flex flex-col gap-1">Invoice</ModalHeader>
               <ModalBody>
-                <div>Versi :</div>
+                {lengthPembayaran > 1 && (
+                  <RadioGroup
+                    label={"Pilih Versi :"}
+                    orientation="horizontal"
+                    value={versi}
+                    onValueChange={setVersi}
+                  >
+                    {dataPembayaran.map((data, i) => (
+                      <Radio value={i} key={i}>
+                        {i == 0 ? "Uang Muka" : `Termin ${i + 1}`}
+                      </Radio>
+                    ))}
+                  </RadioGroup>
+                )}
                 <div
                   ref={componentRef}
                   className="bg-white text-black leading-none text-sm"
@@ -104,7 +135,8 @@ export default function Invoice({
                           {invoice(proyek.id_kustom, new Date(proyek.tanggal))}
                         </div>
                         <div>
-                          Tanggal : {getDateFId(new Date(proyek.tanggal))}
+                          Tanggal :{" "}
+                          {getDateFId(new Date(dataPembayaran[versi]?.tanggal))}
                         </div>
                         <div>No. PO : {proyek.id_po}</div>
                       </div>
@@ -132,15 +164,16 @@ export default function Invoice({
                             key: "",
                             val: rekapTotal.hargaPajak,
                             classNames:
-                              lengthPembayaran == 1 && "border-b border-black",
+                              lengthPembayaranVersi == 1 &&
+                              "border-b border-black",
                           },
-                          ...pembayaranProyek.data.map((v, i) => ({
-                            ...(i == lengthPembayaran - 1
+                          ...dataPembayaranVersi.map((v, i) => ({
+                            ...(i == lengthPembayaranVersi - 1
                               ? { key: "Total", classNames: "font-bold" }
                               : {
                                   key: i == 0 ? "Uang Muka" : `Termin ${i + 1}`,
                                   classNames:
-                                    i + 1 == lengthPembayaran - 1 &&
+                                    i + 1 == lengthPembayaranVersi - 1 &&
                                     "border-b border-black",
                                 }),
                             val: v.nominal,
@@ -149,15 +182,16 @@ export default function Invoice({
                       />
                     </div>
                     <div className="font-bold border-b border-black">
-                      *** {nominalToText(pembayaranProyek.data.at(-1).nominal)}
+                      *** {nominalToText(dataPembayaranVersi.at(-1)?.nominal)}
                     </div>
                     <div className="flex">
                       <div className="basis-2/4">
-                        Pembayaran melalui : Rek. {dataPembayaran[0]?.nama_bank}{" "}
-                        : {dataPembayaran[0]?.norekening}
+                        Pembayaran melalui : Rek.{" "}
+                        {dataPembayaranVersi.at(-1)?.nama_bank} :{" "}
+                        {dataPembayaranVersi.at(-1)?.norekening}
                       </div>
                       <div className="basis-2/4">
-                        An. {dataPembayaran[0]?.atasnama}
+                        An. {dataPembayaranVersi.at(-1)?.atasnama}
                       </div>
                     </div>
                     <div className="flex flex-col">
@@ -200,15 +234,13 @@ export default function Invoice({
                       </div>
                     )} */}
                   </div>
-                  <div className="bg-black h-0.5 my-2"></div>
-                  <div className="flex flex-row items-center">
-                    <div className="flex flex-col">
-                      {proyek.namaperusahaan == "bks" ? (
-                        <BKSHeader />
-                      ) : (
-                        <SVTHeader />
-                      )}
-                    </div>
+                  <div className="no-break">
+                    <div className="bg-black h-0.5 my-2"></div>
+                    {proyek.namaperusahaan == "bks" ? (
+                      <BKSHeader />
+                    ) : (
+                      <SVTHeader />
+                    )}
                   </div>
                 </div>
               </ModalBody>

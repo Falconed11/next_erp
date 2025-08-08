@@ -26,6 +26,7 @@ export default function Rekapitulasi({
   rekapitulasi,
   idProyek,
   versi,
+  selectedProyek,
 }) {
   const [formPeralatan, setFormPeralatan] = useState({});
   const [formInstalasi, setFormInstalasi] = useState({});
@@ -90,7 +91,7 @@ export default function Rekapitulasi({
       console.error(err);
     }
   };
-  const modal = rekapitulasiTotal.modal
+  const modal = rekapitulasiTotal.modal;
   const jual = rekapitulasiTotal.jual;
   const diskon = formInstalasi.diskon + formPeralatan.diskon || 0;
   const hargaDiskon = jual - diskon;
@@ -114,15 +115,14 @@ export default function Rekapitulasi({
             Children={<RecapTable tableData={instalasi} />}
           />
         </div>
-        <RecapBody
-          title="Total"
-          Children={<RecapTable tableData={total} />}
-        />
-        <div className="text-right">
-          <Button color="primary" onPress={editButtonPress}>
-            Edit
-          </Button>
-        </div>
+        <RecapBody title="Total" Children={<RecapTable tableData={total} />} />
+        {selectedProyek.versi == 0 && (
+          <div className="text-right">
+            <Button color="primary" onPress={editButtonPress}>
+              Edit
+            </Button>
+          </div>
+        )}
       </div>
       <Modal
         scrollBehavior="inside"
