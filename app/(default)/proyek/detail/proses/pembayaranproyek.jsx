@@ -1,8 +1,18 @@
 import DatePicker from "react-datepicker";
 import { Input, NumberInput, Select, SelectItem } from "@heroui/react";
 import { getDate } from "@/app/utils/date";
+import Harga from "@/components/harga";
 
-export default function PembayaranProyek({ form, setForm, metodepembayaran }) {
+export default function PembayaranProyek({
+  isCreate,
+  form,
+  setForm,
+  metodepembayaran,
+  rekap,
+  totalPenagihan,
+}) {
+  const nilaiProyek = rekap.hargaPajak;
+  const piutang = nilaiProyek - totalPenagihan;
   return (
     <>
       <div className="bg-gray-100 p-3 rounded-lg z-50">
@@ -27,7 +37,17 @@ export default function PembayaranProyek({ form, setForm, metodepembayaran }) {
         formatOptions={{
           useGrouping: false,
         }}
-        label="Nominal"
+        label={
+          <>
+            Nominal (Piutang :{" "}
+            <Harga
+              harga={
+                isCreate ? piutang : form.tempTotalPenagihan - form.nominal
+              }
+            />{" "}
+            )
+          </>
+        }
         value={form.nominal}
         placeholder="Masukkan nominal!"
         className=""
@@ -61,6 +81,29 @@ export default function PembayaranProyek({ form, setForm, metodepembayaran }) {
           </SelectItem>
         ))}
       </Select>
+      {isCreate ? (
+        <></>
+      ) : (
+        <Select
+          label="Status Pembayaran"
+          placeholder="Pilih status pembayaran!"
+          className=""
+          selectedKeys={new Set([String(form.status)])}
+          onSelectionChange={(v) => {
+            setForm({
+              ...form,
+              status: v.values().next().value,
+            });
+          }}
+        >
+          {[
+            { key: 0, label: "Menunggu" },
+            { key: 1, label: "Lunas" },
+          ].map((item) => (
+            <SelectItem key={item.key}>{item.label}</SelectItem>
+          ))}
+        </Select>
+      )}
       <Input
         type="text"
         label="Keterangan"

@@ -46,6 +46,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { NavLinkNewTab } from "@/components/mycomponent";
 import PembayaranProyek from "./pembayaranproyek";
+import { countPercentProvit, countRecapitulation } from "@/app/utils/formula";
 
 const api_path = getApiPath();
 
@@ -77,6 +78,27 @@ export default function App({ id }) {
   const produk = useClientFetch(
     `produk?kategori=${selectKategori.values().next().value}`
   );
+  const selectedVersion = proyek.data?.[0]?.versi || 0;
+  const keranjangPeralatan = useClientFetch(
+    `keranjangproyek?id_proyek=${id}&instalasi=0&versi=${selectedVersion}`
+  );
+  const keranjangInstalasi = useClientFetch(
+    `keranjangproyek?id_proyek=${id}&instalasi=1&versi=${selectedVersion}`
+  );
+  const rekapitulasiProyek = useClientFetch(
+    `rekapitulasiproyek?id_proyek=${id}&versi=${selectedVersion}`
+  );
+  const queries = {
+    proyek,
+    pengeluaranproyek,
+    pembayaranproyek,
+    kategori,
+    metodepembayaran,
+    produk,
+    keranjangPeralatan,
+    keranjangInstalasi,
+    rekapitulasiProyek,
+  };
 
   const editButtonPress = (data) => {
     const startdate = new Date(data.tanggalpengeluaran);
@@ -242,6 +264,7 @@ export default function App({ id }) {
     const startdate = new Date(data.tanggal);
     setFormPembayaran({
       ...data,
+      tempTotalPenagihan: (totalPenagihan ? totalPenagihan : 0) + data.nominal,
       modalmode: "Edit",
       selectMetodePembayaran: new Set([String(data.id_metodepembayaran)]),
       tanggal: getDate(startdate),
@@ -290,14 +313,12 @@ export default function App({ id }) {
         "Content-Type": "application/json",
         // 'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: JSON.stringify({
-        ...data,
-        // harga: data.hargajual,
-      }),
+      body: JSON.stringify(data),
     });
     const json = await res.json();
     if (res.status == 400) return alert(json.message);
     setFormPembayaran({ nominal: "" });
+    pembayaranproyek.mutate();
     onClose();
     // return alert(json.message);
   };
@@ -353,6 +374,10 @@ export default function App({ id }) {
       switch (columnKey) {
         case "tanggal":
           return getDateF(new Date(data.tanggal));
+        case "status":
+          return cellValue ? "Lunas" : "Menunggu";
+        case "id_second":
+          return data.status ? cellValue : "";
         case "nominal":
           return <Harga harga={data.nominal} />;
         case "aksi":
@@ -444,6 +469,10 @@ export default function App({ id }) {
         label: "tanggal",
       },
       {
+        key: "id_second",
+        label: "ID",
+      },
+      {
         key: "status",
         label: "Status",
       },
@@ -477,35 +506,34 @@ export default function App({ id }) {
       },
     ],
   };
-
-  if (proyek.error) return <div>failed to load</div>;
-  if (proyek.isLoading) return <div>loading...</div>;
-  if (pengeluaranproyek.error) return <div>failed to load</div>;
-  if (pengeluaranproyek.isLoading) return <div>loading...</div>;
-  if (pembayaranproyek.error) return <div>failed to load</div>;
-  if (pembayaranproyek.isLoading) return <div>loading...</div>;
-  if (kategori.error) return <div>failed to load</div>;
-  if (kategori.isLoading) return <div>loading...</div>;
-  if (produk.error) return <div>failed to load</div>;
-  if (produk.isLoading) return <div>loading...</div>;
-  if (karyawan.error) return <div>failed to load</div>;
-  if (karyawan.isLoading) return <div>loading...</div>;
-  if (metodepembayaran.error) return <div>failed to load</div>;
-  if (metodepembayaran.isLoading) return <div>loading...</div>;
-
+  for (const [name, data] of Object.entries(queries)) {
+    if (data.error) return <div>Failed to load {name}</div>;
+    if (data.isLoading) return <div>Loading {name}...</div>;
+  }
   const selectedProyek = proyek.data[0];
+  const { rekapitulasiPeralatan, rekapitulasiInstalasi, rekapitulasiTotal } =
+    countRecapitulation(
+      keranjangPeralatan.data,
+      keranjangInstalasi.data,
+      rekapitulasiProyek.data[0]
+    );
   const biayaProduksi = pengeluaranproyek.data.reduce((total, v) => {
     return (
       total +
       v.jumlah * (v.hargapengeluaran ? v.hargapengeluaran : v.hargamodal)
     );
   }, 0);
-  const omset = pembayaranproyek.data.reduce((total, v) => {
-    return total + v.nominal;
-  }, 0);
+  const sums = pembayaranproyek.data.reduce(
+    (acc, v) => {
+      if (v.status) acc.omset += v.nominal;
+      acc.totalPenagihan += v.nominal;
+      return acc;
+    },
+    { omset: 0, totalPenagihan: 0 }
+  );
+  const { omset, totalPenagihan } = sums;
   const provit = omset - biayaProduksi;
-
-  // console.log(form);
+  // console.log({ keranjangPeralatan, keranjangPeralatan, rekapitulasiProyek });
   return (
     <div className="flex flex-col gap-2 w-full-">
       <div className="flex gap-2">
@@ -538,13 +566,21 @@ export default function App({ id }) {
               comp: <Harga harga={omset} />,
             },
             {
+              key: "Nilai Proyek",
+              comp: <Harga harga={rekapitulasiTotal.hargaPajak} />,
+            },
+            {
               key: "Provit",
               comp: <Harga harga={provit} />,
+            },
+            {
+              key: "Provit Persen",
+              comp: `${countPercentProvit(biayaProduksi, omset).toFixed(2)}%`,
             },
           ].map((o, i) => (
             <div key={i} className="grid grid-cols-2">
               <div className="">{o.key}</div>
-              <div className=""> : {o.comp}</div>
+              <div className="text-right">{o.comp}</div>
             </div>
           ))}
         </div>
@@ -559,9 +595,12 @@ export default function App({ id }) {
                 <div className="flex flex-row gap-2 mt-3">
                   {
                     <PembayaranProyek
+                      isCreate
                       form={formPembayaran}
                       setForm={setFormPembayaran}
                       metodepembayaran={metodepembayaran}
+                      rekap={rekapitulasiTotal}
+                      totalPenagihan={totalPenagihan}
                     />
                   }
                   <Button
@@ -892,6 +931,8 @@ export default function App({ id }) {
                   form={formPembayaran}
                   setForm={setFormPembayaran}
                   metodepembayaran={metodepembayaran}
+                  rekap={rekapitulasiTotal}
+                  totalPenagihan={totalPenagihan}
                 />
               </ModalBody>
               <ModalFooter>

@@ -97,9 +97,6 @@ export default function App({ id, versi }) {
       selectVersi.values().next().value
     }`
   );
-  const keteranganPenawaran = useClientFetch(
-    `keteranganpenawaran?idProyek=${id}`
-  );
   const keranjangProyekInstalasi = useClientFetch(
     `keranjangproyek?id_proyek=${id}&instalasi=1&versi=${
       selectVersi.values().next().value
@@ -109,6 +106,9 @@ export default function App({ id, versi }) {
     `rekapitulasiproyek?id_proyek=${id}&versi=${
       selectVersi.values().next().value
     }`
+  );
+  const keteranganPenawaran = useClientFetch(
+    `keteranganpenawaran?idProyek=${id}`
   );
   const versiKeranjangProyek = useClientFetch(
     `versikeranjangproyek?id_proyek=${id}`
@@ -621,7 +621,7 @@ export default function App({ id, versi }) {
   if (keteranganPenawaran.isLoading) return <div>loading...</div>;
 
   const keranjangProduk = keranjangProyek.data;
-  const keranjangIntalasi = keranjangProyekInstalasi.data;
+  const keranjangInstalasi = keranjangProyekInstalasi.data;
   const rekapitulasi = rekapitulasiProyek.data[0] || {
     id_proyek: id,
     versi,
@@ -856,7 +856,7 @@ export default function App({ id, versi }) {
     td: "text-xs py-0 align-top", // Reduce font size and vertical padding
   };
   const { rekapitulasiPeralatan, rekapitulasiInstalasi, rekapitulasiTotal } =
-    countRecapitulation(keranjangProduk, keranjangIntalasi, rekapitulasi);
+    countRecapitulation(keranjangProduk, keranjangInstalasi, rekapitulasi);
   const dataTabelPeralatan = (isPenawaran) =>
     createRecapTable(
       rekapitulasiPeralatan,
@@ -1082,7 +1082,7 @@ export default function App({ id, versi }) {
                   proyek={selectedProyek}
                   className={formatTable}
                   peralatan={keranjangProduk}
-                  instalasi={keranjangIntalasi}
+                  instalasi={keranjangInstalasi}
                   rekapTotal={rekapitulasiTotal}
                   compRekapPeralatan={compRekapPeralatan}
                   compRekapInstalasi={compRekapInstalasi}
@@ -1461,7 +1461,7 @@ export default function App({ id, versi }) {
                     </TableColumn>
                   )}
                 </TableHeader>
-                <TableBody items={keranjangIntalasi}>
+                <TableBody items={keranjangInstalasi}>
                   {(item) => (
                     <TableRow key={item.id_keranjangproyek}>
                       {(columnKey) => (
