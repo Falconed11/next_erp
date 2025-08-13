@@ -58,17 +58,20 @@ export default function App({ id }) {
     content: () => componentRef.nota.current,
     pageStyle: "p-10",
   });
-
+  const now = new Date();
   const [selectKategori, setSelectKategori] = useState(new Set([]));
   const [selectProduk, setSelectProduk] = useState(new Set([]));
   const karyawan = useClientFetch(`karyawan`);
   const [selectKaryawan, setSelectKaryawan] = useState("");
   const [form, setForm] = useState({
-    startdate: new Date(),
+    startdate: now,
     selectKategori: new Set([]),
     selectProduk: new Set([]),
   });
-  const [formPembayaran, setFormPembayaran] = useState({});
+  const [formPembayaran, setFormPembayaran] = useState({
+    startdate: now,
+    tanggal: getDate(now),
+  });
 
   const proyek = useClientFetch(`proyek?id=${id}`);
   const pengeluaranproyek = useClientFetch(`pengeluaranproyek?id_proyek=${id}`);
@@ -79,6 +82,15 @@ export default function App({ id }) {
     `produk?kategori=${selectKategori.values().next().value}`
   );
   const selectedVersion = proyek.data?.[0]?.versi || 0;
+  const sums = (pembayaranproyek?.data ?? []).reduce(
+    (acc, v) => {
+      if (v.status) acc.omset += v.nominal;
+      acc.totalPenagihan += v.nominal;
+      return acc;
+    },
+    { omset: 0, totalPenagihan: 0 }
+  );
+  const { omset, totalPenagihan } = sums;
   const keranjangPeralatan = useClientFetch(
     `keranjangproyek?id_proyek=${id}&instalasi=0&versi=${selectedVersion}`
   );
@@ -264,7 +276,7 @@ export default function App({ id }) {
     const startdate = new Date(data.tanggal);
     setFormPembayaran({
       ...data,
-      tempTotalPenagihan: (totalPenagihan ? totalPenagihan : 0) + data.nominal,
+      tempNominal: data.nominal,
       modalmode: "Edit",
       selectMetodePembayaran: new Set([String(data.id_metodepembayaran)]),
       tanggal: getDate(startdate),
@@ -284,6 +296,7 @@ export default function App({ id }) {
       });
       const json = await res.json();
       // return alert(json.message);
+      pembayaranproyek.mutate();
     }
   };
   const tambahButtonPressPembayaran = async (form) => {
@@ -305,6 +318,7 @@ export default function App({ id }) {
       ...formPembayaran,
       nominal: 0,
     });
+    pembayaranproyek.mutate();
   };
   const simpanButtonPressPembayaran = async (data, onClose) => {
     const res = await fetch(`${api_path}pembayaranproyek`, {
@@ -317,7 +331,12 @@ export default function App({ id }) {
     });
     const json = await res.json();
     if (res.status == 400) return alert(json.message);
-    setFormPembayaran({ nominal: "" });
+    const startdate = new Date();
+    setFormPembayaran({
+      selectMetodePembayaran: new Set([String(data.id_metodepembayaran)]),
+      tanggal: getDate(startdate),
+      startdate,
+    });
     pembayaranproyek.mutate();
     onClose();
     // return alert(json.message);
@@ -515,7 +534,7 @@ export default function App({ id }) {
     countRecapitulation(
       keranjangPeralatan.data,
       keranjangInstalasi.data,
-      rekapitulasiProyek.data[0]
+      rekapitulasiProyek.data[0] ?? {}
     );
   const biayaProduksi = pengeluaranproyek.data.reduce((total, v) => {
     return (
@@ -523,15 +542,6 @@ export default function App({ id }) {
       v.jumlah * (v.hargapengeluaran ? v.hargapengeluaran : v.hargamodal)
     );
   }, 0);
-  const sums = pembayaranproyek.data.reduce(
-    (acc, v) => {
-      if (v.status) acc.omset += v.nominal;
-      acc.totalPenagihan += v.nominal;
-      return acc;
-    },
-    { omset: 0, totalPenagihan: 0 }
-  );
-  const { omset, totalPenagihan } = sums;
   const provit = omset - biayaProduksi;
   // console.log({ keranjangPeralatan, keranjangPeralatan, rekapitulasiProyek });
   return (
@@ -936,7 +946,21 @@ export default function App({ id }) {
                 />
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
+                <Button
+                  color="danger"
+                  variant="light"
+                  onPress={() => {
+                    const startdate = new Date();
+                    setFormPembayaran({
+                      selectMetodePembayaran: new Set([
+                        String(form.id_metodepembayaran),
+                      ]),
+                      tanggal: getDate(startdate),
+                      startdate,
+                    });
+                    onClose();
+                  }}
+                >
                   Batal
                 </Button>
                 <Button

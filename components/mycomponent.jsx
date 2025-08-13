@@ -45,20 +45,20 @@ const NavLinkNewTab = ({ href, children }) => {
   );
 };
 
-const BKSHeader = () => {
+const BKSHeader = ({ titleClassname }) => {
   return (
     <div className="flex flex-col">
-      <div>Belga Karya Semesta</div>
+      <div className={`${titleClassname}`}>Belga Karya Semesta</div>
       <div>General Trading - Mechanical Electrical - Supplies - Consultant</div>
       <div>Jogokaryan MJ 3/789, Mantrijeron - Yogyakarta Telp 08121553765</div>
     </div>
   );
 };
 
-const SVTHeader = () => {
+const SVTHeader = ({ titleClassname }) => {
   return (
     <div className="flex flex-col">
-      <div>Satu Visi Teknikatama</div>
+      <div className={`${titleClassname}`}>Satu Visi Teknikatama</div>
       <div>General Trading - Mechanical Electrical - Supplies - Consultant</div>
       <div>
         Wonosalam RT. 005 / RW. 009, Sukoharjo, Ngaglik Sleman - Yogyakarta
@@ -68,4 +68,19 @@ const SVTHeader = () => {
   );
 };
 
-export { MyChip, LinkOpenNewTab, NavLinkNewTab, BKSHeader, SVTHeader };
+const CompanyHeader = ({ id, titleClassname }) => {
+  return id == 1 ? (
+    <BKSHeader titleClassname={titleClassname} />
+  ) : (
+    <SVTHeader titleClassname={titleClassname} />
+  );
+};
+
+export {
+  MyChip,
+  LinkOpenNewTab,
+  NavLinkNewTab,
+  BKSHeader,
+  SVTHeader,
+  CompanyHeader,
+};

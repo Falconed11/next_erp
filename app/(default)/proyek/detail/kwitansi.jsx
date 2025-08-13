@@ -1,0 +1,142 @@
+import { RadioGroup, Radio } from "@heroui/react";
+import { getDateFId } from "@/app/utils/date";
+import { CompanyHeader } from "@/components/mycomponent";
+import Harga from "@/components/harga";
+import {
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Button,
+  useDisclosure,
+} from "@heroui/react";
+import { useRef, useState } from "react";
+import { useReactToPrint } from "react-to-print";
+import { nominalToText } from "@/app/utils/number";
+import { useClientFetch } from "@/app/utils/apiconfig";
+export default function Kwitansi({ proyek }) {
+  const componentRef = useRef(null);
+  const handlePrintInvoice = useReactToPrint({
+    contentRef: componentRef,
+    pageStyle: "p-10 block",
+  });
+  const [versi, setVersi] = useState(0);
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const pembayaranProyek = useClientFetch(
+    `pembayaranProyek?id_proyek=${proyek.id}&asc=1`
+  );
+  if (pembayaranProyek.error) return <div>failed to load keranjang proyek</div>;
+  if (pembayaranProyek.isLoading) return <div>loading...</div>;
+  const pembayaran = pembayaranProyek.data;
+  const lengthPembayaran = pembayaran.length;
+  return (
+    <>
+      <Button
+        isDisabled={lengthPembayaran ? true : false}
+        onPress={() => {
+          setVersi(lengthPembayaran - 1);
+          onOpen();
+        }}
+        className="mt-3"
+        color="primary"
+      >
+        Kwitansi
+      </Button>
+      <Modal
+        scrollBehavior="inside"
+        size="4xl"
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">
+                Kwitansi
+              </ModalHeader>
+              <ModalBody>
+                {lengthPembayaran > 1 && (
+                  <RadioGroup
+                    label={"Pilih Versi :"}
+                    orientation="horizontal"
+                    value={versi}
+                    onValueChange={setVersi}
+                  >
+                    {pembayaran.map((data, i) => (
+                      <Radio value={i} key={i}>
+                        {i == 0 ? "Uang Muka" : `Termin ${i + 1}`}
+                      </Radio>
+                    ))}
+                  </RadioGroup>
+                )}
+                <div ref={componentRef} className="bg-white">
+                  <div className="flex">
+                    <div className="text-center basis-3/4">
+                      <CompanyHeader
+                        id={proyek.id_perusahaan}
+                        titleClassname={"font-bold text-xl"}
+                      />
+                    </div>
+                    <div className="font-bold text-center basis-1/4">
+                      <div className="text-xl">Kwitansi</div>
+                      <div>
+                        No :{" "}
+                        <span className="border border-black px-1">
+                          {pembayaran[versi]?.id_second?.split("-")[1]}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="border-y border-black text-center">
+                    Pembayaran
+                  </div>
+                  <div className="pl-3 border-b border-black">
+                    {[
+                      { key: "Telah Terima Dari", value: proyek.instansi },
+                      {
+                        key: "Uang Sebanyak",
+                        value: nominalToText(pembayaran[versi].nominal),
+                      },
+                      { key: "Untuk Pembayaran", value: proyek.nama },
+                    ].map((data, i) => (
+                      <div key={i} className="flex">
+                        <div className="basis-1/6">{data.key}</div>
+                        <div className="basis-5/6 border-b- border-black border-dotted">
+                          : {data.value}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="grid grid-cols-2">
+                    <div className="content-center border h-full">
+                      Terbilang : Rp.{" "}
+                      <Harga harga={pembayaran[versi].nominal} />
+                      ,00
+                    </div>
+                    <div className="text-right border">
+                      <div className="border">
+                        Yogyakarta,{" "}
+                        {getDateFId(new Date(pembayaran[0].tanggal))}
+                      </div>
+                      <br />
+                      <br />
+                    </div>
+                  </div>
+                </div>
+              </ModalBody>
+              <ModalFooter>
+                <Button color="danger" variant="light" onPress={onClose}>
+                  Tutup
+                </Button>
+                <Button color="primary" onPress={handlePrintInvoice}>
+                  Cetak
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+    </>
+  );
+}

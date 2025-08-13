@@ -64,6 +64,7 @@ import {
   countRecapitulation,
 } from "@/app/utils/formula";
 import { updateSwitch } from "@/app/utils/tools";
+import Kwitansi from "./kwitansi";
 import Invoice from "./invoice";
 import KeteranganPenawaran from "./keteranganpenawaran";
 import Rekapitulasi from "./rekapitulasi";
@@ -1088,6 +1089,10 @@ export default function App({ id, versi }) {
                   compRekapInstalasi={compRekapInstalasi}
                   compRekapTotal={compRekapTotal}
                 />
+              </div>
+              {/* Kwitansi */}
+              <div>
+                <Kwitansi proyek={selectedProyek} />
               </div>
               <NavLinkNewTab
                 href={`/proyek/detail/proses?id=${selectedProyek.id}`}

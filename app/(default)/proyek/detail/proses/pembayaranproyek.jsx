@@ -12,7 +12,9 @@ export default function PembayaranProyek({
   totalPenagihan,
 }) {
   const nilaiProyek = rekap.hargaPajak;
-  const piutang = nilaiProyek - totalPenagihan;
+  const piutang =
+    nilaiProyek - (totalPenagihan - (isCreate ? 0 : form.tempNominal));
+  console.log({ form, totalPenagihan });
   return (
     <>
       <div className="bg-gray-100 p-3 rounded-lg z-50">
@@ -39,13 +41,7 @@ export default function PembayaranProyek({
         }}
         label={
           <>
-            Nominal (Piutang :{" "}
-            <Harga
-              harga={
-                isCreate ? piutang : form.tempTotalPenagihan - form.nominal
-              }
-            />{" "}
-            )
+            Nominal (Piutang : <Harga harga={piutang} /> )
           </>
         }
         value={form.nominal}
