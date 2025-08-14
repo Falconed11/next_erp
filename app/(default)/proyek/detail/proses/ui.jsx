@@ -543,7 +543,6 @@ export default function App({ id }) {
     );
   }, 0);
   const provit = omset - biayaProduksi;
-  // console.log({ keranjangPeralatan, keranjangPeralatan, rekapitulasiProyek });
   return (
     <div className="flex flex-col gap-2 w-full-">
       <div className="flex gap-2">
@@ -1007,7 +1006,7 @@ export default function App({ id }) {
                   Tutup
                 </Button>
                 <Button color="primary">Cetak</Button>
-                <Button onClick={handlePrintNota} color="primary">
+                <Button onPress={handlePrintNota} color="primary">
                   React to Print
                 </Button>
               </ModalFooter>

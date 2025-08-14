@@ -14,7 +14,7 @@ const countPriceByPercentProfit = (hargaModal, provitPercent) => {
 const countRecapitulation = (
   peralatan,
   instalasi,
-  { diskon, diskoninstalasi, pajak }
+  { diskon = 0, diskoninstalasi = 0, pajak = 0 }
 ) => {
   const countModalJual = (data) =>
     data.reduce(

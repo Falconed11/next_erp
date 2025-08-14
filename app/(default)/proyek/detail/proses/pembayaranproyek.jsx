@@ -14,7 +14,6 @@ export default function PembayaranProyek({
   const nilaiProyek = rekap.hargaPajak;
   const piutang =
     nilaiProyek - (totalPenagihan - (isCreate ? 0 : form.tempNominal));
-  console.log({ form, totalPenagihan });
   return (
     <>
       <div className="bg-gray-100 p-3 rounded-lg z-50">

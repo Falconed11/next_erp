@@ -62,7 +62,10 @@ const SVTHeader = ({ titleClassname }) => {
       <div>General Trading - Mechanical Electrical - Supplies - Consultant</div>
       <div>
         Wonosalam RT. 005 / RW. 009, Sukoharjo, Ngaglik Sleman - Yogyakarta
-        55581 Telp 08121553765 - 081578861740
+        55581{" "}
+        <span className="whitespace-nowrap">
+          Telp 08121553765 - 081578861740
+        </span>
       </div>
     </div>
   );

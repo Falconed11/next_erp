@@ -77,6 +77,7 @@ export default function Invoice({
   return (
     <>
       <Button
+        isDisabled={!lengthPembayaran}
         onPress={() => {
           setVersi(lengthPembayaran - 1);
           onOpen();
@@ -169,7 +170,7 @@ export default function Invoice({
                           },
                           ...dataPembayaranVersi.map((v, i) => ({
                             ...(i == lengthPembayaranVersi - 1
-                              ? { key: "Total", classNames: "font-bold" }
+                              ? { key: "Grand Total", classNames: "font-bold" }
                               : {
                                   key: i == 0 ? "Uang Muka" : `Termin ${i + 1}`,
                                   classNames:
@@ -202,11 +203,15 @@ export default function Invoice({
                       </div>
                       <div className="flex">
                         <div className="basis-3/4 p-1 border border-black">
-                          Lorem ipsum dolor sit amet consectetur adipisicing
-                          elit. Quae, architecto. Ipsa illum asperiores,
-                          corrupti nostrum corporis mollitia. Id, aspernatur
-                          dolorem nisi maiores sequi laborum animi, cupiditate
-                          deleniti alias atque quidem.
+                          <div>
+                            Pembayaran harus dianggap lunas apabila cek, giro
+                            atau alat pembayaran lainnnya telah berhasil di
+                            clearing oleh bank kami.
+                          </div>
+                          <div>
+                            Barang yang sudah di beli tidak dapat dikembalikan
+                            atau di tukar.
+                          </div>
                         </div>
                       </div>
                     </div>

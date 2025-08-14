@@ -15,6 +15,7 @@ import { useRef, useState } from "react";
 import { useReactToPrint } from "react-to-print";
 import { nominalToText } from "@/app/utils/number";
 import { useClientFetch } from "@/app/utils/apiconfig";
+
 export default function Kwitansi({ proyek }) {
   const componentRef = useRef(null);
   const handlePrintInvoice = useReactToPrint({
@@ -33,7 +34,7 @@ export default function Kwitansi({ proyek }) {
   return (
     <>
       <Button
-        isDisabled={lengthPembayaran ? true : false}
+        isDisabled={!lengthPembayaran}
         onPress={() => {
           setVersi(lengthPembayaran - 1);
           onOpen();
@@ -98,7 +99,10 @@ export default function Kwitansi({ proyek }) {
                         key: "Uang Sebanyak",
                         value: nominalToText(pembayaran[versi].nominal),
                       },
-                      { key: "Untuk Pembayaran", value: proyek.nama },
+                      {
+                        key: "Untuk Pembayaran",
+                        value: `${proyek.nama} ( Termin ${versi + 1} )`,
+                      },
                     ].map((data, i) => (
                       <div key={i} className="flex">
                         <div className="basis-1/6">{data.key}</div>
@@ -109,18 +113,28 @@ export default function Kwitansi({ proyek }) {
                     ))}
                   </div>
                   <div className="grid grid-cols-2">
-                    <div className="content-center border h-full">
+                    <div className="content-center h-full p-3">
                       Terbilang : Rp.{" "}
                       <Harga harga={pembayaran[versi].nominal} />
                       ,00
                     </div>
-                    <div className="text-right border">
-                      <div className="border">
-                        Yogyakarta,{" "}
-                        {getDateFId(new Date(pembayaran[0].tanggal))}
+                    <div className="text-right">
+                      <div className="grid grid-cols-4">
+                        <div></div>
+                        <div className="text-center col-span-3">
+                          Yogyakarta,{" "}
+                          {getDateFId(new Date(pembayaran[versi].tanggal))}
+                        </div>
                       </div>
                       <br />
                       <br />
+                      <br />
+                      <div className="grid grid-cols-4">
+                        <div></div>
+                        <div className="col-span-3 text-center">
+                          <div className="h-[2px] w-1/2 bg-black mx-auto"></div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
