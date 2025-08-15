@@ -1,16 +1,16 @@
-import UI from "./ui"
+import UI from "./ui";
 
-export default async function app(
-    props: {
-        searchParams: Promise<{ [key: string]: string | string[] | undefined }>
-    }
-) {
-    const searchParams = await props.searchParams;
-    const id = searchParams.id
-    const versi = searchParams.versi
-    return <>
-        <UI id={id} versi={versi} />
+export default async function app(props: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  const searchParams = await props.searchParams;
+  const id = searchParams.id;
+  const versi = searchParams.versi;
+  return (
+    <>
+      <UI id={id} versi={versi} />
     </>
+  );
 }
 
 // async function getProyek(id: any) {

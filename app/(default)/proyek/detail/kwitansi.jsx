@@ -71,7 +71,7 @@ export default function Kwitansi({ proyek, nilaiProyek }) {
                     ))}
                   </RadioGroup>
                 )}
-                <div ref={componentRef} className="bg-white">
+                <div ref={componentRef} className="bg-white text-sm">
                   <div className="flex">
                     <div className="text-center basis-3/4">
                       <CompanyHeader
