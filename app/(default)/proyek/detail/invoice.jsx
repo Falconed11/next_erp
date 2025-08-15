@@ -144,16 +144,24 @@ export default function Invoice({
                     </div>
                     {/* Table */}
                     <div>
-                      <InvoiceTable
-                        title={"Peralatan"}
-                        data={dataPeralatan}
-                        compRecap={compRekapPeralatan}
-                      />
-                      <InvoiceTable
-                        title={"Instalasi"}
-                        data={dataInstalasi}
-                        compRecap={compRekapInstalasi}
-                      />
+                      {peralatan.length ? (
+                        <InvoiceTable
+                          title={"Peralatan"}
+                          data={dataPeralatan}
+                          compRecap={compRekapPeralatan}
+                        />
+                      ) : (
+                        <></>
+                      )}
+                      {instalasi.length ? (
+                        <InvoiceTable
+                          title={"Instalasi"}
+                          data={dataInstalasi}
+                          compRecap={compRekapInstalasi}
+                        />
+                      ) : (
+                        <></>
+                      )}
                     </div>
                     {/* Rekap */}
                     {/* <div>{compRekapTotal}</div> */}
@@ -161,13 +169,17 @@ export default function Invoice({
                       <div></div>
                       <RecapTable
                         tableData={[
-                          {
-                            key: "",
-                            val: rekapTotal.hargaPajak,
-                            classNames:
-                              lengthPembayaranVersi == 1 &&
-                              "border-b border-black",
-                          },
+                          ...(dataPembayaran[0].nominal < rekapTotal.hargaPajak
+                            ? [
+                                {
+                                  key: "",
+                                  val: rekapTotal.hargaPajak,
+                                  classNames:
+                                    lengthPembayaranVersi == 1 &&
+                                    "border-b border-black",
+                                },
+                              ]
+                            : []),
                           ...dataPembayaranVersi.map((v, i) => ({
                             ...(i == lengthPembayaranVersi - 1
                               ? { key: "Grand Total", classNames: "font-bold" }

@@ -49,6 +49,7 @@ const createRecapTable = (
             key: "Harga Setelah Diskon",
             val: rekap.hargaDiskon,
             info: null,
+            classNames: isDiskonFinal && "font-bold",
           },
         ]
       : []),
@@ -62,6 +63,7 @@ const createRecapTable = (
             key: "Harga Setelah Pajak",
             val: pajak ? rekap.hargaDiskon + pajak : rekap.hargaPajak,
             info: null,
+            classNames: "font-bold",
           },
         ]
       : []),
@@ -79,9 +81,17 @@ const createRecapTable = (
 };
 
 const createRecapTableTotal = (data, isPenawaran) => {
+  const [jualPeralatan, jualInstalasi] = [
+    data.jualPeralatan,
+    data.jualInstalasi,
+  ];
   const tableData = [
-    { key: "Peralatan", val: data.jualPeralatan },
-    { key: "Instalasi", val: data.jualInstalasi },
+    ...(jualPeralatan && jualInstalasi
+      ? [
+          { key: "Peralatan", val: jualPeralatan },
+          { key: "Instalasi", val: jualInstalasi },
+        ]
+      : []),
     { key: "Grand Total", val: data.hargaPajak, classNames: "font-bold" },
     ...(isPenawaran
       ? []

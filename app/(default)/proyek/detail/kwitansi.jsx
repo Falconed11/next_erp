@@ -16,7 +16,7 @@ import { useReactToPrint } from "react-to-print";
 import { nominalToText } from "@/app/utils/number";
 import { useClientFetch } from "@/app/utils/apiconfig";
 
-export default function Kwitansi({ proyek }) {
+export default function Kwitansi({ proyek, nilaiProyek }) {
   const componentRef = useRef(null);
   const handlePrintInvoice = useReactToPrint({
     contentRef: componentRef,
@@ -101,7 +101,13 @@ export default function Kwitansi({ proyek }) {
                       },
                       {
                         key: "Untuk Pembayaran",
-                        value: `${proyek.nama} ( Termin ${versi + 1} )`,
+                        value: `${proyek.nama} ${
+                          pembayaran[0].nominal < nilaiProyek
+                            ? `( ${versi == 0 ? "Uang Muka / " : ""}Termin ${
+                                versi + 1
+                              } )`
+                            : ""
+                        }`,
                       },
                     ].map((data, i) => (
                       <div key={i} className="flex">
@@ -143,7 +149,11 @@ export default function Kwitansi({ proyek }) {
                 <Button color="danger" variant="light" onPress={onClose}>
                   Tutup
                 </Button>
-                <Button color="primary" onPress={handlePrintInvoice}>
+                <Button
+                  color="primary"
+                  isDisabled={!pembayaran[versi]?.id_second}
+                  onPress={handlePrintInvoice}
+                >
                   Cetak
                 </Button>
               </ModalFooter>

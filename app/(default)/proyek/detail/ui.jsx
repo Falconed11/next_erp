@@ -885,7 +885,9 @@ export default function App({ id, versi }) {
   const compRekapInstalasi = (
     <TableBottom tableData={dataTabelInstalasi(true)} />
   );
-  const compRekapTotal = <TableBottom tableData={dataTabelTotal(true)} />;
+  const compRekapTotal = (
+    <TableBottom tableData={dataTabelTotal(true)} title="Rekapitulasi" />
+  );
   return (
     <div>
       <div className="flex flex-row gap-2">
@@ -1092,7 +1094,10 @@ export default function App({ id, versi }) {
               </div>
               {/* Kwitansi */}
               <div>
-                <Kwitansi proyek={selectedProyek} />
+                <Kwitansi
+                  proyek={selectedProyek}
+                  nilaiProyek={rekapitulasiTotal.hargaPajak}
+                />
               </div>
               <NavLinkNewTab
                 href={`/proyek/detail/proses?id=${selectedProyek.id}`}
@@ -1871,10 +1876,12 @@ export default function App({ id, versi }) {
                   ) : (
                     <></>
                   )}
-                  {/* Rekapitulasi */}
-                  <div className="mt-0 border no-break text-xs">
-                    {compRekapTotal}
-                  </div>
+                  {
+                    /* Rekapitulasi */
+                    <div className="mt-0 border no-break text-xs">
+                      {compRekapTotal}
+                    </div>
+                  }
                   {/* keterangan */}
                   <div className="flex flex-col mt-3 text-xs">
                     <div className="no-break pb-1">
