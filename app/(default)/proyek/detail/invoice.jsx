@@ -56,7 +56,16 @@ export default function Invoice({
   const componentRef = useRef(null);
   const handlePrintInvoice = useReactToPrint({
     contentRef: componentRef,
-    pageStyle: "p-10 block",
+    pageStyle: `
+    @media print {
+      @page {
+        @bottom-center {
+        content: counter(page) " / " counter(pages);
+        font-size: 12px;
+        color: black;
+      }
+    }  
+    `,
   });
   const [versi, setVersi] = useState(0);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -114,120 +123,147 @@ export default function Invoice({
                 )}
                 <div
                   ref={componentRef}
-                  className="bg-white text-black leading-none text-sm"
+                  className="bg-white text-black leading-none"
                 >
-                  <div className="flex flex-row items-center">
-                    <div className="basis-1/2 bg-black h-0.5"></div>
-                    <div className="basis-1/4 text-2xl font-bold text-center inline-block align-middle items-center">
-                      Invoice
-                    </div>
-                    <div className="basis-1/4 bg-black h-0.5"></div>
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <div className="flex flex-row">
-                      <div className="basis-1/2">
-                        <div>Invoice kepada :</div>
-                        <div>{proyek.klien}</div>
-                        <div>{proyek.instansi}</div>
-                      </div>
-                      <div className="basis-1/2 text-end">
-                        <div>
-                          No. Invoice :{" "}
-                          {invoice(proyek.id_kustom, new Date(proyek.tanggal))}
-                        </div>
-                        <div>
-                          Tanggal :{" "}
-                          {getDateFId(new Date(dataPembayaran[versi]?.tanggal))}
-                        </div>
-                        <div>No. PO : {proyek.id_po}</div>
-                      </div>
-                    </div>
-                    {/* Table */}
-                    <div>
-                      {peralatan.length ? (
-                        <InvoiceTable
-                          title={"Peralatan"}
-                          data={dataPeralatan}
-                          compRecap={compRekapPeralatan}
-                        />
-                      ) : (
-                        <></>
-                      )}
-                      {instalasi.length ? (
-                        <InvoiceTable
-                          title={"Instalasi"}
-                          data={dataInstalasi}
-                          compRecap={compRekapInstalasi}
-                        />
-                      ) : (
-                        <></>
-                      )}
-                    </div>
-                    {/* Rekap */}
-                    {/* <div>{compRekapTotal}</div> */}
-                    <div className="grid grid-cols-2">
-                      <div></div>
-                      <RecapTable
-                        tableData={[
-                          ...(dataPembayaran[0].nominal < rekapTotal.hargaPajak
-                            ? [
-                                {
-                                  key: "",
-                                  val: rekapTotal.hargaPajak,
-                                  classNames:
-                                    lengthPembayaranVersi == 1 &&
-                                    "border-b border-black",
-                                },
-                              ]
-                            : []),
-                          ...dataPembayaranVersi.map((v, i) => ({
-                            ...(i == lengthPembayaranVersi - 1
-                              ? { key: "Grand Total", classNames: "font-bold" }
-                              : {
-                                  key: i == 0 ? "Uang Muka" : `Termin ${i + 1}`,
-                                  classNames:
-                                    i + 1 == lengthPembayaranVersi - 1 &&
-                                    "border-b border-black",
-                                }),
-                            val: v.nominal,
-                          })),
-                        ]}
-                      />
-                    </div>
-                    <div className="font-bold border-b border-black">
-                      *** {nominalToText(dataPembayaranVersi.at(-1)?.nominal)}
-                    </div>
-                    <div className="flex">
-                      <div className="basis-2/4">
-                        Pembayaran melalui : Rek.{" "}
-                        {dataPembayaranVersi.at(-1)?.nama_bank} :{" "}
-                        {dataPembayaranVersi.at(-1)?.norekening}
-                      </div>
-                      <div className="basis-2/4">
-                        An. {dataPembayaranVersi.at(-1)?.atasnama}
-                      </div>
-                    </div>
-                    <div className="flex flex-col">
-                      <div className="flex">
-                        <div className="basis-3/4 p-1 border border-black">
-                          Catatan :
-                        </div>
-                      </div>
-                      <div className="flex">
-                        <div className="basis-3/4 p-1 border border-black">
+                  {/* <div className="print:fixed print:z-50 print:w-full print:-top-5"> */}
+                  <table className="w-full border-collapse">
+                    <thead>
+                      <tr>
+                        <th colSpan="2" className="border-b border-black py-2">
+                          <div className="flex flex-row items-center">
+                            <div className="flex-grow border-t border-black"></div>
+                            <div className="mx-4 text-2xl font-bold">
+                              Invoice
+                            </div>
+                            <div className="flex-grow border-t border-black"></div>
+                          </div>
+                        </th>
+                      </tr>
+                      <tr>
+                        <td className="align-top w-1/2">
+                          <div>Invoice kepada :</div>
+                          <div>{proyek.klien}</div>
+                          <div>{proyek.instansi}</div>
+                        </td>
+                        <td className="text-right w-1/2">
                           <div>
-                            Pembayaran harus dianggap lunas apabila cek, giro
-                            atau alat pembayaran lainnnya telah berhasil di
-                            clearing oleh bank kami.
+                            No. Invoice :{" "}
+                            {invoice(
+                              proyek.id_kustom,
+                              new Date(proyek.tanggal)
+                            )}
                           </div>
                           <div>
-                            Barang yang sudah di beli tidak dapat dikembalikan
-                            atau di tukar.
+                            Tanggal :{" "}
+                            {getDateFId(
+                              new Date(dataPembayaran[versi]?.tanggal)
+                            )}
                           </div>
-                        </div>
-                      </div>
-                    </div>
-                    {/* {proyek.id_perusahaan == 1 ? (
+                          <div>No. PO : {proyek.id_po}</div>
+                        </td>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td colSpan="2">
+                          <div className="flex flex-col gap-2 text-xs">
+                            {/* Table */}
+                            <div>
+                              {peralatan.length ? (
+                                <InvoiceTable
+                                  title={"Peralatan"}
+                                  data={dataPeralatan}
+                                  compRecap={compRekapPeralatan}
+                                />
+                              ) : (
+                                <></>
+                              )}
+                              {instalasi.length ? (
+                                <InvoiceTable
+                                  title={"Instalasi"}
+                                  data={dataInstalasi}
+                                  compRecap={compRekapInstalasi}
+                                />
+                              ) : (
+                                <></>
+                              )}
+                            </div>
+                            {/* Rekap */}
+                            {/* <div>{compRekapTotal}</div> */}
+                            <div className="grid grid-cols-2">
+                              <div></div>
+                              <RecapTable
+                                tableData={[
+                                  ...(dataPembayaran[0].nominal <
+                                  rekapTotal.hargaPajak
+                                    ? [
+                                        {
+                                          key: "",
+                                          val: rekapTotal.hargaPajak,
+                                          classNames:
+                                            lengthPembayaranVersi == 1 &&
+                                            "border-b border-black",
+                                        },
+                                      ]
+                                    : []),
+                                  ...dataPembayaranVersi.map((v, i) => ({
+                                    ...(i == lengthPembayaranVersi - 1
+                                      ? {
+                                          key: "Grand Total",
+                                          classNames: "font-bold",
+                                        }
+                                      : {
+                                          key:
+                                            i == 0
+                                              ? "Uang Muka"
+                                              : `Termin ${i + 1}`,
+                                          classNames:
+                                            i + 1 ==
+                                              lengthPembayaranVersi - 1 &&
+                                            "border-b border-black",
+                                        }),
+                                    val: v.nominal,
+                                  })),
+                                ]}
+                              />
+                            </div>
+                            <div className="font-bold border-b border-black">
+                              ***{" "}
+                              {nominalToText(
+                                dataPembayaranVersi.at(-1)?.nominal
+                              )}
+                            </div>
+                            <div className="flex">
+                              <div className="basis-2/4">
+                                Pembayaran melalui : Rek.{" "}
+                                {dataPembayaranVersi.at(-1)?.nama_bank} :{" "}
+                                {dataPembayaranVersi.at(-1)?.norekening}
+                              </div>
+                              <div className="basis-2/4">
+                                An. {dataPembayaranVersi.at(-1)?.atasnama}
+                              </div>
+                            </div>
+                            <div className="flex flex-col">
+                              <div className="flex">
+                                <div className="basis-3/4 p-1 border border-black">
+                                  Catatan :
+                                </div>
+                              </div>
+                              <div className="flex">
+                                <div className="basis-3/4 p-1 border border-black">
+                                  <div>
+                                    Pembayaran harus dianggap lunas apabila cek,
+                                    giro atau alat pembayaran lainnnya telah
+                                    berhasil di clearing oleh bank kami.
+                                  </div>
+                                  <div>
+                                    Barang yang sudah di beli tidak dapat
+                                    dikembalikan atau di tukar.
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            {/* {proyek.id_perusahaan == 1 ? (
                       <div>
                         <div>Belga Karya Semesta</div>
                         <Image
@@ -250,15 +286,19 @@ export default function Invoice({
                         <div className="underline">Aslkdn Kksladj Lksdj</div>
                       </div>
                     )} */}
-                  </div>
-                  <div className="no-break">
-                    <div className="bg-black h-0.5 my-2"></div>
-                    {proyek.namaperusahaan == "bks" ? (
-                      <BKSHeader />
-                    ) : (
-                      <SVTHeader />
-                    )}
-                  </div>
+                          </div>
+                          <div className="no-break">
+                            <div className="bg-black h-0.5 my-2"></div>
+                            {proyek.namaperusahaan == "bks" ? (
+                              <BKSHeader />
+                            ) : (
+                              <SVTHeader />
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
               </ModalBody>
               <ModalFooter>
