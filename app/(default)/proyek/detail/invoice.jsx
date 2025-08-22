@@ -125,14 +125,36 @@ export default function Invoice({
                   ref={componentRef}
                   className="bg-white text-black leading-none"
                 >
-                  {/* <div className="print:fixed print:z-50 print:w-full print:-top-5"> */}
-                  <div className="flex flex-row items-center">
-                    <div className="flex-grow border-t border-black"></div>
-                    <div className="mx-4 text-2xl font-bold">Invoice</div>
-                    <div className="flex-grow border-t border-black"></div>
-                  </div>
                   <table className="w-full border-collapse">
                     <thead>
+                      <tr>
+                        <th colSpan={2}>
+                          <div className="border-b border-black">abc</div>
+                        </th>
+                      </tr>
+                      {/* <tr>
+                        <td
+                          colSpan={2}
+                          className="text-left font-normal text-xs"
+                        >
+                          {proyek.namaperusahaan == "bks" ? (
+                            <BKSHeader titleClassname="font-bold text-base" />
+                          ) : (
+                            <SVTHeader titleClassname="font-bold text-base" />
+                          )}
+                        </td>
+                      </tr> */}
+                      <tr>
+                        <td colSpan={2}>
+                          <div className="flex flex-row items-center">
+                            <div className="flex-grow border-t border-black"></div>
+                            <div className="mx-4 text-2xl font-bold">
+                              Invoice
+                            </div>
+                            <div className="flex-grow border-t border-black"></div>
+                          </div>
+                        </td>
+                      </tr>
                       <tr>
                         <td className="align-top w-1/2 pb-2">
                           <div>Invoice kepada :</div>
@@ -225,7 +247,8 @@ export default function Invoice({
                               ***{" "}
                               {nominalToText(
                                 dataPembayaranVersi.at(-1)?.nominal
-                              )}
+                              )}{" "}
+                              ***
                             </div>
                             <div className="flex">
                               <div className="basis-2/4">
@@ -256,38 +279,16 @@ export default function Invoice({
                                   </div>
                                 </div>
                               </div>
+                              <div className="flex">
+                                <div className="basis-3/4 p-1 border-black"></div>
+                                <div className="basis-1/4 p-1 border-black text-center">
+                                  <div>Keuangan</div>
+                                  <br />
+                                  <br />
+                                  <div>Paulus</div>
+                                </div>
+                              </div>
                             </div>
-                            {/* {proyek.id_perusahaan == 1 ? (
-                      <div>
-                        <div>Belga Karya Semesta</div>
-                        <Image
-                          src="/sample_signature.png"
-                          alt="signature"
-                          width={200}
-                          height={200}
-                        />
-                        <div className="underline">Aslkdn Kksladj Lksdj</div>
-                      </div>
-                    ) : (
-                      <div>
-                        <div>Satu Visi Teknikatama</div>
-                        <Image
-                          src="/sample_signature.png"
-                          alt="signature"
-                          width={200}
-                          height={200}
-                        />
-                        <div className="underline">Aslkdn Kksladj Lksdj</div>
-                      </div>
-                    )} */}
-                          </div>
-                          <div className="no-break">
-                            <div className="bg-black h-0.5 my-2"></div>
-                            {proyek.namaperusahaan == "bks" ? (
-                              <BKSHeader />
-                            ) : (
-                              <SVTHeader />
-                            )}
                           </div>
                         </td>
                       </tr>
