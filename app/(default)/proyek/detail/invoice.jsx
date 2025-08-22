@@ -126,26 +126,20 @@ export default function Invoice({
                   className="bg-white text-black leading-none"
                 >
                   {/* <div className="print:fixed print:z-50 print:w-full print:-top-5"> */}
+                  <div className="flex flex-row items-center">
+                    <div className="flex-grow border-t border-black"></div>
+                    <div className="mx-4 text-2xl font-bold">Invoice</div>
+                    <div className="flex-grow border-t border-black"></div>
+                  </div>
                   <table className="w-full border-collapse">
                     <thead>
                       <tr>
-                        <th colSpan="2" className="border-b border-black py-2">
-                          <div className="flex flex-row items-center">
-                            <div className="flex-grow border-t border-black"></div>
-                            <div className="mx-4 text-2xl font-bold">
-                              Invoice
-                            </div>
-                            <div className="flex-grow border-t border-black"></div>
-                          </div>
-                        </th>
-                      </tr>
-                      <tr>
-                        <td className="align-top w-1/2">
+                        <td className="align-top w-1/2 pb-2">
                           <div>Invoice kepada :</div>
                           <div>{proyek.klien}</div>
                           <div>{proyek.instansi}</div>
                         </td>
-                        <td className="text-right w-1/2">
+                        <td className="text-right w-1/2 pb-2">
                           <div>
                             No. Invoice :{" "}
                             {invoice(
@@ -243,14 +237,14 @@ export default function Invoice({
                                 An. {dataPembayaranVersi.at(-1)?.atasnama}
                               </div>
                             </div>
-                            <div className="flex flex-col">
+                            <div className="flex flex-col no-break">
                               <div className="flex">
-                                <div className="basis-3/4 p-1 border border-black">
+                                <div className="basis-3/4 p-1 border-b border-black">
                                   Catatan :
                                 </div>
                               </div>
                               <div className="flex">
-                                <div className="basis-3/4 p-1 border border-black">
+                                <div className="basis-3/4 p-1 border-black">
                                   <div>
                                     Pembayaran harus dianggap lunas apabila cek,
                                     giro atau alat pembayaran lainnnya telah
@@ -333,9 +327,9 @@ const InvoiceTable = ({ title, data, compRecap }) => {
         );
       case "jumlah":
         return (
-          <div className="grid grid-cols-2">
+          <div className="grid- grid-cols-2-">
             <div className="text-right">{cellValue}</div>
-            <div className="pl-1">{data.satuan}</div>
+            {/* <div className="pl-1">{data.satuan}</div> */}
           </div>
         );
       case "total":
@@ -380,14 +374,13 @@ const InvoiceTable = ({ title, data, compRecap }) => {
   return (
     <>
       <Table
-        className={`m-0 p-0 border border-black`}
+        className={`m-0 p-0 border-y border-black`}
         classNames={{
           wrapper: "p-1 rounded-none",
           table: "m-0 p-0 border-b border-black border-collapse rounded-none",
-          thead:
-            "border border-black rounded-none bg-transparent [&>tr:last-child]:hidden",
-          th: "border border-black text-black bg-transparent px-1 py-0",
-          td: "border-l border-r border-black px-1 py-0 text-sm align-top",
+          thead: "rounded-none bg-transparent [&>tr:last-child]:hidden",
+          th: "border-y border-black text-black bg-transparent px-1 py-0",
+          td: "px-1 py-0 text-sm align-top",
           tr: "m-0 p-0",
           base: "rounded-none shadow-none",
         }}
@@ -401,7 +394,11 @@ const InvoiceTable = ({ title, data, compRecap }) => {
           {(column) => (
             <TableColumn
               key={column.key}
-              align={["aksi", "no"].includes(column.key) ? "center" : "start"}
+              align={
+                ["aksi", "no", "jumlah", "harga", "total"].includes(column.key)
+                  ? "center"
+                  : "start"
+              }
               className={
                 { no: "w-[30px]", deskripsiitem: "w-1/2", jumlah: "w-1/10" }[
                   column.key
