@@ -73,7 +73,7 @@ export default function Kwitansi({ proyek, nilaiProyek }) {
                 )}
                 <div ref={componentRef} className="bg-white text-">
                   <div className="flex">
-                    <div className="text-center basis-3/4">
+                    <div className="text-sm basis-3/4">
                       <CompanyHeader
                         id={proyek.id_perusahaan}
                         titleClassname={"font-bold text-xl"}
@@ -111,8 +111,8 @@ export default function Kwitansi({ proyek, nilaiProyek }) {
                       },
                     ].map((data, i) => (
                       <div key={i} className="flex">
-                        <div className="basis-1/6">{data.key}</div>
-                        <div className="basis-5/6 border-b- border-black border-dotted">
+                        <div className="basis-1/5">{data.key}</div>
+                        <div className="basis-4/5 border-b- border-black border-dotted">
                           : {data.value}
                         </div>
                       </div>

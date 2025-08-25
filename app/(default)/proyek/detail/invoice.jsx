@@ -33,7 +33,7 @@ import {
 import { invoice } from "@/app/utils/formatid";
 import { getDateFId } from "@/app/utils/date";
 import { nominalToText } from "@/app/utils/number";
-import { BKSHeader, SVTHeader } from "@/components/mycomponent";
+import { BKSHeader, CompanyHeader, SVTHeader } from "@/components/mycomponent";
 import { EditIcon, DeleteIcon } from "@/components/icon";
 import Harga from "@/components/harga";
 import Image from "next/image";
@@ -57,14 +57,19 @@ export default function Invoice({
   const handlePrintInvoice = useReactToPrint({
     contentRef: componentRef,
     pageStyle: `
+    @page {
+      @bottom-center {
+      content: counter(page) " / " counter(pages);
+      vertical-align: top;
+      font-size: 12px;
+      color: black;
+    }
+    }
     @media print {
-      @page {
-        @bottom-center {
-        content: counter(page) " / " counter(pages);
-        font-size: 12px;
-        color: black;
+      thead {
+        display: table-header-group;
       }
-    }  
+    }
     `,
   });
   const [versi, setVersi] = useState(0);
@@ -121,47 +126,44 @@ export default function Invoice({
                     ))}
                   </RadioGroup>
                 )}
-                <div
-                  ref={componentRef}
-                  className="bg-white text-black leading-none"
-                >
-                  <table className="w-full border-collapse">
+                <div ref={componentRef} className="flex bg-white text-black">
+                  <table className="border-collapse w-full overscroll-none">
                     <thead>
                       <tr>
-                        <th colSpan={2}>
-                          <div className="border-b border-black">abc</div>
-                        </th>
-                      </tr>
-                      {/* <tr>
                         <td
                           colSpan={2}
-                          className="text-left font-normal text-xs"
+                          className="text-xs border-b border-black"
                         >
-                          {proyek.namaperusahaan == "bks" ? (
+                          {/* {proyek.namaperusahaan == "bks" ? (
                             <BKSHeader titleClassname="font-bold text-base" />
                           ) : (
                             <SVTHeader titleClassname="font-bold text-base" />
-                          )}
-                        </td>
-                      </tr> */}
-                      <tr>
-                        <td colSpan={2}>
-                          <div className="flex flex-row items-center">
+                          )} */}
+                          <CompanyHeader
+                            id={proyek.id_perusahaan}
+                            titleClassname="font-bold text-base"
+                            sideTitle={
+                              <div className="font-bold text-base text-right">
+                                Invoice
+                              </div>
+                            }
+                          />
+                          {/* <div className="flex flex-row items-center">
                             <div className="flex-grow border-t border-black"></div>
-                            <div className="mx-4 text-2xl font-bold">
+                            <div className="mx-4 text-base font-bold">
                               Invoice
                             </div>
                             <div className="flex-grow border-t border-black"></div>
-                          </div>
+                          </div> */}
                         </td>
                       </tr>
-                      <tr>
-                        <td className="align-top w-1/2 pb-2">
+                      <tr className="text-xs">
+                        <td className="align-top w-1/2 leading-none">
                           <div>Invoice kepada :</div>
                           <div>{proyek.klien}</div>
                           <div>{proyek.instansi}</div>
                         </td>
-                        <td className="text-right w-1/2 pb-2">
+                        <td className="text-right w-1/2 leading-none">
                           <div>
                             No. Invoice :{" "}
                             {invoice(
@@ -182,9 +184,9 @@ export default function Invoice({
                     <tbody>
                       <tr>
                         <td colSpan="2">
-                          <div className="flex flex-col gap-2 text-xs">
+                          <div className="flex flex-col gap-2- text-xs">
                             {/* Table */}
-                            <div>
+                            <div className="overscroll-none">
                               {peralatan.length ? (
                                 <InvoiceTable
                                   title={"Peralatan"}
@@ -262,12 +264,10 @@ export default function Invoice({
                             </div>
                             <div className="flex flex-col no-break">
                               <div className="flex">
-                                <div className="basis-3/4 p-1 border-b border-black">
-                                  Catatan :
-                                </div>
-                              </div>
-                              <div className="flex">
-                                <div className="basis-3/4 p-1 border-black">
+                                <div className="basis-3/4border-b border-black leading-none">
+                                  <div className="border-b border-black">
+                                    Catatan :
+                                  </div>
                                   <div>
                                     Pembayaran harus dianggap lunas apabila cek,
                                     giro atau alat pembayaran lainnnya telah
@@ -278,10 +278,7 @@ export default function Invoice({
                                     dikembalikan atau di tukar.
                                   </div>
                                 </div>
-                              </div>
-                              <div className="flex">
-                                <div className="basis-3/4 p-1 border-black"></div>
-                                <div className="basis-1/4 p-1 border-black text-center">
+                                <div className="basis-1/4 text-center">
                                   <div>Keuangan</div>
                                   <br />
                                   <br />
@@ -375,19 +372,19 @@ const InvoiceTable = ({ title, data, compRecap }) => {
   return (
     <>
       <Table
-        className={`m-0 p-0 border-y border-black`}
+        className={`m-0 p-0 border-y border-black overscroll-none`}
         classNames={{
-          wrapper: "p-1 rounded-none",
-          table: "m-0 p-0 border-b border-black border-collapse rounded-none",
+          wrapper: "p-0 rounded-none gap-0 overscroll-none",
+          table:
+            "m-0 p-0 border-b border-black border-collapse rounded-none overscroll-none",
           thead: "rounded-none bg-transparent [&>tr:last-child]:hidden",
-          th: "border-y border-black text-black bg-transparent px-1 py-0",
-          td: "px-1 py-0 text-sm align-top",
+          th: "border-y border-black text-black bg-transparent px-0 py-0 h-0",
+          td: "px-0 py-0 text-xs leading-none align-top",
           tr: "m-0 p-0",
-          base: "rounded-none shadow-none",
+          base: "rounded-none shadow-none overscroll-none",
         }}
         aria-label="Example table with custom cells"
         shadow="none"
-        isCompact
         topContent={title}
         bottomContent={compRecap}
       >

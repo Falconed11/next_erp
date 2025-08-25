@@ -1936,7 +1936,7 @@ export default function App({ id, versi }) {
 }
 
 const TableBottom = ({ title = "", tableData }) => (
-  <div className="grid grid-cols-2">
+  <div className="grid grid-cols-2 overscroll-none">
     <div>{title}</div>
     <div>
       <RecapTable tableData={tableData} />
