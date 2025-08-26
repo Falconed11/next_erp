@@ -84,7 +84,8 @@ export default function Kwitansi({ proyek, nilaiProyek }) {
                       <div>
                         No :{" "}
                         <span className="border border-black px-1">
-                          {pembayaran[versi]?.id_second?.split("-")[1]}
+                          {pembayaran[versi]?.status == 1 &&
+                            pembayaran[versi]?.id_second?.split("-")[1]}
                         </span>
                       </div>
                     </div>
@@ -94,14 +95,19 @@ export default function Kwitansi({ proyek, nilaiProyek }) {
                   </div>
                   <div className="pl-3 border-b border-black">
                     {[
-                      { key: "Telah Terima Dari", value: proyek.instansi },
+                      {
+                        key: "Telah Terima Dari",
+                        value: pembayaran[versi]?.pembayar || proyek.instansi,
+                      },
                       {
                         key: "Uang Sebanyak",
                         value: nominalToText(pembayaran[versi].nominal),
                       },
                       {
                         key: "Untuk Pembayaran",
-                        value: `${proyek.nama} ${
+                        value: `${
+                          pembayaran[versi]?.untukpembayaran || proyek.nama
+                        } ${
                           pembayaran[0].nominal < nilaiProyek
                             ? `( ${versi == 0 ? "Uang Muka / " : ""}Termin ${
                                 versi + 1
@@ -112,8 +118,9 @@ export default function Kwitansi({ proyek, nilaiProyek }) {
                     ].map((data, i) => (
                       <div key={i} className="flex">
                         <div className="basis-1/5">{data.key}</div>
-                        <div className="basis-4/5 border-b- border-black border-dotted">
-                          : {data.value}
+                        <div className="px-1 text-center">:</div>
+                        <div className="basis-4/5 text-justify">
+                          {data.value}
                         </div>
                       </div>
                     ))}
@@ -138,7 +145,13 @@ export default function Kwitansi({ proyek, nilaiProyek }) {
                       <div className="grid grid-cols-4">
                         <div></div>
                         <div className="col-span-3 text-center">
-                          <div className="h-[2px] w-1/2 bg-black mx-auto"></div>
+                          <div className="w-1/2 mx-auto">
+                            {{
+                              1: "Priyo",
+                              2: "Paulus",
+                              3: "Christo",
+                            }[proyek.id_perusahaan] || "Paulus"}
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -151,7 +164,7 @@ export default function Kwitansi({ proyek, nilaiProyek }) {
                 </Button>
                 <Button
                   color="primary"
-                  isDisabled={!pembayaran[versi]?.id_second}
+                  isDisabled={!pembayaran[versi]?.status}
                   onPress={handlePrintInvoice}
                 >
                   Cetak

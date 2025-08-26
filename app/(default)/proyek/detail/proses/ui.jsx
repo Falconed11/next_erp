@@ -516,6 +516,14 @@ export default function App({ id }) {
         label: "Atas Nama",
       },
       {
+        key: "pembayar",
+        label: "Telah Terima Dari",
+      },
+      {
+        key: "untukpembayaran",
+        label: "Untuk Pembayaran",
+      },
+      {
         key: "keterangan",
         label: "Keterangan",
       },

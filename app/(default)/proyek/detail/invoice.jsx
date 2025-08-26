@@ -128,7 +128,7 @@ export default function Invoice({
                 )}
                 <div ref={componentRef} className="flex bg-white text-black">
                   <table className="border-collapse w-full overscroll-none">
-                    <thead>
+                    <thead className="border-b border-black">
                       <tr>
                         <td
                           colSpan={2}

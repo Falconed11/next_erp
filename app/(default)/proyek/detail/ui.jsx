@@ -1893,7 +1893,11 @@ export default function App({ id, versi }) {
                       ) : (
                         ""
                       )}
-                      - Harga {keteranganPajak} termasuk pajak-pajak. <br />
+                      {!!rekapPajak && (
+                        <>
+                          - Harga {keteranganPajak} termasuk pajak-pajak. <br />
+                        </>
+                      )}
                       - Syarat pembayaran sesuai dengan kesepakatan kedua belah
                       pihak. <br />
                       - Waktu penyerahan barang sesuai jadwal yang disepakati

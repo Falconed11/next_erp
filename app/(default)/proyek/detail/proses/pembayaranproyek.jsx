@@ -101,6 +101,32 @@ export default function PembayaranProyek({
       )}
       <Input
         type="text"
+        label="Telah terima dari"
+        placeholder="Masukkan pembayar!"
+        value={form.pembayar}
+        className=""
+        onValueChange={(v) =>
+          setForm({
+            ...form,
+            pembayar: v,
+          })
+        }
+      />
+      <Input
+        type="text"
+        label="Untuk pembayaran"
+        placeholder="Masukkan tujuan pembayaran!"
+        value={form.untukpembayaran}
+        className=""
+        onValueChange={(v) =>
+          setForm({
+            ...form,
+            untukpembayaran: v,
+          })
+        }
+      />
+      <Input
+        type="text"
         label="Keterangan"
         placeholder="Masukkan keterangan!"
         value={form.keterangan}
