@@ -44,20 +44,22 @@ const NavLinkNewTab = ({ href, children }) => {
     </Link>
   );
 };
-const bks = {
-  name: "Belga Karya Semesta",
-  description:
-    "General Trading - Mechanical Electrical - Supplies - Consultant",
-  address: "Jogokaryan MJ 3/789, Mantrijeron - Yogyakarta Telp 08121553765",
-  contact: "Telp 08121553765",
-};
-const svt = {
-  name: "Satu Visi Teknikatama",
-  description:
-    "General Trading - Mechanical Electrical - Supplies - Consultant",
-  address:
-    "Wonosalam RT. 005 / RW. 009, Sukoharjo, Ngaglik Sleman - Yogyakarta 55581",
-  contact: "Telp 08121553765 - 081578861740",
+const company = {
+  1: {
+    name: "Belga Karya Semesta",
+    description:
+      "General Trading - Mechanical Electrical - Supplies - Consultant",
+    address: "Jogokaryan MJ 3/789, Mantrijeron - Yogyakarta Telp 08121553765",
+    contact: "Telp 08121553765",
+  },
+  2: {
+    name: "Satu Visi Teknikatama",
+    description:
+      "General Trading - Mechanical Electrical - Supplies - Consultant",
+    address:
+      "Wonosalam RT. 005 / RW. 009, Sukoharjo, Ngaglik Sleman - Yogyakarta 55581",
+    contact: "Telp 08121553765 - 081578861740",
+  },
 };
 const BKSHeader = ({ titleClassname }) => {
   return (
@@ -104,23 +106,21 @@ const FormatHeader = ({
     </div>
   );
 };
-const CompanyHeader = ({ id, titleClassname, sideTitle }) => {
-  return id == 1 ? (
+const CompanyHeader = ({
+  name,
+  description,
+  address,
+  contact,
+  sideTitle,
+  titleClassname,
+}) => {
+  return (
     <FormatHeader
       titleClassname={titleClassname}
-      name={bks.name}
-      description={bks.description}
-      address={bks.address}
-      contact={bks.contact}
-      sideTitle={sideTitle}
-    />
-  ) : (
-    <FormatHeader
-      titleClassname={titleClassname}
-      name={svt.name}
-      description={svt.description}
-      address={svt.address}
-      contact={svt.contact}
+      name={name}
+      description={description}
+      address={address}
+      contact={contact}
       sideTitle={sideTitle}
     />
   );

@@ -45,7 +45,12 @@ import { removePrefixIfMatchIgnoreCase } from "@/app/utils/stringmanipulation";
 import Harga from "@/components/harga";
 import { ConditionalComponent } from "@/components/componentmanipulation";
 import TambahProduk from "@/components/tambahproduk";
-import { BKSHeader, NavLinkNewTab, SVTHeader } from "@/components/mycomponent";
+import {
+  BKSHeader,
+  CompanyHeader,
+  NavLinkNewTab,
+  SVTHeader,
+} from "@/components/mycomponent";
 import { Button } from "@heroui/react";
 import { Input } from "@heroui/react";
 import { Divider } from "@heroui/react";
@@ -54,6 +59,7 @@ import { CheckboxGroup, Checkbox } from "@heroui/react";
 import { Form } from "@heroui/form";
 import Image from "next/image";
 import logoBks from "@/public/logo-bks.jpeg";
+import logoSavista from "@/public/logo-savista.png";
 import logoSvt from "@/public/logo-svt.jpeg";
 import { useRouter } from "next/navigation";
 import { v4 as uuidv4 } from "uuid";
@@ -1736,7 +1742,22 @@ export default function App({ id, versi }) {
                 >
                   {/* {Logo} */}
                   <div className="flex flex-row items-center">
-                    {selectedProyek.id_perusahaan == 1 ? (
+                    <Image
+                      src={`/${selectedProyek.logoperusahaan}`}
+                      alt="Company Logo"
+                      width={40}
+                      height={40}
+                    />
+                    <div className="flex flex-col pl-2 text-xs">
+                      <CompanyHeader
+                        titleClassname="text-bold text-base"
+                        name={selectedProyek.namaperusahaan}
+                        description={selectedProyek.deskripsiperusahaan}
+                        address={selectedProyek.alamatperusahaan}
+                        contact={selectedProyek.kontakperusahaan}
+                      />
+                    </div>
+                    {/* {selectedProyek.id_perusahaan == 1 ? (
                       <>
                         <Image src={logoBks} alt="Company Logo" width={40} />
                         <div className="flex flex-col pl-2 text-xs">
@@ -1767,7 +1788,7 @@ export default function App({ id, versi }) {
                           </div>
                         </div>
                       </>
-                    )}
+                    )} */}
                   </div>
                   <Divider className="bg-sky-500 my-1 py-1" />
                   {/* <hr className="my-3 bg-sky-500 h-5" /> */}

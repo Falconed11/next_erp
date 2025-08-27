@@ -140,13 +140,16 @@ export default function Invoice({
                             <SVTHeader titleClassname="font-bold text-base" />
                           )} */}
                           <CompanyHeader
-                            id={proyek.id_perusahaan}
                             titleClassname="font-bold text-base"
                             sideTitle={
                               <div className="font-bold text-base text-right">
                                 Invoice
                               </div>
                             }
+                            name={proyek.namaperusahaan}
+                            description={proyek.deskripsiperusahaan}
+                            address={proyek.alamatperusahaan}
+                            contact={proyek.kontakperusahaan}
                           />
                           {/* <div className="flex flex-row items-center">
                             <div className="flex-grow border-t border-black"></div>

@@ -75,8 +75,11 @@ export default function Kwitansi({ proyek, nilaiProyek }) {
                   <div className="flex">
                     <div className="text-sm basis-3/4">
                       <CompanyHeader
-                        id={proyek.id_perusahaan}
                         titleClassname={"font-bold text-xl"}
+                        name={proyek.namaperusahaan}
+                        description={proyek.deskripsiperusahaan}
+                        address={proyek.alamatperusahaan}
+                        contact={proyek.kontakperusahaan}
                       />
                     </div>
                     <div className="font-bold text-center basis-1/4">
