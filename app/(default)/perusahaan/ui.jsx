@@ -79,14 +79,9 @@ export default function App() {
     formData.append("file", data.newLogo);
     const res = await fetch(`${api_path}perusahaan`, {
       method,
-      // headers: {
-      //   "Content-Type": "application/json",
-      //   // 'Content-Type': 'application/x-www-form-urlencoded',
-      // },
       body: formData,
     });
     const json = await res.json();
-    // setForm({});
     if (res.status == 400) return alert(json.message);
     perusahaan.mutate();
     modal.perusahaan.onClose();

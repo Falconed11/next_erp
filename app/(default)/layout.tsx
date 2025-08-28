@@ -76,7 +76,22 @@ export default function RootLayout({
     links.push(
       { href: "/vendor", name: "Vendor" },
       { href: "/bank", name: "Bank" },
-      { href: "/karyawan", name: "Karyawan" },
+      {
+        href: "/karyawan",
+        name: "Karyawan",
+        dropdown: [
+          {
+            key: "data",
+            name: "Data",
+            href: "/karyawan",
+          },
+          {
+            key: "status",
+            name: "Status",
+            href: "/karyawan/status",
+          },
+        ],
+      },
       {
         href: "/laporan",
         name: "Laporan",
@@ -110,7 +125,8 @@ export default function RootLayout({
       },
       { href: "/perusahaan", name: "Perusahaan" }
     );
-  if (user?.peran == "super") links.push({ href: "/user", name: "User" });
+  if (user?.peran == "super" || true)
+    links.push({ href: "/user", name: "User" });
   if (user?.peran == "super") links.push({ href: "/alat", name: "Alat" });
   links.push({ href: "/api/auth/signout", name: "Signout" });
   return (

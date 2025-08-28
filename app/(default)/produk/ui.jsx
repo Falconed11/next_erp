@@ -585,8 +585,6 @@ export default function App() {
   // }
 
   // console.log({ id_vendor: form.id_vendor ? true : false });
-
-  console.log(form);
   return (
     <div className="">
       <div className="flex flex-col gap-2">
@@ -600,33 +598,6 @@ export default function App() {
             </Button>
           </div>
         </div>
-        {/* Laporan */}
-        {/* <div className="bg-white border rounded-lg p-3">
-          <div>Laporan</div>
-          <AuthorizationComponent
-            roles={["admin", "super"]}
-            user={user}
-            component={
-              <>
-                {result.map((cur, i) => (
-                  <div key={i}>
-                    {cur.kategori}: <Harga harga={cur.totalModal} /> /{" "}
-                    <Harga harga={cur.totalJual} />
-                  </div>
-                ))}
-              </>
-            }
-          />
-          <div>
-            Total Modal: <Harga harga={totalModal} />
-          </div>
-          <div>
-            Total Jual: <Harga harga={totalJual} />
-          </div>
-          <div>
-            Total Provit: <Harga harga={totalJual - totalModal} />
-          </div>
-        </div> */}
         <AuthorizationComponent
           roles={("super", "admin")}
           user={user}

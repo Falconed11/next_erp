@@ -294,7 +294,6 @@ export default function App() {
       label: "Aksi",
     },
   ];
-  console.log(form.selectbank?.size);
   return (
     <div className="flex gap-2">
       <Bank bank={bank} />

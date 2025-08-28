@@ -551,7 +551,6 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
     summary.totalPenawaranReject +
     summary.totalPenawaranWaiting;
   summary.totalProvit = summary.totalPenawaran - summary.totalModal;
-  console.log("render");
   return (
     <div className="flex flex-col gap-2">
       {id_instansi ? (

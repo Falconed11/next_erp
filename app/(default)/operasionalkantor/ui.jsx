@@ -1,8 +1,9 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useClientFetch, getApiPath } from "../../utils/apiconfig";
 import { penawaran } from "../../utils/formatid";
 import {
+  Pagination,
   Table,
   TableHeader,
   TableColumn,
@@ -24,7 +25,7 @@ import {
   Button,
   useDisclosure,
 } from "@heroui/react";
-import { Input } from "@heroui/react";
+import { Input, NumberInput } from "@heroui/react";
 import { Textarea } from "@heroui/react";
 import { Select, SelectItem } from "@heroui/react";
 import Link from "next/link";
@@ -52,7 +53,6 @@ const apiPath = getApiPath();
 const [startDate, endDate] = getCurFirstLastDay();
 
 export default function App() {
-  const kategorioperasionalkantor = useClientFetch("kategorioperasionalkantor");
   const [filter, setFilter] = useState({
     startDate,
     endDate,
@@ -62,6 +62,10 @@ export default function App() {
     startDate,
     endDate,
   });
+  const [page, setPage] = React.useState(1);
+  const rowsPerPage = 10;
+  const kategorioperasionalkantor = useClientFetch("kategorioperasionalkantor");
+  const karyawan = useClientFetch("karyawan");
   const operasionalkantor = useClientFetch(
     `operasionalkantor?start=${getDate(current.startDate)}&end=${getDate(
       current.endDate
@@ -71,12 +75,15 @@ export default function App() {
         : ""
     }`
   );
-  const karyawan = useClientFetch("karyawan");
-  const [selectKaryawan, setSelectKaryawan] = useState(new Set([]));
-  const [selectKategori, setSelectKategori] = useState(new Set([]));
-  const [form, setForm] = useState({});
+  const pages = useMemo(() => {
+    return operasionalkantor?.data
+      ? Math.ceil(operasionalkantor?.data?.length / rowsPerPage)
+      : 0;
+  }, [operasionalkantor?.data?.length, rowsPerPage]);
+  const loadingState = operasionalkantor.isLoading ? "loading" : "idle";
+  const offset = (page - 1) * rowsPerPage;
+  const [form, setForm] = useState({ tanggal: new Date() });
   const [json, setJson] = useState([]);
-  const [method, setMethod] = useState("POST");
 
   const handleFileUpload = (jsonData) => {
     // console.log(jsonData);
@@ -139,8 +146,10 @@ export default function App() {
       { compression: true }
     );
   };
-
-  const simpanButtonPress = async (onClose) => {
+  const tambahButtonPress = async (method) => {
+    // if (select.size == 0) return alert("Produk belum dipilih.");
+    if (!form.tanggal || !form.id_karyawan || !form.biaya)
+      return alert("Data belum lengkap");
     const res = await fetch(`${apiPath}operasionalkantor`, {
       method,
       headers: {
@@ -149,54 +158,30 @@ export default function App() {
       },
       body: JSON.stringify({
         ...form,
-        id_karyawan: selectKaryawan.values().next().value,
-        id_kategorioperasionalkantor: selectKategori.values().next().value,
+        id_kategorioperasionalkantor: form.id_kategorioperasionalkantor
+          ?.values()
+          ?.next()?.value,
+        id_karyawan: form.id_karyawan?.values()?.next()?.value,
+        tanggal: getDate(form.tanggal),
       }),
     });
     const json = await res.json();
-    onClose();
-    // return alert(json.message);
-  };
-  const tambahButtonPress = async () => {
-    // if (select.size == 0) return alert("Produk belum dipilih.");
-    if (
-      !form.tanggal ||
-      selectKategori.size == 0 ||
-      selectKaryawan.size == 0 ||
-      !form.biaya
-    )
-      return alert("Data belum lengkap");
-    const res = await fetch(`${apiPath}operasionalkantor`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify({
-        id_kategorioperasionalkantor: selectKategori.values().next().value,
-        id_karyawan: selectKaryawan.values().next().value,
-        biaya: form.biaya,
-        keterangan: form.keterangan ? form.keterangan : "",
-        tanggal: form.tanggal,
-      }),
-    });
-    const json = await res.json();
-    setForm({ biaya: "", keterangan: "" });
-    setSelectKaryawan([]);
-    setSelectKategori([]);
+    if (res.status == 400) return alert(json.message);
+    setForm({});
+    operasionalkantor.mutate();
     // return alert(json.message);
   };
   const editButtonPress = (data) => {
     const startdate = new Date(data.tanggal);
     setForm({
       ...data,
+      id_karyawan: new Set([String(data.id_karyawan)]),
+      id_kategorioperasionalkantor: new Set([
+        String(data.id_kategorioperasionalkantor || ""),
+      ]),
       modalmode: "Edit",
-      tanggal: getDate(startdate),
-      startdate,
+      tanggal: startdate,
     });
-    setSelectKaryawan(new Set(String(data.id_karyawan)));
-    setSelectKategori(new Set(String(data.id_kategorioperasionalkantor)));
-    setMethod("PUT");
     onOpen();
     return;
   };
@@ -267,12 +252,9 @@ export default function App() {
   const [reportList, setReportList] = useState([]);
   const report = useDisclosure();
 
-  if (operasionalkantor.error) return <div>failed to load</div>;
-  if (operasionalkantor.isLoading) return <div>loading...</div>;
-  if (karyawan.error) return <div>failed to load</div>;
-  if (karyawan.isLoading) return <div>loading...</div>;
-  if (kategorioperasionalkantor.error) return <div>failed to load</div>;
-  if (kategorioperasionalkantor.isLoading) return <div>loading...</div>;
+  const sources = [karyawan, kategorioperasionalkantor, operasionalkantor];
+  if (sources.some((o) => o.error)) return <div>failed to load</div>;
+  if (sources.some((o) => o.isLoading)) return <div>loading...</div>;
 
   const col = [
     {
@@ -304,71 +286,23 @@ export default function App() {
   // const sumBiaya = operasionalkantor.data.reduce((acc, v) => {
   //   return acc + v.biaya;
   // });
-
   return (
     <div className="flex flex-col gap-2">
       <div className="bg-white p-3 rounded-lg">
         <div>Operasional Kantor</div>
-        <div className="flex-col gap-2">
-          <div className="flex flex-row gap-2">
-            <div className="bg-gray-100 p-3 rounded-lg">
-              <div>Tanggal</div>
-              <DatePicker
-                placeholderText="Pilih tanggal"
-                dateFormat="dd/MM/yyyy"
-                selected={form.startdate}
-                onChange={(v) =>
-                  setForm({ ...form, startdate: v, tanggal: getDate(v) })
-                }
-              />
-            </div>
-            <Select
-              label="Kategori"
-              placeholder="Pilih kategori!"
-              className="w-4/12"
-              selectedKeys={selectKategori}
-              onSelectionChange={setSelectKategori}
-            >
-              {kategorioperasionalkantor.data.map((item) => (
-                <SelectItem key={item.id} value={item.id}>
-                  {item.nama}
-                </SelectItem>
-              ))}
-            </Select>
-            <Select
-              label="Karyawan"
-              placeholder="Pilih karyawan!"
-              className="w-5/12 pl-2"
-              selectedKeys={selectKaryawan}
-              onSelectionChange={setSelectKaryawan}
-            >
-              {karyawan.data.map((item) => (
-                <SelectItem key={item.id} value={item.id}>
-                  {item.nama}
-                </SelectItem>
-              ))}
-            </Select>
-            <Input
-              type="number"
-              min={0}
-              label="Biaya"
-              value={form.biaya}
-              placeholder="Masukkan biaya!"
-              className="w-4/12 pl-2"
-              onValueChange={(v) => setForm({ ...form, biaya: v })}
+        <div className="flex flex-col gap-2">
+          <div className="flex gap-2 w-full">
+            <FormOperasionalKantor
+              form={form}
+              setForm={setForm}
+              kategorioperasionalkantor={kategorioperasionalkantor}
+              karyawan={karyawan}
             />
           </div>
-          <div className="flex flex-row gap-2 mt-3">
-            <Textarea
-              label="Keterangan"
-              labelPlacement="inside"
-              placeholder="Masukkan keterangan!"
-              value={form.keterangan}
-              onValueChange={(v) => setForm({ ...form, keterangan: v })}
-            />
+          <div className="flex flex-row gap-2">
             <Button
-              onClick={() => {
-                tambahButtonPress();
+              onPress={() => {
+                tambahButtonPress("POST");
               }}
               color="primary"
               className="ml-2"
@@ -396,6 +330,7 @@ export default function App() {
           Upload Excel
         </Button>
       </div> */}
+      {/* Edit Operasional Kantor */}
       <Modal
         isOpen={isOpen}
         onOpenChange={onOpenChange}
@@ -408,66 +343,30 @@ export default function App() {
                 {form.modalmode} Operasional Kantor
               </ModalHeader>
               <ModalBody>
-                <div className="bg-gray-100 p-3 rounded-lg">
-                  <div>Tanggal</div>
-                  <DatePicker
-                    placeholderText="Pilih tanggal"
-                    dateFormat="dd/MM/yyyy"
-                    selected={form.startdate}
-                    onChange={(v) =>
-                      setForm({ ...form, startdate: v, tanggal: getDate(v) })
-                    }
-                  />
-                </div>
-                <Select
-                  label="Kategori"
-                  placeholder="Pilih kategori!"
-                  className=""
-                  selectedKeys={selectKategori}
-                  onSelectionChange={setSelectKategori}
-                >
-                  {kategorioperasionalkantor.data.map((item) => (
-                    <SelectItem key={item.id} value={item.id}>
-                      {item.nama}
-                    </SelectItem>
-                  ))}
-                </Select>
-                <Select
-                  label="Karyawan"
-                  placeholder="Pilih karyawan!"
-                  className=""
-                  selectedKeys={selectKaryawan}
-                  onSelectionChange={setSelectKaryawan}
-                >
-                  {karyawan.data.map((item) => (
-                    <SelectItem key={item.id} value={item.id}>
-                      {item.nama}
-                    </SelectItem>
-                  ))}
-                </Select>
-                <Input
-                  type="number"
-                  label="Biaya"
-                  value={form.biaya}
-                  placeholder="Masukkan biaya!"
-                  className=""
-                  onValueChange={(v) => setForm({ ...form, biaya: v })}
-                />
-                <Textarea
-                  label="Keterangan"
-                  labelPlacement="inside"
-                  placeholder="Masukkan keterangan!"
-                  value={form.keterangan}
-                  onValueChange={(v) => setForm({ ...form, keterangan: v })}
+                <FormOperasionalKantor
+                  form={form}
+                  setForm={setForm}
+                  kategorioperasionalkantor={kategorioperasionalkantor}
+                  karyawan={karyawan}
                 />
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
+                <Button
+                  color="danger"
+                  variant="light"
+                  onPress={() => {
+                    setForm({});
+                    onClose();
+                  }}
+                >
                   Batal
                 </Button>
                 <Button
                   color="primary"
-                  onPress={() => simpanButtonPress(onClose)}
+                  onPress={() => {
+                    tambahButtonPress("PUT");
+                    onClose();
+                  }}
                 >
                   Simpan
                 </Button>
@@ -539,6 +438,21 @@ export default function App() {
             </div> */}
           </>
         }
+        bottomContent={
+          pages > 0 ? (
+            <div className="flex w-full justify-center">
+              <Pagination
+                isCompact
+                showControls
+                showShadow
+                color="primary"
+                page={page}
+                total={pages}
+                onChange={(page) => setPage(page)}
+              />
+            </div>
+          ) : null
+        }
       >
         <TableHeader columns={col}>
           {(column) => (
@@ -550,7 +464,12 @@ export default function App() {
             </TableColumn>
           )}
         </TableHeader>
-        <TableBody items={operasionalkantor.data}>
+        <TableBody
+          items={operasionalkantor.data.slice(offset, offset + rowsPerPage)}
+          loadingContent={"Loading..."}
+          emptyContent={"Kosong"}
+          loadingState={loadingState}
+        >
           {(item) => (
             <TableRow key={item.id}>
               {(columnKey) => (
@@ -563,3 +482,71 @@ export default function App() {
     </div>
   );
 }
+
+const FormOperasionalKantor = ({
+  form,
+  setForm,
+  kategorioperasionalkantor,
+  karyawan,
+}) => {
+  return (
+    <>
+      <div className="bg-gray-100 p-3 rounded-lg">
+        <div>Tanggal</div>
+        <DatePicker
+          placeholderText="Pilih tanggal"
+          dateFormat="dd/MM/yyyy"
+          selected={form.tanggal}
+          onChange={(v) => setForm({ ...form, tanggal: v })}
+        />
+      </div>
+      <Select
+        label="Kategori"
+        placeholder="Pilih kategori!"
+        className=""
+        selectedKeys={form.id_kategorioperasionalkantor || new Set([])}
+        onSelectionChange={(v) =>
+          setForm({ ...form, id_kategorioperasionalkantor: v })
+        }
+      >
+        {kategorioperasionalkantor.data.map((item) => (
+          <SelectItem key={item.id} value={item.id}>
+            {item.nama}
+          </SelectItem>
+        ))}
+      </Select>
+      <Select
+        label="Karyawan"
+        placeholder="Pilih karyawan!"
+        className=""
+        selectedKeys={form.id_karyawan || new Set([])}
+        onSelectionChange={(v) => setForm({ ...form, id_karyawan: v })}
+      >
+        {karyawan.data.map((item) => (
+          <SelectItem key={item.id} value={item.id}>
+            {item.nama}
+          </SelectItem>
+        ))}
+      </Select>
+      <NumberInput
+        hideStepper
+        isWheelDisabled
+        formatOptions={{
+          useGrouping: false,
+        }}
+        label="Biaya"
+        value={form.biaya}
+        placeholder="Masukkan biaya!"
+        className=""
+        onValueChange={(v) => setForm({ ...form, biaya: v })}
+      />
+      <Textarea
+        label="Keterangan"
+        labelPlacement="inside"
+        placeholder="Masukkan keterangan!"
+        value={form.keterangan}
+        onValueChange={(v) => setForm({ ...form, keterangan: v })}
+      />
+    </>
+  );
+};

@@ -20,7 +20,7 @@ import {
   EyeIcon,
   UserIcon,
   IconScaleBalanced,
-} from "../../../components/icon";
+} from "@/components/icon";
 import {
   Modal,
   ModalContent,
@@ -29,33 +29,32 @@ import {
   ModalFooter,
   useDisclosure,
 } from "@heroui/react";
-import { getApiPath, useClientFetch } from "../../utils/apiconfig";
+import { getApiPath, useClientFetch } from "@/app/utils/apiconfig";
 import { FileUploader } from "@/components/input";
-import { Button, Select, SelectItem } from "@heroui/react";
+import { Button } from "@heroui/react";
 import { Input } from "@heroui/react";
 import Link from "next/link";
 
 const apiPath = getApiPath();
 
 export default function App() {
-  const karyawan = useClientFetch(`karyawan`);
   const statuskaryawan = useClientFetch(`statuskaryawan`);
   const [form, setForm] = useState({});
   const [json, setJson] = useState([]);
   const [method, setMethod] = useState();
   const tambahButtonPress = () => {
-    setForm({ id: "", nama: "", modalmode: "Tambah" });
+    setForm({});
     setMethod("POST");
-    modal.karyawan.onOpen();
+    modal.statuskaryawan.onOpen();
   };
   const editButtonPress = (data) => {
     setForm({ ...data, modalmode: "Edit" });
     setMethod("PUT");
-    modal.karyawan.onOpen();
+    modal.statuskaryawan.onOpen();
   };
   const deleteButtonPress = async (id) => {
-    if (confirm("Hapus karyawan?")) {
-      const res = await fetch(`${apiPath}karyawan`, {
+    if (confirm("Hapus statuskaryawan?")) {
+      const res = await fetch(`${apiPath}statuskaryawan`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -68,7 +67,7 @@ export default function App() {
     }
   };
   const simpanButtonPress = async (data, onClose) => {
-    const res = await fetch(`${apiPath}karyawan`, {
+    const res = await fetch(`${apiPath}statuskaryawan`, {
       method,
       headers: {
         "Content-Type": "application/json",
@@ -78,7 +77,7 @@ export default function App() {
     });
     const json = await res.json();
     if (res.status == 400) return alert(json.message);
-    karyawan.mutate();
+    statuskaryawan.mutate();
     onClose();
     // return alert(json.message);
   };
@@ -95,7 +94,7 @@ export default function App() {
     try {
       const responses = await Promise.all(
         json.map((v) =>
-          fetch(`${apiPath}karyawan`, {
+          fetch(`${apiPath}statuskaryawan`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -117,7 +116,7 @@ export default function App() {
   };
 
   const renderCell = {
-    karyawan: React.useCallback((data, columnKey) => {
+    statuskaryawan: React.useCallback((data, columnKey) => {
       const cellValue = data[columnKey];
       switch (columnKey) {
         case "totalharga-beli":
@@ -130,7 +129,7 @@ export default function App() {
                   // onClick={() => alert("Clicked")}
                   className="text-lg text-default-400 cursor-pointer active:opacity-50"
                 >
-                  <Link href="karyawan/neraca">
+                  <Link href="statuskaryawan/neraca">
                     <IconScaleBalanced />
                   </Link>
                 </span>
@@ -168,14 +167,14 @@ export default function App() {
     }, []),
   };
   const col = {
-    karyawan: [
+    statuskaryawan: [
       {
-        key: "nama",
-        label: "Nama",
+        key: "status",
+        label: "Status",
       },
       {
-        key: "statuskaryawan",
-        label: "Status",
+        key: "keterangan",
+        label: "Keterangan",
       },
       {
         key: "aksi",
@@ -184,14 +183,13 @@ export default function App() {
     ],
   };
   const modal = {
-    karyawan: useDisclosure(),
+    statuskaryawan: useDisclosure(),
   };
   const [reportList, setReportList] = useState([]);
   const report = useDisclosure();
 
-  const sources = [karyawan, statuskaryawan];
-  if (sources.some((o) => o.error)) return <div>failed to load</div>;
-  if (sources.some((o) => o.isLoading)) return <div>loading...</div>;
+  if (statuskaryawan.error) return <div>failed to load</div>;
+  if (statuskaryawan.isLoading) return <div>loading...</div>;
 
   return (
     <div>
@@ -202,7 +200,7 @@ export default function App() {
         {/* <div>
           <Link
             className="bg-primary text-white p-2 rounded-lg inline-block"
-            href={"/karyawan.xlsx"}
+            href={"/statuskaryawan.xlsx"}
           >
             Download Format
           </Link>
@@ -213,7 +211,7 @@ export default function App() {
         </Button> */}
       </div>
       <Table className="pt-3" aria-label="Example table with custom cells">
-        <TableHeader columns={col.karyawan}>
+        <TableHeader columns={col.statuskaryawan}>
           {(column) => (
             <TableColumn
               key={column.key}
@@ -223,11 +221,13 @@ export default function App() {
             </TableColumn>
           )}
         </TableHeader>
-        <TableBody items={karyawan.data}>
+        <TableBody emptyContent="Kosong" items={statuskaryawan.data}>
           {(item) => (
             <TableRow key={item.id}>
               {(columnKey) => (
-                <TableCell>{renderCell.karyawan(item, columnKey)}</TableCell>
+                <TableCell>
+                  {renderCell.statuskaryawan(item, columnKey)}
+                </TableCell>
               )}
             </TableRow>
           )}
@@ -235,8 +235,8 @@ export default function App() {
       </Table>
       <Modal
         scrollBehavior="inside"
-        isOpen={modal.karyawan.isOpen}
-        onOpenChange={modal.karyawan.onOpenChange}
+        isOpen={modal.statuskaryawan.isOpen}
+        onOpenChange={modal.statuskaryawan.onOpenChange}
       >
         <ModalContent>
           {(onClose) => (
@@ -247,30 +247,18 @@ export default function App() {
               <ModalBody>
                 <Input
                   type="text"
-                  label="Nama"
-                  placeholder="Masukkan nama!"
-                  value={form.nama}
-                  onValueChange={(val) => setForm({ ...form, nama: val })}
-                />
-                <Select
                   label="Status"
-                  variant="bordered"
-                  placeholder="Pilih status!"
-                  selectedKeys={new Set([String(form.id_statuskaryawan)])}
-                  className="max-w-xs"
-                  onSelectionChange={(v) => {
-                    setForm({
-                      ...form,
-                      id_statuskaryawan: new Set(v).values().next().value,
-                    });
-                  }}
-                >
-                  {statuskaryawan.data.map((item) => (
-                    <SelectItem key={item.id} value={item.id}>
-                      {item.status}
-                    </SelectItem>
-                  ))}
-                </Select>
+                  placeholder="Masukkan status!"
+                  value={form.status}
+                  onValueChange={(val) => setForm({ ...form, status: val })}
+                />
+                <Input
+                  type="text"
+                  label="keterangan"
+                  placeholder="Masukkan keterangan!"
+                  value={form.keterangan}
+                  onValueChange={(val) => setForm({ ...form, keterangan: val })}
+                />
               </ModalBody>
               <ModalFooter>
                 <Button color="danger" variant="light" onPress={onClose}>

@@ -39,7 +39,9 @@ const api_path = getApiPath();
 export default function App() {
   const session = useSession();
 
-  const user = useClientFetch(`user`);
+  const user = useClientFetch(
+    `user?id=${session.data?.user?.id}&peran=${session.data?.user?.peran}`
+  );
   const [form, setForm] = useState({});
   const [method, setMethod] = useState();
   const tambahButtonPress = () => {
@@ -89,7 +91,7 @@ export default function App() {
         "Content-Type": "application/json",
         // 'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: JSON.stringify(data),
+      body: JSON.stringify({ ...data, srcperan: session.data.user.peran }),
     });
     const json = await res.json();
     return alert(json.message);
@@ -148,12 +150,12 @@ export default function App() {
   if (user.error) return <div>failed to load</div>;
   if (user.isLoading) return <div>loading...</div>;
   if (session.status === "loading") return <>Loading...</>;
-  if (session.data.user.peran != "super")
-    return <div>Anda tidak memiliki akses pada laman ini.</div>;
+  // if (session.data.user.peran != "super")
+  //   return <div>Anda tidak memiliki akses pada laman ini.</div>;
 
   return (
     <div>
-      <Button onClick={tambahButtonPress} color="primary">
+      <Button onPress={tambahButtonPress} color="primary">
         Tambah
       </Button>
       <Table className="pt-3" aria-label="Example table with custom cells">

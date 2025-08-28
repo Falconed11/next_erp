@@ -484,13 +484,13 @@ export default function App() {
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                Transfer Vendor
+                Transfer Customer
               </ModalHeader>
               <ModalBody>
                 <Input
                   isDisabled
                   type="text"
-                  label="Vendor asal"
+                  label="Customer asal"
                   defaultValue={form.nama}
                   className="max-w-xs"
                 />
