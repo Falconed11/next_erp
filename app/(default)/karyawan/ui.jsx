@@ -44,7 +44,12 @@ export default function App() {
   const [json, setJson] = useState([]);
   const [method, setMethod] = useState();
   const tambahButtonPress = () => {
-    setForm({ id: "", nama: "", modalmode: "Tambah" });
+    setForm({
+      id: "",
+      nama: "",
+      id_statuskaryawan: 1,
+      modalmode: "Tambah",
+    });
     setMethod("POST");
     modal.karyawan.onOpen();
   };
@@ -53,7 +58,9 @@ export default function App() {
     setMethod("PUT");
     modal.karyawan.onOpen();
   };
-  const deleteButtonPress = async (id) => {
+  const deleteButtonPress = async (id, id_statuskaryawan) => {
+    if (id_statuskaryawan == 1)
+      return alert("Tidak dapat menghapus karyawan dengan status aktif.");
     if (confirm("Hapus karyawan?")) {
       const res = await fetch(`${apiPath}karyawan`, {
         method: "DELETE",
@@ -64,7 +71,8 @@ export default function App() {
         body: JSON.stringify({ id }),
       });
       const json = await res.json();
-      // return alert(json.message);
+      if (res.status == 400) return alert(json.message);
+      karyawan.mutate();
     }
   };
   const simpanButtonPress = async (data, onClose) => {
@@ -145,7 +153,9 @@ export default function App() {
               </Tooltip>
               <Tooltip color="danger" content="Delete">
                 <span
-                  onClick={() => deleteButtonPress(data.id)}
+                  onClick={() =>
+                    deleteButtonPress(data.id, data.id_statuskaryawan)
+                  }
                   className="text-lg text-danger cursor-pointer active:opacity-50"
                 >
                   <DeleteIcon />
@@ -256,7 +266,13 @@ export default function App() {
                   label="Status"
                   variant="bordered"
                   placeholder="Pilih status!"
-                  selectedKeys={new Set([String(form.id_statuskaryawan)])}
+                  selectedKeys={
+                    new Set(
+                      form.id_statuskaryawan
+                        ? [String(form.id_statuskaryawan)]
+                        : []
+                    )
+                  }
                   className="max-w-xs"
                   onSelectionChange={(v) => {
                     setForm({

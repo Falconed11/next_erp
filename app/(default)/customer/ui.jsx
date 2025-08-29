@@ -60,6 +60,7 @@ const apiPath = getApiPath();
 
 export default function App() {
   const session = useSession();
+  const sessionuser = session.data;
   const user = session.data?.user;
 
   const [value, setValue] = React.useState("");
@@ -192,61 +193,68 @@ export default function App() {
     );
   };
 
-  const renderCell = React.useCallback((data, columnKey) => {
-    const cellValue = data[columnKey];
-    const date = new Date(data.tanggal);
-    const hutang = data.hutang ?? 0;
-    switch (columnKey) {
-      case "tanggal":
-        return getDateF(new Date(data.tanggal));
-      case "totalharga":
-        return data.jumlah * data.harga;
-      case "swasta":
-        return data.swasta ? "Swasta" : "Negri";
-      case "provit":
-        return (
-          <div className="text-right">
-            <Harga harga={+data.provit} />
-          </div>
-        );
-      case "aksi":
-        return (
-          <div className="relative flex items-center gap-2">
-            <LinkOpenNewTab
-              content="Detail"
-              link={`/proyek?id_instansi=${data.id}`}
-              icon={<EyeIcon />}
-            />
-            <Tooltip content="Transfer">
-              <span
-                onClick={() => transferButtonPress(data)}
-                className="text-lg text-default-400 cursor-pointer active:opacity-50"
-              >
-                <TransferIcon />
-              </span>
-            </Tooltip>
-            <Tooltip content="Edit">
-              <span
-                onClick={() => editButtonPress(data)}
-                className="text-lg text-default-400 cursor-pointer active:opacity-50"
-              >
-                <EditIcon />
-              </span>
-            </Tooltip>
-            <Tooltip color="danger" content="Delete">
-              <span
-                onClick={() => deleteButtonPress(data.id)}
-                className="text-lg text-danger cursor-pointer active:opacity-50"
-              >
-                <DeleteIcon />
-              </span>
-            </Tooltip>
-          </div>
-        );
-      default:
-        return cellValue;
-    }
-  }, []);
+  const renderCell = React.useCallback(
+    (data, columnKey) => {
+      const cellValue = data[columnKey];
+      const date = new Date(data.tanggal);
+      const hutang = data.hutang ?? 0;
+      switch (columnKey) {
+        case "tanggal":
+          return getDateF(new Date(data.tanggal));
+        case "totalharga":
+          return data.jumlah * data.harga;
+        case "swasta":
+          return data.swasta ? "Swasta" : "Negri";
+        case "provit":
+          return (
+            <div className="text-right">
+              <Harga harga={+data.provit} />
+            </div>
+          );
+        case "aksi":
+          return (
+            <div className="relative flex items-center gap-2">
+              <Tooltip content="Edit">
+                <span
+                  onClick={() => editButtonPress(data)}
+                  className="text-lg text-default-400 cursor-pointer active:opacity-50"
+                >
+                  <EditIcon />
+                </span>
+              </Tooltip>
+              {sessionuser?.rank <= 10 && (
+                <>
+                  <LinkOpenNewTab
+                    content="Detail"
+                    link={`/proyek?id_instansi=${data.id}`}
+                    icon={<EyeIcon />}
+                  />
+                  <Tooltip content="Transfer">
+                    <span
+                      onClick={() => transferButtonPress(data)}
+                      className="text-lg text-default-400 cursor-pointer active:opacity-50"
+                    >
+                      <TransferIcon />
+                    </span>
+                  </Tooltip>
+                  <Tooltip color="danger" content="Delete">
+                    <span
+                      onClick={() => deleteButtonPress(data.id)}
+                      className="text-lg text-danger cursor-pointer active:opacity-50"
+                    >
+                      <DeleteIcon />
+                    </span>
+                  </Tooltip>
+                </>
+              )}
+            </div>
+          );
+        default:
+          return cellValue;
+      }
+    },
+    [sessionuser]
+  );
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const transfer = useDisclosure();
   const report = useDisclosure();

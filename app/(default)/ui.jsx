@@ -1,10 +1,15 @@
 "use client";
 import { getCurFirstLastDay } from "@/app/utils/date";
 import { Penawaran, OperasionalKantor } from "@/components/laporan";
+import { useSession } from "next-auth/react";
 
 import "react-datepicker/dist/react-datepicker.css";
 
 export default function app() {
+  const session = useSession();
+  const sessionuser = session?.data?.user;
+  if (session.status === "loading") return <>Loading...</>;
+  console.log(sessionuser);
   const currentDate = new Date();
   const currentMonth = currentDate.getMonth();
   const nextMonthFirstDay = new Date(

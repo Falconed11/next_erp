@@ -32,25 +32,26 @@ import {
 import "react-datepicker/dist/react-datepicker.css";
 import { getApiPath, useClientFetch } from "../../utils/apiconfig";
 import { Button } from "@heroui/react";
-import { Input } from "@heroui/react";
+import { Input, Select, SelectItem } from "@heroui/react";
+import { rolesCheck } from "@/app/utils/tools";
 
 const api_path = getApiPath();
 
 export default function App() {
   const session = useSession();
+  const sessionuser = session?.data?.user;
 
   const user = useClientFetch(
-    `user?id=${session.data?.user?.id}&peran=${session.data?.user?.peran}`
+    `user?id=${sessionuser?.id}&peran=${sessionuser?.peran}&rank=${sessionuser?.rank}`
+  );
+  const karyawan = useClientFetch(`karyawan?id_statuskaryawan=1`);
+  const peran = useClientFetch(
+    `peran?peran=${sessionuser?.peran}&rank=${sessionuser?.rank}`
   );
   const [form, setForm] = useState({});
   const [method, setMethod] = useState();
   const tambahButtonPress = () => {
     setForm({
-      id: "",
-      username: "",
-      peran: "",
-      password: "",
-      ulangipassword: "",
       modalmode: "Tambah",
     });
     setMethod("POST");
@@ -60,6 +61,8 @@ export default function App() {
     const date = new Date(data.tanggal);
     setForm({
       ...data,
+      tempRank: data.rank,
+      tempNama: data.nama,
       passwordlama: "",
       password: "",
       ulangipassword: "",
@@ -82,7 +85,7 @@ export default function App() {
       return alert(json.message);
     }
   };
-  const simpanButtonPress = async (data) => {
+  const simpanButtonPress = async (data, onClose) => {
     if (data.password != data.ulangipassword)
       return alert("Ulangi Password tidak sesuai");
     const res = await fetch(`${api_path}user`, {
@@ -94,7 +97,9 @@ export default function App() {
       body: JSON.stringify({ ...data, srcperan: session.data.user.peran }),
     });
     const json = await res.json();
-    return alert(json.message);
+    if (res.status == 400) return alert(json.message);
+    onClose();
+    user.mutate();
   };
   const renderCell = {
     user: React.useCallback((data, columnKey) => {
@@ -138,6 +143,10 @@ export default function App() {
         label: "Peran",
       },
       {
+        key: "nama",
+        label: "Karyawan",
+      },
+      {
         key: "aksi",
         label: "Aksi",
       },
@@ -147,12 +156,12 @@ export default function App() {
     user: useDisclosure(),
   };
 
-  if (user.error) return <div>failed to load</div>;
-  if (user.isLoading) return <div>loading...</div>;
+  const sources = [karyawan, user, peran];
+  if (sources.some((o) => o.error)) return <div>failed to load</div>;
+  if (sources.some((o) => o.isLoading)) return <div>loading...</div>;
   if (session.status === "loading") return <>Loading...</>;
   // if (session.data.user.peran != "super")
   //   return <div>Anda tidak memiliki akses pada laman ini.</div>;
-
   return (
     <div>
       <Button onPress={tambahButtonPress} color="primary">
@@ -198,13 +207,66 @@ export default function App() {
                   value={form.username}
                   onValueChange={(v) => setForm({ ...form, username: v })}
                 />
-                <Input
-                  type="text"
-                  label="Peran"
-                  placeholder="Masukkan peran"
-                  value={form.peran}
-                  onValueChange={(v) => setForm({ ...form, peran: v })}
-                />
+                {sessionuser.rank >= form.tempRank ? (
+                  <Input
+                    disabled
+                    type="text"
+                    label="Peran"
+                    value={form.peran}
+                  />
+                ) : (
+                  <Select
+                    label="Peran"
+                    variant="bordered"
+                    disabled={
+                      sessionuser.rank < form.tempRank ? undefined : true
+                    }
+                    placeholder="Pilih peran!"
+                    selectedKeys={new Set([String(form.peran)])}
+                    className="max-w-xs"
+                    onSelectionChange={(v) => {
+                      console.log({ v });
+                      setForm({
+                        ...form,
+                        peran: new Set(v).values().next().value,
+                      });
+                    }}
+                  >
+                    {peran.data.map((item) => (
+                      <SelectItem key={item.nama} value={item.nama}>
+                        {item.nama}
+                      </SelectItem>
+                    ))}
+                  </Select>
+                )}
+                {sessionuser.rank > 10 ? (
+                  <Input
+                    disabled
+                    type="text"
+                    label="Karyawan"
+                    value={form.tempNama}
+                  />
+                ) : (
+                  <Select
+                    label="Karyawan"
+                    variant="bordered"
+                    placeholder="Pilih karyawan!"
+                    selectedKeys={new Set([String(form.id_karyawan)])}
+                    className="max-w-xs"
+                    onSelectionChange={(v) => {
+                      setForm({
+                        ...form,
+                        id_karyawan: new Set(v).values().next().value,
+                      });
+                    }}
+                  >
+                    {karyawan.data.map((item) => (
+                      <SelectItem key={item.id} value={item.id}>
+                        {item.nama}
+                      </SelectItem>
+                    ))}
+                  </Select>
+                )}
                 {form.modalmode == "Tambah" ? (
                   <>
                     <Input
@@ -258,7 +320,10 @@ export default function App() {
                 <Button color="danger" variant="light" onPress={onClose}>
                   Batal
                 </Button>
-                <Button color="primary" onPress={() => simpanButtonPress(form)}>
+                <Button
+                  color="primary"
+                  onPress={() => simpanButtonPress(form, onClose)}
+                >
                   Simpan
                 </Button>
               </ModalFooter>
