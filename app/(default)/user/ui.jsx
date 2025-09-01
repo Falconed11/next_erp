@@ -40,13 +40,16 @@ const api_path = getApiPath();
 export default function App() {
   const session = useSession();
   const sessionuser = session?.data?.user;
-
   const user = useClientFetch(
-    `user?id=${sessionuser?.id}&peran=${sessionuser?.peran}&rank=${sessionuser?.rank}`
+    sessionuser
+      ? `user?id=${sessionuser.id}&peran=${sessionuser.peran}&rank=${sessionuser.rank}`
+      : null
   );
   const karyawan = useClientFetch(`karyawan?id_statuskaryawan=1`);
   const peran = useClientFetch(
-    `peran?peran=${sessionuser?.peran}&rank=${sessionuser?.rank}`
+    sessionuser
+      ? `peran?peran=${sessionuser.peran}&rank=${sessionuser.rank}`
+      : null
   );
   const [form, setForm] = useState({});
   const [method, setMethod] = useState();
@@ -244,14 +247,18 @@ export default function App() {
                     disabled
                     type="text"
                     label="Karyawan"
-                    value={form.tempNama}
+                    value={form.tempNama || ""}
                   />
                 ) : (
                   <Select
                     label="Karyawan"
                     variant="bordered"
                     placeholder="Pilih karyawan!"
-                    selectedKeys={new Set([String(form.id_karyawan)])}
+                    selectedKeys={
+                      new Set(
+                        form.id_karyawan ? [String(form.id_karyawan)] : []
+                      )
+                    }
                     className="max-w-xs"
                     onSelectionChange={(v) => {
                       setForm({

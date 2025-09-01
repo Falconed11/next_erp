@@ -34,16 +34,18 @@ export const options: NextAuthOptions = {
         if (user.id)
           return {
             id: user.id,
-            nama: user.username,
+            username: user.username,
+            nama: user.nama,
             peran: user.peran,
             rank: user.rank,
+            id_karyawan: user.id_karyawan,
             keteranganperan: user.keteranganperan,
           };
         return null;
       },
     }),
   ],
-  session: { maxAge: 1 * 18 * 60 * 60 },
+  session: { maxAge: 1 * 18 * 60 * 60 }, // day, hour, minute, second
   theme: { colorScheme: "light" },
   callbacks: {
     jwt({ token, user }) {
@@ -51,9 +53,11 @@ export const options: NextAuthOptions = {
         token = {
           ...token,
           id: user.id,
+          username: user.username,
           nama: user.nama,
           peran: user.peran,
           rank: user.rank,
+          id_karyawan: user.id_karyawan,
           keteranganperan: user.keteranganperan,
         };
       return token;
@@ -62,9 +66,11 @@ export const options: NextAuthOptions = {
       session.user = {
         ...session.user,
         id: token.id,
+        username: token.username,
         nama: token.nama,
         peran: token.peran,
         rank: token.rank,
+        id_karyawan: token.id_karyawan,
         keteranganperan: token.keteranganperan,
       };
       return session;

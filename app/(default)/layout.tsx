@@ -62,8 +62,9 @@ export default function RootLayout({
       ],
     },
   ];
-  if (user?.peran == "sales") links.push({ href: "/proyek", name: "Proyek" });
-  if (user?.peran == "admin" || user?.peran == "super")
+  if (rolesCheck(["head-sales", "sales"], user?.peran))
+    links.push({ href: "/proyek", name: "Proyek" });
+  if (rolesCheck(["admin", "super"], user?.peran))
     links.push({ href: "/proyek", name: "Proyek", dropdown: proyek });
   if (user?.peran == "admin" || user?.peran == "super")
     links.push(

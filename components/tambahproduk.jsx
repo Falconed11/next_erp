@@ -22,6 +22,7 @@ export default function TambahProduk({
   disableVendor,
   refHargaModal,
   customInput,
+  rank = 21,
 }) {
   const [nama, setNama] = useState("");
   const [sVendor, setSVendor] = useState("");
@@ -66,6 +67,7 @@ export default function TambahProduk({
   );
   fvendor = fvendor.slice(0, 100);
   const selectProduk = produk.data.filter((v) => v.id == form.selectProduk)[0];
+  const hideComponent = rank >= 20 ? "hidden" : "";
   // console.log(form.selectProduk);
   // console.log({ nama });
   return (
@@ -245,7 +247,7 @@ export default function TambahProduk({
           value={form.hargamodal}
           label={<>Harga Modal (Ref: {<Harga harga={form.oldHargaModal} />})</>}
           placeholder="Masukkan harga!"
-          className="w-3/12"
+          className={`w-3/12 ${hideComponent}`}
           onValueChange={(v) =>
             setForm({
               ...form,

@@ -12,7 +12,10 @@ export default function App(user) {
         </div>
       </div>
       <div>
-        <div>{data.nama}</div>
+        <div>
+          {data.username}
+          {data.nama ? ` ( ${data.nama} )` : ""}
+        </div>
         <div className="text-gray-400">{data.peran}</div>
       </div>
     </div>

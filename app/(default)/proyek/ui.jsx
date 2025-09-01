@@ -283,9 +283,13 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
         return data.swasta ? "swasta" : "negri";
       case "status":
         return data.versi == -1 ? (
-          "reject"
+          <span className="p-2 rounded-sm bg-red-600 text-white font-bold">
+            Reject
+          </span>
         ) : data.versi > 0 ? (
-          "deal"
+          <span className="p-2 rounded-sm bg-green-500 text-white font-bold">
+            Deal
+          </span>
         ) : data.jumlahbarangkeluar > 0 ? (
           <Tooltip
             color="warning"
@@ -299,7 +303,7 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
             </div>
           </Tooltip>
         ) : (
-          "penawaran"
+          data.statusproyek
         );
       case "pengeluaranproyek":
         return (

@@ -317,26 +317,11 @@ export default function App({ id, versi }) {
         id,
         versi: selectedVersion,
         tanggal: getDate(new Date()),
+        id_statusproyek: 2,
       }),
     });
     const json = await res.json();
     if (res.status == 400) return alert(json.message);
-    // console.log(json.message);
-    // return alert(json.message);
-  };
-  const handleButtonCancelDealClick = async () => {
-    const res = await fetch(`${api_path}updateversiproyek`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify({
-        id,
-        versi: 0,
-      }),
-    });
-    const json = await res.json();
     // console.log(json.message);
     // return alert(json.message);
   };
@@ -350,13 +335,14 @@ export default function App({ id, versi }) {
       body: JSON.stringify({
         id,
         versi: -1,
+        id_statusproyek: -1,
       }),
     });
     const json = await res.json();
     // console.log(json.message);
     // return alert(json.message);
   };
-  const handleButtonCancelRejectClick = async () => {
+  const handleButtonCancelDealRejectClick = async () => {
     const res = await fetch(`${api_path}updateversiproyek`, {
       method: "PUT",
       headers: {
@@ -366,6 +352,7 @@ export default function App({ id, versi }) {
       body: JSON.stringify({
         id,
         versi: 0,
+        id_statusproyek: 1,
       }),
     });
     const json = await res.json();
@@ -894,6 +881,7 @@ export default function App({ id, versi }) {
   const compRekapTotal = (
     <TableBottom tableData={dataTabelTotal(true)} title="Rekapitulasi" />
   );
+  const hideComponent = user.rank || 21 >= 20 ? "hidden" : "";
   return (
     <div>
       <div className="flex flex-row gap-2">
@@ -1049,7 +1037,7 @@ export default function App({ id, versi }) {
                 ) : (
                   <div>
                     <Button
-                      onPress={handleButtonCancelDealClick}
+                      onPress={handleButtonCancelDealRejectClick}
                       color="primary"
                       className="mt-3"
                     >
@@ -1074,7 +1062,7 @@ export default function App({ id, versi }) {
                 ) : (
                   <div>
                     <Button
-                      onPress={handleButtonCancelRejectClick}
+                      onPress={handleButtonCancelDealRejectClick}
                       color="primary"
                       className="mt-3"
                     >
@@ -1139,7 +1127,7 @@ export default function App({ id, versi }) {
                                   formatOptions={{
                                     useGrouping: false,
                                   }}
-                                  className="w-3/12"
+                                  className={`w-3/12 ${hideComponent}`}
                                   value={form.harga - form.hargamodal || ""}
                                   label={"Provit"}
                                   placeholder="Masukkan provit!"
@@ -1156,7 +1144,7 @@ export default function App({ id, versi }) {
                                   formatOptions={{
                                     useGrouping: false,
                                   }}
-                                  className="w-3/12"
+                                  className={`w-3/12" ${hideComponent}`}
                                   value={
                                     Math.round(
                                       countPercentProvit(

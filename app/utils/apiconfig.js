@@ -9,24 +9,24 @@ const fetcher = async (...args) => {
   if (!res.ok) throw new Error("API error");
   return res.json();
 };
+const getFullPath = (endpoint) => (endpoint ? `${apiPath}${endpoint}` : null);
 const useClientFetch = (endpoint) => {
-  const fullPath = `${apiPath}${endpoint}`;
-  return useSWR(fullPath, fetcher, { refreshInterval: 5000 });
+  return useSWR(getFullPath(endpoint), fetcher, { refreshInterval: 5000 });
 };
 const useClientFetchPagination = (endpoint) => {
-  const fullPath = `${apiPath}${endpoint}`;
-  return useSWR(fullPath, fetcher, {
+  if (!endpoint) return defaultValue;
+  return useSWR(getFullPath(endpoint), fetcher, {
     keepPreviousData: true,
     refreshInterval: 5000,
   });
 };
 const useClientFetchInterval = (endpoint, interval) => {
-  const fullPath = `${apiPath}${endpoint}`;
-  return useSWR(fullPath, fetcher, { refreshInterval: interval });
+  if (!endpoint) return defaultValue;
+  return useSWR(getFullPath(endpoint), fetcher, { refreshInterval: interval });
 };
 const useClientFetchNoInterval = (endpoint) => {
-  const fullPath = `${apiPath}${endpoint}`;
-  return useSWR(fullPath, fetcher);
+  if (!endpoint) return defaultValue;
+  return useSWR(getFullPath(endpoint), fetcher);
 };
 
 export {

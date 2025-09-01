@@ -180,6 +180,10 @@ export default function App() {
   const col = {
     karyawan: [
       {
+        key: "id",
+        label: "Id",
+      },
+      {
         key: "nama",
         label: "Nama",
       },
