@@ -2,10 +2,6 @@ import { getApiPath } from "./apiconfig";
 
 const api_path = getApiPath();
 
-const rolesCheck = (roles, peran) => {
-  return roles.includes(peran);
-};
-
 const updateSwitch = async (
   switchValue,
   currentValue,
@@ -29,6 +25,4 @@ const updateSwitch = async (
   referenceData.forEach((data) => data.mutate());
 };
 
-const highRoleCheck = (rank) => rank <= 20;
-
-export { rolesCheck, updateSwitch, highRoleCheck };
+export {};

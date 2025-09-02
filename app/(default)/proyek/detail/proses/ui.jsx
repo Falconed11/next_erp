@@ -47,10 +47,14 @@ import "react-datepicker/dist/react-datepicker.css";
 import { NavLinkNewTab } from "@/components/mycomponent";
 import PembayaranProyek from "./pembayaranproyek";
 import { countPercentProvit, countRecapitulation } from "@/app/utils/formula";
+import { highRoleCheck } from "@/app/utils/tools";
+import { useSession } from "next-auth/react";
 
 const api_path = getApiPath();
 
 export default function App({ id }) {
+  const session = useSession();
+  const sessUser = session.data?.user;
   const componentRef = {
     nota: useRef(),
   };
@@ -156,12 +160,10 @@ export default function App({ id }) {
             id_produk: data.id,
           }),
         });
-        console.log(res);
-        console.log(res.status);
         const json = await res.json();
-        console.log(json);
         if (res.status == 400) return alert(json.message);
       }
+      pengeluaranproyek.mutate();
     }
   };
   const tambahButtonPress = async ({ selectProduk, selectKaryawan, form }) => {
@@ -210,8 +212,6 @@ export default function App({ id }) {
         }),
       });
     }
-    console.log(res);
-    console.log(res.status);
     const json = await res.json();
     if (res.status == 400) return alert(json.message);
     setForm({
@@ -222,13 +222,15 @@ export default function App({ id }) {
       selectKategori: new Set([]),
       selectProduk: new Set([]),
     });
+    pengeluaranproyek.mutate();
     // return alert(json.message);
   };
   const simpanButtonPress = async (data, onClose) => {
     // return console.log({ form, id });
     let res;
     if (data.id_produkkeluar) {
-      console.log(data);
+      if (data.stok + data.oldJumlah < data.jumlah)
+        return alert("Jumlah melebihi batas maksimal.");
       res = await fetch(`${api_path}produkkeluar`, {
         method: "PUT",
         headers: {
@@ -268,6 +270,7 @@ export default function App({ id }) {
       });
     const json = await res.json();
     if (res.status == 400) return alert(json.message);
+    pengeluaranproyek.mutate();
     onClose();
     // console.log(json.message);
   };
@@ -343,51 +346,64 @@ export default function App({ id }) {
   };
 
   const renderCell = {
-    pengeluaranproyek: React.useCallback((data, columnKey) => {
-      const cellValue = data[columnKey];
-      const harga = data.hargaprodukmasuk || data.hargapengeluaran;
-      switch (columnKey) {
-        case "status":
-          return data.status == 1 ? "Lunas" : "Belum Lunas";
-        case "tanggal":
-          return getDateF(new Date(data.tanggalpengeluaran));
-        case "harga":
-          return (
-            <div className="text-right">
-              <Harga harga={harga} />
-            </div>
-          );
-        case "totalharga":
-          return (
-            <div className="text-right">
-              <Harga harga={data.jumlah * harga} />
-            </div>
-          );
-        case "aksi":
-          return (
-            <div className="relative flex items-center gap-2">
-              <Tooltip content="Edit">
-                <span
-                  onClick={() => editButtonPress(data)}
-                  className="text-lg text-default-400 cursor-pointer active:opacity-50"
-                >
-                  <EditIcon />
-                </span>
-              </Tooltip>
-              <Tooltip color="danger" content="Delete">
-                <span
-                  onClick={() => deleteButtonPress(data)}
-                  className="text-lg text-danger cursor-pointer active:opacity-50"
-                >
-                  <DeleteIcon />
-                </span>
-              </Tooltip>
-            </div>
-          );
-        default:
-          return cellValue;
-      }
-    }, []),
+    pengeluaranproyek: React.useCallback(
+      (data, columnKey) => {
+        if (session.status === "loading") return;
+        if (session.status === "unauthenticated") return;
+        const cellValue = data[columnKey];
+        const harga = data.hargaprodukmasuk || data.hargapengeluaran;
+        switch (columnKey) {
+          case "status":
+            return data.status == 1 ? "Lunas" : "Belum Lunas";
+          case "tanggal":
+            return getDateF(new Date(data.tanggalpengeluaran));
+          case "harga":
+            return (
+              <div className="text-right">
+                {isHighRole || !data.id_produkkeluar ? (
+                  <Harga harga={harga} />
+                ) : (
+                  "Sistem"
+                )}
+              </div>
+            );
+          case "totalharga":
+            return (
+              <div className="text-right">
+                {isHighRole || !data.id_produkkeluar ? (
+                  <Harga harga={data.jumlah * harga} />
+                ) : (
+                  "Sistem"
+                )}
+              </div>
+            );
+          case "aksi":
+            return (
+              <div className="relative flex items-center gap-2">
+                <Tooltip content="Edit">
+                  <span
+                    onClick={() => editButtonPress(data)}
+                    className="text-lg text-default-400 cursor-pointer active:opacity-50"
+                  >
+                    <EditIcon />
+                  </span>
+                </Tooltip>
+                <Tooltip color="danger" content="Delete">
+                  <span
+                    onClick={() => deleteButtonPress(data)}
+                    className="text-lg text-danger cursor-pointer active:opacity-50"
+                  >
+                    <DeleteIcon />
+                  </span>
+                </Tooltip>
+              </div>
+            );
+          default:
+            return cellValue;
+        }
+      },
+      [sessUser?.rank]
+    ),
     pembayaranproyek: React.useCallback((data, columnKey) => {
       const cellValue = data[columnKey];
       switch (columnKey) {
@@ -537,6 +553,8 @@ export default function App({ id }) {
     if (data.error) return <div>Failed to load {name}</div>;
     if (data.isLoading) return <div>Loading {name}...</div>;
   }
+  if (session.status === "loading") return <>Session Loading ...</>;
+  const isHighRole = highRoleCheck(sessUser.rank);
   const selectedProyek = proyek.data[0];
   const { rekapitulasiPeralatan, rekapitulasiInstalasi, rekapitulasiTotal } =
     countRecapitulation(
@@ -586,14 +604,20 @@ export default function App({ id }) {
               key: "Nilai Proyek",
               comp: <Harga harga={rekapitulasiTotal.hargaPajak} />,
             },
-            {
-              key: "Provit",
-              comp: <Harga harga={provit} />,
-            },
-            {
-              key: "Provit Persen",
-              comp: `${countPercentProvit(biayaProduksi, omset).toFixed(2)}%`,
-            },
+            ...(isHighRole
+              ? [
+                  {
+                    key: "Provit",
+                    comp: <Harga harga={provit} />,
+                  },
+                  {
+                    key: "Provit Persen",
+                    comp: `${countPercentProvit(biayaProduksi, omset).toFixed(
+                      2
+                    )}%`,
+                  },
+                ]
+              : []),
           ].map((o, i) => (
             <div key={i} className="grid grid-cols-2">
               <div className="">{o.key}</div>
@@ -859,7 +883,7 @@ export default function App({ id }) {
                 {/* <div>Harga Modal : {form.hargamodal}</div> */}
                 <Input
                   type="number"
-                  disabled
+                  disabled={form.id_produkkeluar ? true : undefined}
                   value={form.harga}
                   label={`Harga Satuan (${form.oldHarga})`}
                   placeholder="Masukkan harga!"

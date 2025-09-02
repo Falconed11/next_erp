@@ -11,6 +11,8 @@ import {
 } from "@/app/utils/formula";
 import { getDateF, getDateFId } from "@/app/utils/date";
 import Harga from "@/components/harga";
+import { useSession } from "next-auth/react";
+import { highRoleCheck } from "@/app/utils/tools";
 
 const api_path = getApiPath();
 
@@ -24,6 +26,8 @@ export default function TambahProduk({
   customInput,
   rank = 21,
 }) {
+  const session = useSession();
+  const sessUser = session.data?.user;
   const [nama, setNama] = useState("");
   const [sVendor, setSVendor] = useState("");
   const kategori = useClientFetch(`kategoriproduk`);
@@ -36,15 +40,15 @@ export default function TambahProduk({
   );
   const vendor = useClientFetch("vendor");
   // const pilihProduk = useClientFetch(`produk`)
+  const queries = { kategori, produk, vendor };
   const errorsJumlah = [];
 
-  if (kategori.error) return <div>failed to load</div>;
-  if (kategori.isLoading) return <div>loading...</div>;
-  if (produk.error) return <div>failed to load</div>;
-  if (produk.isLoading) return <div>loading...</div>;
-  if (vendor.error) return <div>failed to load</div>;
-  if (vendor.isLoading) return <div>loading...</div>;
-
+  for (const [name, data] of Object.entries(queries)) {
+    if (data.error) return <div>Failed to load {name}</div>;
+    if (data.isLoading) return <div>Loading {name}...</div>;
+  }
+  if (session.status === "loading") return "Session Loading ...";
+  const isHighRole = highRoleCheck(sessUser.rank);
   if ((form.jumlah < 1 || !form.jumlah) && form.selectProduk?.length > 0)
     errorsJumlah.push("Jumlah minimal 1");
   if (form.jumlah > form.stok && form.isSelected)
@@ -300,7 +304,7 @@ export default function TambahProduk({
         //   }
         // )`}
         placeholder="Masukkan harga!"
-        className="w-3/12"
+        className={`w-3/12${!isHighRole && form.isSelected ? " hidden" : ""}`}
         onValueChange={(v) =>
           setForm({
             ...form,

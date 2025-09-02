@@ -1,8 +1,9 @@
+import { Spinner } from "@heroui/react";
 import { UserIcon, DeleteIcon } from "./icon";
 
 export default function App(user) {
   const status = user.user.status;
-  if (status == "loading") return <>Loading...</>;
+  if (status == "loading") return <Spinner />;
   const data = user.user.data.user;
   return (
     <div className="flex flex-row">

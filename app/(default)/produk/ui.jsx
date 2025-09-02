@@ -61,11 +61,13 @@ import {
   countPriceByProvitMarginPercent,
   countProvitMarginPercent,
 } from "@/app/utils/formula";
+import { highRoleCheck } from "@/app/utils/tools";
 
 const apiPath = getApiPath();
 
 export default function App() {
   const session = useSession();
+  const sessUser = session.data?.user;
   // dynamic input
   const terapkanButton = useRef();
   const [inputs, setInputs] = useState([{ id: uuidv4(), value: "" }]);
@@ -100,6 +102,13 @@ export default function App() {
   const vendor = useClientFetch("vendor?columnName=nama");
   const metodepengeluaran = useClientFetch("metodepengeluaran");
   const kategori = useClientFetch("kategoriproduk");
+  const queries = {
+    produk,
+    merek,
+    vendor,
+    metodepengeluaran,
+    kategori,
+  };
 
   const [method, setMethod] = useState("POST");
   const [form, setForm] = useState({
@@ -419,7 +428,7 @@ export default function App() {
                 <AddIcon />
               </span>
             </Tooltip>
-            {data.stok > 0 ? (
+            {/* {data.stok > 0 ? (
               <Tooltip content="Produk Keluar">
                 <span
                   onClick={() => onProdukKeluarClick(data)}
@@ -430,7 +439,7 @@ export default function App() {
               </Tooltip>
             ) : (
               <></>
-            )}
+            )} */}
             <Tooltip color="danger" content="Delete">
               <span
                 onClick={() => deleteButtonPress(data.id)}
@@ -470,21 +479,12 @@ export default function App() {
   }, [filteredData?.length, rowsPerPage]);
   const loadingState = produk.isLoading ? "loading" : "idle";
   const offset = (page - 1) * rowsPerPage;
-
-  if (isLoading) return <>Loading...</>;
-  if (produk.error) return <div>failed to load</div>;
-  if (produk.isLoading) return <div>loading...</div>;
-  if (vendor.error) return <div>failed to load</div>;
-  if (vendor.isLoading) return <div>loading...</div>;
-  if (metodepengeluaran.error) return <div>failed to load</div>;
-  if (metodepengeluaran.isLoading) return <div>loading...</div>;
-  if (kategori.error) return <div>failed to load</div>;
-  if (kategori.isLoading) return <div>loading...</div>;
-  if (merek.error) return <div>failed to load</div>;
-  if (merek.isLoading) return <div>loading...</div>;
-  if (session.data?.user == undefined) return <div>loading...</div>;
-
-  const user = session.data?.user;
+  for (const [name, data] of Object.entries(queries)) {
+    if (data.error) return <div>Failed to load {name}</div>;
+    if (data.isLoading) return <div>Loading {name}...</div>;
+  }
+  if (session.status === "loading") return <div>Session Loading...</div>;
+  const isHighRole = highRoleCheck(sessUser.rank);
 
   const col = [
     {
@@ -519,18 +519,26 @@ export default function App() {
       key: "satuan",
       label: "Satuan",
     },
-    {
-      key: "hargamodal",
-      label: "Harga Modal",
-    },
+    ...(isHighRole
+      ? [
+          {
+            key: "hargamodal",
+            label: "Harga Modal",
+          },
+        ]
+      : []),
     {
       key: "hargajual",
       label: "Harga Jual",
     },
-    {
-      key: "totalmodal",
-      label: "Total Modal",
-    },
+    ...(isHighRole
+      ? [
+          {
+            key: "totalmodal",
+            label: "Total Modal",
+          },
+        ]
+      : []),
     {
       key: "totaljual",
       label: "Total Jual",
@@ -577,7 +585,7 @@ export default function App() {
     }
     return acc;
   }, []);
-
+  const classCompByRole = isHighRole ? "" : "hidden";
   // if (form.id_kategori) {
   //   filteredsubkategori = subkategori.data.filter((item) => {
   //     if (item.id_kategoriproduk == form.id_kategori) return item;
@@ -589,9 +597,11 @@ export default function App() {
     <div className="">
       <div className="flex flex-col gap-2">
         <div className="flex gap-2">
-          <Button color="primary" onPress={tambahButtonPress}>
-            Tambah
-          </Button>
+          {isHighRole && (
+            <Button color="primary" onPress={tambahButtonPress}>
+              Tambah
+            </Button>
+          )}
           <div className="flex flex-row gap-2">
             <Button color="primary" onPress={exportStok}>
               Export Stok
@@ -600,7 +610,7 @@ export default function App() {
         </div>
         <AuthorizationComponent
           roles={("super", "admin")}
-          user={user}
+          user={sessUser}
           component={
             <>
               <div>
@@ -812,6 +822,7 @@ export default function App() {
                   formatOptions={{
                     useGrouping: false,
                   }}
+                  className={classCompByRole}
                   label="Harga Modal"
                   placeholder="Masukkan harga modal!"
                   value={form.hargamodal}
@@ -834,6 +845,7 @@ export default function App() {
                   formatOptions={{
                     useGrouping: false,
                   }}
+                  className={classCompByRole}
                   label="Provit"
                   // label={`Provit (${
                   //   Math.round(
@@ -858,6 +870,7 @@ export default function App() {
                   formatOptions={{
                     useGrouping: false,
                   }}
+                  className={classCompByRole}
                   label="Persen Provit (%)"
                   placeholder="Masukkan persen provit!"
                   value={
@@ -1054,15 +1067,24 @@ export default function App() {
                     </AutocompleteItem>
                   )}
                 </Autocomplete>
-                <Input
-                  type="number"
+                <NumberInput
+                  hideStepper
+                  isWheelDisabled
+                  formatOptions={{
+                    useGrouping: false,
+                  }}
                   label="Jumlah"
                   placeholder="Masukkan jumlah!"
                   value={form.jumlah}
                   onValueChange={(val) => setForm({ ...form, jumlah: val })}
                 />
-                <Input
-                  type="number"
+                <NumberInput
+                  hideStepper
+                  isWheelDisabled
+                  formatOptions={{
+                    useGrouping: false,
+                  }}
+                  className={classCompByRole}
                   label={
                     <>
                       Harga Modal (Ref: <Harga harga={form.hargamodal} />)

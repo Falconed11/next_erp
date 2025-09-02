@@ -69,7 +69,7 @@ import {
   countProvitMarginPercent,
   countRecapitulation,
 } from "@/app/utils/formula";
-import { updateSwitch } from "@/app/utils/tools";
+import { highRoleCheck, updateSwitch } from "@/app/utils/tools";
 import Kwitansi from "./kwitansi";
 import Invoice from "./invoice";
 import KeteranganPenawaran from "./keteranganpenawaran";
@@ -613,6 +613,7 @@ export default function App({ id, versi }) {
   if (subProyek.isLoading) return <div>loading...</div>;
   if (keteranganPenawaran.error) return <div>failed to load</div>;
   if (keteranganPenawaran.isLoading) return <div>loading...</div>;
+  if (session.status === "loading") return <>Session Loading ...</>;
 
   const keranjangProduk = keranjangProyek.data;
   const keranjangInstalasi = keranjangProyekInstalasi.data;
@@ -623,9 +624,8 @@ export default function App({ id, versi }) {
     diskoninstalasi: 0,
     pajak: 0,
   };
-
   const selectedProyek = proyek.data[0];
-
+  const isHighRole = highRoleCheck(user.rank);
   const col = {
     keranjangproyek: [
       {
@@ -672,34 +672,54 @@ export default function App({ id, versi }) {
         key: "satuan",
         label: "Satuan",
       },
-      {
-        key: "temphargamodal",
-        label: "Harga Modal",
-      },
+      ...(isHighRole
+        ? [
+            {
+              key: "temphargamodal",
+              label: "Harga Modal",
+            },
+          ]
+        : []),
       {
         key: "harga",
         label: "Harga Jual",
       },
-      {
-        key: "profit",
-        label: "Profit",
-      },
-      {
-        key: "persenprovit",
-        label: "%",
-      },
-      {
-        key: "totalharga-modal",
-        label: "Total Harga Modal",
-      },
+      ...(isHighRole
+        ? [
+            {
+              key: "profit",
+              label: "Profit",
+            },
+          ]
+        : []),
+      ...(isHighRole
+        ? [
+            {
+              key: "persenprovit",
+              label: "%",
+            },
+          ]
+        : []),
+      ...(isHighRole
+        ? [
+            {
+              key: "totalharga-modal",
+              label: "Total Harga Modal",
+            },
+          ]
+        : []),
       {
         key: "totalharga-jual",
         label: "Total Harga Jual",
       },
-      {
-        key: "totalprofit",
-        label: "Total Profit",
-      },
+      ...(isHighRole
+        ? [
+            {
+              key: "totalprofit",
+              label: "Total Profit",
+            },
+          ]
+        : []),
     ],
     instalasi: [
       {
@@ -746,34 +766,54 @@ export default function App({ id, versi }) {
         key: "satuan",
         label: "Satuan",
       },
-      {
-        key: "temphargamodal",
-        label: "Harga Modal",
-      },
+      ...(isHighRole
+        ? [
+            {
+              key: "temphargamodal",
+              label: "Harga Modal",
+            },
+          ]
+        : []),
       {
         key: "harga",
         label: "Harga Instalasi",
       },
-      {
-        key: "profit",
-        label: "Profit",
-      },
-      {
-        key: "persenprovit",
-        label: "%",
-      },
-      {
-        key: "totalharga-modal",
-        label: "Total Harga Modal",
-      },
+      ...(isHighRole
+        ? [
+            {
+              key: "profit",
+              label: "Profit",
+            },
+          ]
+        : []),
+      ...(isHighRole
+        ? [
+            {
+              key: "persenprovit",
+              label: "%",
+            },
+          ]
+        : []),
+      ...(isHighRole
+        ? [
+            {
+              key: "totalharga-modal",
+              label: "Total Harga Modal",
+            },
+          ]
+        : []),
       {
         key: "totalharga-jual",
         label: "Total Harga Instalasi",
       },
-      {
-        key: "totalprofit",
-        label: "Total Profit",
-      },
+      ...(isHighRole
+        ? [
+            {
+              key: "totalprofit",
+              label: "Total Profit",
+            },
+          ]
+        : []),
     ],
     penawaran: [
       {
@@ -810,7 +850,6 @@ export default function App({ id, versi }) {
       },
     ],
   };
-
   if (selectedProyek.versi == 0) {
     col.keranjangproyek.push({
       key: "aksi",
@@ -821,7 +860,6 @@ export default function App({ id, versi }) {
       label: "Aksi",
     });
   }
-
   const selectedRekapitulasiProyek = rekapitulasiProyek.data[0];
   const kategoriProyek = [];
   if (selectedRekapitulasiProyek) {
@@ -869,9 +907,9 @@ export default function App({ id, versi }) {
     );
   const dataTabelTotal = (isPenawaran) =>
     createRecapTableTotal(rekapitulasiTotal, isPenawaran);
-  const tabelPeralatan = dataTabelPeralatan(false);
-  const tabelInstalasi = dataTabelInstalasi(false);
-  const tabelTotal = dataTabelTotal(false);
+  const tabelPeralatan = dataTabelPeralatan(!isHighRole);
+  const tabelInstalasi = dataTabelInstalasi(!isHighRole);
+  const tabelTotal = dataTabelTotal(!isHighRole);
   const compRekapPeralatan = (
     <TableBottom tableData={dataTabelPeralatan(true)} />
   );
@@ -953,7 +991,7 @@ export default function App({ id, versi }) {
           </div>
         </div>
         {/* alat */}
-        {selectedProyek.versi == 0 ? (
+        {selectedProyek.versi == 0 && user.rank <= 10 ? (
           <div className="bg-white rounded-lg p-3 flex flex-col gap-2">
             <div>Alat</div>
             <Form onSubmit={terapkanButtonPress}>
@@ -1223,41 +1261,45 @@ export default function App({ id, versi }) {
                     <div className="text-right">
                       <div>
                         <Harga
-                          harga={keranjangProyek.data.reduce(
-                            (total, currentValue) => {
-                              return (
-                                total +
-                                currentValue.jumlah *
-                                  currentValue.temphargamodal
-                              );
-                            },
-                            0
-                          )}
-                          label="Sub Total Harga Modal :"
-                        />
-                      </div>
-                      <div>
-                        <Harga
                           label="Sub Total Harga Jual :"
                           harga={subTotalHargaJual}
                         />
                       </div>
-                      <div>
-                        <Harga
-                          label={"Sub Total Provit :"}
-                          harga={keranjangProyek.data.reduce(
-                            (total, currentValue) => {
-                              return (
-                                total +
-                                currentValue.jumlah *
-                                  (currentValue.harga -
-                                    currentValue.temphargamodal)
-                              );
-                            },
-                            0
-                          )}
-                        />
-                      </div>
+                      {isHighRole && (
+                        <>
+                          <div>
+                            <Harga
+                              harga={keranjangProyek.data.reduce(
+                                (total, currentValue) => {
+                                  return (
+                                    total +
+                                    currentValue.jumlah *
+                                      currentValue.temphargamodal
+                                  );
+                                },
+                                0
+                              )}
+                              label="Sub Total Harga Modal :"
+                            />
+                          </div>
+                          <div>
+                            <Harga
+                              label={"Sub Total Provit :"}
+                              harga={keranjangProyek.data.reduce(
+                                (total, currentValue) => {
+                                  return (
+                                    total +
+                                    currentValue.jumlah *
+                                      (currentValue.harga -
+                                        currentValue.temphargamodal)
+                                  );
+                                },
+                                0
+                              )}
+                            />
+                          </div>
+                        </>
+                      )}
                     </div>
                   </>
                 }
@@ -1414,41 +1456,45 @@ export default function App({ id, versi }) {
                     <div className="text-right">
                       <div>
                         <Harga
-                          harga={keranjangProyekInstalasi.data.reduce(
-                            (total, currentValue) => {
-                              return (
-                                total +
-                                currentValue.jumlah *
-                                  currentValue.temphargamodal
-                              );
-                            },
-                            0
-                          )}
-                          label="Sub Total Harga Modal :"
-                        />
-                      </div>
-                      <div>
-                        <Harga
                           label="Sub Total Harga Instalasi :"
                           harga={subTotalHargaInstalasi}
                         />
                       </div>
-                      <div>
-                        <Harga
-                          label={"Sub Total Provit :"}
-                          harga={keranjangProyekInstalasi.data.reduce(
-                            (total, currentValue) => {
-                              return (
-                                total +
-                                currentValue.jumlah *
-                                  (currentValue.harga -
-                                    currentValue.temphargamodal)
-                              );
-                            },
-                            0
-                          )}
-                        />
-                      </div>
+                      {isHighRole && (
+                        <>
+                          <div>
+                            <Harga
+                              harga={keranjangProyekInstalasi.data.reduce(
+                                (total, currentValue) => {
+                                  return (
+                                    total +
+                                    currentValue.jumlah *
+                                      currentValue.temphargamodal
+                                  );
+                                },
+                                0
+                              )}
+                              label="Sub Total Harga Modal :"
+                            />
+                          </div>
+                          <div>
+                            <Harga
+                              label={"Sub Total Provit :"}
+                              harga={keranjangProyekInstalasi.data.reduce(
+                                (total, currentValue) => {
+                                  return (
+                                    total +
+                                    currentValue.jumlah *
+                                      (currentValue.harga -
+                                        currentValue.temphargamodal)
+                                  );
+                                },
+                                0
+                              )}
+                            />
+                          </div>
+                        </>
+                      )}
                     </div>
                   </>
                 }
@@ -1594,6 +1640,7 @@ export default function App({ id, versi }) {
                   formatOptions={{
                     useGrouping: false,
                   }}
+                  className={hideComponent}
                   value={form.temphargamodal}
                   label={
                     <>
@@ -1636,6 +1683,7 @@ export default function App({ id, versi }) {
                   formatOptions={{
                     useGrouping: false,
                   }}
+                  className={hideComponent}
                   value={form.harga - form.temphargamodal || ""}
                   // label={`Harga Jual (Ref: ${form.refHarga})`}
                   label={
@@ -1658,6 +1706,7 @@ export default function App({ id, versi }) {
                   formatOptions={{
                     useGrouping: false,
                   }}
+                  className={hideComponent}
                   value={
                     Math.round(
                       countPercentProvit(
@@ -1681,22 +1730,33 @@ export default function App({ id, versi }) {
                     })
                   }
                 />
-                <div>
-                  Total Harga Modal :{" "}
-                  <Harga harga={form.temphargamodal * form.jumlah} />
-                </div>
+                {isHighRole && (
+                  <div>
+                    Total Harga Modal :{" "}
+                    <Harga harga={form.temphargamodal * form.jumlah} />
+                  </div>
+                )}
                 <div>
                   Total Harga Jual : <Harga harga={form.harga * form.jumlah} />
                 </div>
-                <div>
-                  Total Profit :{" "}
-                  <Harga
-                    harga={(form.harga - form.temphargamodal) * form.jumlah}
-                  />
-                </div>
+                {isHighRole && (
+                  <div>
+                    Total Profit :{" "}
+                    <Harga
+                      harga={(form.harga - form.temphargamodal) * form.jumlah}
+                    />
+                  </div>
+                )}
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
+                <Button
+                  color="danger"
+                  variant="light"
+                  onPress={() => {
+                    setForm({});
+                    onClose();
+                  }}
+                >
                   Batal
                 </Button>
                 <Button
