@@ -14,18 +14,15 @@ const useClientFetch = (endpoint) => {
   return useSWR(getFullPath(endpoint), fetcher, { refreshInterval: 5000 });
 };
 const useClientFetchPagination = (endpoint) => {
-  if (!endpoint) return defaultValue;
   return useSWR(getFullPath(endpoint), fetcher, {
     keepPreviousData: true,
     refreshInterval: 5000,
   });
 };
 const useClientFetchInterval = (endpoint, interval) => {
-  if (!endpoint) return defaultValue;
   return useSWR(getFullPath(endpoint), fetcher, { refreshInterval: interval });
 };
 const useClientFetchNoInterval = (endpoint) => {
-  if (!endpoint) return defaultValue;
   return useSWR(getFullPath(endpoint), fetcher);
 };
 

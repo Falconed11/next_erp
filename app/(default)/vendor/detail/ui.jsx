@@ -345,8 +345,6 @@ export default function App({ id }) {
     //   label: "Aksi",
     // },
   ];
-
-  console.log(vendor.data);
   return (
     <div>
       <div className="-w-11/12">
@@ -370,6 +368,7 @@ export default function App({ id }) {
                 page={page}
                 setPage={setPage}
                 kategori={kategori}
+                hideReadyStock
               />
             </>
           }

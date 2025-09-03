@@ -15,20 +15,23 @@ const FilterProduk = ({
   isReadyStock,
   setIsReadyStock,
   kategori,
+  hideReadyStock,
 }) => {
   return (
     <>
       <div>Filter</div>
       <div className="flex gap-3">
-        <Checkbox
-          isSelected={isReadyStock}
-          onValueChange={(v) => {
-            setIsReadyStock(v);
-            setPage(1);
-          }}
-        >
-          Stok Siap
-        </Checkbox>
+        {!hideReadyStock && (
+          <Checkbox
+            isSelected={isReadyStock}
+            onValueChange={(v) => {
+              setIsReadyStock(v);
+              setPage(1);
+            }}
+          >
+            Stok Siap
+          </Checkbox>
+        )}
         <Select
           label="Kategori"
           variant="bordered"

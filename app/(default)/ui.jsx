@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react";
 
 import "react-datepicker/dist/react-datepicker.css";
 
-export default function app() {
+export default function App() {
   const session = useSession();
   const sessionuser = session?.data?.user;
   if (session.status === "loading") return <>Loading...</>;

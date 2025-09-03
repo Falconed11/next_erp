@@ -324,6 +324,7 @@ export default function App({ id, versi }) {
     if (res.status == 400) return alert(json.message);
     // console.log(json.message);
     // return alert(json.message);
+    proyek.mutate();
   };
   const handleButtonSetAsRejectClick = async () => {
     const res = await fetch(`${api_path}updateversiproyek`, {
@@ -339,8 +340,10 @@ export default function App({ id, versi }) {
       }),
     });
     const json = await res.json();
+    if (res.status == 400) return alert(json.message);
     // console.log(json.message);
     // return alert(json.message);
+    proyek.mutate();
   };
   const handleButtonCancelDealRejectClick = async () => {
     const res = await fetch(`${api_path}updateversiproyek`, {
@@ -358,6 +361,7 @@ export default function App({ id, versi }) {
     const json = await res.json();
     // console.log(json.message);
     // return alert(json.message);
+    proyek.mutate();
   };
   const renderCell = {
     keranjangproyek: React.useCallback((data, columnKey) => {
