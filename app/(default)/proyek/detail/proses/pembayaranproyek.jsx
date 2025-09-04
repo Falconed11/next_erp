@@ -1,5 +1,11 @@
 import DatePicker from "react-datepicker";
-import { Input, NumberInput, Select, SelectItem } from "@heroui/react";
+import {
+  Input,
+  NumberInput,
+  Select,
+  SelectItem,
+  Textarea,
+} from "@heroui/react";
 import { getDate } from "@/app/utils/date";
 import Harga from "@/components/harga";
 
@@ -112,9 +118,9 @@ export default function PembayaranProyek({
           })
         }
       />
-      <Input
+      <Textarea
         type="text"
-        label="Untuk pembayaran"
+        label={`Untuk pembayaran (${form.untukpembayaran?.length})`}
         placeholder="Masukkan tujuan pembayaran!"
         value={form.untukpembayaran}
         className=""

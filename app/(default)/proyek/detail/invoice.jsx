@@ -375,7 +375,7 @@ const InvoiceTable = ({ title, data, compRecap }) => {
   return (
     <>
       <Table
-        className={`m-0 p-0 border-y border-black overscroll-none`}
+        className={`m-0 p-0 border-b border-black overscroll-none`}
         classNames={{
           wrapper: "p-0 rounded-none gap-0 overscroll-none",
           table:

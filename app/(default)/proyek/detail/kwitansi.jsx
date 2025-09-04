@@ -73,7 +73,7 @@ export default function Kwitansi({ proyek, nilaiProyek }) {
                 )}
                 <div ref={componentRef} className="bg-white text-">
                   <div className="flex">
-                    <div className="text-sm basis-3/4">
+                    <div className="text-xs basis-3/4">
                       <CompanyHeader
                         titleClassname={"font-bold text-xl"}
                         name={proyek.namaperusahaan}
@@ -119,7 +119,7 @@ export default function Kwitansi({ proyek, nilaiProyek }) {
                         }`,
                       },
                     ].map((data, i) => (
-                      <div key={i} className="flex">
+                      <div key={i} className="flex text-sm">
                         <div className="basis-1/5">{data.key}</div>
                         <div className="px-1 text-center">:</div>
                         <div className="basis-4/5 text-justify">
@@ -128,7 +128,7 @@ export default function Kwitansi({ proyek, nilaiProyek }) {
                       </div>
                     ))}
                   </div>
-                  <div className="grid grid-cols-2">
+                  <div className="grid grid-cols-2 text-sm">
                     <div className="content-center h-full p-3">
                       Terbilang : Rp.{" "}
                       <Harga harga={pembayaran[versi].nominal} />
