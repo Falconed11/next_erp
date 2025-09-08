@@ -86,7 +86,7 @@ const api_path = getApiPath();
 
 export default function App({ id, versi }) {
   const session = useSession();
-  const user = session.data?.user;
+  const sessUser = session.data?.user;
   const router = useRouter();
   const componentRef = {
     penawaran: useRef(null),
@@ -120,7 +120,18 @@ export default function App({ id, versi }) {
   const versiKeranjangProyek = useClientFetch(
     `versikeranjangproyek?id_proyek=${id}`
   );
+  const statusProyek = useClientFetch(`statusproyek?ids=1&ids=3`);
   const subProyek = useClientFetch(`subproyek?id_proyek=${id}`);
+  const sources = [
+    proyek,
+    keranjangProyek,
+    keranjangProyekInstalasi,
+    rekapitulasiProyek,
+    keteranganPenawaran,
+    versiKeranjangProyek,
+    statusProyek,
+    subProyek,
+  ];
   const [form, setForm] = useState({
     selectProduk: new Set([]),
     selectKategori: new Set([]),
@@ -601,22 +612,8 @@ export default function App({ id, versi }) {
     }
     resultInstalasi.push(item);
   });
-
-  if (proyek.error) return <div>failed to load</div>;
-  if (proyek.isLoading) return <div>loading...</div>;
-  if (keranjangProyek.error) return <div>failed to load keranjang proyek</div>;
-  if (keranjangProyek.isLoading) return <div>loading...</div>;
-  if (keranjangProyekInstalasi.error)
-    return <div>failed to load keranjang instalasi</div>;
-  if (keranjangProyekInstalasi.isLoading) return <div>loading...</div>;
-  if (rekapitulasiProyek.error) return <div>failed to load rekapitulasi</div>;
-  if (rekapitulasiProyek.isLoading) return <div>loading...</div>;
-  if (versiKeranjangProyek.error) return <div>failed to load</div>;
-  if (versiKeranjangProyek.isLoading) return <div>loading...</div>;
-  if (subProyek.error) return <div>failed to load</div>;
-  if (subProyek.isLoading) return <div>loading...</div>;
-  if (keteranganPenawaran.error) return <div>failed to load</div>;
-  if (keteranganPenawaran.isLoading) return <div>loading...</div>;
+  if (sources.some((o) => o.error)) return <div>failed to load</div>;
+  if (sources.some((o) => o.isLoading)) return <div>loading...</div>;
   if (session.status === "loading") return <>Session Loading ...</>;
 
   const keranjangProduk = keranjangProyek.data;
@@ -629,7 +626,7 @@ export default function App({ id, versi }) {
     pajak: 0,
   };
   const selectedProyek = proyek.data[0];
-  const isHighRole = highRoleCheck(user.rank);
+  const isHighRole = highRoleCheck(sessUser.rank);
   const col = {
     keranjangproyek: [
       {
@@ -923,7 +920,8 @@ export default function App({ id, versi }) {
   const compRekapTotal = (
     <TableBottom tableData={dataTabelTotal(true)} title="Rekapitulasi" />
   );
-  const hideComponent = user.rank || 21 >= 20 ? "hidden" : "";
+  const hideComponent = sessUser.rank || 21 >= 20 ? "hidden" : "";
+  console.log(statusProyek.data);
   return (
     <div>
       <div className="flex flex-row gap-2">
@@ -995,7 +993,7 @@ export default function App({ id, versi }) {
           </div>
         </div>
         {/* alat */}
-        {selectedProyek.versi == 0 && user.rank <= 10 ? (
+        {selectedProyek.versi == 0 && sessUser.rank <= 10 ? (
           <div className="bg-white rounded-lg p-3 flex flex-col gap-2">
             <div>Alat</div>
             <Form onSubmit={terapkanButtonPress}>
@@ -1065,7 +1063,7 @@ export default function App({ id, versi }) {
                   Penawaran
                 </Button>
               </div>
-              {["admin", "super"].includes(user?.peran) ? (
+              {["admin", "super"].includes(sessUser?.peran) ? (
                 selectedProyek.versi <= 0 ? (
                   <div>
                     <Button
@@ -1090,7 +1088,7 @@ export default function App({ id, versi }) {
               ) : (
                 <></>
               )}
-              {["admin", "super"].includes(user?.peran) ? (
+              {["admin", "super"].includes(sessUser?.peran) ? (
                 selectedProyek.versi != -1 ? (
                   <div>
                     <Button

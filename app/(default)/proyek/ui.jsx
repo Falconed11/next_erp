@@ -58,7 +58,7 @@ import {
   getDate,
   getDateF,
 } from "@/app/utils/date";
-import { rolesCheck } from "@/app/utils/tools";
+import { highRoleCheck, rolesCheck } from "@/app/utils/tools";
 import { FileUploader } from "@/components/input";
 import { RangeDate } from "@/components/input";
 import { LinkOpenNewTab } from "@/components/mycomponent";
@@ -71,8 +71,8 @@ const apiPath = getApiPath();
 
 export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
   const [sort, setSort] = React.useState("tanggal_penawaran");
-  const [isLoading, setIsLoading] = useState(0);
   const session = useSession();
+  const sessUser = session.data?.user;
 
   const [selectedKeys, setSelectedKeys] = React.useState(new Set([]));
   const [current, setCurrent] = useState({
@@ -86,7 +86,6 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
   const [stat, setStat] = useState(1);
   const [page, setPage] = React.useState(1);
   const rowsPerPage = 10;
-  const [selectProyek, setSelectProyek] = useState({});
   const [filteredData, setFilteredData] = useState([]);
   const proyek = useClientFetch(
     `proyek?${id_instansi ? `id_instansi=${id_instansi}` : ""}${
@@ -102,21 +101,6 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
       current.endDate
     )}`
   );
-  const disclosure = {
-    drawer: useDisclosure(),
-  };
-  const user = session.data?.user;
-  // filteredData = proyek?.data;
-  // filteredData.forEach((data) => [(data.peran = user?.peran)]);
-  useEffect(() => {
-    const updated = proyek?.data?.map((d) => ({ ...d, peran: user?.peran }));
-    setFilteredData(updated);
-  }, [proyek?.data, user?.peran]);
-  const pages = useMemo(() => {
-    return filteredData ? Math.ceil(filteredData?.length / rowsPerPage) : 0;
-  }, [filteredData?.length, rowsPerPage]);
-  const loadingState = proyek.isLoading ? "loading" : "idle";
-  const offset = (page - 1) * rowsPerPage;
   const perusahaan = useClientFetch("perusahaan");
   const karyawan = useClientFetch("karyawan");
   const statusproyek = useClientFetch("statusproyek");
@@ -124,9 +108,32 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
     `customer?${id_instansi ? `id=${id_instansi}` : ""}`
   );
   const kategoriproyek = useClientFetch("kategoriproyek");
+  const sources = [
+    proyek,
+    penawaran,
+    perusahaan,
+    karyawan,
+    statusproyek,
+    customer,
+    kategoriproyek,
+  ];
   const [form, setForm] = useState({});
   const [method, setMethod] = useState("POST");
   const [json, setJson] = useState([]);
+  // filteredData = proyek?.data;
+  // filteredData.forEach((data) => [(data.peran = sessUser?.peran)]);
+  useEffect(() => {
+    const updated = proyek?.data?.map((d) => ({
+      ...d,
+      peran: sessUser?.peran,
+    }));
+    setFilteredData(updated);
+  }, [proyek?.data, sessUser?.peran]);
+  const pages = useMemo(() => {
+    return filteredData ? Math.ceil(filteredData?.length / rowsPerPage) : 0;
+  }, [filteredData?.length, rowsPerPage]);
+  const loadingState = proyek.isLoading ? "loading" : "idle";
+  const offset = (page - 1) * rowsPerPage;
   const saveButtonPress = async (onClose) => {
     // if (form.isSwasta.size == 0) return alert("Swasta/Negri belum diisi");
     const res = await fetch(`${apiPath}proyek`, {
@@ -416,22 +423,10 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [reportList, setReportList] = useState([]);
   const report = useDisclosure();
-  if (isLoading) return <div>loading...</div>;
-  if (proyek.error) return <div>failed to load</div>;
-  if (proyek.isLoading) return <div>loading...</div>;
-  if (karyawan.error) return <div>failed to load</div>;
-  if (karyawan.isLoading) return <div>loading...</div>;
-  if (perusahaan.error) return <div>failed to load</div>;
-  if (perusahaan.isLoading) return <div>loading...</div>;
-  if (statusproyek.error) return <div>failed to load</div>;
-  if (statusproyek.isLoading) return <div>loading...</div>;
-  if (customer.error) return <div>failed to load</div>;
-  if (customer.isLoading) return <div>loading...</div>;
-  if (kategoriproyek.error) return <div>failed to load</div>;
-  if (kategoriproyek.isLoading) return <div>loading...</div>;
-  if (penawaran.error) return <div>failed to load</div>;
-  if (penawaran.isLoading) return <div>loading...</div>;
-  if (session.data?.user == undefined) return <div>loading...</div>;
+  if (sources.some((o) => o.error)) return <div>failed to load</div>;
+  if (sources.some((o) => o.isLoading)) return <div>loading...</div>;
+  if (session.status === "loading") return <>Loading...</>;
+  const isHighRole = highRoleCheck(sessUser.rank);
   const columns = [
     // {
     //   key: "id",
@@ -488,10 +483,14 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
       key: "totalpenawaran",
       label: "Penawaran",
     },
-    {
-      key: "pengeluaranproyek",
-      label: "Pengeluaran Proyek",
-    },
+    ...(isHighRole
+      ? [
+          {
+            key: "pengeluaranproyek",
+            label: "Pengeluaran Proyek",
+          },
+        ]
+      : []),
     {
       key: "tanggal_penawaran",
       label: "Tanggal Penawaran",

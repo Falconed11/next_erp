@@ -1,5 +1,5 @@
+// https://reactsvgicons.com/
 import React from "react";
-
 const AddIcon = (props) => {
   return (
     <svg
@@ -20,6 +20,23 @@ const AddIcon = (props) => {
     </svg>
   );
 };
+const BusinessProgressBarIcon = (props) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 14 14"
+    width="1em"
+    height="1em"
+    {...props}
+  >
+    <path
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M5.5 12.5a1.5 1.5 0 1 0 0-3a1.5 1.5 0 0 0 0 3M.5 11H4m3 0h6.5m-2-2l2 2l-2 2m-6-3.5V1m0 0L10 3.5L5.5 6z"
+    ></path>
+  </svg>
+);
 const UserIcon = (props) => (
   <svg
     viewBox="0 0 1024 1024"
@@ -332,6 +349,7 @@ const DangerTriangleBrokenIcon = (props) => {
 
 export {
   AddIcon,
+  BusinessProgressBarIcon,
   EditIcon,
   DeleteIcon,
   EyeIcon,
@@ -348,7 +366,6 @@ export {
   DangerTriangleBrokenIcon,
 };
 
-// https://reactsvgicons.com/
 // module.exports = {
 //   AddIcon,
 //   EditIcon,
