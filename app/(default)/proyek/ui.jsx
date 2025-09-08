@@ -51,6 +51,7 @@ import {
   ReportMoneyIcon,
   FileExportIcon,
   DangerTriangleBrokenIcon,
+  BusinessProgressBarIcon,
 } from "@/components/icon";
 import {
   getCurFirstLastDay,
@@ -337,6 +338,13 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
       case "aksi":
         return (
           <div className="relative flex items-center gap-2">
+            <LinkOpenNewTab
+              content="Prospek"
+              link={`/proyek/prospek?id=${data.id}&versi=${
+                data.versi <= 0 ? "1" : data.versi
+              }`}
+              icon={<BusinessProgressBarIcon />}
+            />
             <LinkOpenNewTab
               content="Penawaran"
               link={`/proyek/detail?id=${data.id}&versi=${
