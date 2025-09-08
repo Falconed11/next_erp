@@ -108,7 +108,7 @@ const RecapTable = ({ tableData }) => {
   return (
     <div>
       {tableData.map((v, i) => (
-        <div key={i} className="grid grid-cols-2 leading-[1.1]">
+        <div key={i} className="grid grid-cols-2 leading-[1.1]-">
           <div className={`${v.classNames}`}>{v.key}</div>
           <div className={`text-right ${v.classNames}`}>
             {v.info ? `(${v.info}%) ` : ""}

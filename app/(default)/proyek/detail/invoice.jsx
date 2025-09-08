@@ -382,7 +382,7 @@ const InvoiceTable = ({ title, data, compRecap }) => {
             "m-0 p-0 border-b border-black border-collapse rounded-none overscroll-none",
           thead: "rounded-none bg-transparent [&>tr:last-child]:hidden",
           th: "border-y border-black text-black bg-transparent px-0 py-0 h-0",
-          td: "px-0 py-0 text-xs leading-none align-top",
+          td: "px-0 py-0 text-xs leading-none- align-top",
           tr: "m-0 p-0",
           base: "rounded-none shadow-none overscroll-none",
         }}

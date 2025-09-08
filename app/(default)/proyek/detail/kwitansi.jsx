@@ -129,12 +129,13 @@ export default function Kwitansi({ proyek, nilaiProyek }) {
                     ))}
                   </div>
                   <div className="grid grid-cols-2 text-sm">
-                    <div className="content-center h-full p-3">
+                    <div className="content-center- h-full p-3">
                       Terbilang : Rp.{" "}
                       <Harga harga={pembayaran[versi].nominal} />
                       ,00
                     </div>
                     <div className="text-right">
+                      <br />
                       <div className="grid grid-cols-4">
                         <div></div>
                         <div className="text-center col-span-3">
