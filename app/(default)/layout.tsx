@@ -19,25 +19,44 @@ export default function RootLayout({
       name: "Proyek",
       href: "",
     },
+    ...(rolesCheck(["admin", "super"], user?.peran)
+      ? [
+          {
+            key: "pengeluaran",
+            name: "Pengeluaran",
+            href: "/pengeluaran",
+          },
+          {
+            key: "pembayaran",
+            name: "Pembayaran",
+            href: "/pembayaran",
+          },
+        ]
+      : []),
+    {
+      key: "aktivitassales",
+      name: "Aktivitas Sales",
+      href: "/aktivitassales",
+    },
     // {
     //     key: "kategori",
     //     name: "Kategori",
     //     href: "/kategori"
     // },
   ];
-  if (user?.peran == "admin" || user?.peran == "super")
-    proyek.push(
-      {
-        key: "pengeluaran",
-        name: "Pengeluaran",
-        href: "/pengeluaran",
-      },
-      {
-        key: "pembayaran",
-        name: "Pembayaran",
-        href: "/pembayaran",
-      }
-    );
+  // if (user?.peran == "admin" || user?.peran == "super")
+  //   proyek.push(
+  //     {
+  //       key: "pengeluaran",
+  //       name: "Pengeluaran",
+  //       href: "/pengeluaran",
+  //     },
+  //     {
+  //       key: "pembayaran",
+  //       name: "Pembayaran",
+  //       href: "/pembayaran",
+  //     }
+  //   );
   const links = [
     { href: "/", name: "Dashboard" },
     {
@@ -62,10 +81,10 @@ export default function RootLayout({
       ],
     },
   ];
-  if (rolesCheck(["head-sales", "sales"], user?.peran))
-    links.push({ href: "/proyek", name: "Proyek" });
-  if (rolesCheck(["admin", "super"], user?.peran))
-    links.push({ href: "/proyek", name: "Proyek", dropdown: proyek });
+  // if (rolesCheck(["head-sales", "sales"], user?.peran))
+  //   links.push({ href: "/proyek", name: "Proyek", dropdown: proyek });
+  // if (rolesCheck(["admin", "super"], user?.peran))
+  links.push({ href: "/proyek", name: "Proyek", dropdown: proyek });
   if (user?.peran == "admin" || user?.peran == "super")
     links.push(
       // { href: "/nota", name: "Nota" },

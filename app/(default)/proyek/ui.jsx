@@ -339,8 +339,8 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
         return (
           <div className="relative flex items-center gap-2">
             <LinkOpenNewTab
-              content="Prospek"
-              link={`/proyek/prospek?id=${data.id}&versi=${
+              content="Aktivitas Sales"
+              link={`/proyek/aktivitassales?id=${data.id}&versi=${
                 data.versi <= 0 ? "1" : data.versi
               }`}
               icon={<BusinessProgressBarIcon />}
@@ -436,6 +436,10 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
   if (session.status === "loading") return <>Loading...</>;
   const isHighRole = highRoleCheck(sessUser.rank);
   const columns = [
+    {
+      key: "aksi",
+      label: "Aksi",
+    },
     // {
     //   key: "id",
     //   label: "Id",
@@ -510,10 +514,6 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
     {
       key: "keterangan",
       label: "Keterangan",
-    },
-    {
-      key: "aksi",
-      label: "Aksi",
     }
   );
   const isSwasta = [
@@ -652,35 +652,37 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
                           </div>
                         </div>
                       </div>
-                      <div className="text-center text-sm">
-                        <div className="gap-2 flex flex-col">
-                          <div>Modal</div>
-                          <div className="px-2 py-1 text-white rounded-large bg-primary">
-                            <div>Total</div>
-                            <div>
-                              <Harga harga={summary.totalModal} />
+                      {isHighRole && (
+                        <div className="text-center text-sm">
+                          <div className="gap-2 flex flex-col">
+                            <div>Modal</div>
+                            <div className="px-2 py-1 text-white rounded-large bg-primary">
+                              <div>Total</div>
+                              <div>
+                                <Harga harga={summary.totalModal} />
+                              </div>
                             </div>
-                          </div>
-                          <div className="px-2 py-1 rounded-large bg-warning">
-                            <div>Waiting</div>
-                            <div>
-                              <Harga harga={summary.totalModalWaiting} />
+                            <div className="px-2 py-1 rounded-large bg-warning">
+                              <div>Waiting</div>
+                              <div>
+                                <Harga harga={summary.totalModalWaiting} />
+                              </div>
                             </div>
-                          </div>
-                          <div className="px-2 py-1 rounded-large bg-success">
-                            <div>Deal</div>
-                            <div>
-                              <Harga harga={summary.totalModalDeal} />
+                            <div className="px-2 py-1 rounded-large bg-success">
+                              <div>Deal</div>
+                              <div>
+                                <Harga harga={summary.totalModalDeal} />
+                              </div>
                             </div>
-                          </div>
-                          <div className="px-2 py-1 text-white rounded-large bg-danger">
-                            <div>Reject</div>
-                            <div>
-                              <Harga harga={summary.totalModalReject} />
+                            <div className="px-2 py-1 text-white rounded-large bg-danger">
+                              <div>Reject</div>
+                              <div>
+                                <Harga harga={summary.totalModalReject} />
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
+                      )}
                       <div className="text-center text-sm">
                         <div className="gap-2 flex flex-col">
                           <div>Nilai Penawaran</div>
@@ -716,50 +718,52 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
                           </div>
                         </div>
                       </div>
-                      <div className="text-center text-sm">
-                        <div className="gap-2 flex flex-col">
-                          <div>Provit</div>
-                          <div className="px-2 py-1 text-white rounded-large bg-primary">
-                            <div>Total</div>
-                            <div>
-                              <Harga harga={summary.totalProvit} />
+                      {isHighRole && (
+                        <div className="text-center text-sm">
+                          <div className="gap-2 flex flex-col">
+                            <div>Provit</div>
+                            <div className="px-2 py-1 text-white rounded-large bg-primary">
+                              <div>Total</div>
+                              <div>
+                                <Harga harga={summary.totalProvit} />
+                              </div>
                             </div>
-                          </div>
-                          <div className="px-2 py-1 rounded-large bg-warning">
-                            <div>Waiting</div>
-                            <div>
-                              <Harga
-                                harga={
-                                  summary.totalPenawaranWaiting -
-                                  summary.totalModalWaiting
-                                }
-                              />
+                            <div className="px-2 py-1 rounded-large bg-warning">
+                              <div>Waiting</div>
+                              <div>
+                                <Harga
+                                  harga={
+                                    summary.totalPenawaranWaiting -
+                                    summary.totalModalWaiting
+                                  }
+                                />
+                              </div>
                             </div>
-                          </div>
-                          <div className="px-2 py-1 rounded-large bg-success">
-                            <div>Deal</div>
-                            <div>
-                              <Harga
-                                harga={
-                                  summary.totalPenawaranDeal -
-                                  summary.totalModalDeal
-                                }
-                              />
+                            <div className="px-2 py-1 rounded-large bg-success">
+                              <div>Deal</div>
+                              <div>
+                                <Harga
+                                  harga={
+                                    summary.totalPenawaranDeal -
+                                    summary.totalModalDeal
+                                  }
+                                />
+                              </div>
                             </div>
-                          </div>
-                          <div className="px-2 py-1 text-white rounded-large bg-danger">
-                            <div>Reject</div>
-                            <div>
-                              <Harga
-                                harga={
-                                  summary.totalPenawaranReject -
-                                  summary.totalModalReject
-                                }
-                              />
+                            <div className="px-2 py-1 text-white rounded-large bg-danger">
+                              <div>Reject</div>
+                              <div>
+                                <Harga
+                                  harga={
+                                    summary.totalPenawaranReject -
+                                    summary.totalModalReject
+                                  }
+                                />
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -890,7 +894,6 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
                   selectedKeys={form.selectkaryawan}
                   className="max-w-xs"
                   onSelectionChange={(val) => {
-                    console.log(val);
                     setForm({
                       ...form,
                       selectkaryawan: val,
