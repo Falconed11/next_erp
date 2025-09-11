@@ -345,6 +345,7 @@ export default function App({ id }) {
     // return alert(json.message);
   };
 
+  const isHighRole = highRoleCheck(sessUser?.rank);
   const renderCell = {
     pengeluaranproyek: React.useCallback(
       (data, columnKey) => {
@@ -554,7 +555,6 @@ export default function App({ id }) {
     if (data.isLoading) return <div>Loading {name}...</div>;
   }
   if (session.status === "loading") return <>Session Loading ...</>;
-  const isHighRole = highRoleCheck(sessUser.rank);
   const selectedProyek = proyek.data[0];
   const { rekapitulasiPeralatan, rekapitulasiInstalasi, rekapitulasiTotal } =
     countRecapitulation(

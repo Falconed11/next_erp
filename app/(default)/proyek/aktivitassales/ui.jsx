@@ -20,6 +20,7 @@ import {
   DeleteIcon,
   EyeIcon,
   UserIcon,
+  NoteIcon,
 } from "@/components/icon";
 import {
   Modal,
@@ -45,7 +46,7 @@ import Image from "next/image";
 import logo from "@/public/logofinal.jpg";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { NavLinkNewTab } from "@/components/mycomponent";
+import { NavLinkNewTab, LinkOpenNewTab } from "@/components/mycomponent";
 import { highRoleCheck } from "@/app/utils/tools";
 import { useSession } from "next-auth/react";
 
@@ -58,7 +59,7 @@ export default function App({ id }) {
 
   const proyek = useClientFetch(id ? `proyek?id=${id}` : "");
   const aktivitassales = useClientFetch(
-    `aktivitassales?${id ? `id_proyek=${id}` : ""}`
+    `aktivitassales?${id ? `id_proyek=${id}` : "groupbyproyek=true"}`
   );
   const karyawan = useClientFetch(`karyawan`);
   const selectedVersion = proyek.data?.[0]?.versi || 0;
@@ -224,6 +225,13 @@ export default function App({ id }) {
                     <EditIcon />
                   </span>
                 </Tooltip>
+                <LinkOpenNewTab
+                  content="Riwayat"
+                  link={`/proyek/aktivitassales?id=${data.id_proyek}&versi=${
+                    data.versi <= 0 ? "1" : data.versi
+                  }`}
+                  icon={<NoteIcon />}
+                />
                 <Tooltip color="danger" content="Delete">
                   <span
                     onClick={() => deleteButtonPress(data)}
@@ -262,7 +270,11 @@ export default function App({ id }) {
         : [
             {
               key: "instansi",
-              label: "Karyawan",
+              label: "Instansi",
+            },
+            {
+              key: "jumlahaktivitas",
+              label: "Jumlah Aktivitas",
             },
           ]),
       {
@@ -311,7 +323,7 @@ export default function App({ id }) {
                 Tambah
               </Button>
             </div>
-            <div className="flex gap-2">
+            {/* <div className="flex gap-2">
               <NavLinkNewTab
                 href={`/proyek/detail?id=${selectedProyek.id}&versi=${
                   selectedProyek.versi <= 0 ? "1" : selectedProyek.versi
@@ -319,7 +331,7 @@ export default function App({ id }) {
               >
                 {"Penawaran ==>>"}
               </NavLinkNewTab>
-            </div>
+            </div> */}
           </>
         )}
       </div>

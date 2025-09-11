@@ -247,7 +247,7 @@ export default function App({ id, versi }) {
   };
   const simpanButtonPress = async (data, onClose) => {
     // if (data.jumlah <= 0) return alert("Jumlah belum diisi");
-    if (data.provitmarginpersen > 99)
+    if (data.provitmarginpersen > 99 && data.hargamodal)
       return alert("Provit margin tidak boleh lebi dari 99.");
     const res = await fetch(`${api_path}keranjangproyek`, {
       method: "PUT",
@@ -629,6 +629,14 @@ export default function App({ id, versi }) {
   const isHighRole = highRoleCheck(sessUser.rank);
   const col = {
     keranjangproyek: [
+      ...(selectedProyek.versi
+        ? []
+        : [
+            {
+              key: "aksi",
+              label: "Aksi",
+            },
+          ]),
       {
         key: "kategoriproduk",
         label: "Kategori",
@@ -723,6 +731,14 @@ export default function App({ id, versi }) {
         : []),
     ],
     instalasi: [
+      ...(selectedProyek.versi
+        ? []
+        : [
+            {
+              key: "aksi",
+              label: "Aksi",
+            },
+          ]),
       {
         key: "kategoriproduk",
         label: "Kategori",
@@ -851,16 +867,6 @@ export default function App({ id, versi }) {
       },
     ],
   };
-  if (selectedProyek.versi == 0) {
-    col.keranjangproyek.push({
-      key: "aksi",
-      label: "Aksi",
-    });
-    col.instalasi.push({
-      key: "aksi",
-      label: "Aksi",
-    });
-  }
   const selectedRekapitulasiProyek = rekapitulasiProyek.data[0];
   const kategoriProyek = [];
   if (selectedRekapitulasiProyek) {
@@ -920,8 +926,7 @@ export default function App({ id, versi }) {
   const compRekapTotal = (
     <TableBottom tableData={dataTabelTotal(true)} title="Rekapitulasi" />
   );
-  const hideComponent = sessUser.rank || 21 >= 20 ? "hidden" : "";
-  console.log(statusProyek.data);
+  const hideComponent = isHighRole ? "" : "hidden";
   return (
     <div>
       <div className="flex flex-row gap-2">
@@ -1159,6 +1164,7 @@ export default function App({ id, versi }) {
                             setForm={setForm}
                             disableStok
                             disableVendor
+                            rank={sessUser.rank}
                             customInput={
                               <>
                                 <NumberInput
@@ -1345,6 +1351,7 @@ export default function App({ id, versi }) {
                             setForm={setFormInstalasi}
                             disableStok
                             disableVendor
+                            rank={sessUser.rank}
                             customInput={
                               <>
                                 <NumberInput

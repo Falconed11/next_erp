@@ -104,7 +104,7 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
   );
   const perusahaan = useClientFetch("perusahaan");
   const karyawan = useClientFetch("karyawan");
-  const statusproyek = useClientFetch("statusproyek");
+  const statusproyek = useClientFetch("statusproyek?ids=1&ids=3");
   const customer = useClientFetch(
     `customer?${id_instansi ? `id=${id_instansi}` : ""}`
   );
@@ -167,6 +167,7 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
       tanggal: getDate(new Date()),
       startdate: new Date(),
       keterangan: "",
+      id_statusproyek: 1,
     });
     setMethod("POST");
     onOpen();
@@ -827,25 +828,51 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
               </ModalHeader>
               <ModalBody>
                 <Select
-                  label="Perusahaan"
+                  label="Status"
                   variant="bordered"
-                  placeholder="Pilih perusahaan!"
-                  selectedKeys={form.selectperusahaan}
+                  placeholder="Pilih status!"
+                  disallowEmptySelection
+                  selectedKeys={
+                    new Set(
+                      form.id_statusproyek ? [String(form.id_statusproyek)] : []
+                    )
+                  }
                   className="max-w-xs"
                   onSelectionChange={(val) => {
                     setForm({
                       ...form,
-                      selectperusahaan: val,
-                      id_perusahaan: new Set(val).values().next().value,
+                      id_statusproyek: new Set(val).values().next().value,
                     });
                   }}
                 >
-                  {perusahaan.data.map((item) => (
+                  {statusproyek.data.map((item) => (
                     <SelectItem key={item.id} value={item.id}>
                       {item.nama}
                     </SelectItem>
                   ))}
                 </Select>
+                {form.id_statusproyek == 1 && (
+                  <Select
+                    label="Perusahaan"
+                    variant="bordered"
+                    placeholder="Pilih perusahaan!"
+                    selectedKeys={form.selectperusahaan}
+                    className="max-w-xs"
+                    onSelectionChange={(val) => {
+                      setForm({
+                        ...form,
+                        selectperusahaan: val,
+                        id_perusahaan: new Set(val).values().next().value,
+                      });
+                    }}
+                  >
+                    {perusahaan.data.map((item) => (
+                      <SelectItem key={item.id} value={item.id}>
+                        {item.nama}
+                      </SelectItem>
+                    ))}
+                  </Select>
+                )}
                 <Autocomplete
                   label="Customer"
                   variant="bordered"
@@ -880,13 +907,15 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
                   value={form.klien}
                   onValueChange={(val) => setForm({ ...form, klien: val })}
                 />
-                <Input
-                  type="text"
-                  label="No PO"
-                  placeholder="Masukkan no. PO!"
-                  value={form.id_po}
-                  onValueChange={(val) => setForm({ ...form, id_po: val })}
-                />
+                {form.id_statusproyek == 1 && (
+                  <Input
+                    type="text"
+                    label="No PO"
+                    placeholder="Masukkan no. PO!"
+                    value={form.id_po}
+                    onValueChange={(val) => setForm({ ...form, id_po: val })}
+                  />
+                )}
                 <Select
                   label="Sales"
                   variant="bordered"
@@ -911,17 +940,19 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
                     </SelectItem>
                   ))}
                 </Select>
-                <div className="bg-gray-100 p-3 rounded-lg">
-                  <div>Tanggal Penawaran</div>
-                  <DatePicker
-                    placeholderText="Pilih tanggal"
-                    dateFormat="dd/MM/yyyy"
-                    selected={form.startdate}
-                    onChange={(v) =>
-                      setForm({ ...form, startdate: v, tanggal: getDate(v) })
-                    }
-                  />
-                </div>
+                {form.id_statusproyek == 1 && (
+                  <div className="bg-gray-100 p-3 rounded-lg">
+                    <div>Tanggal Penawaran</div>
+                    <DatePicker
+                      placeholderText="Pilih tanggal"
+                      dateFormat="dd/MM/yyyy"
+                      selected={form.startdate}
+                      onChange={(v) =>
+                        setForm({ ...form, startdate: v, tanggal: getDate(v) })
+                      }
+                    />
+                  </div>
+                )}
                 <Textarea
                   label="Keterangan"
                   labelPlacement="inside"

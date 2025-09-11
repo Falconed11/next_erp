@@ -257,12 +257,17 @@ export default function Invoice({
                             </div>
                             <div className="flex">
                               <div className="basis-2/4">
-                                Pembayaran melalui : Rek.{" "}
-                                {dataPembayaranVersi.at(-1)?.nama_bank} :{" "}
-                                {dataPembayaranVersi.at(-1)?.norekening}
+                                Pembayaran melalui :{" "}
+                                {dataPembayaranVersi.at(-1)?.norekening &&
+                                  "Rek. "}
+                                {dataPembayaranVersi.at(-1)?.nama_bank}
+                                {dataPembayaranVersi.at(-1)?.norekening &&
+                                  " : " +
+                                    dataPembayaranVersi.at(-1)?.norekening}
                               </div>
                               <div className="basis-2/4">
-                                An. {dataPembayaranVersi.at(-1)?.atasnama}
+                                {dataPembayaranVersi.at(-1)?.atasnama &&
+                                  "An. " + dataPembayaranVersi.at(-1)?.atasnama}
                               </div>
                             </div>
                             <div className="flex flex-col no-break">

@@ -71,7 +71,7 @@ export default function TambahProduk({
   );
   fvendor = fvendor.slice(0, 100);
   const selectProduk = produk.data.filter((v) => v.id == form.selectProduk)[0];
-  const hideComponent = rank >= 20 ? "hidden" : "";
+  const hideComponent = isHighRole ? "" : "hidden";
   // console.log(form.selectProduk);
   // console.log({ nama });
   return (
@@ -216,13 +216,13 @@ export default function TambahProduk({
         formatOptions={{
           useGrouping: false,
         }}
-        errorMessage={
-          <ul>
-            {errorsJumlah.map((error, i) => (
-              <li key={i}>{error}</li>
-            ))}
-          </ul>
-        }
+        // errorMessage={
+        //   <ul>
+        //     {errorsJumlah.map((error, i) => (
+        //       <li key={i}>{error}</li>
+        //     ))}
+        //   </ul>
+        // }
         isInvalid={errorsJumlah.length > 0}
         value={form.jumlah}
         label="Jumlah"
