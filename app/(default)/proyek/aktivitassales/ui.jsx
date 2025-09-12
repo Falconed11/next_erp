@@ -36,6 +36,7 @@ import { getDateF, getDateFId, getDate } from "@/app/utils/date";
 import Harga from "@/components/harga";
 import DetailProyek from "@/components/detailproyek";
 import TambahProduk from "@/components/tambahproduk";
+import SelectStatusProyek from "@/components/selectstatusproyek";
 import { Button } from "@heroui/react";
 import { Input } from "@heroui/react";
 import { Divider } from "@heroui/react";
@@ -56,17 +57,20 @@ export default function App({ id }) {
   const session = useSession();
   const sessUser = session.data?.user;
   const [form, setForm] = useState({});
+  const [selectStatusProyek, setSelectStatusProyek] = useState(id ? null : 3);
 
-  const proyek = useClientFetch(id ? `proyek?id=${id}` : "");
   const aktivitassales = useClientFetch(
-    `aktivitassales?${id ? `id_proyek=${id}` : "groupbyproyek=true"}`
+    `aktivitassales?${id ? `id_proyek=${id}` : "groupbyproyek=true"}${
+      selectStatusProyek ? `&id_statusproyek=${selectStatusProyek}` : ""
+    }`
   );
   const karyawan = useClientFetch(`karyawan`);
+  const proyek = useClientFetch(id ? `proyek?id=${id}` : "");
   const selectedVersion = proyek.data?.[0]?.versi || 0;
   const queries = {
-    proyek,
-    karyawan,
     aktivitassales,
+    karyawan,
+    proyek,
   };
 
   const editButtonPress = (data) => {
@@ -269,6 +273,10 @@ export default function App({ id }) {
         ? []
         : [
             {
+              key: "statusproyek",
+              label: "Status",
+            },
+            {
               key: "instansi",
               label: "Instansi",
             },
@@ -347,7 +355,20 @@ export default function App({ id }) {
       <Table
         className="z-10"
         aria-label="Example table with custom cells"
-        topContent="Aktivitas Sales"
+        topContent={
+          <div className="flex flex-col">
+            <div>Aktivitas Sales</div>
+            {!id && (
+              <>
+                <div>Filter :</div>
+                <SelectStatusProyek
+                  select={selectStatusProyek}
+                  setSelect={setSelectStatusProyek}
+                />
+              </>
+            )}
+          </div>
+        }
       >
         <TableHeader columns={col.aktivitassales}>
           {(column) => (

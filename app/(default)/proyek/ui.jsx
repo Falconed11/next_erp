@@ -67,6 +67,7 @@ import Harga from "@/components/harga";
 import { ShowHideComponent } from "@/components/componentmanipulation";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import SelectStatusProyek from "@/components/selectstatusproyek";
 
 const apiPath = getApiPath();
 
@@ -88,6 +89,7 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
   const [page, setPage] = React.useState(1);
   const rowsPerPage = 10;
   const [filteredData, setFilteredData] = useState([]);
+  const [selectStatusProyek, setSelectStatusProyek] = useState();
   const proyek = useClientFetch(
     `proyek?${id_instansi ? `id_instansi=${id_instansi}` : ""}${
       selectkaryawan.size > 0
@@ -95,6 +97,8 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
         : ""
     }${current.startDate ? `&start=${getDate(current.startDate)}` : ""}${
       current.endDate ? `&end=${getDate(current.endDate)}` : ""
+    }${
+      selectStatusProyek ? `&id_statusproyek=${selectStatusProyek}` : ""
     }&sort=${sort}`
   );
   const penawaran = useClientFetch(
@@ -347,7 +351,7 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
               icon={<BusinessProgressBarIcon />}
             />
             <LinkOpenNewTab
-              content="Penawaran"
+              content="Detail"
               link={`/proyek/detail?id=${data.id}&versi=${
                 data.versi <= 0 ? "1" : data.versi
               }`}
@@ -627,6 +631,10 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
                         </SelectItem>
                       ))}
                     </Select>
+                    <SelectStatusProyek
+                      select={selectStatusProyek}
+                      setSelect={setSelectStatusProyek}
+                    />
                   </div>
                   {/* Ringkasan */}
                   <div>

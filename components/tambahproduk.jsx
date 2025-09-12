@@ -74,12 +74,14 @@ export default function TambahProduk({
   const hideComponent = isHighRole ? "" : "hidden";
   // console.log(form.selectProduk);
   // console.log({ nama });
+  const defStyleFormWidth = "w-2/12";
   return (
     <div className="w-max flex flex-wrap gap-3">
       <Select
         label="Kategori"
         placeholder="Pilih kategori!"
-        className="w-3/12"
+        className={defStyleFormWidth}
+        classNames={{ popoverContent: "w-fit" }}
         selectedKeys={form.selectKategori}
         onSelectionChange={(v) => {
           setForm({
@@ -92,7 +94,7 @@ export default function TambahProduk({
         }}
       >
         {kategori.data.map((item) => (
-          <SelectItem key={item.id} value={item.id}>
+          <SelectItem className="" key={item.id} value={item.id}>
             {item.nama}
           </SelectItem>
         ))}
@@ -152,7 +154,7 @@ export default function TambahProduk({
           variant="bordered"
           defaultItems={fvendor}
           placeholder="Pilih vendor"
-          className="w-3/12"
+          className={defStyleFormWidth}
           selectedKey={form.selectVendor}
           onSelectionChange={(v) => {
             setForm({
@@ -197,7 +199,7 @@ export default function TambahProduk({
         disabled
         label="Stok"
         // placeholder="Masukkan jumlah!"
-        className="w-3/12"
+        className={defStyleFormWidth}
         endContent={
           <div className="pointer-events-none flex items-center">
             <span className="text-default-400 text-small"></span>
@@ -227,7 +229,7 @@ export default function TambahProduk({
         value={form.jumlah}
         label="Jumlah"
         placeholder="Masukkan jumlah!"
-        className="w-3/12"
+        className={defStyleFormWidth}
         endContent={
           <div className="pointer-events-none flex items-center">
             <span className="text-default-400 text-small"></span>
@@ -251,7 +253,7 @@ export default function TambahProduk({
           value={form.hargamodal}
           label={<>Harga Modal (Ref: {<Harga harga={form.oldHargaModal} />})</>}
           placeholder="Masukkan harga!"
-          className={`w-3/12 ${hideComponent}`}
+          className={`${defStyleFormWidth} ${hideComponent}`}
           onValueChange={(v) =>
             setForm({
               ...form,
@@ -304,7 +306,9 @@ export default function TambahProduk({
         //   }
         // )`}
         placeholder="Masukkan harga!"
-        className={`w-3/12${!isHighRole && form.isSelected ? " hidden" : ""}`}
+        className={`${defStyleFormWidth} ${
+          !isHighRole && form.isSelected ? " hidden" : ""
+        }`}
         onValueChange={(v) =>
           setForm({
             ...form,

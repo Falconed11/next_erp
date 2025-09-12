@@ -927,6 +927,7 @@ export default function App({ id, versi }) {
     <TableBottom tableData={dataTabelTotal(true)} title="Rekapitulasi" />
   );
   const hideComponent = isHighRole ? "" : "hidden";
+  const defStyleFormWidth = "w-2/12";
   return (
     <div>
       <div className="flex flex-row gap-2">
@@ -1144,7 +1145,7 @@ export default function App({ id, versi }) {
                 {"Pengeluaran & Pembayaran ==>>"}
               </NavLinkNewTab>
             </div>
-            <div className="-w-11/12">
+            <div className="w-9/12-">
               {/* sub proyek */}
               <SubProyek id={id} selectedProyek={selectedProyek} />
               {/* tabel peralatan */}
@@ -1158,97 +1159,99 @@ export default function App({ id, versi }) {
                     <ConditionalComponent
                       condition={selectedProyek.versi == 0}
                       component={
-                        <div className="flex flex-col gap-2">
-                          <TambahProduk
-                            form={form}
-                            setForm={setForm}
-                            disableStok
-                            disableVendor
-                            rank={sessUser.rank}
-                            customInput={
-                              <>
-                                <NumberInput
-                                  hideStepper
-                                  isWheelDisabled
-                                  formatOptions={{
-                                    useGrouping: false,
-                                  }}
-                                  className={`w-3/12 ${hideComponent}`}
-                                  value={form.harga - form.hargamodal || ""}
-                                  label={"Provit"}
-                                  placeholder="Masukkan provit!"
-                                  onValueChange={(v) => {
-                                    setForm({
-                                      ...form,
-                                      harga: form.hargamodal + v || "",
-                                    });
-                                  }}
-                                />
-                                <NumberInput
-                                  hideStepper
-                                  isWheelDisabled
-                                  formatOptions={{
-                                    useGrouping: false,
-                                  }}
-                                  className={`w-3/12" ${hideComponent}`}
-                                  value={
-                                    Math.round(
-                                      countPercentProvit(
-                                        form.hargamodal,
-                                        form.harga
-                                      ) * 100
-                                    ) / 100 || ""
-                                  }
-                                  label={"Provit (%)"}
-                                  placeholder="Masukkan provit %!"
-                                  onValueChange={(v) => {
-                                    setForm({
-                                      ...form,
-                                      harga:
-                                        Math.round(
-                                          countPriceByPercentProfit(
-                                            form.hargamodal,
-                                            v
-                                          )
-                                        ) || "",
-                                    });
-                                  }}
-                                />
-                                <Input
-                                  type="text"
-                                  value={form.keterangan}
-                                  label="Nama Kustom"
-                                  placeholder="Masukkan nama kustom! (Opsional)"
-                                  // placeholder="Masukkan jumlah!"
-                                  className="w-3/12"
-                                  onValueChange={(v) =>
-                                    setForm({
-                                      ...form,
-                                      keterangan: v,
-                                    })
-                                  }
-                                />
-                                <Select
-                                  label="Sub Proyek"
-                                  placeholder="Pilih subproyek! (Opsional)"
-                                  className="w-3/12"
-                                  selectedKeys={form.selectSubProyek}
-                                  onSelectionChange={(v) => {
-                                    setForm({
-                                      ...form,
-                                      selectSubProyek: v,
-                                    });
-                                  }}
-                                >
-                                  {subProyek.data.map((item) => (
-                                    <SelectItem key={item.id} value={item.id}>
-                                      {item.nama}
-                                    </SelectItem>
-                                  ))}
-                                </Select>
-                              </>
-                            }
-                          />
+                        <>
+                          <div className="flex gap-2 w-9/12">
+                            <TambahProduk
+                              form={form}
+                              setForm={setForm}
+                              disableStok
+                              disableVendor
+                              rank={sessUser.rank}
+                              customInput={
+                                <>
+                                  <NumberInput
+                                    hideStepper
+                                    isWheelDisabled
+                                    formatOptions={{
+                                      useGrouping: false,
+                                    }}
+                                    className={`${defStyleFormWidth} ${hideComponent}`}
+                                    value={form.harga - form.hargamodal || ""}
+                                    label={"Provit"}
+                                    placeholder="Masukkan provit!"
+                                    onValueChange={(v) => {
+                                      setForm({
+                                        ...form,
+                                        harga: form.hargamodal + v || "",
+                                      });
+                                    }}
+                                  />
+                                  <NumberInput
+                                    hideStepper
+                                    isWheelDisabled
+                                    formatOptions={{
+                                      useGrouping: false,
+                                    }}
+                                    className={`${defStyleFormWidth} ${hideComponent}`}
+                                    value={
+                                      Math.round(
+                                        countPercentProvit(
+                                          form.hargamodal,
+                                          form.harga
+                                        ) * 100
+                                      ) / 100 || ""
+                                    }
+                                    label={"Provit (%)"}
+                                    placeholder="Masukkan provit %!"
+                                    onValueChange={(v) => {
+                                      setForm({
+                                        ...form,
+                                        harga:
+                                          Math.round(
+                                            countPriceByPercentProfit(
+                                              form.hargamodal,
+                                              v
+                                            )
+                                          ) || "",
+                                      });
+                                    }}
+                                  />
+                                  <Input
+                                    type="text"
+                                    value={form.keterangan}
+                                    label="Nama Kustom"
+                                    placeholder="Masukkan nama kustom! (Opsional)"
+                                    // placeholder="Masukkan jumlah!"
+                                    className={`${defStyleFormWidth}`}
+                                    onValueChange={(v) =>
+                                      setForm({
+                                        ...form,
+                                        keterangan: v,
+                                      })
+                                    }
+                                  />
+                                  <Select
+                                    label="Sub Proyek"
+                                    placeholder="Pilih subproyek! (Opsional)"
+                                    className={`${defStyleFormWidth}`}
+                                    selectedKeys={form.selectSubProyek}
+                                    onSelectionChange={(v) => {
+                                      setForm({
+                                        ...form,
+                                        selectSubProyek: v,
+                                      });
+                                    }}
+                                  >
+                                    {subProyek.data.map((item) => (
+                                      <SelectItem key={item.id} value={item.id}>
+                                        {item.nama}
+                                      </SelectItem>
+                                    ))}
+                                  </Select>
+                                </>
+                              }
+                            />
+                          </div>
                           <div>
                             <Button
                               onPress={() => {
@@ -1259,7 +1262,7 @@ export default function App({ id, versi }) {
                               Tambah
                             </Button>
                           </div>
-                        </div>
+                        </>
                       }
                     />
                   </>
@@ -1345,7 +1348,7 @@ export default function App({ id, versi }) {
                     <ConditionalComponent
                       condition={selectedProyek.versi == 0}
                       component={
-                        <div className="flex flex-col gap-2">
+                        <div className="flex gap-2 w-9/12">
                           <TambahProduk
                             form={formInstalasi}
                             setForm={setFormInstalasi}
@@ -1360,7 +1363,7 @@ export default function App({ id, versi }) {
                                   formatOptions={{
                                     useGrouping: false,
                                   }}
-                                  className="w-3/12"
+                                  className={`${defStyleFormWidth} ${hideComponent}`}
                                   value={
                                     formInstalasi.harga -
                                       formInstalasi.hargamodal || ""
@@ -1380,7 +1383,7 @@ export default function App({ id, versi }) {
                                   formatOptions={{
                                     useGrouping: false,
                                   }}
-                                  className="w-3/12"
+                                  className={`${defStyleFormWidth} ${hideComponent}`}
                                   value={
                                     Math.round(
                                       countPercentProvit(
@@ -1410,7 +1413,7 @@ export default function App({ id, versi }) {
                                   label="Nama Kustom"
                                   placeholder="Masukkan nama kustom! (Opsional)"
                                   // placeholder="Masukkan jumlah!"
-                                  className="w-3/12"
+                                  className={`${defStyleFormWidth}`}
                                   onValueChange={(v) =>
                                     setFormInstalasi({
                                       ...formInstalasi,
@@ -1421,7 +1424,7 @@ export default function App({ id, versi }) {
                                 <Select
                                   label="Sub Proyek"
                                   placeholder="Pilih subproyek! (Opsional)"
-                                  className="w-3/12"
+                                  className={`${defStyleFormWidth}`}
                                   selectedKeys={formInstalasi.selectSubProyek}
                                   onSelectionChange={(v) => {
                                     setFormInstalasi({
@@ -1797,6 +1800,12 @@ export default function App({ id, versi }) {
                   ref={componentRef.penawaran}
                   className="bg-white text-black overflow-x-hidden"
                 >
+                  {/* Watermark */}
+                  {/* <div className="pointer-events-none fixed inset-0 flex items-center justify-center opacity-10 z-50">
+                    <span className="text-[20vw] font-bold rotate-[-30deg] whitespace-nowrap">
+                      Draft
+                    </span>
+                  </div> */}
                   {/* {Logo} */}
                   <div className="flex flex-row items-center">
                     <Image
