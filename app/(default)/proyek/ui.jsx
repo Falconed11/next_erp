@@ -113,7 +113,7 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
     `customer?${id_instansi ? `id=${id_instansi}` : ""}`
   );
   const kategoriproyek = useClientFetch("kategoriproyek");
-  const sources = [
+  const queries = [
     proyek,
     penawaran,
     perusahaan,
@@ -436,9 +436,11 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [reportList, setReportList] = useState([]);
   const report = useDisclosure();
-  if (sources.some((o) => o.error)) return <div>failed to load</div>;
-  if (sources.some((o) => o.isLoading)) return <div>loading...</div>;
-  if (session.status === "loading") return <>Loading...</>;
+  for (const [name, data] of Object.entries(queries)) {
+    if (data.error) return <div>Failed to load {name}</div>;
+    if (data.isLoading) return <div>Loading {name}...</div>;
+  }
+  if (session.status === "loading") return <>Session Loading ...</>;
   const isHighRole = highRoleCheck(sessUser.rank);
   const columns = [
     {
