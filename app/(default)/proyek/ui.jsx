@@ -68,6 +68,7 @@ import { ShowHideComponent } from "@/components/componentmanipulation";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import SelectStatusProyek from "@/components/selectstatusproyek";
+import { LIST_SWASTA_NEGRI } from "@/app/utils/const";
 
 const apiPath = getApiPath();
 
@@ -569,6 +570,8 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
     summary.totalPenawaranReject +
     summary.totalPenawaranWaiting;
   summary.totalProvit = summary.totalPenawaran - summary.totalModal;
+  const isCustomerSelected = form?.id_instansi;
+  // console.log(form);
   return (
     <div className="flex flex-col gap-2">
       {id_instansi ? (
@@ -883,18 +886,37 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
                     ))}
                   </Select>
                 )}
+                <Input
+                  type="text"
+                  variant="bordered"
+                  label="Nama Proyek"
+                  placeholder="Masukkan nama proyek!"
+                  value={form.nama}
+                  onValueChange={(val) => setForm({ ...form, nama: val })}
+                />
                 <Autocomplete
                   label="Customer"
                   variant="bordered"
+                  allowsCustomValue
                   defaultItems={customer.data}
                   placeholder="Cari customer"
                   className="max-w-xs"
                   selectedKey={form.id_instansi}
                   defaultSelectedKey={form.id_instansi}
                   defaultInputValue={form.instansi}
-                  onSelectionChange={(v) =>
-                    setForm({ ...form, id_instansi: v })
-                  }
+                  onInputChange={(v) => setForm({ ...form, instansi: v })}
+                  onSelectionChange={(v) => {
+                    const selectedInstansi = customer.data.find(
+                      (o) => o.id == v
+                    );
+                    setForm({
+                      ...form,
+                      id_instansi: v,
+                      swasta: selectedInstansi?.swasta,
+                      kota: selectedInstansi?.kota,
+                      alamat: selectedInstansi?.alamat,
+                    });
+                  }}
                 >
                   {(item) => (
                     <AutocompleteItem key={item.id} textValue={item.nama}>
@@ -903,12 +925,45 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
                     </AutocompleteItem>
                   )}
                 </Autocomplete>
+                <Select
+                  label="S/N"
+                  variant="bordered"
+                  isDisabled={isCustomerSelected}
+                  placeholder="Pilih swasta/negri!"
+                  selectedKeys={
+                    new Set(form.swasta ? [String(form.swasta)] : [])
+                  }
+                  className="max-w-xs"
+                  onSelectionChange={(v) => {
+                    setForm({
+                      ...form,
+                      swasta: new Set(v).values().next().value,
+                    });
+                  }}
+                >
+                  {LIST_SWASTA_NEGRI.map((item) => (
+                    <SelectItem key={item.id} value={item.id}>
+                      {item.nama}
+                    </SelectItem>
+                  ))}
+                </Select>
                 <Input
                   type="text"
-                  label="Nama Proyek"
-                  placeholder="Masukkan nama proyek!"
-                  value={form.nama}
-                  onValueChange={(val) => setForm({ ...form, nama: val })}
+                  variant="bordered"
+                  isDisabled={isCustomerSelected}
+                  label="Kota"
+                  placeholder="Masukkan kota!"
+                  value={form.kota}
+                  onValueChange={(v) => setForm({ ...form, kota: v })}
+                />
+                <Textarea
+                  type="text"
+                  variant="bordered"
+                  label="Alamat"
+                  isDisabled={isCustomerSelected}
+                  placeholder="Masukkan alamat!"
+                  value={form.alamat}
+                  onValueChange={(v) => setForm({ ...form, alamat: v })}
                 />
                 <Input
                   type="text"

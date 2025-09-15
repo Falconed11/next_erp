@@ -25,4 +25,9 @@ const updateSwitch = async (
   referenceData.forEach((data) => data.mutate());
 };
 
-export {};
+const LIST_SWASTA_NEGRI = [
+  { id: 1, nama: "swasta" },
+  { id: 0, nama: "negri" },
+];
+
+export { LIST_SWASTA_NEGRI };

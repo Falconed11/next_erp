@@ -50,6 +50,7 @@ import {
   getDate,
   getDateF,
 } from "@/app/utils/date";
+import { LIST_SWASTA_NEGRI } from "@/app/utils/const";
 import Harga from "@/components/harga";
 import { FileUploader } from "@/components/input";
 import DatePicker from "react-datepicker";
@@ -448,10 +449,7 @@ export default function App() {
                     })
                   }
                 >
-                  {[
-                    { id: 1, nama: "swasta" },
-                    { id: 0, nama: "negri" },
-                  ].map((item) => (
+                  {LIST_SWASTA_NEGRI.map((item) => (
                     <SelectItem key={item.id} value={item.id}>
                       {item.nama}
                     </SelectItem>
