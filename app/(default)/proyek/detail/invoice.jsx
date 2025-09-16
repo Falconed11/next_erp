@@ -97,7 +97,7 @@ export default function Invoice({
           onOpen();
         }}
         color="primary"
-        className="mt-3"
+        className=""
       >
         Invoice
       </Button>

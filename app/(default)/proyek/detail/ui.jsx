@@ -75,6 +75,7 @@ import Invoice from "./invoice";
 import KeteranganPenawaran from "./keteranganpenawaran";
 import Rekapitulasi from "./rekapitulasi";
 import SubProyek from "./subproyek";
+import SuratJalan from "./suratjalan";
 import {
   createRecapTable,
   createRecapTableTotal,
@@ -122,7 +123,7 @@ export default function App({ id, versi }) {
   );
   const statusProyek = useClientFetch(`statusproyek?ids=1&ids=3`);
   const subProyek = useClientFetch(`subproyek?id_proyek=${id}`);
-  const sources = [
+  const queries = {
     proyek,
     keranjangProyek,
     keranjangProyekInstalasi,
@@ -131,7 +132,7 @@ export default function App({ id, versi }) {
     versiKeranjangProyek,
     statusProyek,
     subProyek,
-  ];
+  };
   const [form, setForm] = useState({
     selectProduk: new Set([]),
     selectKategori: new Set([]),
@@ -612,8 +613,10 @@ export default function App({ id, versi }) {
     }
     resultInstalasi.push(item);
   });
-  if (sources.some((o) => o.error)) return <div>failed to load</div>;
-  if (sources.some((o) => o.isLoading)) return <div>loading...</div>;
+  for (const [name, data] of Object.entries(queries)) {
+    if (data.error) return <div>Failed to load {name}</div>;
+    if (data.isLoading) return <div>Loading {name}...</div>;
+  }
   if (session.status === "loading") return <>Session Loading ...</>;
 
   const keranjangProduk = keranjangProyek.data;
@@ -929,8 +932,8 @@ export default function App({ id, versi }) {
   const hideComponent = isHighRole ? "" : "hidden";
   const defStyleFormWidth = "w-2/12";
   return (
-    <div>
-      <div className="flex flex-row gap-2">
+    <div className="flex gap-2 flex-col">
+      <div className="flex gap-2">
         {/* detail  */}
         <div className="bg-white rounded-lg p-3">
           <div>Detail</div>
@@ -1064,7 +1067,7 @@ export default function App({ id, versi }) {
                 <Button
                   onPress={modal.penawaran.onOpen}
                   color="primary"
-                  className="mt-3"
+                  className=""
                 >
                   Penawaran
                 </Button>
@@ -1130,6 +1133,13 @@ export default function App({ id, versi }) {
                   compRekapPeralatan={compRekapPeralatan}
                   compRekapInstalasi={compRekapInstalasi}
                   compRekapTotal={compRekapTotal}
+                />
+              </div>
+              {/* Surat Jalan */}
+              <div>
+                <SuratJalan
+                  id_proyek={id}
+                  versi={selectVersi.values().next().value}
                 />
               </div>
               {/* Kwitansi */}

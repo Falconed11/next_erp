@@ -93,7 +93,7 @@ export default function SubProyek({ id, selectedProyek }) {
   if (subProyek.error) return <div>failed to load</div>;
   if (subProyek.isLoading) return <div>loading...</div>;
   return (
-    <div className="bg-white rounded-lg flex flex-col gap-2 mt-2 p-3">
+    <div className="bg-white rounded-lg flex flex-col gap-2 p-3">
       <div>Sub Proyek</div>
       {selectedProyek.versi == 0 ? (
         <div className="flex gap-2">

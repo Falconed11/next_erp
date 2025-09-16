@@ -39,7 +39,7 @@ export default function Kwitansi({ proyek, nilaiProyek }) {
           setVersi(lengthPembayaran - 1);
           onOpen();
         }}
-        className="mt-3"
+        className=""
         color="primary"
       >
         Kwitansi

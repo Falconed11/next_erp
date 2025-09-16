@@ -16,7 +16,6 @@ const MyChip = ({ text, theme }) => {
       </span>
     );
 };
-
 const LinkOpenNewTab = ({ content, link, icon }) => {
   return (
     <Tooltip content={content}>
@@ -36,7 +35,6 @@ const LinkOpenNewTab = ({ content, link, icon }) => {
     </Tooltip>
   );
 };
-
 const NavLinkNewTab = ({ href, children }) => {
   return (
     <Link href={href} target="_blank" rel="noopener noreferrer">
@@ -125,6 +123,22 @@ const CompanyHeader = ({
     />
   );
 };
+const PrintWithHeader = ({ header, body }) => {
+  return (
+    <table className="border-collapse w-full overscroll-none">
+      <thead className="">
+        <tr>
+          <td className="">{header}</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>{body}</td>
+        </tr>
+      </tbody>
+    </table>
+  );
+};
 
 export {
   MyChip,
@@ -133,4 +147,5 @@ export {
   BKSHeader,
   SVTHeader,
   CompanyHeader,
+  PrintWithHeader,
 };
