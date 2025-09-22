@@ -1063,22 +1063,13 @@ export default function App({ id, versi }) {
                   Buat Versi Baru
                 </Button>
               </div> */}
-              <div>
-                <Button
-                  onPress={modal.penawaran.onOpen}
-                  color="primary"
-                  className=""
-                >
-                  Penawaran
-                </Button>
-              </div>
               {["admin", "super"].includes(sessUser?.peran) ? (
                 selectedProyek.versi <= 0 ? (
                   <div>
                     <Button
                       onPress={handleButtonSetAsDealClick}
                       color="primary"
-                      className="mt-3"
+                      className=""
                     >
                       Set as Deal
                     </Button>
@@ -1088,7 +1079,7 @@ export default function App({ id, versi }) {
                     <Button
                       onPress={handleButtonCancelDealRejectClick}
                       color="primary"
-                      className="mt-3"
+                      className=""
                     >
                       Cancel Deal
                     </Button>
@@ -1103,7 +1094,7 @@ export default function App({ id, versi }) {
                     <Button
                       onPress={handleButtonSetAsRejectClick}
                       color="primary"
-                      className="mt-3"
+                      className=""
                     >
                       Set as Reject
                     </Button>
@@ -1113,7 +1104,7 @@ export default function App({ id, versi }) {
                     <Button
                       onPress={handleButtonCancelDealRejectClick}
                       color="primary"
-                      className="mt-3"
+                      className=""
                     >
                       Cancel Reject
                     </Button>
@@ -1122,6 +1113,15 @@ export default function App({ id, versi }) {
               ) : (
                 <></>
               )}
+              <div>
+                <Button
+                  onPress={modal.penawaran.onOpen}
+                  color="primary"
+                  className=""
+                >
+                  Penawaran
+                </Button>
+              </div>
               {/* Invoice */}
               <div>
                 <Invoice
