@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import * as XLSX from "xlsx";
 import { RadioGroup, Radio } from "@heroui/react";
 import { useClientFetch, getApiPath } from "@/app/utils/apiconfig";
+const apiPath = getApiPath();
 import { fIdProyek } from "@/app/utils/formatid";
 import { Autocomplete, AutocompleteItem } from "@heroui/react";
 import {
@@ -69,8 +70,6 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import SelectStatusProyek from "@/components/selectstatusproyek";
 import { LIST_SWASTA_NEGRI } from "@/app/utils/const";
-
-const apiPath = getApiPath();
 
 export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
   const [sort, setSort] = React.useState("tanggal_penawaran");
@@ -152,6 +151,7 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
     });
     const json = await res.json();
     if (res.status == 400) return alert(json.message);
+    proyek.mutate();
     onClose();
     //return alert(json.message);
   };

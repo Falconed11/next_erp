@@ -30,7 +30,8 @@ import Harga from "@/components/harga";
 import { useRef, useState, useCallback, useMemo } from "react";
 import { useReactToPrint } from "react-to-print";
 import { nominalToText } from "@/app/utils/number";
-import { useClientFetch } from "@/app/utils/apiconfig";
+import { useClientFetch, getApiPath } from "@/app/utils/apiconfig";
+const apiPath = getApiPath();
 import { getDateFId, getDate } from "@/app/utils/date";
 import { invoice } from "@/app/utils/formatid";
 import DatePicker from "react-datepicker";
@@ -119,6 +120,10 @@ export default function SuratJalan({ id_proyek, versi }) {
       <Button
         color="primary"
         onPress={() => {
+          setForm({
+            alamatsuratjalan: selectedProyek.alamatsuratjalan,
+            tanggalsuratjalan: selectedProyek.tanggalsuratjalan,
+          });
           onOpen();
         }}
       >
@@ -166,6 +171,41 @@ export default function SuratJalan({ id_proyek, versi }) {
                     />
                   </div>
                 </div>
+                <div className="flex gap-2 justify-end">
+                  <div>
+                    <Button
+                      color="primary"
+                      onPress={() => {
+                        setForm({
+                          alamatsuratjalan: selectedProyek.alamatsuratjalan,
+                          tanggalsuratjalan: selectedProyek.tanggalsuratjalan,
+                        });
+                      }}
+                    >
+                      Refresh
+                    </Button>
+                  </div>
+                  <div>
+                    <Button
+                      color="primary"
+                      onPress={async () => {
+                        const res = await fetch(`${apiPath}proyek`, {
+                          method: "PUT",
+                          headers: {
+                            "Content-Type": "application/json",
+                            // 'Content-Type': 'application/x-www-form-urlencoded',
+                          },
+                          body: JSON.stringify({ ...form, id: id_proyek }),
+                        });
+                        const json = await res.json();
+                        if (res.status == 400) return alert(json.message);
+                        proyek.mutate();
+                      }}
+                    >
+                      Update
+                    </Button>
+                  </div>
+                </div>
                 <div ref={componentRef} className="bg-white text-xs">
                   <PrintWithHeader
                     header={
@@ -188,6 +228,9 @@ export default function SuratJalan({ id_proyek, versi }) {
                             <div>Ditujukan kepada :</div>
                             <div>{selectedProyek.klien}</div>
                             <div>{selectedProyek.instansi}</div>
+                            {selectedProyek.alamatsuratjalan && (
+                              <div>{selectedProyek.alamatsuratjalan}</div>
+                            )}
                           </div>
                           <div className="text-right">
                             <div>
@@ -197,7 +240,12 @@ export default function SuratJalan({ id_proyek, versi }) {
                                 new Date(selectedProyek.tanggal)
                               )}
                             </div>
-                            <div>Tanggal : {getDateFId(new Date())}</div>
+                            <div>
+                              Tanggal :{" "}
+                              {getDateFId(
+                                new Date(selectedProyek.tanggalsuratjalan)
+                              )}
+                            </div>
                             <div>No. PO : {selectedProyek.id_po}</div>
                           </div>
                         </div>
