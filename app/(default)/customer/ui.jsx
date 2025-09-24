@@ -100,6 +100,7 @@ export default function App() {
     });
     const json = await res.json();
     if (res.status == 400) return alert(json.message);
+    customer.mutate();
     onClose();
     //return alert(json.message);
   };
@@ -130,7 +131,7 @@ export default function App() {
     transfer.onOpen();
   };
   const deleteButtonPress = async (id) => {
-    if (confirm("Hapus vendor?")) {
+    if (confirm("Hapus customer?")) {
       const res = await fetch(`${apiPath}customer`, {
         method: "DELETE",
         headers: {
@@ -139,6 +140,9 @@ export default function App() {
         },
         body: JSON.stringify({ id }),
       });
+      const json = await res.json();
+      if (res.status == 400) return alert(json.message);
+      customer.mutate();
       // return alert(await res.json().then((json) => json.message));
     }
   };

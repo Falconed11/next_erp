@@ -281,6 +281,10 @@ export default function App({ id }) {
               label: "Instansi",
             },
             {
+              key: "kota",
+              label: "Kota",
+            },
+            {
               key: "jumlahaktivitas",
               label: "Jumlah Aktivitas",
             },
@@ -405,9 +409,10 @@ export default function App({ id }) {
                 {form.method == "POST" ? "Tambah" : "Edit"} Aktivitas Sales
               </ModalHeader>
               <ModalBody>
-                <div className="bg-gray-100 p-3 rounded-lg z-50">
+                <div className="bg-gray-100 p-3 rounded-lg z-50 w-fit border">
                   <div>Tanggal</div>
                   <DatePicker
+                    className="bg-white"
                     placeholderText="Pilih tanggal"
                     dateFormat="dd/MM/yyyy"
                     selected={
@@ -417,6 +422,7 @@ export default function App({ id }) {
                   />
                 </div>
                 <Select
+                  variant="bordered"
                   label="Karyawan"
                   placeholder="Pilih karyawan!"
                   className=""
@@ -437,6 +443,7 @@ export default function App({ id }) {
                   ))}
                 </Select>
                 <Textarea
+                  variant="bordered"
                   value={form.aktivitas}
                   label="Aktivitas"
                   placeholder="Masukkan aktivitas!"
@@ -449,6 +456,7 @@ export default function App({ id }) {
                   }
                 />
                 <Textarea
+                  variant="bordered"
                   value={form.catatan}
                   label="Catatan"
                   placeholder="Masukkan catatan!"
@@ -461,6 +469,7 @@ export default function App({ id }) {
                   }
                 />
                 <Textarea
+                  variant="bordered"
                   value={form.output}
                   label="Output"
                   placeholder="Masukkan output!"
@@ -473,6 +482,7 @@ export default function App({ id }) {
                   }
                 />
                 <Textarea
+                  variant="bordered"
                   value={form.tindakanselanjutnya}
                   label="Tindakan Selanjutnya"
                   placeholder="Masukkan tindakanselanjutnya!"

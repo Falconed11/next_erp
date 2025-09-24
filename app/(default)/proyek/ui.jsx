@@ -173,6 +173,7 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
       startdate: new Date(),
       keterangan: "",
       id_statusproyek: 1,
+      last_user: sessUser?.nama,
     });
     setMethod("POST");
     onOpen();
@@ -208,6 +209,7 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
       // return alert(await res.json().then((json) => json.message));
       const json = await res.json();
       if (res.status == 400) return alert(json.message);
+      proyek.mutate();
     }
   };
   const handleFileUpload = (jsonData) => {
@@ -570,7 +572,8 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
     summary.totalPenawaranReject +
     summary.totalPenawaranWaiting;
   summary.totalProvit = summary.totalPenawaran - summary.totalModal;
-  const isCustomerSelected = form?.id_instansi;
+  const isCustomerSelected =
+    form.id_instansi || !form.instansi ? true : undefined;
   // console.log(form);
   return (
     <div className="flex flex-col gap-2">
@@ -904,7 +907,15 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
                   selectedKey={form.id_instansi}
                   defaultSelectedKey={form.id_instansi}
                   defaultInputValue={form.instansi}
-                  onInputChange={(v) => setForm({ ...form, instansi: v })}
+                  onInputChange={(v) => {
+                    const nextForm = { ...form, instansi: v };
+                    if (!form.id_instansi) {
+                      nextForm.swasta = "";
+                      nextForm.kota = "";
+                      nextForm.alamat = "";
+                    }
+                    setForm(nextForm);
+                  }}
                   onSelectionChange={(v) => {
                     const selectedInstansi = customer.data.find(
                       (o) => o.id == v
@@ -931,7 +942,11 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
                   isDisabled={isCustomerSelected}
                   placeholder="Pilih swasta/negri!"
                   selectedKeys={
-                    new Set(form.swasta ? [String(form.swasta)] : [])
+                    new Set(
+                      form.swasta || form.swasta == 0
+                        ? [String(form.swasta)]
+                        : []
+                    )
                   }
                   className="max-w-xs"
                   onSelectionChange={(v) => {
