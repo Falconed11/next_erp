@@ -906,7 +906,7 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
                   className="max-w-xs"
                   selectedKey={form.id_instansi}
                   defaultSelectedKey={form.id_instansi}
-                  defaultInputValue={form.instansi}
+                  defaultInputValue={form.instansi || ""}
                   onInputChange={(v) => {
                     const nextForm = { ...form, instansi: v };
                     if (!form.id_instansi) {
@@ -968,7 +968,7 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
                   isDisabled={isCustomerSelected}
                   label="Kota"
                   placeholder="Masukkan kota!"
-                  value={form.kota}
+                  value={form.kota || ""}
                   onValueChange={(v) => setForm({ ...form, kota: v })}
                 />
                 <Textarea

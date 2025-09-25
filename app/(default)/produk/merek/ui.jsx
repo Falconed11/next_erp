@@ -75,6 +75,7 @@ export default function App() {
     });
     const json = await res.json();
     if (res.status == 400) return alert(json.message);
+    merek.mutate();
     onClose();
     //return alert(json.message);
   };
@@ -93,6 +94,7 @@ export default function App() {
     });
     const json = await res.json();
     if (res.status == 400) return alert(json.message);
+    merek.mutate();
     onClose();
     //return alert(json.message);
   };
@@ -134,6 +136,7 @@ export default function App() {
       // return alert(await res.json().then((json) => json.message));
       const json = await res.json();
       if (res.status == 400) return alert(json.message);
+      merek.mutate();
     }
   };
 

@@ -76,6 +76,7 @@ export default function App() {
     });
     const json = await res.json();
     if (res.status == 400) return alert(json.message);
+    vendor.mutate();
     onClose();
     //return alert(json.message);
   };
@@ -94,6 +95,7 @@ export default function App() {
     });
     const json = await res.json();
     if (res.status == 400) return alert(json.message);
+    vendor.mutate();
     onClose();
     //return alert(json.message);
   };
@@ -132,7 +134,9 @@ export default function App() {
         },
         body: JSON.stringify({ id }),
       });
-      // return alert(await res.json().then((json) => json.message));
+      const json = await res.json();
+      if (res.status == 400) return alert(json.message);
+      vendor.mutate();
     }
   };
 
