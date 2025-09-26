@@ -9,7 +9,6 @@ export default function App() {
   const session = useSession();
   const sessionuser = session?.data?.user;
   if (session.status === "loading") return <>Loading...</>;
-  console.log(sessionuser);
   const currentDate = new Date();
   const currentMonth = currentDate.getMonth();
   const nextMonthFirstDay = new Date(

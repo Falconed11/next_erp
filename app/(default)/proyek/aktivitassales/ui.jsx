@@ -78,35 +78,19 @@ export default function App({ id }) {
     modal.aktivitassales.onOpen();
   };
   const deleteButtonPress = async (data) => {
-    if (confirm("Hapus produk?")) {
-      if (data.id_produkkeluar == "") {
-        const res = await fetch(`${api_path}aktivitassales`, {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            // 'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          body: JSON.stringify({ id: data.id_pengeluaranproyek }),
-        });
-        const json = await res.json();
-        if (res.status == 400) return alert(json.message);
-      } else {
-        const res = await fetch(`${api_path}produkkeluar`, {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            // 'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          body: JSON.stringify({
-            ...data,
-            id: data.id_produkkeluar,
-            metodepengeluaran: "proyek",
-            id_produk: data.id,
-          }),
-        });
-        const json = await res.json();
-        if (res.status == 400) return alert(json.message);
-      }
+    if (confirm("Hapus data?")) {
+      const res = await fetch(`${api_path}aktivitassales`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify({
+          id: data.id,
+        }),
+      });
+      const json = await res.json();
+      if (res.status == 400) return alert(json.message);
       aktivitassales.mutate();
     }
   };
