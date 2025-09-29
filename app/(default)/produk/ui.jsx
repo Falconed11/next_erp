@@ -719,13 +719,20 @@ export default function App() {
               <ModalBody>
                 <Autocomplete
                   variant="bordered"
-                  label="Kategori"
+                  label={
+                    <LabelRecordCheck
+                      title={"Kategori"}
+                      isNotAvailable={
+                        form.kategoriproduk && form.id_kategori == null
+                      }
+                    />
+                  }
                   allowsCustomValue
+                  isClearable={false}
                   defaultItems={kategori.data}
                   placeholder="Cari kategori"
                   className="max-w-xs"
                   selectedKey={form.id_kategori}
-                  defaultSelectedKey={form.id_kategori}
                   defaultInputValue={form.kategoriproduk}
                   onSelectionChange={(v) =>
                     setForm({ ...form, id_kategori: v })
@@ -754,7 +761,12 @@ export default function App() {
                 />
                 <Autocomplete
                   variant="bordered"
-                  label="Merek"
+                  label={
+                    <LabelRecordCheck
+                      title={"Merek"}
+                      isNotAvailable={form.merek && !form.id_merek}
+                    />
+                  }
                   allowsCustomValue
                   defaultItems={dataMerek}
                   placeholder="Cari merek"
@@ -795,7 +807,12 @@ export default function App() {
                     <Autocomplete
                       allowsCustomValue
                       isDisabled={form.stok ? undefined : true}
-                      label="Vendor"
+                      label={
+                        <LabelRecordCheck
+                          title={"Vendor"}
+                          isNotAvailable={form.vendor && !form.id_vendor}
+                        />
+                      }
                       variant="bordered"
                       defaultItems={vendor.data}
                       placeholder="Cari vendor"
@@ -822,7 +839,7 @@ export default function App() {
                       )}
                     </Autocomplete>
                     <Textarea
-                      isDisabled={form.stok ? undefined : true}
+                      isDisabled={!form.stok || !form.vendor ? true : undefined}
                       label="alamat"
                       labelPlacement="inside"
                       placeholder="Masukkan alamat!"
@@ -1340,3 +1357,14 @@ export default function App() {
     </div>
   );
 }
+
+const LabelRecordCheck = ({ title, isNotAvailable }) => {
+  return (
+    <>
+      {title}
+      {isNotAvailable && (
+        <span className="text-danger">{" *Data tidak terdaftar"}</span>
+      )}
+    </>
+  );
+};

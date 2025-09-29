@@ -144,7 +144,22 @@ export default function TambahProduk({
           </AutocompleteItem>
         )}
       </Autocomplete>
-      <></>
+      <>
+        <Input
+          type="id"
+          value={form.id_kustom}
+          disabled
+          label="Id"
+          placeholder="Masukkan id!"
+          className={defStyleFormWidth}
+          onValueChange={(v) =>
+            setForm({
+              ...form,
+              id_kustom: v,
+            })
+          }
+        />
+      </>
       {disableVendor ? (
         <></>
       ) : form.isSelected == true ? (
