@@ -62,6 +62,7 @@ import {
   countProvitMarginPercent,
 } from "@/app/utils/formula";
 import { highRoleCheck } from "@/app/utils/tools";
+import { useFilter } from "@react-aria/i18n";
 
 const apiPath = getApiPath();
 
@@ -91,6 +92,7 @@ export default function App() {
   const [page, setPage] = React.useState(1);
   const [isReadyStock, setIsReadyStock] = useState(false);
   const rowsPerPage = 10;
+  const { startsWith } = useFilter({ sensitivity: "base" });
 
   const produk = useClientFetch(
     `produk?kategori=${selectKategori.values().next().value ?? ""}${
@@ -208,22 +210,26 @@ export default function App() {
     setMethod("POST");
     onOpen();
   };
-  const editButtonPress = (data) => {
-    setForm({
-      ...data,
-      modalmode: "Edit",
-      selectKategori: new Set([String(data.id_kategori)]),
-      merek: data.nmerek,
-      id_merek: data.id_merek,
-      vendor: data.nvendor,
-      id_vendor: data.id_vendor,
-      startdate: new Date(data.tanggal),
-      tanggal: data.tanggal,
-    });
-    console.log(form);
-    setMethod("PUT");
-    onOpen();
-  };
+  const editButtonPress = React.useCallback(
+    (data) => {
+      setForm({
+        ...data,
+        modalmode: "Edit",
+        selectKategori: new Set([String(data.id_kategori)]),
+        merek: data.nmerek,
+        id_merek: data.id_merek,
+        vendor: data.nvendor,
+        id_vendor: data.id_vendor,
+        startdate: new Date(data.tanggal),
+        tanggal: data.tanggal,
+        dataKategori: kategori.data?.slice(0, 10),
+      });
+      console.log(form);
+      setMethod("PUT");
+      onOpen();
+    },
+    [kategori.data]
+  );
   const deleteButtonPress = async (id) => {
     if (confirm("Hapus product?")) {
       const res = await fetch(`${apiPath}produk`, {
@@ -729,10 +735,77 @@ export default function App() {
                   }
                   allowsCustomValue
                   isClearable={false}
+                  items={form?.dataKategori || []}
+                  placeholder="Cari kategori"
+                  className="max-w-xs"
+                  selectedKey={form.id_kategori}
+                  // inputValue={form.kategoriproduk}
+                  defaultSelectedKey={form.id_kategori}
+                  defaultInputValue={form.kategoriproduk}
+                  onSelectionChange={
+                    (v) =>
+                      setForm((prevState) => {
+                        let selectedItem = prevState.dataKategori.find(
+                          (option) => option.value === v
+                        );
+                        return {
+                          ...form,
+                          ketegoriproduk: selectedItem?.nama || "",
+                          id_kategori: v,
+                          dataKategori: kategori.data
+                            .filter((item) =>
+                              startsWith(item.nama, selectedItem?.nama || "")
+                            )
+                            .slice(0, 10),
+                        };
+                      })
+                    // setForm({ ...form, id_kategori: v })
+                  }
+                  onInputChange={(v) => {
+                    setForm((prevState) => ({
+                      ...form,
+                      kategoriproduk: v,
+                      id_kategori: v === "" ? null : prevState.id_kategori,
+                      dataKategori: kategori.data
+                        .filter((item) => startsWith(item.nama, v))
+                        .slice(0, 10),
+                    }));
+                  }}
+                  onOpenChange={(isOpen, menuTrigger) => {
+                    if (menuTrigger === "manual" && isOpen) {
+                      setForm((prevState) => ({
+                        ...form,
+                        kategoriproduk: prevState.kategoriproduk,
+                        id_kategori: prevState.id_kategori,
+                        dataKategori: kategori.data.slice(0, 10),
+                      }));
+                    }
+                  }}
+                >
+                  {(item) => (
+                    <AutocompleteItem key={item.id} textValue={item.nama}>
+                      {item.nama}
+                    </AutocompleteItem>
+                  )}
+                </Autocomplete>
+                {/* <Autocomplete
+                  variant="bordered"
+                  label={
+                    <LabelRecordCheck
+                      title={"Kategori"}
+                      isNotAvailable={
+                        form.kategoriproduk && form.id_kategori == null
+                      }
+                    />
+                  }
+                  allowsCustomValue
+                  isClearable={false}
                   defaultItems={kategori.data}
                   placeholder="Cari kategori"
                   className="max-w-xs"
                   selectedKey={form.id_kategori}
+                  // inputValue={form.kategoriproduk}
+                  defaultSelectedKey={form.id_kategori}
                   defaultInputValue={form.kategoriproduk}
                   onSelectionChange={(v) =>
                     setForm({ ...form, id_kategori: v })
@@ -744,7 +817,7 @@ export default function App() {
                       {item.nama}
                     </AutocompleteItem>
                   )}
-                </Autocomplete>
+                </Autocomplete> */}
                 <Input
                   type="text"
                   label="Id"
@@ -768,6 +841,7 @@ export default function App() {
                     />
                   }
                   allowsCustomValue
+                  isClearable={false}
                   defaultItems={dataMerek}
                   placeholder="Cari merek"
                   className="max-w-xs"
@@ -806,6 +880,7 @@ export default function App() {
                     />
                     <Autocomplete
                       allowsCustomValue
+                      isClearable={false}
                       isDisabled={form.stok ? undefined : true}
                       label={
                         <LabelRecordCheck
