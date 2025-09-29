@@ -158,7 +158,7 @@ export default function App() {
   };
 
   const saveButtonPress = async (onClose) => {
-    if (form.tipe == "" || (!form.id_kategori && !form.kategori))
+    if (form.tipe == "" || (!form.id_kategori && !form.kategoriproduk))
       return alert("Tipe, dan Kategori wajib diisi!");
     if (
       form.modalmode == "Tambah" &&
@@ -220,6 +220,7 @@ export default function App() {
       startdate: new Date(data.tanggal),
       tanggal: data.tanggal,
     });
+    console.log(form);
     setMethod("PUT");
     onOpen();
   };
@@ -495,6 +496,10 @@ export default function App() {
 
   const col = [
     {
+      key: "aksi",
+      label: "Aksi",
+    },
+    {
       key: "kategoriproduk",
       label: "Kategori",
     },
@@ -557,10 +562,6 @@ export default function App() {
     {
       key: "keterangan",
       label: "Keterangan",
-    },
-    {
-      key: "aksi",
-      label: "Aksi",
     },
   ];
 
@@ -725,11 +726,11 @@ export default function App() {
                   className="max-w-xs"
                   selectedKey={form.id_kategori}
                   defaultSelectedKey={form.id_kategori}
-                  defaultInputValue={form.kategori}
+                  defaultInputValue={form.kategoriproduk}
                   onSelectionChange={(v) =>
                     setForm({ ...form, id_kategori: v })
                   }
-                  onValueChange={(v) => setForm({ ...form, kategori: v })}
+                  onValueChange={(v) => setForm({ ...form, kategoriproduk: v })}
                 >
                   {(item) => (
                     <AutocompleteItem key={item.id} textValue={item.nama}>

@@ -432,10 +432,10 @@ export default function App({ id_produk }) {
   return (
     <div className="flex flex-col gap-2">
       <div className="bg-white rounded-lg p-2">
-        <div>Produk: {selectedProduk.nama}</div>
-        <div>Merek: {selectedProduk.nmerek}</div>
-        <div>Tipe: {selectedProduk.tipe}</div>
-        <div>Stok: {selectedProduk.stok}</div>
+        <div>Produk: {selectedProduk?.nama || "Produk tidak ditemukan"}</div>
+        <div>Merek: {selectedProduk?.nmerek}</div>
+        <div>Tipe: {selectedProduk?.tipe}</div>
+        <div>Stok: {selectedProduk?.stok}</div>
       </div>
       {/* <div className="flex flex-row gap-2">
         <Button color="primary" onPress={tambahButtonPress}>
