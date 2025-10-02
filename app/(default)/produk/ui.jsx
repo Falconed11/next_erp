@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useMemo, useRef } from "react";
+import React, { useCallback, useState, useMemo, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { v4 as uuidv4 } from "uuid";
 import * as XLSX from "xlsx";
@@ -92,7 +92,7 @@ export default function App() {
   const [page, setPage] = React.useState(1);
   const [isReadyStock, setIsReadyStock] = useState(false);
   const rowsPerPage = 10;
-  const { startsWith } = useFilter({ sensitivity: "base" });
+  const { contains } = useFilter({ sensitivity: "base" });
 
   const produk = useClientFetch(
     `produk?kategori=${selectKategori.values().next().value ?? ""}${
@@ -117,6 +117,7 @@ export default function App() {
     id: "",
     kategori: "",
     id_kustom: "",
+    id_kategori: null,
     nama: "",
     merek: "",
     tipe: "",
@@ -141,11 +142,12 @@ export default function App() {
 
   const modal = { masuk: useDisclosure(), keluar: useDisclosure() };
 
-  const [fieldState, setFieldState] = React.useState({
+  const [fieldState, setFieldState] = useState({
     selectedKey: "",
     inputValue: "",
     items: vendor.data?.slice(0, 10), // Initially show only top 10 items
   });
+  const [dataKategori, setDataKategori] = useState(kategori?.data);
 
   const onInputChange = (value) => {
     const filteredItems = vendor.data
@@ -183,7 +185,7 @@ export default function App() {
     onClose();
     // return alert(json.message);
   };
-  const tambahButtonPress = () => {
+  const tambahButtonPress = useCallback(() => {
     setForm({
       modalmode: "Tambah",
       id: "",
@@ -207,12 +209,13 @@ export default function App() {
       lunas: "1",
       keterangan: "",
     });
+    setDataKategori(kategori?.data);
     setMethod("POST");
     onOpen();
-  };
-  const editButtonPress = React.useCallback(
+  }, [kategori, onOpen]);
+  const editButtonPress = useCallback(
     (data) => {
-      setForm({
+      const newForm = {
         ...data,
         modalmode: "Edit",
         selectKategori: new Set([String(data.id_kategori)]),
@@ -222,13 +225,13 @@ export default function App() {
         id_vendor: data.id_vendor,
         startdate: new Date(data.tanggal),
         tanggal: data.tanggal,
-        dataKategori: kategori.data?.slice(0, 10),
-      });
-      console.log(form);
+      };
+      setForm(newForm);
+      setDataKategori(kategori?.data);
       setMethod("PUT");
       onOpen();
     },
-    [kategori.data]
+    [kategori, onOpen]
   );
   const deleteButtonPress = async (id) => {
     if (confirm("Hapus product?")) {
@@ -384,65 +387,66 @@ export default function App() {
     });
   };
 
-  const renderCell = React.useCallback((data, columnKey) => {
-    const cellValue = data[columnKey];
-    switch (columnKey) {
-      case "hargamodal":
-        return (
-          <div className="text-right">
-            <Harga harga={data.hargamodal} />
-          </div>
-        );
-      case "tanggal":
-        return getDateFId(new Date(data.tanggal));
-      case "hargajual":
-        return (
-          <div className="text-right">
-            <Harga harga={data.hargajual} />
-          </div>
-        );
-      case "totalmodal":
-        return (
-          <div className="text-right">
-            <Harga harga={data.hargamodal * data.stok} />
-          </div>
-        );
-      case "totaljual":
-        return (
-          <div className="text-right">
-            <Harga harga={data.hargajual * data.stok} />
-          </div>
-        );
-      case "aksi":
-        return (
-          <div className="relative flex items-center gap-2">
-            {/* <Tooltip content="Details">
+  const renderCell = React.useCallback(
+    (data, columnKey) => {
+      const cellValue = data[columnKey];
+      switch (columnKey) {
+        case "hargamodal":
+          return (
+            <div className="text-right">
+              <Harga harga={data.hargamodal} />
+            </div>
+          );
+        case "tanggal":
+          return getDateFId(new Date(data.tanggal));
+        case "hargajual":
+          return (
+            <div className="text-right">
+              <Harga harga={data.hargajual} />
+            </div>
+          );
+        case "totalmodal":
+          return (
+            <div className="text-right">
+              <Harga harga={data.hargamodal * data.stok} />
+            </div>
+          );
+        case "totaljual":
+          return (
+            <div className="text-right">
+              <Harga harga={data.hargajual * data.stok} />
+            </div>
+          );
+        case "aksi":
+          return (
+            <div className="relative flex items-center gap-2">
+              {/* <Tooltip content="Details">
               <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
                 <EyeIcon />
               </span>
             </Tooltip> */}
-            <LinkOpenNewTab
-              content="Riwayat"
-              link={`/produk/masuk?id_produk=${data.id}`}
-              icon={<NoteIcon />}
-            />
-            <Tooltip content="Edit">
-              <span
-                onClick={() => editButtonPress(data)}
-                className="text-lg text-default-400 cursor-pointer active:opacity-50"
-              >
-                <EditIcon />
-              </span>
-            </Tooltip>
-            <Tooltip content="Produk Masuk">
-              <span
-                onClick={() => onProdukMasukClick(data)}
-                className="text-lg text-default-400 cursor-pointer active:opacity-50"
-              >
-                <AddIcon />
-              </span>
-            </Tooltip>
-            {/* {data.stok > 0 ? (
+              <LinkOpenNewTab
+                content="Riwayat"
+                link={`/produk/masuk?id_produk=${data.id}`}
+                icon={<NoteIcon />}
+              />
+              <Tooltip content="Edit">
+                <span
+                  onClick={() => editButtonPress(data)}
+                  className="text-lg text-default-400 cursor-pointer active:opacity-50"
+                >
+                  <EditIcon />
+                </span>
+              </Tooltip>
+              <Tooltip content="Produk Masuk">
+                <span
+                  onClick={() => onProdukMasukClick(data)}
+                  className="text-lg text-default-400 cursor-pointer active:opacity-50"
+                >
+                  <AddIcon />
+                </span>
+              </Tooltip>
+              {/* {data.stok > 0 ? (
               <Tooltip content="Produk Keluar">
                 <span
                   onClick={() => onProdukKeluarClick(data)}
@@ -454,20 +458,22 @@ export default function App() {
             ) : (
               <></>
             )} */}
-            <Tooltip color="danger" content="Delete">
-              <span
-                onClick={() => deleteButtonPress(data.id)}
-                className="text-lg text-danger cursor-pointer active:opacity-50"
-              >
-                <DeleteIcon />
-              </span>
-            </Tooltip>
-          </div>
-        );
-      default:
-        return cellValue;
-    }
-  }, []);
+              <Tooltip color="danger" content="Delete">
+                <span
+                  onClick={() => deleteButtonPress(data.id)}
+                  className="text-lg text-danger cursor-pointer active:opacity-50"
+                >
+                  <DeleteIcon />
+                </span>
+              </Tooltip>
+            </div>
+          );
+        default:
+          return cellValue;
+      }
+    },
+    [kategori]
+  );
   const filteredData = useMemo(() => {
     if (!produk?.data) return [];
     return produk.data.filter(
@@ -605,7 +611,7 @@ export default function App() {
   //     if (item.id_kategoriproduk == form.id_kategori) return item;
   //   });
   // }
-  console.log(form);
+  console.log([form.kategoriproduk, form.id_kategori]);
   return (
     <div className="">
       <div className="flex flex-col gap-2">
@@ -734,50 +740,53 @@ export default function App() {
                     />
                   }
                   allowsCustomValue
-                  isClearable={false}
-                  items={form?.dataKategori || []}
+                  // isClearable={false}
+                  items={dataKategori}
                   placeholder="Cari kategori"
                   className="max-w-xs"
+                  inputValue={form.kategoriproduk}
                   selectedKey={form.id_kategori}
-                  // inputValue={form.kategoriproduk}
-                  defaultSelectedKey={form.id_kategori}
-                  defaultInputValue={form.kategoriproduk}
-                  onSelectionChange={
-                    (v) =>
-                      setForm((prevState) => {
-                        let selectedItem = prevState.dataKategori.find(
-                          (option) => option.value === v
-                        );
-                        return {
-                          ...form,
-                          ketegoriproduk: selectedItem?.nama || "",
-                          id_kategori: v,
-                          dataKategori: kategori.data
-                            .filter((item) =>
-                              startsWith(item.nama, selectedItem?.nama || "")
-                            )
-                            .slice(0, 10),
-                        };
-                      })
-                    // setForm({ ...form, id_kategori: v })
-                  }
-                  onInputChange={(v) => {
+                  // defaultSelectedKey={form.id_kategori}
+                  // defaultInputValue={form.kategoriproduk}
+                  onSelectionChange={(key) => {
+                    let selectedItem = kategori.data.find(
+                      (option) => option.id == key
+                    );
+                    setDataKategori(
+                      kategori.data.filter((item) =>
+                        contains(item.nama, selectedItem?.nama || "")
+                      )
+                    );
+                    setForm((prevState) => {
+                      return {
+                        ...prevState,
+                        kategoriproduk:
+                          selectedItem?.nama || prevState.kategoriproduk,
+                        id_kategori: key || prevState.id_kategori,
+                      };
+                    });
+                  }}
+                  onInputChange={(value) => {
+                    setDataKategori(
+                      kategori.data.filter((item) => contains(item.nama, value))
+                    );
                     setForm((prevState) => ({
-                      ...form,
-                      kategoriproduk: v,
-                      id_kategori: v === "" ? null : prevState.id_kategori,
-                      dataKategori: kategori.data
-                        .filter((item) => startsWith(item.nama, v))
-                        .slice(0, 10),
+                      ...prevState,
+                      kategoriproduk: value,
+                      id_kategori:
+                        kategori.data.find(
+                          (option) =>
+                            option.nama?.toLowerCase() == value.toLowerCase()
+                        )?.id ?? null,
                     }));
                   }}
                   onOpenChange={(isOpen, menuTrigger) => {
                     if (menuTrigger === "manual" && isOpen) {
+                      setDataKategori(kategori.data);
                       setForm((prevState) => ({
-                        ...form,
+                        ...prevState,
                         kategoriproduk: prevState.kategoriproduk,
                         id_kategori: prevState.id_kategori,
-                        dataKategori: kategori.data.slice(0, 10),
                       }));
                     }
                   }}
