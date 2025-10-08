@@ -150,11 +150,7 @@ export default function Kwitansi({ proyek, nilaiProyek }) {
                         <div></div>
                         <div className="col-span-3 text-center">
                           <div className="w-1/2 mx-auto">
-                            {{
-                              1: "Priyo",
-                              2: "Paulus",
-                              3: "Christo",
-                            }[proyek.id_perusahaan] || "Paulus"}
+                            {pembayaran[versi]?.picKwitansi}
                           </div>
                         </div>
                       </div>

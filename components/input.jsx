@@ -50,11 +50,12 @@ const FileUploader = ({ onFileUpload }) => {
   );
 };
 
-const RangeDate = ({ current, setCurrent }) => {
+const RangeDate = ({ current, setCurrent, setPage }) => {
   const [filter, setFilter] = useState(current);
   const cariOnPress = (e) => {
     e.preventDefault();
     setCurrent(filter);
+    setPage(1);
   };
   const theme = "bg-white";
   return (
@@ -68,6 +69,7 @@ const RangeDate = ({ current, setCurrent }) => {
           onChange={(date) => setFilter({ ...filter, startDate: date })}
           onSelect={(date) => {
             setCurrent({ ...filter, startDate: date });
+            setPage(1);
           }}
           selectsStart
           startDate={filter.startDate}
@@ -130,6 +132,7 @@ function TemplateImport({
       v.tanggal = getDate(excelToJSDate(v.tanggal));
       return v;
     });
+    console.log(jsonData);
     setJson(jsonData);
   };
   const handleButtonUploadExcelPress = async (apiendpoint) => {

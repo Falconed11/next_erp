@@ -628,7 +628,7 @@ export default function App() {
           </div>
         </div>
         <AuthorizationComponent
-          roles={("super", "admin")}
+          roles={["super", "admin"]}
           user={sessUser}
           component={
             <>

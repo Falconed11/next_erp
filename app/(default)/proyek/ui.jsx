@@ -86,7 +86,7 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
     // new Set([])
   );
   const [stat, setStat] = useState(1);
-  const [page, setPage] = React.useState(1);
+  const [page, setPage] = useState(1);
   const rowsPerPage = 10;
   const [filteredData, setFilteredData] = useState([]);
   const [selectStatusProyek, setSelectStatusProyek] = useState();
@@ -619,7 +619,11 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
                     </RadioGroup>
                     <div className="flex flex-row gap-2">
                       <div className="flex">
-                        <RangeDate current={current} setCurrent={setCurrent} />
+                        <RangeDate
+                          current={current}
+                          setCurrent={setCurrent}
+                          setPage={setPage}
+                        />
                       </div>
                     </div>
                     <Select

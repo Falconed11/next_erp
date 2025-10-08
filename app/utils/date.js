@@ -88,7 +88,7 @@ const getCurFirstLastDay = () => {
 };
 
 const excelToJSDate = (excelDate) => {
-  return new Date((excelDate - 25569) * 86400 * 1000);
+  return excelDate ? new Date((excelDate - 25569) * 86400 * 1000) : new Date();
 };
 
 module.exports = {

@@ -8,6 +8,9 @@ import {
 } from "@heroui/react";
 import { getDate } from "@/app/utils/date";
 import Harga from "@/components/harga";
+import { getApiPath, useClientFetch } from "@/app/utils/apiconfig";
+import { key2set, set2key } from "@/app/utils/tools";
+const apiPath = getApiPath();
 
 export default function PembayaranProyek({
   isCreate,
@@ -17,9 +20,16 @@ export default function PembayaranProyek({
   rekap,
   totalPenagihan,
 }) {
+  const karyawan = useClientFetch(`karyawan?id_statuskaryawan=1`);
+  const queries = { karyawan };
+  for (const [name, data] of Object.entries(queries)) {
+    if (data.error) return <div>Failed to load {name}</div>;
+    if (data.isLoading) return <div>Loading {name}...</div>;
+  }
   const nilaiProyek = rekap.hargaPajak;
   const piutang =
     nilaiProyek - (totalPenagihan - (isCreate ? 0 : form.tempNominal));
+  console.log(form);
   return (
     <>
       <div className="bg-gray-100 p-3 rounded-lg z-50">
@@ -79,6 +89,42 @@ export default function PembayaranProyek({
             textValue={`${item.nama} ${item.namabank} ${item.norekening} ${item.atasnama}`}
           >
             {item.nama} {item.namabank} {item.norekening} {item.atasnama}
+          </SelectItem>
+        ))}
+      </Select>
+      <Select
+        label="Invoice"
+        placeholder="Pilih karyawan!"
+        className=""
+        selectedKeys={key2set(form.id_karyawaninvoice)}
+        onSelectionChange={(v) => {
+          setForm({
+            ...form,
+            id_karyawaninvoice: set2key(v),
+          });
+        }}
+      >
+        {karyawan.data.map((item) => (
+          <SelectItem key={item.id} value={item.id} textValue={item.nama}>
+            {item.nama}
+          </SelectItem>
+        ))}
+      </Select>
+      <Select
+        label="Kwitansi"
+        placeholder="Pilih karyawan!"
+        className=""
+        selectedKeys={key2set(form.id_karyawankwitansi)}
+        onSelectionChange={(v) => {
+          setForm({
+            ...form,
+            id_karyawankwitansi: set2key(v),
+          });
+        }}
+      >
+        {karyawan.data.map((item) => (
+          <SelectItem key={item.id} value={item.id} textValue={item.nama}>
+            {item.nama}
           </SelectItem>
         ))}
       </Select>

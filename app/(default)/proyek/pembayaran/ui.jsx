@@ -53,8 +53,8 @@ const [startDate, endDate] = getCurFirstLastDay();
 
 export default function UI() {
   const [filter, setFilter] = useState({
-    startDate,
-    endDate,
+    startDate: null,
+    endDate: null,
     selectKategori: new Set([]),
   });
   const pembayaran = useClientFetch(
@@ -62,7 +62,7 @@ export default function UI() {
       filter.endDate
     )}`
   );
-  const metodepembayaran = useClientFetch(`bank`);
+  const metodepembayaran = useClientFetch(`metodepembayaran`);
   const [form, setForm] = useState({});
   const [json, setJson] = useState([]);
   const [page, setPage] = React.useState(1);
@@ -228,20 +228,20 @@ export default function UI() {
 
   const col = [
     {
+      key: "aksi",
+      label: "Aksi",
+    },
+    {
       key: "tanggal",
       label: "tanggal",
     },
-    // {
-    //   key: "id_proyek",
-    //   label: "Id Proyek",
-    // },
     {
-      key: "nama",
-      label: "Nama Proyek",
+      key: "id_second",
+      label: "ID",
     },
     {
-      key: "instansi",
-      label: "Instansi",
+      key: "status",
+      label: "Status",
     },
     {
       key: "nominal",
@@ -252,12 +252,28 @@ export default function UI() {
       label: "Metode Pembayaran",
     },
     {
-      key: "keterangan",
-      label: "Keterangan",
+      key: "nama_bank",
+      label: "Bank",
     },
     {
-      key: "aksi",
-      label: "Aksi",
+      key: "norekening",
+      label: "Nomor Rekening",
+    },
+    {
+      key: "atasnama",
+      label: "Atas Nama",
+    },
+    {
+      key: "pembayar",
+      label: "Telah Terima Dari",
+    },
+    {
+      key: "untukpembayaran",
+      label: "Untuk Pembayaran",
+    },
+    {
+      key: "keterangan",
+      label: "Keterangan",
     },
   ];
   return (
@@ -284,7 +300,11 @@ export default function UI() {
             <div>Filter</div>
             <div className="flex flex-row gap-2">
               <div className="flex flex-col bg-gray-100 rounded-lg">
-                <RangeDate current={filter} setCurrent={setFilter} />
+                <RangeDate
+                  current={filter}
+                  setCurrent={setFilter}
+                  setPage={setPage}
+                />
               </div>
             </div>
             {/* <div className="flex flex-row gap-2">

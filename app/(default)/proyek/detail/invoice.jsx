@@ -290,7 +290,7 @@ export default function Invoice({
                                   <div>Keuangan</div>
                                   <br />
                                   <br />
-                                  <div>Paulus</div>
+                                  <div>{dataPembayaran[versi]?.picInvoice}</div>
                                 </div>
                               </div>
                             </div>

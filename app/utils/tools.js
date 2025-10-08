@@ -31,4 +31,6 @@ const updateSwitch = async (
 
 const highRoleCheck = (rank) => rank <= 20;
 
-export { rolesCheck, updateSwitch, highRoleCheck };
+const key2set = (key) => new Set(key ? [String(key)] : []);
+const set2key = (set) => new Set(set).values().next().value || null;
+export { rolesCheck, updateSwitch, highRoleCheck, key2set, set2key };

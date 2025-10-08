@@ -415,7 +415,11 @@ export default function App({ id }) {
         case "id_second":
           return data.status ? cellValue : "";
         case "nominal":
-          return <Harga harga={data.nominal} />;
+          return (
+            <div className="text-right">
+              <Harga harga={data.nominal} />
+            </div>
+          );
         case "aksi":
           return (
             <div className="relative flex items-center gap-2">
@@ -450,6 +454,10 @@ export default function App({ id }) {
   };
   const col = {
     pengeluaranproyek: [
+      {
+        key: "aksi",
+        label: "Aksi",
+      },
       {
         key: "tanggal",
         label: "tanggal",
@@ -494,12 +502,12 @@ export default function App({ id }) {
         key: "status",
         label: "Status",
       },
+    ],
+    pembayaranproyek: [
       {
         key: "aksi",
         label: "Aksi",
       },
-    ],
-    pembayaranproyek: [
       {
         key: "tanggal",
         label: "tanggal",
@@ -533,6 +541,14 @@ export default function App({ id }) {
         label: "Atas Nama",
       },
       {
+        key: "picInvoice",
+        label: "Invoice",
+      },
+      {
+        key: "picKwitansi",
+        label: "Kwitansi",
+      },
+      {
         key: "pembayar",
         label: "Telah Terima Dari",
       },
@@ -543,10 +559,6 @@ export default function App({ id }) {
       {
         key: "keterangan",
         label: "Keterangan",
-      },
-      {
-        key: "aksi",
-        label: "Aksi",
       },
     ],
   };
@@ -633,7 +645,7 @@ export default function App({ id }) {
             <>
               <div>Pembayaran Proyek</div>
               <div className="flex-col gap-2">
-                <div className="flex flex-row gap-2 mt-3">
+                <div className="grid grid-cols-6 gap-2 mt-3">
                   {
                     <PembayaranProyek
                       isCreate
@@ -644,15 +656,17 @@ export default function App({ id }) {
                       totalPenagihan={totalPenagihan}
                     />
                   }
-                  <Button
-                    onPress={() => {
-                      tambahButtonPressPembayaran(formPembayaran);
-                    }}
-                    color="primary"
-                    className="ml-2"
-                  >
-                    Tambah
-                  </Button>
+                  <div>
+                    <Button
+                      onPress={() => {
+                        tambahButtonPressPembayaran(formPembayaran);
+                      }}
+                      color="primary"
+                      className="ml-2"
+                    >
+                      Tambah
+                    </Button>
+                  </div>
                 </div>
               </div>
             </>
