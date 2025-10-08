@@ -371,6 +371,7 @@ export default function App({ id, versi }) {
       }),
     });
     const json = await res.json();
+    if (res.status == 400) return alert(json.message);
     // console.log(json.message);
     // return alert(json.message);
     proyek.mutate();
