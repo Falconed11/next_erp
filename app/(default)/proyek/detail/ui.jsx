@@ -69,7 +69,12 @@ import {
   countProvitMarginPercent,
   countRecapitulation,
 } from "@/app/utils/formula";
-import { highRoleCheck, updateSwitch } from "@/app/utils/tools";
+import {
+  highRoleCheck,
+  key2set,
+  set2key,
+  updateSwitch,
+} from "@/app/utils/tools";
 import Kwitansi from "./kwitansi";
 import Invoice from "./invoice";
 import KeteranganPenawaran from "./keteranganpenawaran";
@@ -133,17 +138,19 @@ export default function App({ id, versi }) {
     statusProyek,
     subProyek,
   };
-  const [form, setForm] = useState({
+  const starterForm = {
     selectProduk: new Set([]),
     selectKategori: new Set([]),
-  });
-  const [formInstalasi, setFormInstalasi] = useState({
-    selectProduk: new Set([]),
-    selectKategori: new Set([]),
-  });
+  };
+  const [form, setForm] = useState(starterForm);
+  const [formInstalasi, setFormInstalasi] = useState(starterForm);
   const PERSEN_PROVIT = 30;
   const [inputPersenProvit, setInputPersenProvit] = useState(PERSEN_PROVIT);
 
+  const mutateKeranjang = () => {
+    keranjangProyek.mutate();
+    keranjangProyekInstalasi.mutate();
+  };
   const tambahButtonPress = async (form, setForm) => {
     if (!form.selectProduk) return alert("Silahkan pilih produk");
     if (form.jumlah <= 0) return alert("Jumlah belum diisi");
@@ -156,7 +163,6 @@ export default function App({ id, versi }) {
       body: JSON.stringify({
         ...form,
         id_proyek: id,
-        id_subproyek: form.selectSubProyek?.values().next().value ?? 0,
         id_produk: form.selectProduk,
         jumlah: form.jumlah,
         harga: form.harga,
@@ -167,14 +173,16 @@ export default function App({ id, versi }) {
     });
     const json = await res.json();
     if (res.status == 400) return alert(json.message);
-    if (form.instalasi)
-      setFormInstalasi({
-        selectProduk: "",
-        jumlah: "",
-        harga: "",
-        keterangan: "",
-      });
-    else setForm({ selectProduk: "", jumlah: "", harga: "", keterangan: "" });
+    const newForm = {
+      selectProduk: "",
+      jumlah: "",
+      harga: "",
+      keterangan: "",
+      id_subproyek: null,
+    };
+    if (form.instalasi) setFormInstalasi(newForm);
+    else setForm(newForm);
+    mutateKeranjang();
     // console.log(json.message);
     // return alert(json.message);
   };
@@ -191,7 +199,6 @@ export default function App({ id, versi }) {
         data.temphargamodal,
         data.harga
       ),
-      selectSubProyek: new Set(data.id_subproyek ? [data.id_subproyek] : [0]),
     });
     modal.produk.onOpen();
   };
@@ -206,6 +213,8 @@ export default function App({ id, versi }) {
         body: JSON.stringify({ id }),
       });
       const json = await res.json();
+      if (res.status == 400) return alert(json.message);
+      mutateKeranjang();
       return;
       // return alert(json.message);
     }
@@ -258,12 +267,12 @@ export default function App({ id, versi }) {
       },
       body: JSON.stringify({
         ...data,
-        id_subproyek: form.selectSubProyek?.values().next().value ?? 0,
         hargamodal: form.temphargamodal,
       }),
     });
     const json = await res.json();
     if (res.status == 400) return alert(json.message);
+    mutateKeranjang();
     onClose();
     // console.log(json.message);
     //return alert(json.message);
@@ -630,10 +639,11 @@ export default function App({ id, versi }) {
     pajak: 0,
   };
   const selectedProyek = proyek.data[0];
+  if (!selectedProyek) return <>Proyek tidak ditemukan</>;
   const isHighRole = highRoleCheck(sessUser.rank);
   const col = {
     keranjangproyek: [
-      ...(selectedProyek.versi
+      ...(selectedProyek?.versi
         ? []
         : [
             {
@@ -735,7 +745,7 @@ export default function App({ id, versi }) {
         : []),
     ],
     instalasi: [
-      ...(selectedProyek.versi
+      ...(selectedProyek?.versi
         ? []
         : [
             {
@@ -930,8 +940,10 @@ export default function App({ id, versi }) {
   const compRekapTotal = (
     <TableBottom tableData={dataTabelTotal(true)} title="Rekapitulasi" />
   );
+  const dataSubProyek = subProyek.data;
   const hideComponent = isHighRole ? "" : "hidden";
   const defStyleFormWidth = "w-2/12";
+  console.log(form);
   return (
     <div className="flex gap-2 flex-col">
       <div className="flex gap-2">
@@ -972,26 +984,26 @@ export default function App({ id, versi }) {
               <div>
                 :{" "}
                 {penawaran(
-                  selectedProyek.id_penawaran,
-                  new Date(selectedProyek.tanggal_penawaran)
+                  selectedProyek?.id_penawaran,
+                  new Date(selectedProyek?.tanggal_penawaran)
                 )}{" "}
               </div>
-              <div>: {selectedProyek.namaperusahaan} </div>
-              <div>: {selectedProyek.nama} </div>
+              <div>: {selectedProyek?.namaperusahaan} </div>
+              <div>: {selectedProyek?.nama} </div>
               <div>
-                : {getDateFId(new Date(selectedProyek.tanggal_penawaran))}{" "}
+                : {getDateFId(new Date(selectedProyek?.tanggal_penawaran))}{" "}
               </div>
-              <div>: {selectedProyek.klien} </div>
-              <div>: {selectedProyek.instansi} </div>
-              <div>: {selectedProyek.kota} </div>
-              <div>: {selectedProyek.namakaryawan} </div>
+              <div>: {selectedProyek?.klien} </div>
+              <div>: {selectedProyek?.instansi} </div>
+              <div>: {selectedProyek?.kota} </div>
+              <div>: {selectedProyek?.namakaryawan} </div>
               <div>
                 :{" "}
-                {selectedProyek.versi == -1 ? (
+                {selectedProyek?.versi == -1 ? (
                   <span className="bg-red-600 text-white p-1 rounded-sm font-bold">
                     REJECT
                   </span>
-                ) : selectedProyek.versi == selectedVersion ? (
+                ) : selectedProyek?.versi == selectedVersion ? (
                   <span className="bg-green-400 text-white p-1 rounded-sm font-bold">
                     DEAL
                   </span>
@@ -1003,7 +1015,7 @@ export default function App({ id, versi }) {
           </div>
         </div>
         {/* alat */}
-        {selectedProyek.versi == 0 && sessUser.rank <= 10 ? (
+        {selectedProyek?.versi == 0 && sessUser.rank <= 10 ? (
           <div className="bg-white rounded-lg p-3 flex flex-col gap-2">
             <div>Alat</div>
             <Form onSubmit={terapkanButtonPress}>
@@ -1045,7 +1057,7 @@ export default function App({ id, versi }) {
         <div>
           <KeteranganPenawaran
             keteranganPenawaran={keteranganPenawaran}
-            idProyek={selectedProyek.id}
+            idProyek={selectedProyek?.id}
           />
         </div>
       </div>
@@ -1065,7 +1077,7 @@ export default function App({ id, versi }) {
                 </Button>
               </div> */}
               {["admin", "super"].includes(sessUser?.peran) ? (
-                selectedProyek.versi <= 0 ? (
+                selectedProyek?.versi <= 0 ? (
                   <div>
                     <Button
                       onPress={handleButtonSetAsDealClick}
@@ -1090,7 +1102,7 @@ export default function App({ id, versi }) {
                 <></>
               )}
               {["admin", "super"].includes(sessUser?.peran) ? (
-                selectedProyek.versi != -1 ? (
+                selectedProyek?.versi != -1 ? (
                   <div>
                     <Button
                       onPress={handleButtonSetAsRejectClick}
@@ -1151,7 +1163,7 @@ export default function App({ id, versi }) {
                 />
               </div>
               <NavLinkNewTab
-                href={`/proyek/detail/proses?id=${selectedProyek.id}`}
+                href={`/proyek/detail/proses?id=${selectedProyek?.id}`}
               >
                 {"Pengeluaran & Pembayaran ==>>"}
               </NavLinkNewTab>
@@ -1168,7 +1180,7 @@ export default function App({ id, versi }) {
                   <>
                     <div>Peralatan</div>
                     <ConditionalComponent
-                      condition={selectedProyek.versi == 0}
+                      condition={selectedProyek?.versi == 0}
                       component={
                         <>
                           <div className="flex gap-2 w-9/12">
@@ -1241,24 +1253,12 @@ export default function App({ id, versi }) {
                                       })
                                     }
                                   />
-                                  <Select
-                                    label="Sub Proyek"
-                                    placeholder="Pilih subproyek! (Opsional)"
-                                    className={`${defStyleFormWidth}`}
-                                    selectedKeys={form.selectSubProyek}
-                                    onSelectionChange={(v) => {
-                                      setForm({
-                                        ...form,
-                                        selectSubProyek: v,
-                                      });
-                                    }}
-                                  >
-                                    {subProyek.data.map((item) => (
-                                      <SelectItem key={item.id} value={item.id}>
-                                        {item.nama}
-                                      </SelectItem>
-                                    ))}
-                                  </Select>
+                                  <SelectSubProyek
+                                    classNames={defStyleFormWidth}
+                                    data={dataSubProyek}
+                                    form={form}
+                                    setForm={setForm}
+                                  />
                                 </>
                               }
                             />
@@ -1357,7 +1357,7 @@ export default function App({ id, versi }) {
                   <>
                     <div>Instalasi</div>
                     <ConditionalComponent
-                      condition={selectedProyek.versi == 0}
+                      condition={selectedProyek?.versi == 0}
                       component={
                         <div className="flex gap-2 w-9/12">
                           <TambahProduk
@@ -1432,24 +1432,12 @@ export default function App({ id, versi }) {
                                     })
                                   }
                                 />
-                                <Select
-                                  label="Sub Proyek"
-                                  placeholder="Pilih subproyek! (Opsional)"
-                                  className={`${defStyleFormWidth}`}
-                                  selectedKeys={formInstalasi.selectSubProyek}
-                                  onSelectionChange={(v) => {
-                                    setFormInstalasi({
-                                      ...formInstalasi,
-                                      selectSubProyek: v,
-                                    });
-                                  }}
-                                >
-                                  {subProyek.data.map((item) => (
-                                    <SelectItem key={item.id} value={item.id}>
-                                      {item.nama}
-                                    </SelectItem>
-                                  ))}
-                                </Select>
+                                <SelectSubProyek
+                                  classNames={defStyleFormWidth}
+                                  data={dataSubProyek}
+                                  form={formInstalasi}
+                                  setForm={setFormInstalasi}
+                                />
                               </>
                             }
                           />
@@ -1606,23 +1594,11 @@ export default function App({ id, versi }) {
                 Edit {form.instalasi ? "Instalasi" : "Produk"}
               </ModalHeader>
               <ModalBody>
-                <Select
-                  label="Sub Proyek"
-                  placeholder="Pilih subproyek! (Opsional)"
-                  selectedKeys={form.selectSubProyek}
-                  onSelectionChange={(v) => {
-                    setForm({
-                      ...form,
-                      selectSubProyek: v,
-                    });
-                  }}
-                >
-                  {subProyek.data.map((item) => (
-                    <SelectItem key={item.id} value={item.id}>
-                      {item.nama}
-                    </SelectItem>
-                  ))}
-                </Select>
+                <SelectSubProyek
+                  data={dataSubProyek}
+                  form={form}
+                  setForm={setForm}
+                />
                 <div>Nama : {form.nama}</div>
                 <Input
                   type="text"
@@ -2045,3 +2021,26 @@ const TableBottom = ({ title = "", tableData }) => (
     </div>
   </div>
 );
+
+const SelectSubProyek = ({ classNames = "", data = [], form, setForm }) => {
+  return (
+    <Select
+      className={classNames}
+      label="Sub Proyek"
+      placeholder="Pilih subproyek! (Opsional)"
+      selectedKeys={key2set(form.id_subproyek)}
+      onSelectionChange={(v) => {
+        setForm({
+          ...form,
+          id_subproyek: set2key(v),
+        });
+      }}
+    >
+      {data.map((item) => (
+        <SelectItem key={item.id} value={item.id}>
+          {item.nama}
+        </SelectItem>
+      ))}
+    </Select>
+  );
+};

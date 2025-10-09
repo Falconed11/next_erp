@@ -568,6 +568,7 @@ export default function App({ id }) {
   }
   if (session.status === "loading") return <>Session Loading ...</>;
   const selectedProyek = proyek.data[0];
+  if (!selectedProyek) return <>Proyek tidak ditemukan</>;
   const { rekapitulasiPeralatan, rekapitulasiInstalasi, rekapitulasiTotal } =
     countRecapitulation(
       keranjangPeralatan.data,

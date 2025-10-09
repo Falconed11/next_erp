@@ -418,7 +418,7 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
                 <FileExportIcon />
               </span>
             </Tooltip> */}
-            {["super"].includes(peran) ? (
+            {["super", "admin"].includes(peran) ? (
               <Tooltip color="danger" content="Delete">
                 <span
                   onClick={() => deleteButtonPress(data.id)}

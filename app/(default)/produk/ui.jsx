@@ -142,12 +142,14 @@ export default function App() {
 
   const modal = { masuk: useDisclosure(), keluar: useDisclosure() };
 
-  const [fieldState, setFieldState] = useState({
-    selectedKey: "",
-    inputValue: "",
-    items: vendor.data?.slice(0, 10), // Initially show only top 10 items
-  });
+  // const [fieldState, setFieldState] = useState({
+  //   selectedKey: "",
+  //   inputValue: "",
+  //   items: vendor.data?.slice(0, 10), // Initially show only top 10 items
+  // });
   const [dataKategori, setDataKategori] = useState(kategori?.data);
+  const [dataMerek, setDataMerek] = useState(merek?.data);
+  const [dataVendor, setDataVendor] = useState(vendor?.data);
 
   const onInputChange = (value) => {
     const filteredItems = vendor.data
@@ -210,9 +212,11 @@ export default function App() {
       keterangan: "",
     });
     setDataKategori(kategori?.data);
+    setDataMerek(merek?.data);
+    setDataMerek(vendor?.data);
     setMethod("POST");
     onOpen();
-  }, [kategori, onOpen]);
+  }, [kategori, merek, vendor, onOpen]);
   const editButtonPress = useCallback(
     (data) => {
       const newForm = {
@@ -228,10 +232,12 @@ export default function App() {
       };
       setForm(newForm);
       setDataKategori(kategori?.data);
+      setDataMerek(merek?.data);
+      setDataVendor(vendor?.data);
       setMethod("PUT");
       onOpen();
     },
-    [kategori, onOpen]
+    [kategori, merek, vendor, onOpen]
   );
   const deleteButtonPress = async (id) => {
     if (confirm("Hapus product?")) {
@@ -472,7 +478,7 @@ export default function App() {
           return cellValue;
       }
     },
-    [kategori]
+    [kategori, merek, vendor]
   );
   const filteredData = useMemo(() => {
     if (!produk?.data) return [];
@@ -486,14 +492,14 @@ export default function App() {
         row.id_kustom.toLowerCase().includes(id.toLowerCase())
     );
   }, [produk?.data, nama, id]);
-  const dataMerek = useMemo(() => {
-    if (!merek?.data) return [];
-    return merek.data
-      .filter((merek) =>
-        merek.nama.toLowerCase().includes(form.merek.toLowerCase())
-      )
-      .slice(0, 20);
-  }, [merek?.data, form.merek]);
+  // const dataMerek = useMemo(() => {
+  //   if (!merek?.data) return [];
+  //   return merek.data
+  //     .filter((merek) =>
+  //       merek.nama.toLowerCase().includes(form.merek.toLowerCase())
+  //     )
+  //     .slice(0, 20);
+  // }, [merek?.data, form.merek]);
   const pages = useMemo(() => {
     return filteredData ? Math.ceil(filteredData?.length / rowsPerPage) : 0;
   }, [filteredData?.length, rowsPerPage]);
@@ -611,7 +617,7 @@ export default function App() {
   //     if (item.id_kategoriproduk == form.id_kategori) return item;
   //   });
   // }
-  console.log([form.kategoriproduk, form.id_kategori]);
+  // console.log([form.kategoriproduk, form.id_kategori]);
   return (
     <div className="">
       <div className="flex flex-col gap-2">
@@ -729,7 +735,7 @@ export default function App() {
                 {form.modalmode} Produk
               </ModalHeader>
               <ModalBody>
-                <Autocomplete
+                {/* <Autocomplete
                   variant="bordered"
                   label={
                     <LabelRecordCheck
@@ -796,37 +802,20 @@ export default function App() {
                       {item.nama}
                     </AutocompleteItem>
                   )}
-                </Autocomplete>
-                {/* <Autocomplete
-                  variant="bordered"
-                  label={
-                    <LabelRecordCheck
-                      title={"Kategori"}
-                      isNotAvailable={
-                        form.kategoriproduk && form.id_kategori == null
-                      }
-                    />
-                  }
-                  allowsCustomValue
-                  isClearable={false}
-                  defaultItems={kategori.data}
-                  placeholder="Cari kategori"
-                  className="max-w-xs"
-                  selectedKey={form.id_kategori}
-                  // inputValue={form.kategoriproduk}
-                  defaultSelectedKey={form.id_kategori}
-                  defaultInputValue={form.kategoriproduk}
-                  onSelectionChange={(v) =>
-                    setForm({ ...form, id_kategori: v })
-                  }
-                  onValueChange={(v) => setForm({ ...form, kategoriproduk: v })}
-                >
-                  {(item) => (
-                    <AutocompleteItem key={item.id} textValue={item.nama}>
-                      {item.nama}
-                    </AutocompleteItem>
-                  )}
                 </Autocomplete> */}
+                <AutocompleteWithCustomValue
+                  title={"Kategori"}
+                  contains={contains}
+                  data={kategori.data}
+                  filteredData={dataKategori}
+                  setFilteredData={setDataKategori}
+                  form={form}
+                  setForm={setForm}
+                  field={"kategoriproduk"}
+                  id={"id_kategori"}
+                  labelKey={"nama"}
+                  valueKey={"id"}
+                />
                 <Input
                   type="text"
                   label="Id"
@@ -841,31 +830,19 @@ export default function App() {
                   value={form.nama}
                   onValueChange={(val) => setForm({ ...form, nama: val })}
                 />
-                <Autocomplete
-                  variant="bordered"
-                  label={
-                    <LabelRecordCheck
-                      title={"Merek"}
-                      isNotAvailable={form.merek && !form.id_merek}
-                    />
-                  }
-                  allowsCustomValue
-                  isClearable={false}
-                  defaultItems={dataMerek}
-                  placeholder="Cari merek"
-                  className="max-w-xs"
-                  selectedKey={form.id_merek}
-                  defaultSelectedKey={form.id_merek}
-                  defaultInputValue={form.merek}
-                  onSelectionChange={(v) => setForm({ ...form, id_merek: v })}
-                  onValueChange={(v) => setForm({ ...form, merek: v })}
-                >
-                  {(item) => (
-                    <AutocompleteItem key={item.id} textValue={item.nama}>
-                      {item.nama}
-                    </AutocompleteItem>
-                  )}
-                </Autocomplete>
+                <AutocompleteWithCustomValue
+                  title={"Merek"}
+                  contains={contains}
+                  data={merek.data}
+                  filteredData={dataMerek}
+                  setFilteredData={setDataMerek}
+                  form={form}
+                  setForm={setForm}
+                  field={"merek"}
+                  id={"id_merek"}
+                  labelKey={"nama"}
+                  valueKey={"id"}
+                />
                 <Input
                   type="text"
                   label="Tipe"
@@ -887,43 +864,26 @@ export default function App() {
                       value={form.stok}
                       onValueChange={(val) => setForm({ ...form, stok: val })}
                     />
-                    <Autocomplete
-                      allowsCustomValue
-                      isClearable={false}
+                    <AutocompleteWithCustomValue
                       isDisabled={form.stok ? undefined : true}
-                      label={
-                        <LabelRecordCheck
-                          title={"Vendor"}
-                          isNotAvailable={form.vendor && !form.id_vendor}
-                        />
-                      }
-                      variant="bordered"
-                      defaultItems={vendor.data}
-                      placeholder="Cari vendor"
-                      className="max-w-xs"
-                      selectedKey={form.id_vendor}
-                      defaultSelectedKey={form.id_vendor}
-                      defaultInputValue={form.vendor}
-                      onSelectionChange={(v) => {
-                        const selectedVendor = vendor.data.find(
-                          (o) => o.id == v
-                        );
-                        setForm({
-                          ...form,
-                          id_vendor: v,
-                          alamat: selectedVendor?.alamat,
-                        });
-                      }}
-                      onValueChange={(v) => setForm({ ...form, vendor: v })}
-                    >
-                      {(item) => (
-                        <AutocompleteItem key={item.id} textValue={item.nama}>
-                          {item.nama}
-                        </AutocompleteItem>
-                      )}
-                    </Autocomplete>
+                      title={"Vendor"}
+                      contains={contains}
+                      data={vendor.data}
+                      filteredData={dataVendor}
+                      setFilteredData={setDataVendor}
+                      form={form}
+                      setForm={setForm}
+                      field={"vendor"}
+                      id={"id_vendor"}
+                      labelKey={"nama"}
+                      valueKey={"id"}
+                    />
                     <Textarea
-                      isDisabled={!form.stok || !form.vendor ? true : undefined}
+                      isDisabled={
+                        !form.stok || !form.vendor || form.id_vendor
+                          ? true
+                          : undefined
+                      }
                       label="alamat"
                       labelPlacement="inside"
                       placeholder="Masukkan alamat!"
@@ -1450,5 +1410,89 @@ const LabelRecordCheck = ({ title, isNotAvailable }) => {
         <span className="text-danger">{" *Data tidak terdaftar"}</span>
       )}
     </>
+  );
+};
+
+const AutocompleteWithCustomValue = ({
+  isDisabled = undefined,
+  title,
+  data,
+  filteredData,
+  setFilteredData,
+  form,
+  setForm,
+  field,
+  id,
+  valueKey,
+  labelKey,
+  contains,
+}) => {
+  return (
+    <Autocomplete
+      isDisabled={isDisabled}
+      variant="bordered"
+      label={
+        <LabelRecordCheck
+          title={title}
+          isNotAvailable={form[field] && form[id] == null}
+        />
+      }
+      allowsCustomValue
+      // isClearable={false}
+      items={filteredData}
+      placeholder={"Cari " + title}
+      className="max-w-xs"
+      inputValue={form[field]}
+      selectedKey={form[id]}
+      // defaultSelectedKey={form.id_kategori}
+      // defaultInputValue={form.kategoriproduk}
+      onSelectionChange={(key) => {
+        let selectedItem = data.find((option) => option[valueKey] == key);
+        setFilteredData(
+          // data.filter((item) =>
+          //   contains(item[labelKey], selectedItem?.[labelKey] || "")
+          // )
+          selectedItem
+            ? data.filter((item) =>
+                contains(item[labelKey], selectedItem[labelKey])
+              )
+            : data
+        );
+        setForm((prevState) => {
+          return {
+            ...prevState,
+            [field]: selectedItem?.[labelKey] || prevState[field],
+            [id]: key || prevState[id],
+          };
+        });
+      }}
+      onInputChange={(value) => {
+        setFilteredData(data.filter((item) => contains(item[labelKey], value)));
+        setForm((prevState) => ({
+          ...prevState,
+          [field]: value,
+          [id]:
+            data.find(
+              (option) => option[labelKey]?.toLowerCase() == value.toLowerCase()
+            )?.[valueKey] ?? null,
+        }));
+      }}
+      onOpenChange={(isOpen, menuTrigger) => {
+        if (menuTrigger === "manual" && isOpen) {
+          setFilteredData(data);
+          setForm((prevState) => ({
+            ...prevState,
+            [field]: prevState[field],
+            [id]: prevState[id],
+          }));
+        }
+      }}
+    >
+      {(item) => (
+        <AutocompleteItem key={item[valueKey]} textValue={item[labelKey]}>
+          {item[labelKey]}
+        </AutocompleteItem>
+      )}
+    </Autocomplete>
   );
 };
