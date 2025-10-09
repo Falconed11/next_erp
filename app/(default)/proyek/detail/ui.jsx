@@ -1359,88 +1359,91 @@ export default function App({ id, versi }) {
                     <ConditionalComponent
                       condition={selectedProyek?.versi == 0}
                       component={
-                        <div className="flex gap-2 w-9/12">
-                          <TambahProduk
-                            form={formInstalasi}
-                            setForm={setFormInstalasi}
-                            disableStok
-                            disableVendor
-                            rank={sessUser.rank}
-                            customInput={
-                              <>
-                                <NumberInput
-                                  hideStepper
-                                  isWheelDisabled
-                                  formatOptions={{
-                                    useGrouping: false,
-                                  }}
-                                  className={`${defStyleFormWidth} ${hideComponent}`}
-                                  value={
-                                    formInstalasi.harga -
-                                      formInstalasi.hargamodal || ""
-                                  }
-                                  label={"Provit"}
-                                  placeholder="Masukkan provit!"
-                                  onValueChange={(v) => {
-                                    setFormInstalasi({
-                                      ...formInstalasi,
-                                      harga: formInstalasi.hargamodal + v || "",
-                                    });
-                                  }}
-                                />
-                                <NumberInput
-                                  hideStepper
-                                  isWheelDisabled
-                                  formatOptions={{
-                                    useGrouping: false,
-                                  }}
-                                  className={`${defStyleFormWidth} ${hideComponent}`}
-                                  value={
-                                    Math.round(
-                                      countPercentProvit(
-                                        formInstalasi.hargamodal,
-                                        formInstalasi.harga
-                                      ) * 100
-                                    ) / 100 || ""
-                                  }
-                                  label={"Provit (%)"}
-                                  placeholder="Masukkan provit %!"
-                                  onValueChange={(v) => {
-                                    setFormInstalasi({
-                                      ...formInstalasi,
-                                      harga:
-                                        Math.round(
-                                          countPriceByPercentProfit(
-                                            formInstalasi.hargamodal,
-                                            v
-                                          )
-                                        ) || "",
-                                    });
-                                  }}
-                                />
-                                <Input
-                                  type="text"
-                                  value={formInstalasi.keterangan}
-                                  label="Nama Kustom"
-                                  placeholder="Masukkan nama kustom! (Opsional)"
-                                  // placeholder="Masukkan jumlah!"
-                                  className={`${defStyleFormWidth}`}
-                                  onValueChange={(v) =>
-                                    setFormInstalasi({
-                                      ...formInstalasi,
-                                      keterangan: v,
-                                    })
-                                  }
-                                />
-                                <SelectSubProyek
-                                  classNames={defStyleFormWidth}
-                                  data={dataSubProyek}
-                                  form={formInstalasi}
-                                  setForm={setFormInstalasi}
-                                />
-                              </>
-                            }
-                          />
+                        <>
+                          <div className="flex gap-2 w-9/12">
+                            <TambahProduk
+                              form={formInstalasi}
+                              setForm={setFormInstalasi}
+                              disableStok
+                              disableVendor
+                              rank={sessUser.rank}
+                              customInput={
+                                <>
+                                  <NumberInput
+                                    hideStepper
+                                    isWheelDisabled
+                                    formatOptions={{
+                                      useGrouping: false,
+                                    }}
+                                    className={`${defStyleFormWidth} ${hideComponent}`}
+                                    value={
+                                      formInstalasi.harga -
+                                        formInstalasi.hargamodal || ""
+                                    }
+                                    label={"Provit"}
+                                    placeholder="Masukkan provit!"
+                                    onValueChange={(v) => {
+                                      setFormInstalasi({
+                                        ...formInstalasi,
+                                        harga:
+                                          formInstalasi.hargamodal + v || "",
+                                      });
+                                    }}
+                                  />
+                                  <NumberInput
+                                    hideStepper
+                                    isWheelDisabled
+                                    formatOptions={{
+                                      useGrouping: false,
+                                    }}
+                                    className={`${defStyleFormWidth} ${hideComponent}`}
+                                    value={
+                                      Math.round(
+                                        countPercentProvit(
+                                          formInstalasi.hargamodal,
+                                          formInstalasi.harga
+                                        ) * 100
+                                      ) / 100 || ""
+                                    }
+                                    label={"Provit (%)"}
+                                    placeholder="Masukkan provit %!"
+                                    onValueChange={(v) => {
+                                      setFormInstalasi({
+                                        ...formInstalasi,
+                                        harga:
+                                          Math.round(
+                                            countPriceByPercentProfit(
+                                              formInstalasi.hargamodal,
+                                              v
+                                            )
+                                          ) || "",
+                                      });
+                                    }}
+                                  />
+                                  <Input
+                                    type="text"
+                                    value={formInstalasi.keterangan}
+                                    label="Nama Kustom"
+                                    placeholder="Masukkan nama kustom! (Opsional)"
+                                    // placeholder="Masukkan jumlah!"
+                                    className={`${defStyleFormWidth}`}
+                                    onValueChange={(v) =>
+                                      setFormInstalasi({
+                                        ...formInstalasi,
+                                        keterangan: v,
+                                      })
+                                    }
+                                  />
+                                  <SelectSubProyek
+                                    classNames={defStyleFormWidth}
+                                    data={dataSubProyek}
+                                    form={formInstalasi}
+                                    setForm={setFormInstalasi}
+                                  />
+                                </>
+                              }
+                            />
+                          </div>
                           <div>
                             <Button
                               onPress={() => {
@@ -1457,7 +1460,7 @@ export default function App({ id, versi }) {
                               Tambah
                             </Button>
                           </div>
-                        </div>
+                        </>
                       }
                     />
                   </>
