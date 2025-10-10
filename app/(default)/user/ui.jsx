@@ -20,7 +20,7 @@ import {
   DeleteIcon,
   EyeIcon,
   UserIcon,
-} from "../../../components/icon";
+} from "@/components/icon";
 import {
   Modal,
   ModalContent,
@@ -33,7 +33,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { getApiPath, useClientFetch } from "../../utils/apiconfig";
 import { Button } from "@heroui/react";
 import { Input, Select, SelectItem } from "@heroui/react";
-import { rolesCheck } from "@/app/utils/tools";
+import { key2set, rolesCheck, set2key } from "@/app/utils/tools";
 
 const api_path = getApiPath();
 
@@ -138,6 +138,10 @@ export default function App() {
   const col = {
     user: [
       {
+        key: "aksi",
+        label: "Aksi",
+      },
+      {
         key: "username",
         label: "Username",
       },
@@ -148,10 +152,6 @@ export default function App() {
       {
         key: "nama",
         label: "Karyawan",
-      },
-      {
-        key: "aksi",
-        label: "Aksi",
       },
     ],
   };
@@ -165,6 +165,7 @@ export default function App() {
   if (session.status === "loading") return <>Loading...</>;
   // if (session.data.user.peran != "super")
   //   return <div>Anda tidak memiliki akses pada laman ini.</div>;
+  // console.log(peran);
   return (
     <div>
       <Button onPress={tambahButtonPress} color="primary">
@@ -222,16 +223,19 @@ export default function App() {
                     label="Peran"
                     variant="bordered"
                     disabled={
-                      sessionuser.rank < form.tempRank ? undefined : true
+                      sessionuser.rank < form.tempRank ||
+                      form.modalmode == "Tambah"
+                        ? undefined
+                        : true
                     }
                     placeholder="Pilih peran!"
-                    selectedKeys={new Set([String(form.peran)])}
+                    selectedKeys={key2set(form.peran)}
                     className="max-w-xs"
                     onSelectionChange={(v) => {
                       console.log({ v });
                       setForm({
                         ...form,
-                        peran: new Set(v).values().next().value,
+                        peran: set2key(v),
                       });
                     }}
                   >

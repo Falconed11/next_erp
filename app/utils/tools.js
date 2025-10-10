@@ -1,6 +1,9 @@
 import { getApiPath } from "./apiconfig";
 
 const api_path = getApiPath();
+const getNextDomain = () => {
+  return process.env.NEXT_PUBLIC_MAIN_URL;
+};
 
 const rolesCheck = (roles, peran) => {
   return roles.includes(peran);
@@ -33,4 +36,11 @@ const highRoleCheck = (rank) => rank <= 20;
 
 const key2set = (key) => new Set(key ? [String(key)] : []);
 const set2key = (set) => new Set(set).values().next().value || null;
-export { rolesCheck, updateSwitch, highRoleCheck, key2set, set2key };
+export {
+  rolesCheck,
+  updateSwitch,
+  highRoleCheck,
+  key2set,
+  set2key,
+  getNextDomain,
+};

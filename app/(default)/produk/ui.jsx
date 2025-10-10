@@ -162,7 +162,6 @@ export default function App() {
       items: value ? filteredItems : vendor.data.slice(0, 10), // If no input, show top 10 unfiltered items
     }));
   };
-
   const saveButtonPress = async (onClose) => {
     if (form.tipe == "" || (!form.id_kategori && !form.kategoriproduk))
       return alert("Tipe, dan Kategori wajib diisi!");
@@ -213,7 +212,7 @@ export default function App() {
     });
     setDataKategori(kategori?.data);
     setDataMerek(merek?.data);
-    setDataMerek(vendor?.data);
+    setDataVendor(vendor?.data);
     setMethod("POST");
     onOpen();
   }, [kategori, merek, vendor, onOpen]);
@@ -1417,7 +1416,7 @@ const AutocompleteWithCustomValue = ({
   isDisabled = undefined,
   title,
   data,
-  filteredData,
+  filteredData = [],
   setFilteredData,
   form,
   setForm,

@@ -17,6 +17,7 @@ import {
   NumberInput,
   Spinner,
   Switch,
+  Snippet,
 } from "@heroui/react";
 import {
   AddIcon,
@@ -24,6 +25,7 @@ import {
   DeleteIcon,
   EyeIcon,
   UserIcon,
+  WAIcon,
 } from "@/components/icon";
 import {
   Modal,
@@ -70,6 +72,7 @@ import {
   countRecapitulation,
 } from "@/app/utils/formula";
 import {
+  getNextDomain,
   highRoleCheck,
   key2set,
   set2key,
@@ -87,6 +90,7 @@ import {
   createTable,
   RecapTable,
 } from "./rekap";
+import { NEXT_DOMAIN } from "@/app/utils/const";
 
 const api_path = getApiPath();
 
@@ -943,73 +947,98 @@ export default function App({ id, versi }) {
   const dataSubProyek = subProyek.data;
   const hideComponent = isHighRole ? "" : "hidden";
   const defStyleFormWidth = "w-2/12";
-  console.log(form);
+  const fullPath = `${NEXT_DOMAIN}/proyek/detail?id=${id}&versi=${versi}`;
   return (
     <div className="flex gap-2 flex-col">
       <div className="flex gap-2">
         {/* detail  */}
-        <div className="bg-white rounded-lg p-3">
-          <div>Detail</div>
-          {versiKeranjangProyek.data.length > 1 ? (
-            <Select
-              label="Versi"
-              placeholder="Pilih versi!"
-              selectedKeys={selectVersi}
-              onSelectionChange={setSelectVersi}
+        <div className="flex gap-2 flex-col">
+          <div className="p-2 bg-white flex rounded-lg gap-2">
+            Bagikan:
+            <Snippet
+              size="md"
+              hideSymbol
+              tooltipProps={{ content: "Kopi URL Proyek" }}
+              codeString={fullPath}
+            ></Snippet>
+            <Button
+              isIconOnly
+              radius="full"
+              size="md"
+              onPress={() => {
+                const encodedMessage = encodeURIComponent(fullPath);
+                const whatsappUrl = `https://wa.me/?text=${encodedMessage}`;
+                window.open(whatsappUrl, "_blank");
+              }}
+              className="bg-green-500 hover:bg-green-600 transition text-xl text-center"
+              title="Share on WhatsApp"
             >
-              {versiKeranjangProyek.data.map((item) => (
-                <SelectItem key={item.versi} value={item.versi}>
-                  {`${item.versi} ${
-                    item.versi == selectedProyek.versi ? "(deal)" : ""
-                  }`}
-                </SelectItem>
-              ))}
-            </Select>
-          ) : (
-            <></>
-          )}
-          <div className="flex">
-            <div>
-              <div>No.</div>
-              <div>Perusahaan</div>
-              <div>Nama Proyek{"  "}</div>
-              <div>Tanggal</div>
-              <div>Klien</div>
-              <div>Instansi</div>
-              <div>Kota</div>
-              <div>Sales</div>
-              <div>Status</div>
-            </div>
-            <div>
+              <WAIcon />
+            </Button>
+          </div>
+          <div className="bg-white rounded-lg p-3">
+            <div>Detail</div>
+            {versiKeranjangProyek.data.length > 1 ? (
+              <Select
+                label="Versi"
+                placeholder="Pilih versi!"
+                selectedKeys={selectVersi}
+                onSelectionChange={setSelectVersi}
+              >
+                {versiKeranjangProyek.data.map((item) => (
+                  <SelectItem key={item.versi} value={item.versi}>
+                    {`${item.versi} ${
+                      item.versi == selectedProyek.versi ? "(deal)" : ""
+                    }`}
+                  </SelectItem>
+                ))}
+              </Select>
+            ) : (
+              <></>
+            )}
+            <div className="flex">
               <div>
-                :{" "}
-                {penawaran(
-                  selectedProyek?.id_penawaran,
-                  new Date(selectedProyek?.tanggal_penawaran)
-                )}{" "}
+                <div>No.</div>
+                <div>Perusahaan</div>
+                <div>Nama Proyek{"  "}</div>
+                <div>Tanggal</div>
+                <div>Klien</div>
+                <div>Instansi</div>
+                <div>Kota</div>
+                <div>Sales</div>
+                <div>Status</div>
               </div>
-              <div>: {selectedProyek?.namaperusahaan} </div>
-              <div>: {selectedProyek?.nama} </div>
               <div>
-                : {getDateFId(new Date(selectedProyek?.tanggal_penawaran))}{" "}
-              </div>
-              <div>: {selectedProyek?.klien} </div>
-              <div>: {selectedProyek?.instansi} </div>
-              <div>: {selectedProyek?.kota} </div>
-              <div>: {selectedProyek?.namakaryawan} </div>
-              <div>
-                :{" "}
-                {selectedProyek?.versi == -1 ? (
-                  <span className="bg-red-600 text-white p-1 rounded-sm font-bold">
-                    REJECT
-                  </span>
-                ) : selectedProyek?.versi == selectedVersion ? (
-                  <span className="bg-green-400 text-white p-1 rounded-sm font-bold">
-                    DEAL
-                  </span>
-                ) : (
-                  "penawaran"
-                )}
+                <div>
+                  :{" "}
+                  {penawaran(
+                    selectedProyek?.id_penawaran,
+                    new Date(selectedProyek?.tanggal_penawaran)
+                  )}{" "}
+                </div>
+                <div>: {selectedProyek?.namaperusahaan} </div>
+                <div>: {selectedProyek?.nama} </div>
+                <div>
+                  : {getDateFId(new Date(selectedProyek?.tanggal_penawaran))}{" "}
+                </div>
+                <div>: {selectedProyek?.klien} </div>
+                <div>: {selectedProyek?.instansi} </div>
+                <div>: {selectedProyek?.kota} </div>
+                <div>: {selectedProyek?.namakaryawan} </div>
+                <div>
+                  :{" "}
+                  {selectedProyek?.versi == -1 ? (
+                    <span className="bg-red-600 text-white p-1 rounded-sm font-bold">
+                      REJECT
+                    </span>
+                  ) : selectedProyek?.versi == selectedVersion ? (
+                    <span className="bg-green-400 text-white p-1 rounded-sm font-bold">
+                      DEAL
+                    </span>
+                  ) : (
+                    "penawaran"
+                  )}
+                </div>
               </div>
             </div>
           </div>

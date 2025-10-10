@@ -1,4 +1,5 @@
 import { getApiPath } from "./apiconfig";
+import { getNextDomain } from "./tools";
 
 const api_path = getApiPath();
 
@@ -29,5 +30,6 @@ const LIST_SWASTA_NEGRI = [
   { id: 1, nama: "swasta" },
   { id: 0, nama: "negri" },
 ];
+const NEXT_DOMAIN = getNextDomain();
 
-export { LIST_SWASTA_NEGRI };
+export { LIST_SWASTA_NEGRI, NEXT_DOMAIN };
