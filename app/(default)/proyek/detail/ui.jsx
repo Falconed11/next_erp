@@ -953,28 +953,32 @@ export default function App({ id, versi }) {
       <div className="flex gap-2">
         {/* detail  */}
         <div className="flex gap-2 flex-col">
-          <div className="p-2 bg-white flex rounded-lg gap-2">
+          <div className="p-2 bg-white flex flex-col rounded-lg gap-2">
             Bagikan:
-            <Snippet
-              size="md"
-              hideSymbol
-              tooltipProps={{ content: "Kopi URL Proyek" }}
-              codeString={fullPath}
-            ></Snippet>
-            <Button
-              isIconOnly
-              radius="full"
-              size="md"
-              onPress={() => {
-                const encodedMessage = encodeURIComponent(fullPath);
-                const whatsappUrl = `https://wa.me/?text=${encodedMessage}`;
-                window.open(whatsappUrl, "_blank");
-              }}
-              className="bg-green-500 hover:bg-green-600 transition text-xl text-center"
-              title="Share on WhatsApp"
-            >
-              <WAIcon />
-            </Button>
+            <div className="flex gap-2">
+              <Snippet
+                size="sm"
+                hideSymbol
+                tooltipProps={{ content: fullPath }}
+                codeString={fullPath}
+              >
+                Kopi URL
+              </Snippet>
+              <Button
+                isIconOnly
+                radius="full"
+                size="sm"
+                onPress={() => {
+                  const encodedMessage = encodeURIComponent(fullPath);
+                  const whatsappUrl = `https://wa.me/?text=${encodedMessage}`;
+                  window.open(whatsappUrl, "_blank");
+                }}
+                className="bg-green-500 hover:bg-green-600 transition text-xl text-center"
+                title="Share on WhatsApp"
+              >
+                <WAIcon />
+              </Button>
+            </div>
           </div>
           <div className="bg-white rounded-lg p-3">
             <div>Detail</div>
