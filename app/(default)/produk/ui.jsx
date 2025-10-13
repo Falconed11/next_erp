@@ -863,19 +863,14 @@ export default function App() {
                       value={form.stok}
                       onValueChange={(val) => setForm({ ...form, stok: val })}
                     />
-                    <AutocompleteWithCustomValue
-                      isDisabled={form.stok ? undefined : true}
-                      title={"Vendor"}
+                    <AutocompleteWithCustomValueVendor
+                      isDisabled={!form.stok}
                       contains={contains}
                       data={vendor.data}
                       filteredData={dataVendor}
                       setFilteredData={setDataVendor}
                       form={form}
                       setForm={setForm}
-                      field={"vendor"}
-                      id={"id_vendor"}
-                      labelKey={"nama"}
-                      valueKey={"id"}
                     />
                     <Textarea
                       isDisabled={
@@ -1132,25 +1127,14 @@ export default function App() {
                   {form.id_kustom} | {form.nama} | {form.nmerek} | {form.tipe} |
                   Stok: {form.stok}
                 </div>
-                <Autocomplete
-                  label="Vendor"
-                  variant="bordered"
-                  //defaultItems={fieldState.items}
-                  items={fieldState.items ?? vendor.data.slice(0, 10)}
-                  placeholder="Cari vendor"
-                  className="max-w-xs"
-                  selectedKey={form.id_vendor}
-                  defaultSelectedKey={form.id_vendor}
-                  defaultInputValue={form.vendor}
-                  onSelectionChange={(v) => setForm({ ...form, id_vendor: v })}
-                  onInputChange={onInputChange}
-                >
-                  {(item) => (
-                    <AutocompleteItem key={item.id} textValue={item.nama}>
-                      {item.nama}
-                    </AutocompleteItem>
-                  )}
-                </Autocomplete>
+                <AutocompleteWithCustomValueVendor
+                  contains={contains}
+                  data={vendor.data}
+                  filteredData={dataVendor}
+                  setFilteredData={setDataVendor}
+                  form={form}
+                  setForm={setForm}
+                />
                 <NumberInput
                   hideStepper
                   isWheelDisabled
@@ -1493,5 +1477,32 @@ const AutocompleteWithCustomValue = ({
         </AutocompleteItem>
       )}
     </Autocomplete>
+  );
+};
+
+const AutocompleteWithCustomValueVendor = ({
+  form,
+  contains,
+  data,
+  filteredData,
+  setFilteredData,
+  setForm,
+  isDisabled = undefined,
+}) => {
+  return (
+    <AutocompleteWithCustomValue
+      isDisabled={isDisabled}
+      title={"Vendor"}
+      contains={contains}
+      data={data}
+      filteredData={filteredData}
+      setFilteredData={setFilteredData}
+      form={form}
+      setForm={setForm}
+      field={"vendor"}
+      id={"id_vendor"}
+      labelKey={"nama"}
+      valueKey={"id"}
+    />
   );
 };
