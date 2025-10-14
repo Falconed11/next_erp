@@ -1,5 +1,11 @@
 "use client";
-import React, { useCallback, useState, useMemo, useRef } from "react";
+import React, {
+  useCallback,
+  useState,
+  useMemo,
+  useRef,
+  useEffect,
+} from "react";
 import { useSession } from "next-auth/react";
 import { v4 as uuidv4 } from "uuid";
 import * as XLSX from "xlsx";
@@ -126,10 +132,6 @@ export default function App() {
     satuan: "",
     hargamodal: 0,
     hargajual: 0,
-    selectedKategori: new Set([]),
-    select_subkategori: new Set([]),
-    select_merek: new Set([]),
-    filteredsubkategori: [],
     keterangan: "",
   });
   const [persenProvit, setPersenProvit] = useState(30);
@@ -141,15 +143,6 @@ export default function App() {
   const report = useDisclosure();
 
   const modal = { masuk: useDisclosure(), keluar: useDisclosure() };
-
-  // const [fieldState, setFieldState] = useState({
-  //   selectedKey: "",
-  //   inputValue: "",
-  //   items: vendor.data?.slice(0, 10), // Initially show only top 10 items
-  // });
-  const [dataKategori, setDataKategori] = useState(kategori?.data);
-  const [dataMerek, setDataMerek] = useState(merek?.data);
-  const [dataVendor, setDataVendor] = useState(vendor?.data);
 
   const onInputChange = (value) => {
     const filteredItems = vendor.data
@@ -186,7 +179,7 @@ export default function App() {
     onClose();
     // return alert(json.message);
   };
-  const tambahButtonPress = useCallback(() => {
+  const tambahButtonPress = () => {
     setForm({
       modalmode: "Tambah",
       id: "",
@@ -200,44 +193,29 @@ export default function App() {
       satuan: "",
       hargamodal: "",
       hargajual: "",
-      selectedKategori: new Set([]),
-      select_subkategori: new Set([]),
-      select_merek: new Set([]),
-      selectKategori: new Set([]),
-      filteredsubkategori: [],
       startdate: new Date(),
       tanggal: getDate(new Date()),
       lunas: "1",
       keterangan: "",
     });
-    setDataKategori(kategori?.data);
-    setDataMerek(merek?.data);
-    setDataVendor(vendor?.data);
     setMethod("POST");
     onOpen();
-  }, [kategori, merek, vendor, onOpen]);
-  const editButtonPress = useCallback(
-    (data) => {
-      const newForm = {
-        ...data,
-        modalmode: "Edit",
-        selectKategori: new Set([String(data.id_kategori)]),
-        merek: data.nmerek,
-        id_merek: data.id_merek,
-        vendor: data.nvendor,
-        id_vendor: data.id_vendor,
-        startdate: new Date(data.tanggal),
-        tanggal: data.tanggal,
-      };
-      setForm(newForm);
-      setDataKategori(kategori?.data);
-      setDataMerek(merek?.data);
-      setDataVendor(vendor?.data);
-      setMethod("PUT");
-      onOpen();
-    },
-    [kategori, merek, vendor, onOpen]
-  );
+  };
+  const editButtonPress = (data) => {
+    const newForm = {
+      ...data,
+      modalmode: "Edit",
+      merek: data.nmerek,
+      id_merek: data.id_merek,
+      vendor: data.nvendor,
+      id_vendor: data.id_vendor,
+      startdate: new Date(data.tanggal),
+      tanggal: data.tanggal,
+    };
+    setForm(newForm);
+    setMethod("PUT");
+    onOpen();
+  };
   const deleteButtonPress = async (id) => {
     if (confirm("Hapus product?")) {
       const res = await fetch(`${apiPath}produk`, {
@@ -392,66 +370,65 @@ export default function App() {
     });
   };
 
-  const renderCell = React.useCallback(
-    (data, columnKey) => {
-      const cellValue = data[columnKey];
-      switch (columnKey) {
-        case "hargamodal":
-          return (
-            <div className="text-right">
-              <Harga harga={data.hargamodal} />
-            </div>
-          );
-        case "tanggal":
-          return getDateFId(new Date(data.tanggal));
-        case "hargajual":
-          return (
-            <div className="text-right">
-              <Harga harga={data.hargajual} />
-            </div>
-          );
-        case "totalmodal":
-          return (
-            <div className="text-right">
-              <Harga harga={data.hargamodal * data.stok} />
-            </div>
-          );
-        case "totaljual":
-          return (
-            <div className="text-right">
-              <Harga harga={data.hargajual * data.stok} />
-            </div>
-          );
-        case "aksi":
-          return (
-            <div className="relative flex items-center gap-2">
-              {/* <Tooltip content="Details">
+  const renderCell = React.useCallback((data, columnKey) => {
+    const cellValue = data[columnKey];
+    switch (columnKey) {
+      case "hargamodal":
+        return (
+          <div className="text-right">
+            <Harga harga={data.hargamodal} />
+          </div>
+        );
+      case "tanggal":
+        return getDateFId(new Date(data.tanggal));
+      case "hargajual":
+        return (
+          <div className="text-right">
+            <Harga harga={data.hargajual} />
+          </div>
+        );
+      case "totalmodal":
+        return (
+          <div className="text-right">
+            <Harga harga={data.hargamodal * data.stok} />
+          </div>
+        );
+      case "totaljual":
+        return (
+          <div className="text-right">
+            <Harga harga={data.hargajual * data.stok} />
+          </div>
+        );
+      case "aksi":
+        return (
+          <div className="relative flex items-center gap-2">
+            {/* <Tooltip content="Details">
               <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
                 <EyeIcon />
               </span>
             </Tooltip> */}
-              <LinkOpenNewTab
-                content="Riwayat"
-                link={`/produk/masuk?id_produk=${data.id}`}
-                icon={<NoteIcon />}
-              />
-              <Tooltip content="Edit">
-                <span
-                  onClick={() => editButtonPress(data)}
-                  className="text-lg text-default-400 cursor-pointer active:opacity-50"
-                >
-                  <EditIcon />
-                </span>
-              </Tooltip>
-              <Tooltip content="Produk Masuk">
-                <span
-                  onClick={() => onProdukMasukClick(data)}
-                  className="text-lg text-default-400 cursor-pointer active:opacity-50"
-                >
-                  <AddIcon />
-                </span>
-              </Tooltip>
-              {/* {data.stok > 0 ? (
+            <LinkOpenNewTab
+              content="Riwayat"
+              link={`/produk/masuk?id_produk=${data.id}`}
+              icon={<NoteIcon />}
+            />
+            <Tooltip content="Edit">
+              <span
+                onClick={() => editButtonPress(data)}
+                className="text-lg text-default-400 cursor-pointer active:opacity-50"
+              >
+                <EditIcon />
+              </span>
+            </Tooltip>
+            <Tooltip content="Produk Masuk">
+              <span
+                onClick={() => onProdukMasukClick(data)}
+                className="text-lg text-default-400 cursor-pointer active:opacity-50"
+              >
+                <AddIcon />
+              </span>
+            </Tooltip>
+            {/* {data.stok > 0 ? (
               <Tooltip content="Produk Keluar">
                 <span
                   onClick={() => onProdukKeluarClick(data)}
@@ -463,22 +440,20 @@ export default function App() {
             ) : (
               <></>
             )} */}
-              <Tooltip color="danger" content="Delete">
-                <span
-                  onClick={() => deleteButtonPress(data.id)}
-                  className="text-lg text-danger cursor-pointer active:opacity-50"
-                >
-                  <DeleteIcon />
-                </span>
-              </Tooltip>
-            </div>
-          );
-        default:
-          return cellValue;
-      }
-    },
-    [kategori, merek, vendor]
-  );
+            <Tooltip color="danger" content="Delete">
+              <span
+                onClick={() => deleteButtonPress(data.id)}
+                className="text-lg text-danger cursor-pointer active:opacity-50"
+              >
+                <DeleteIcon />
+              </span>
+            </Tooltip>
+          </div>
+        );
+      default:
+        return cellValue;
+    }
+  }, []);
   const filteredData = useMemo(() => {
     if (!produk?.data) return [];
     return produk.data.filter(
@@ -616,7 +591,7 @@ export default function App() {
   //     if (item.id_kategoriproduk == form.id_kategori) return item;
   //   });
   // }
-  // console.log([form.kategoriproduk, form.id_kategori]);
+  console.log(form);
   return (
     <div className="">
       <div className="flex flex-col gap-2">
@@ -804,10 +779,7 @@ export default function App() {
                 </Autocomplete> */}
                 <AutocompleteWithCustomValue
                   title={"Kategori"}
-                  contains={contains}
                   data={kategori.data}
-                  filteredData={dataKategori}
-                  setFilteredData={setDataKategori}
                   form={form}
                   setForm={setForm}
                   field={"kategoriproduk"}
@@ -831,10 +803,7 @@ export default function App() {
                 />
                 <AutocompleteWithCustomValue
                   title={"Merek"}
-                  contains={contains}
                   data={merek.data}
-                  filteredData={dataMerek}
-                  setFilteredData={setDataMerek}
                   form={form}
                   setForm={setForm}
                   field={"merek"}
@@ -865,10 +834,7 @@ export default function App() {
                     />
                     <AutocompleteWithCustomValueVendor
                       isDisabled={!form.stok}
-                      contains={contains}
                       data={vendor.data}
-                      filteredData={dataVendor}
-                      setFilteredData={setDataVendor}
                       form={form}
                       setForm={setForm}
                     />
@@ -1128,10 +1094,7 @@ export default function App() {
                   Stok: {form.stok}
                 </div>
                 <AutocompleteWithCustomValueVendor
-                  contains={contains}
                   data={vendor.data}
-                  filteredData={dataVendor}
-                  setFilteredData={setDataVendor}
                   form={form}
                   setForm={setForm}
                 />
@@ -1399,17 +1362,44 @@ const LabelRecordCheck = ({ title, isNotAvailable }) => {
 const AutocompleteWithCustomValue = ({
   isDisabled = undefined,
   title,
-  data,
-  filteredData = [],
-  setFilteredData,
+  data = [],
   form,
   setForm,
   field,
   id,
   valueKey,
   labelKey,
-  contains,
 }) => {
+  const [filteredData, setFilteredData] = useState(data);
+  const { contains } = useFilter({ sensitivity: "base" });
+  const handleSelectionChange = (key) => {
+    const selectedItem = data.find((item) => item[valueKey] == key);
+    setForm((prev) => ({
+      ...prev,
+      [field]: selectedItem?.[labelKey] || prev[field] || "",
+      [id]: key ?? prev[id],
+    }));
+  };
+
+  const handleInputChange = (value) => {
+    // filter items locally
+    setFilteredData(data.filter((o) => contains(o[labelKey], value)));
+
+    // update form value and id
+    const match = data.find(
+      (item) => item[labelKey]?.toLowerCase() == value.toLowerCase()
+    );
+    setForm((prev) => ({
+      ...prev,
+      [field]: value,
+      [id]: match != null ? match[valueKey] : null,
+    }));
+  };
+
+  const handleOpenChange = (isOpen) => {
+    if (isOpen) setFilteredData(data); // reset dropdown when opened
+  };
+
   return (
     <Autocomplete
       isDisabled={isDisabled}
@@ -1421,55 +1411,14 @@ const AutocompleteWithCustomValue = ({
         />
       }
       allowsCustomValue
-      // isClearable={false}
       items={filteredData}
-      placeholder={"Cari " + title}
+      placeholder={`Cari ${title}`}
       className="max-w-xs"
-      inputValue={form[field]}
-      selectedKey={form[id]}
-      // defaultSelectedKey={form.id_kategori}
-      // defaultInputValue={form.kategoriproduk}
-      onSelectionChange={(key) => {
-        let selectedItem = data.find((option) => option[valueKey] == key);
-        setFilteredData(
-          // data.filter((item) =>
-          //   contains(item[labelKey], selectedItem?.[labelKey] || "")
-          // )
-          selectedItem
-            ? data.filter((item) =>
-                contains(item[labelKey], selectedItem[labelKey])
-              )
-            : data
-        );
-        setForm((prevState) => {
-          return {
-            ...prevState,
-            [field]: selectedItem?.[labelKey] || prevState[field],
-            [id]: key || prevState[id],
-          };
-        });
-      }}
-      onInputChange={(value) => {
-        setFilteredData(data.filter((item) => contains(item[labelKey], value)));
-        setForm((prevState) => ({
-          ...prevState,
-          [field]: value,
-          [id]:
-            data.find(
-              (option) => option[labelKey]?.toLowerCase() == value.toLowerCase()
-            )?.[valueKey] ?? null,
-        }));
-      }}
-      onOpenChange={(isOpen, menuTrigger) => {
-        if (menuTrigger === "manual" && isOpen) {
-          setFilteredData(data);
-          setForm((prevState) => ({
-            ...prevState,
-            [field]: prevState[field],
-            [id]: prevState[id],
-          }));
-        }
-      }}
+      inputValue={form[field] ?? ""}
+      selectedKey={form[id] ?? null}
+      onSelectionChange={handleSelectionChange}
+      onInputChange={handleInputChange}
+      onOpenChange={handleOpenChange}
     >
       {(item) => (
         <AutocompleteItem key={item[valueKey]} textValue={item[labelKey]}>
@@ -1482,10 +1431,7 @@ const AutocompleteWithCustomValue = ({
 
 const AutocompleteWithCustomValueVendor = ({
   form,
-  contains,
   data,
-  filteredData,
-  setFilteredData,
   setForm,
   isDisabled = undefined,
 }) => {
@@ -1493,10 +1439,7 @@ const AutocompleteWithCustomValueVendor = ({
     <AutocompleteWithCustomValue
       isDisabled={isDisabled}
       title={"Vendor"}
-      contains={contains}
       data={data}
-      filteredData={filteredData}
-      setFilteredData={setFilteredData}
       form={form}
       setForm={setForm}
       field={"vendor"}
