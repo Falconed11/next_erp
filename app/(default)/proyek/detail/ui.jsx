@@ -91,6 +91,7 @@ import {
   RecapTable,
 } from "./rekap";
 import { NEXT_DOMAIN } from "@/app/utils/const";
+import { TemplateImportV2 } from "@/components/input";
 
 const api_path = getApiPath();
 
@@ -109,6 +110,11 @@ export default function App({ id, versi }) {
   const [selectVersi, setSelectVersi] = useState(new Set(versi ? [versi] : []));
   const [selected, setSelected] = React.useState(["audio", "multimedia"]);
   const proyek = useClientFetch(`proyek?id=${id}`);
+  const [json, setJson] = useState({});
+  const [isLoading, setIsLoading] = useState(0);
+  const [reportList, setReportList] = useState([]);
+  const report = useDisclosure();
+
   const keranjangProyek = useClientFetch(
     `keranjangproyek?id_proyek=${id}&instalasi=0&versi=${
       selectVersi.values().next().value
@@ -948,6 +954,7 @@ export default function App({ id, versi }) {
   const hideComponent = isHighRole ? "" : "hidden";
   const defStyleFormWidth = "w-2/12";
   const fullPath = `${NEXT_DOMAIN}/proyek/detail?id=${id}&versi=${versi}`;
+  console.log(json);
   return (
     <div className="flex gap-2 flex-col">
       <div className="flex gap-2">
@@ -1200,6 +1207,19 @@ export default function App({ id, versi }) {
               >
                 {"Pengeluaran & Pembayaran ==>>"}
               </NavLinkNewTab>
+            </div>
+            <div>
+              <TemplateImportV2
+                json={json}
+                setJson={setJson}
+                report={report}
+                setReportList={setReportList}
+                name={"Import Produk"}
+                // apiendpoint={"importproduk"}
+                isLoading={isLoading}
+                setIsLoading={setIsLoading}
+                formatLink={"/produk.xlsx"}
+              />
             </div>
             <div className="w-9/12-">
               {/* sub proyek */}

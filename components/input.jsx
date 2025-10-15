@@ -6,7 +6,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import Link from "next/link";
 import { Input, Textarea } from "@heroui/react";
-import { getDate, excelToJSDate } from "@/app/utils/date";
+import { getDate, excelToJSDate, getDateF } from "@/app/utils/date";
 import { getApiPath } from "@/app/utils/apiconfig";
 
 const apiPath = getApiPath();
@@ -219,6 +219,8 @@ function TemplateImport({
   );
 }
 function TemplateImportV2({
+  json,
+  setJson,
   setReportList,
   report,
   name,
@@ -229,7 +231,7 @@ function TemplateImportV2({
 }) {
   formatLink = formatLink ?? "";
   const [customInputCode, setCustomInputCode] = useState([]);
-  const [json, setJson] = useState([]);
+  const [file, setFile] = useState();
   const handleFileUpload = (jsonData) => {
     // console.log(jsonData);
     // Do something with the converted JSON object, e.g., send it to an API
@@ -240,7 +242,7 @@ function TemplateImportV2({
     setJson(jsonData);
   };
   const handleButtonUploadExcelPress = async (apiendpoint) => {
-    if (!customInputCode) return alert("Kode input wajib diisi!");
+    // if (!customInputCode) return alert("Kode input wajib diisi!");
     if (json.length == 0) return alert("File belum dipilih");
     setIsLoading(1);
     setReportList([]);
@@ -250,12 +252,16 @@ function TemplateImportV2({
         "Content-Type": "application/json",
         // 'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: JSON.stringify({ customInputCode, json }),
+      body: JSON.stringify({
+        customInputCode: customInputCode || getDateF(new Date()),
+        json,
+      }),
     });
     const json2 = await res.json();
     if (res.status == 400) return alert(json2?.message ?? "no msg");
     setReportList(json2.result);
     setJson([]);
+    setFile();
     setIsLoading(0);
     report.onOpen();
   };
@@ -281,7 +287,11 @@ function TemplateImportV2({
             onValueChange={setCustomInputCode}
           />
         </div>
-        <FileUploaderV2 onFileUpload={handleFileUpload} />
+        <FileUploaderV2
+          file={file}
+          setFile={setFile}
+          onFileUpload={handleFileUpload}
+        />
         <Button
           color="primary"
           onPress={() => handleButtonUploadExcelPress(apiendpoint)}
@@ -293,4 +303,4 @@ function TemplateImportV2({
   );
 }
 
-export { FileUploader, RangeDate, TemplateImport };
+export { FileUploader, RangeDate, TemplateImport, TemplateImportV2 };

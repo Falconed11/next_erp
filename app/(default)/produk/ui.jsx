@@ -74,7 +74,7 @@ const apiPath = getApiPath();
 
 export default function App() {
   const session = useSession();
-  const sessUser = session.data?.user;
+  const sessUser = useMemo(() => session.data?.user, [session]);
   // dynamic input
   const terapkanButton = useRef();
   const [inputs, setInputs] = useState([{ id: uuidv4(), value: "" }]);
@@ -143,18 +143,6 @@ export default function App() {
   const report = useDisclosure();
 
   const modal = { masuk: useDisclosure(), keluar: useDisclosure() };
-
-  const onInputChange = (value) => {
-    const filteredItems = vendor.data
-      ?.filter((item) => item.nama.toLowerCase().includes(value.toLowerCase()))
-      .slice(0, 10); // Always limit to top 10 items
-
-    setFieldState((prevState) => ({
-      inputValue: value,
-      selectedKey: value === "" ? null : prevState.selectedKey,
-      items: value ? filteredItems : vendor.data.slice(0, 10), // If no input, show top 10 unfiltered items
-    }));
-  };
   const saveButtonPress = async (onClose) => {
     if (form.tipe == "" || (!form.id_kategori && !form.kategoriproduk))
       return alert("Tipe, dan Kategori wajib diisi!");
@@ -466,19 +454,26 @@ export default function App() {
         row.id_kustom.toLowerCase().includes(id.toLowerCase())
     );
   }, [produk?.data, nama, id]);
-  // const dataMerek = useMemo(() => {
-  //   if (!merek?.data) return [];
-  //   return merek.data
-  //     .filter((merek) =>
-  //       merek.nama.toLowerCase().includes(form.merek.toLowerCase())
-  //     )
-  //     .slice(0, 20);
-  // }, [merek?.data, form.merek]);
   const pages = useMemo(() => {
     return filteredData ? Math.ceil(filteredData?.length / rowsPerPage) : 0;
   }, [filteredData?.length, rowsPerPage]);
   const loadingState = produk.isLoading ? "loading" : "idle";
   const offset = (page - 1) * rowsPerPage;
+  useEffect(() => {
+    console.log("form changed");
+  }, [form]);
+  useEffect(() => {
+    console.log("produk changed");
+  }, [produk]);
+  useEffect(() => {
+    console.log("kategori changed");
+  }, [kategori]);
+  useEffect(() => {
+    console.log("merek changed");
+  }, [merek]);
+  useEffect(() => {
+    console.log("vendor changed");
+  }, [vendor]);
   for (const [name, data] of Object.entries(queries)) {
     if (data.error) return <div>Failed to load {name}</div>;
     if (data.isLoading) return <div>Loading {name}...</div>;
@@ -591,7 +586,6 @@ export default function App() {
   //     if (item.id_kategoriproduk == form.id_kategori) return item;
   //   });
   // }
-  console.log(form);
   return (
     <div className="">
       <div className="flex flex-col gap-2">
@@ -709,74 +703,6 @@ export default function App() {
                 {form.modalmode} Produk
               </ModalHeader>
               <ModalBody>
-                {/* <Autocomplete
-                  variant="bordered"
-                  label={
-                    <LabelRecordCheck
-                      title={"Kategori"}
-                      isNotAvailable={
-                        form.kategoriproduk && form.id_kategori == null
-                      }
-                    />
-                  }
-                  allowsCustomValue
-                  // isClearable={false}
-                  items={dataKategori}
-                  placeholder="Cari kategori"
-                  className="max-w-xs"
-                  inputValue={form.kategoriproduk}
-                  selectedKey={form.id_kategori}
-                  // defaultSelectedKey={form.id_kategori}
-                  // defaultInputValue={form.kategoriproduk}
-                  onSelectionChange={(key) => {
-                    let selectedItem = kategori.data.find(
-                      (option) => option.id == key
-                    );
-                    setDataKategori(
-                      kategori.data.filter((item) =>
-                        contains(item.nama, selectedItem?.nama || "")
-                      )
-                    );
-                    setForm((prevState) => {
-                      return {
-                        ...prevState,
-                        kategoriproduk:
-                          selectedItem?.nama || prevState.kategoriproduk,
-                        id_kategori: key || prevState.id_kategori,
-                      };
-                    });
-                  }}
-                  onInputChange={(value) => {
-                    setDataKategori(
-                      kategori.data.filter((item) => contains(item.nama, value))
-                    );
-                    setForm((prevState) => ({
-                      ...prevState,
-                      kategoriproduk: value,
-                      id_kategori:
-                        kategori.data.find(
-                          (option) =>
-                            option.nama?.toLowerCase() == value.toLowerCase()
-                        )?.id ?? null,
-                    }));
-                  }}
-                  onOpenChange={(isOpen, menuTrigger) => {
-                    if (menuTrigger === "manual" && isOpen) {
-                      setDataKategori(kategori.data);
-                      setForm((prevState) => ({
-                        ...prevState,
-                        kategoriproduk: prevState.kategoriproduk,
-                        id_kategori: prevState.id_kategori,
-                      }));
-                    }
-                  }}
-                >
-                  {(item) => (
-                    <AutocompleteItem key={item.id} textValue={item.nama}>
-                      {item.nama}
-                    </AutocompleteItem>
-                  )}
-                </Autocomplete> */}
                 <AutocompleteWithCustomValue
                   title={"Kategori"}
                   data={kategori.data}
