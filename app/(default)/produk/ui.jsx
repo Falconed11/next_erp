@@ -459,21 +459,6 @@ export default function App() {
   }, [filteredData?.length, rowsPerPage]);
   const loadingState = produk.isLoading ? "loading" : "idle";
   const offset = (page - 1) * rowsPerPage;
-  useEffect(() => {
-    console.log("form changed");
-  }, [form]);
-  useEffect(() => {
-    console.log("produk changed");
-  }, [produk]);
-  useEffect(() => {
-    console.log("kategori changed");
-  }, [kategori]);
-  useEffect(() => {
-    console.log("merek changed");
-  }, [merek]);
-  useEffect(() => {
-    console.log("vendor changed");
-  }, [vendor]);
   for (const [name, data] of Object.entries(queries)) {
     if (data.error) return <div>Failed to load {name}</div>;
     if (data.isLoading) return <div>Loading {name}...</div>;

@@ -1,7 +1,15 @@
 import { useState } from "react";
 import * as XLSX from "xlsx";
 import { useDropzone } from "react-dropzone";
-import { Button } from "@heroui/react";
+import {
+  Button,
+  useDisclosure,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+} from "@heroui/react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import Link from "next/link";
@@ -219,24 +227,28 @@ function TemplateImport({
   );
 }
 function TemplateImportV2({
+  children,
   json,
   setJson,
-  setReportList,
-  report,
   name,
   apiendpoint,
   isLoading,
+  isDisabled,
   setIsLoading,
   formatLink,
+  editRow,
 }) {
   formatLink = formatLink ?? "";
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [customInputCode, setCustomInputCode] = useState([]);
   const [file, setFile] = useState();
+  const [reportList, setReportList] = useState();
   const handleFileUpload = (jsonData) => {
     // console.log(jsonData);
     // Do something with the converted JSON object, e.g., send it to an API
     jsonData = jsonData.map((v) => {
       v.tanggal = getDate(excelToJSDate(v.tanggal));
+      if (editRow) v = editRow(v);
       return v;
     });
     setJson(jsonData);
@@ -263,7 +275,7 @@ function TemplateImportV2({
     setJson([]);
     setFile();
     setIsLoading(0);
-    report.onOpen();
+    onOpen();
   };
 
   return (
@@ -271,12 +283,12 @@ function TemplateImportV2({
       {name}
       <div className="flex gap-2">
         <div>
-          <Link
+          <a
             className="bg-primary text-white p-2 rounded-lg inline-block"
             href={formatLink}
           >
             Download Format
-          </Link>
+          </a>
         </div>
         <div>
           <Input
@@ -292,13 +304,43 @@ function TemplateImportV2({
           setFile={setFile}
           onFileUpload={handleFileUpload}
         />
+        {children}
         <Button
           color="primary"
           onPress={() => handleButtonUploadExcelPress(apiendpoint)}
+          isDisabled={isDisabled}
         >
           Upload Excel
         </Button>
       </div>
+      {/* upload report */}
+      <Modal
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        scrollBehavior="inside"
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">
+                Hasil Upload
+              </ModalHeader>
+              <ModalBody>
+                {reportList.map((r, i) => (
+                  <div key={i}>
+                    {i + 1}. {r}
+                  </div>
+                ))}
+              </ModalBody>
+              <ModalFooter>
+                <Button color="danger" variant="light" onPress={onClose}>
+                  Tutup
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
     </div>
   );
 }

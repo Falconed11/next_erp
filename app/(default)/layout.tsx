@@ -150,9 +150,9 @@ export default function RootLayout({
   if (user?.peran == "super") links.push({ href: "/alat", name: "Alat" });
   links.push({ href: "/api/auth/signout", name: "Signout" });
   return (
-    <section>
-      <div className="pb-3"></div>
-      <div className="flex flex-row py-2 mx-3 mb-3 rounded-lg bg-background">
+    <section className="flex flex-col gap-3">
+      <div className=""></div>
+      <div className="flex flex-row py-2 mx-3 mb-3- rounded-lg bg-background">
         <div className="basis-3/4">
           <div className="p-3">ERP{pathname}</div>
         </div>
@@ -162,11 +162,13 @@ export default function RootLayout({
           </div>
         </div>
       </div>
-      <div className="flex flex-row">
-        <div>
-          <Nav navLinks={links}></Nav>
+      <div className="flex flex-row gap-3">
+        <div></div>
+        <div className="w-1/9-">
+          <Nav navLinks={links} className={""}></Nav>
         </div>
-        {children}
+        <div className="w-8/9-">{children}</div>
+        <div></div>
       </div>
     </section>
   );

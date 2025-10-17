@@ -14,7 +14,7 @@ import { useRouter } from "next/navigation";
 import { useClientFetch } from "@/app/utils/apiconfig";
 import { useEffect } from "react";
 
-export default function Navigation({ navLinks }) {
+export default function Navigation({ navLinks, className }) {
   const proyek = useClientFetch(`proyek?countProgressNoOffer=true`);
   const router = useRouter();
   const pathname = usePathname();
@@ -30,7 +30,9 @@ export default function Navigation({ navLinks }) {
 
   const numberProgressNoOffer = proyek.data.length;
   return (
-    <nav className="mx-3 flex flex-col rounded-lg columns-10 bg-background">
+    <nav
+      className={`mx-3- flex flex-col rounded-lg columns-10 bg-background ${className}`}
+    >
       <ul>
         {navLinks.map((link) => {
           const isActive =

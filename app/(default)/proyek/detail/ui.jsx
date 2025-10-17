@@ -108,12 +108,11 @@ export default function App({ id, versi }) {
   });
 
   const [selectVersi, setSelectVersi] = useState(new Set(versi ? [versi] : []));
+  const [selectInstalasi, setSelectInstalasi] = useState(new Set([]));
   const [selected, setSelected] = React.useState(["audio", "multimedia"]);
   const proyek = useClientFetch(`proyek?id=${id}`);
-  const [json, setJson] = useState({});
+  const [json, setJson] = useState();
   const [isLoading, setIsLoading] = useState(0);
-  const [reportList, setReportList] = useState([]);
-  const report = useDisclosure();
 
   const keranjangProyek = useClientFetch(
     `keranjangproyek?id_proyek=${id}&instalasi=0&versi=${
@@ -1208,19 +1207,47 @@ export default function App({ id, versi }) {
                 {"Pengeluaran & Pembayaran ==>>"}
               </NavLinkNewTab>
             </div>
-            <div>
-              <TemplateImportV2
-                json={json}
-                setJson={setJson}
-                report={report}
-                setReportList={setReportList}
-                name={"Import Produk"}
-                // apiendpoint={"importproduk"}
-                isLoading={isLoading}
-                setIsLoading={setIsLoading}
-                formatLink={"/produk.xlsx"}
-              />
-            </div>
+            {id &&
+              versi &&
+              selectedProyek.statusproyek.toLowerCase() ==
+                "penawaran".toLowerCase() && (
+                <div>
+                  <TemplateImportV2
+                    json={json}
+                    setJson={setJson}
+                    name={"Import Produk"}
+                    apiendpoint={"importproduk"}
+                    isLoading={isLoading}
+                    isDisabled={
+                      selectInstalasi.size && json?.length ? undefined : true
+                    }
+                    setIsLoading={setIsLoading}
+                    formatLink={"/produk.xlsx"}
+                    editRow={(row) => ({
+                      ...row,
+                      id_proyek: id,
+                      instalasi: set2key(selectInstalasi),
+                      versi,
+                    })}
+                  >
+                    <div className="w-1/12">
+                      <Select
+                        label="Peralatan / Instalasi"
+                        placeholder="Pilih opsi"
+                        selectedKeys={selectInstalasi}
+                        onSelectionChange={setSelectInstalasi}
+                      >
+                        {[
+                          { key: 0, label: "Peralatan" },
+                          { key: 1, label: "Instalasi" },
+                        ].map((data) => (
+                          <SelectItem key={data.key}>{data.label}</SelectItem>
+                        ))}
+                      </Select>
+                    </div>
+                  </TemplateImportV2>
+                </div>
+              )}
             <div className="w-9/12-">
               {/* sub proyek */}
               <SubProyek id={id} selectedProyek={selectedProyek} />

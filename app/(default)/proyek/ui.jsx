@@ -576,7 +576,7 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
     form.id_instansi || !form.instansi ? true : undefined;
   // console.log(form);
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-2 w-7/8- h-3/4 overscroll-auto">
       {id_instansi ? (
         <div className="flex">
           <div className="bg-white rounded-lg p-3">
@@ -593,7 +593,7 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
       </div>
       <Table
         isStriped
-        className="pt-3"
+        className=""
         aria-label="Example table with custom cells"
         // selectionMode="multiple"
         selectedKeys={selectedKeys}

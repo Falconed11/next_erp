@@ -13,15 +13,28 @@
   --font-arial: Arial;
 }
 
-/*
-  The default border color has changed to `currentcolor` in Tailwind CSS v4,
-  so we've added these compatibility styles to make sure everything still
-  looks the same as it did with Tailwind CSS v3.
-
-  If we ever want to remove these styles, we need to add an explicit border
-  color utility to any element that depends on these defaults.
-*/
+/* ✅ Combine all base styles into a single block */
 @layer base {
+  :root {
+    --foreground-rgb: 0, 0, 0;
+    --background-start-rgb: 214, 219, 220;
+    --background-end-rgb: 255, 255, 255;
+  }
+
+  html,
+  body {
+    height: 100%;
+    min-height: 100vh; /* 👈 ensures background fills the screen */
+    margin: 0;
+    padding: 0;
+    font-family: "Arial", sans-serif; /* merged from your second @layer */
+  }
+
+  body {
+    background: rgb(var(--background-start-rgb));
+    /* color: rgb(var(--foreground-rgb)); */
+  }
+
   *,
   ::after,
   ::before,
@@ -31,38 +44,7 @@
   }
 }
 
-@layer utilities {
-  :root {
-    --foreground-rgb: 0, 0, 0;
-    --background-start-rgb: 214, 219, 220;
-    --background-end-rgb: 255, 255, 255;
-  }
-
-  /* @media (prefers-color-scheme: light) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
-} */
-
-  body {
-    color: rgb(var(--foreground-rgb));
-    background: linear-gradient(
-        to bottom,
-        transparent,
-        rgb(var(--background-end-rgb))
-      )
-      rgb(var(--background-start-rgb));
-  }
-}
-
-@layer base {
-  html {
-    font-family: "Arial";
-  }
-}
-
+/* ✅ You can keep your custom utilities below */
 .no-break {
   page-break-inside: avoid;
 }
@@ -93,6 +75,7 @@
 .w-101 {
   width: 488px;
 }
+
 /* dot matrix
 0.1mm = 4px
 0.25mm = 1px */
