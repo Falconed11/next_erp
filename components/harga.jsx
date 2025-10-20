@@ -3,7 +3,7 @@
 export default function App({ harga, label, endContent }) {
   return (
     <div className="inline-block text-right">
-      {label} {harga ? harga.toLocaleString("id-ID") : 0} {endContent}
+      {label} {harga ? (+harga).toLocaleString("id-ID") : 0} {endContent}
     </div>
   );
 

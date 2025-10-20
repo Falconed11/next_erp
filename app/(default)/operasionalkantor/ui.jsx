@@ -46,6 +46,7 @@ import {
 } from "@/app/utils/date";
 import Harga from "@/components/harga";
 import { RangeDate } from "@/components/input";
+import KategoriOperasionalKantor from "./kategori";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -58,10 +59,7 @@ export default function App() {
     endDate,
     selectKategori: new Set([]),
   });
-  const [current, setCurrent] = useState({
-    startDate,
-    endDate,
-  });
+  const [current, setCurrent] = useState({});
   const [page, setPage] = React.useState(1);
   const rowsPerPage = 10;
   const kategorioperasionalkantor = useClientFetch("kategorioperasionalkantor");
@@ -205,7 +203,11 @@ export default function App() {
       case "tanggal":
         return getDateF(new Date(data.tanggal));
       case "biaya":
-        return <Harga harga={data.biaya} />;
+        return (
+          <div className="text-right">
+            <Harga harga={data.biaya} />
+          </div>
+        );
       case "aksi":
         const id_statusproyek = data.id_statusproyek;
         let link = ``;
@@ -258,6 +260,10 @@ export default function App() {
 
   const col = [
     {
+      key: "aksi",
+      label: "Aksi",
+    },
+    {
       key: "tanggal",
       label: "Tanggal",
     },
@@ -277,42 +283,40 @@ export default function App() {
       key: "biaya",
       label: "Biaya",
     },
-    {
-      key: "aksi",
-      label: "Aksi",
-    },
   ];
 
   // const sumBiaya = operasionalkantor.data.reduce((acc, v) => {
   //   return acc + v.biaya;
   // });
   return (
-    <div className="flex flex-col gap-2">
-      <div className="bg-white p-3 rounded-lg">
-        <div>Operasional Kantor</div>
+    <>
+      <div className="flex gap-2">
         <div className="flex flex-col gap-2">
-          <div className="flex gap-2 w-full">
-            <FormOperasionalKantor
-              form={form}
-              setForm={setForm}
-              kategorioperasionalkantor={kategorioperasionalkantor}
-              karyawan={karyawan}
-            />
+          <div className="bg-white p-3 rounded-lg">
+            <div>Operasional Kantor</div>
+            <div className="flex flex-col gap-2">
+              <div className="flex gap-2 w-full">
+                <FormOperasionalKantor
+                  form={form}
+                  setForm={setForm}
+                  kategorioperasionalkantor={kategorioperasionalkantor}
+                  karyawan={karyawan}
+                />
+              </div>
+              <div className="flex flex-row gap-2">
+                <Button
+                  onPress={() => {
+                    tambahButtonPress("POST");
+                  }}
+                  color="primary"
+                  className="ml-2"
+                >
+                  Tambah
+                </Button>
+              </div>
+            </div>
           </div>
-          <div className="flex flex-row gap-2">
-            <Button
-              onPress={() => {
-                tambahButtonPress("POST");
-              }}
-              color="primary"
-              className="ml-2"
-            >
-              Tambah
-            </Button>
-          </div>
-        </div>
-      </div>
-      {/* <div className="flex flex-row gap-2">
+          {/* <div className="flex flex-row gap-2">
         <div>
           <Link
             className="bg-primary text-white p-2 rounded-lg inline-block"
@@ -330,6 +334,93 @@ export default function App() {
           Upload Excel
         </Button>
       </div> */}
+          <Table
+            isStriped
+            className="h-full w-full"
+            aria-label="Example table with custom cells"
+            topContent={
+              <>
+                <div>Filter</div>
+                <div className="flex flex-row gap-3">
+                  <div className="flex flex-row gap-2">
+                    <div className="flex">
+                      <RangeDate
+                        current={current}
+                        setCurrent={setCurrent}
+                        setPage={setPage}
+                      />
+                    </div>
+                  </div>
+                  {/* kategori */}
+                  <Select
+                    label="Kategori"
+                    placeholder="Pilih kategori!"
+                    className="w-4/12"
+                    selectedKeys={filter.selectKategori}
+                    onSelectionChange={(v) =>
+                      setFilter({ ...filter, selectKategori: v })
+                    }
+                  >
+                    {kategorioperasionalkantor.data.map((item) => (
+                      <SelectItem key={item.id} value={item.id}>
+                        {item.nama}
+                      </SelectItem>
+                    ))}
+                  </Select>
+                </div>
+                {/* <div>
+              <Button color="primary" onClick={handleButtonExportToExcelPress}>
+                Export to Excel
+              </Button>
+            </div> */}
+              </>
+            }
+            bottomContent={
+              pages > 0 ? (
+                <div className="flex w-full justify-center">
+                  <Pagination
+                    isCompact
+                    showControls
+                    showShadow
+                    color="primary"
+                    page={page}
+                    total={pages}
+                    onChange={(page) => setPage(page)}
+                  />
+                </div>
+              ) : null
+            }
+          >
+            <TableHeader columns={col}>
+              {(column) => (
+                <TableColumn
+                  key={column.key}
+                  align={column.key === "actions" ? "center" : "start"}
+                >
+                  {column.label}
+                </TableColumn>
+              )}
+            </TableHeader>
+            <TableBody
+              items={operasionalkantor.data.slice(offset, offset + rowsPerPage)}
+              loadingContent={"Loading..."}
+              emptyContent={"Kosong"}
+              loadingState={loadingState}
+            >
+              {(item) => (
+                <TableRow key={item.id}>
+                  {(columnKey) => (
+                    <TableCell>{renderCell(item, columnKey)}</TableCell>
+                  )}
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+        <div className="flex">
+          <KategoriOperasionalKantor />
+        </div>
+      </div>
       {/* Edit Operasional Kantor */}
       <Modal
         isOpen={isOpen}
@@ -401,85 +492,7 @@ export default function App() {
           )}
         </ModalContent>
       </Modal>
-      <Table
-        isStriped
-        className="h-full w-full"
-        aria-label="Example table with custom cells"
-        topContent={
-          <>
-            <div>Filter</div>
-            <div className="flex flex-row gap-3">
-              <div className="flex flex-row gap-2">
-                <div className="flex">
-                  <RangeDate current={current} setCurrent={setCurrent} />
-                </div>
-              </div>
-              {/* kategori */}
-              <Select
-                label="Kategori"
-                placeholder="Pilih kategori!"
-                className="w-4/12"
-                selectedKeys={filter.selectKategori}
-                onSelectionChange={(v) =>
-                  setFilter({ ...filter, selectKategori: v })
-                }
-              >
-                {kategorioperasionalkantor.data.map((item) => (
-                  <SelectItem key={item.id} value={item.id}>
-                    {item.nama}
-                  </SelectItem>
-                ))}
-              </Select>
-            </div>
-            {/* <div>
-              <Button color="primary" onClick={handleButtonExportToExcelPress}>
-                Export to Excel
-              </Button>
-            </div> */}
-          </>
-        }
-        bottomContent={
-          pages > 0 ? (
-            <div className="flex w-full justify-center">
-              <Pagination
-                isCompact
-                showControls
-                showShadow
-                color="primary"
-                page={page}
-                total={pages}
-                onChange={(page) => setPage(page)}
-              />
-            </div>
-          ) : null
-        }
-      >
-        <TableHeader columns={col}>
-          {(column) => (
-            <TableColumn
-              key={column.key}
-              align={column.key === "actions" ? "center" : "start"}
-            >
-              {column.label}
-            </TableColumn>
-          )}
-        </TableHeader>
-        <TableBody
-          items={operasionalkantor.data.slice(offset, offset + rowsPerPage)}
-          loadingContent={"Loading..."}
-          emptyContent={"Kosong"}
-          loadingState={loadingState}
-        >
-          {(item) => (
-            <TableRow key={item.id}>
-              {(columnKey) => (
-                <TableCell>{renderCell(item, columnKey)}</TableCell>
-              )}
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-    </div>
+    </>
   );
 }
 

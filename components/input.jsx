@@ -89,12 +89,24 @@ const FileUploaderV2 = ({ file, setFile, onFileUpload }) => {
   );
 };
 
-const RangeDate = ({ current, setCurrent, setPage }) => {
+const RangeDate = ({
+  current,
+  setCurrent,
+  setPage = () => {
+    console.log("No page used");
+  },
+}) => {
   const [filter, setFilter] = useState(current);
   const cariOnPress = (e) => {
     e.preventDefault();
     setCurrent(filter);
     setPage(1);
+  };
+  const onClear = (date, current, setCurrent, field) => {
+    if (date == null) {
+      setCurrent({ ...current, [field]: date });
+      setPage(1);
+    }
   };
   const theme = "bg-white";
   return (
@@ -103,9 +115,13 @@ const RangeDate = ({ current, setCurrent, setPage }) => {
       <form onSubmit={cariOnPress} className="flex flex-col gap-2">
         <DatePicker
           className={theme}
+          isClearable
           dateFormat="dd/MM/yyyy"
           selected={filter.startDate}
-          onChange={(date) => setFilter({ ...filter, startDate: date })}
+          onChange={(date) => {
+            onClear(date, current, setCurrent, "startDate");
+            setFilter({ ...filter, startDate: date });
+          }}
           onSelect={(date) => {
             setCurrent({ ...filter, startDate: date });
             setPage(1);
@@ -121,9 +137,13 @@ const RangeDate = ({ current, setCurrent, setPage }) => {
         />
         <DatePicker
           className={theme}
+          isClearable
           dateFormat="dd/MM/yyyy"
           selected={filter.endDate}
-          onChange={(date) => setFilter({ ...filter, endDate: date })}
+          onChange={(date) => {
+            onClear(date, current, setCurrent, "endDate");
+            setFilter({ ...filter, endDate: date });
+          }}
           onSelect={(date) => {
             setCurrent({ ...filter, endDate: date });
           }}
