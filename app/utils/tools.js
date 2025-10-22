@@ -31,7 +31,7 @@ const updateSwitch = async (
 const highRoleCheck = (rank) => rank <= 20;
 const key2set = (key) => new Set(key ? [String(key)] : []);
 const set2key = (set) => new Set(set).values().next().value || null;
-const capitalizeEachWord = (str) => {
+const capitalizeEachWord = (str = "") => {
   return str.replace(
     /\b\w+/g,
     (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()

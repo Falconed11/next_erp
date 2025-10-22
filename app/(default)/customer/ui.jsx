@@ -56,6 +56,7 @@ import { FileUploader } from "@/components/input";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { LinkOpenNewTab } from "@/components/mycomponent";
+import ModalTransferData from "@/components/modaltransferdata";
 
 const apiPath = getApiPath();
 
@@ -64,6 +65,9 @@ export default function App() {
   const sessionuser = session.data?.user;
   const user = session.data?.user;
 
+  const [id, setId] = useState();
+  const [newId, setNewId] = useState();
+  const [name, setName] = useState();
   const [value, setValue] = React.useState("");
   const customer = useClientFetch("customer");
   const [form, setForm] = useState({});
@@ -82,27 +86,23 @@ export default function App() {
     });
     const json = await res.json();
     if (res.status == 400) return alert(json.message);
+    customer.mutate();
     onClose();
     //return alert(json.message);
   };
-  const saveTransferButtonPress = async (onClose) => {
-    // if (form.isSwasta.size == 0) return alert("Swasta/Negri belum diisi");
+  const onSave = async (onClose) => {
     const res = await fetch(`${apiPath}transfercustomer`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
         // 'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: JSON.stringify({
-        currentId: form.currentId,
-        targetId: form.targetId,
-      }),
+      body: JSON.stringify({ id, newId }),
     });
     const json = await res.json();
     if (res.status == 400) return alert(json.message);
     customer.mutate();
     onClose();
-    //return alert(json.message);
   };
   const tambahButtonPress = () => {
     setForm({
@@ -124,10 +124,9 @@ export default function App() {
     onOpen();
   };
   const transferButtonPress = (data) => {
-    setForm({
-      currentId: data.id,
-      nama: data.nama,
-    });
+    setId(data.id);
+    setNewId(null);
+    setName(data.nama);
     transfer.onOpen();
   };
   const deleteButtonPress = async (id) => {
@@ -211,6 +210,12 @@ export default function App() {
           return data.jumlah * data.harga;
         case "swasta":
           return data.swasta ? "Swasta" : "Negri";
+        case "jumlah_proyek":
+          return (
+            <div className="text-right">
+              <Harga harga={cellValue} />
+            </div>
+          );
         case "provit":
           return (
             <div className="text-right">
@@ -283,6 +288,10 @@ export default function App() {
     //   label: "Id",
     // },
     {
+      key: "aksi",
+      label: "Aksi",
+    },
+    {
       key: "nama",
       label: "Nama",
     },
@@ -319,11 +328,7 @@ export default function App() {
             label: "Update Terakhir",
           },
         ]
-      : []),
-    {
-      key: "aksi",
-      label: "Aksi",
-    }
+      : [])
   );
 
   return (
@@ -497,7 +502,7 @@ export default function App() {
         </ModalContent>
       </Modal>
       {/* transfer */}
-      <Modal
+      {/* <Modal
         isOpen={transfer.isOpen}
         onOpenChange={transfer.onOpenChange}
         scrollBehavior="inside"
@@ -536,20 +541,6 @@ export default function App() {
                     </SelectItem>
                   ))}
                 </Select>
-                {/* <Input
-                  type="text"
-                  label="Alamat"
-                  placeholder="Masukkan alamat!"
-                  value={form.alamat}
-                  onValueChange={(val) => setForm({ ...form, alamat: val })}
-                /> */}
-                {/* <Textarea
-                  label="Keterangan"
-                  labelPlacement="inside"
-                  placeholder="Masukkan keterangan!"
-                  value={form.keterangan}
-                  onValueChange={(val) => setForm({ ...form, keterangan: val })}
-                /> */}
               </ModalBody>
               <ModalFooter>
                 <Button
@@ -569,7 +560,20 @@ export default function App() {
             </>
           )}
         </ModalContent>
-      </Modal>
+      </Modal> */}
+      <ModalTransferData
+        title="Customer"
+        data={customer.data}
+        isOpen={transfer.isOpen}
+        onOpenChange={transfer.onOpenChange}
+        id={id}
+        newId={newId}
+        setNewId={setNewId}
+        name={name}
+        valueKey={"id"}
+        labelKey={"nama"}
+        onSave={onSave}
+      />
       {/* upload report */}
       <Modal
         isOpen={report.isOpen}

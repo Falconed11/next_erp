@@ -1,7 +1,5 @@
 "use client";
-import React, { useState, useMemo, useCallback } from "react";
-import { useSession } from "next-auth/react";
-import * as XLSX from "xlsx";
+import { useCallback, useState } from "react";
 import {
   useClientFetch,
   getApiPath,
@@ -20,6 +18,8 @@ import {
   Pagination,
   ChipProps,
   getKeyValue,
+  Autocomplete,
+  AutocompleteItem,
 } from "@heroui/react";
 import {
   Modal,
@@ -31,9 +31,6 @@ import {
   useDisclosure,
 } from "@heroui/react";
 import { Input } from "@heroui/react";
-import { Textarea } from "@heroui/react";
-import { Select, SelectItem } from "@heroui/react";
-import Link from "next/link";
 import {
   AddIcon,
   EditIcon,
@@ -50,28 +47,23 @@ import {
   getDate,
   getDateF,
 } from "@/app/utils/date";
-import { LIST_SWASTA_NEGRI } from "@/app/utils/const";
 import Harga from "@/components/harga";
-import { FileUploader } from "@/components/input";
-import DatePicker from "react-datepicker";
+import ModalTransferData from "@/components/modaltransferdata";
 import "react-datepicker/dist/react-datepicker.css";
-import { LinkOpenNewTab } from "@/components/mycomponent";
-import { capitalizeEachWord, key2set, set2key } from "@/app/utils/tools";
+import { capitalizeEachWord } from "@/app/utils/tools";
 
 const apiPath = getApiPath();
 
-export default function App() {
-  const session = useSession();
-  const sessionuser = session.data?.user;
-  const [value, setValue] = React.useState("");
-  const operasionalkantor = useClientFetch(
-    `operasionalkantor?groupbykategori=true`
-  );
-  const queries = { operasionalkantor };
-  const [form, setForm] = useState({});
+export default function App({ sessionuser }) {
+  const [id, setId] = useState();
+  const [newId, setNewId] = useState();
+  const [name, setName] = useState();
+  const [form, setForm] = useState();
+  const kategorioperasionalkantor = useClientFetch(`kategorioperasionalkantor`);
+  const queries = { kategorioperasionalkantor };
   const saveButtonPress = async (onClose) => {
     // if (form.isSwasta.size == 0) return alert("Swasta/Negri belum diisi");
-    const res = await fetch(`${apiPath}customer`, {
+    const res = await fetch(`${apiPath}kategorioperasionalkantor`, {
       method: form.method,
       headers: {
         "Content-Type": "application/json",
@@ -81,24 +73,24 @@ export default function App() {
     });
     const json = await res.json();
     if (res.status == 400) return alert(json.message);
+    kategorioperasionalkantor.mutate();
     onClose();
     //return alert(json.message);
   };
-  const saveTransferButtonPress = async (onClose) => {
-    // if (form.isSwasta.size == 0) return alert("Swasta/Negri belum diisi");
+  const onSave = async (onClose) => {
     const res = await fetch(`${apiPath}transferoperasionalkantor`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
         // 'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: JSON.stringify(form),
+      body: JSON.stringify({ id, newId }),
     });
     const json = await res.json();
     if (res.status == 400) return alert(json.message);
-    operasionalkantor.mutate();
+    console.log(json);
+    kategorioperasionalkantor.mutate();
     onClose();
-    //return alert(json.message);
   };
   const tambahButtonPress = () => {
     setForm({
@@ -120,15 +112,14 @@ export default function App() {
     onOpen();
   };
   const transferButtonPress = (data) => {
-    setForm({
-      id_kategorioperasionalkantor: data.id_kategorioperasionalkantor,
-      kategori: data.kategori,
-    });
+    setId(data.id);
+    setName(data.nama);
+    setNewId(null);
     transfer.onOpen();
   };
-  const deleteButtonPress = async (id) => {
-    if (confirm("Hapus customer?")) {
-      const res = await fetch(`${apiPath}customer`, {
+  const deleteButtonPress = async (id, nama) => {
+    if (confirm(`Hapus kategori id: ${id}, nama: ${nama}?`)) {
+      const res = await fetch(`${apiPath}kategorioperasionalkantor`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -138,167 +129,103 @@ export default function App() {
       });
       const json = await res.json();
       if (res.status == 400) return alert(json.message);
-      customer.mutate();
+      kategorioperasionalkantor.mutate();
       // return alert(await res.json().then((json) => json.message));
     }
   };
-  const handleFileUpload = (jsonData) => {
-    // console.log(jsonData);
-    // Do something with the converted JSON object, e.g., send it to an API
-    jsonData = jsonData.map((v) => {
-      v.tanggal = getDate(excelToJSDate(v.tanggal));
-      return v;
-    });
-    setJson(jsonData);
-    console.log(jsonData);
-  };
-  const handleButtonUploadExcelPress = async () => {
-    if (json.length == 0) return alert("File belum dipilih");
-    setReportList([]);
-    try {
-      const responses = await Promise.all(
-        json.map((v) =>
-          fetch(`${apiPath}proyek`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              // 'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: JSON.stringify({ ...v, id_second: v.id }),
-          })
-        )
-      );
-      const dataArray = await Promise.all(
-        responses.map((response) => response.json())
-      );
-      setReportList(dataArray.map((v, i) => `${i + 1}. ${v.message}`));
-    } catch (e) {
-      console.error(e);
+  const renderCell = useCallback((data, columnKey) => {
+    const cellValue = data[columnKey];
+    const date = new Date(data.tanggal);
+    const hutang = data.hutang ?? 0;
+    switch (columnKey) {
+      case "tanggal":
+        return getDateF(new Date(data.tanggal));
+      case "totalharga":
+        return data.jumlah * data.harga;
+      case "nama":
+        return capitalizeEachWord(cellValue);
+      case "totaltransaksi":
+        return (
+          <div className="text-right">
+            <Harga harga={cellValue} />
+          </div>
+        );
+      case "totalbiaya":
+        return (
+          <div className="text-right">
+            <Harga harga={cellValue} />
+          </div>
+        );
+      case "lastupdate":
+        return (data.namakaryawan || "nn") + ", " + getDateF(data.lastupdate);
+      case "aksi":
+        return (
+          <div className="relative flex items-center gap-2">
+            <Tooltip content="Edit">
+              <span
+                onClick={() => editButtonPress(data)}
+                className="text-lg text-default-400 cursor-pointer active:opacity-50"
+              >
+                <EditIcon />
+              </span>
+            </Tooltip>
+            {/* <LinkOpenNewTab
+                content="Detail"
+                link={`/proyek?id_instansi=${data.id}`}
+                icon={<EyeIcon />}
+              /> */}
+            <Tooltip content="Transfer">
+              <span
+                onClick={() => transferButtonPress(data)}
+                className="text-lg text-default-400 cursor-pointer active:opacity-50"
+              >
+                <TransferIcon />
+              </span>
+            </Tooltip>
+            <Tooltip color="danger" content="Delete">
+              <span
+                onClick={() => deleteButtonPress(data.id, data.nama)}
+                className="text-lg text-danger cursor-pointer active:opacity-50"
+              >
+                <DeleteIcon />
+              </span>
+            </Tooltip>
+          </div>
+        );
+      default:
+        return cellValue;
     }
-    setJson([]);
-    report.onOpen();
-  };
-  const handleButtonExportToExcelPress = () => {
-    const rows = proyek.data.map((v) => {
-      const totalHarga = (v.hargakustom ?? v.hargajual) * v.jumlah;
-      return v;
-    });
-    const worksheet = XLSX.utils.json_to_sheet(rows);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "sheet1");
-    XLSX.writeFile(
-      workbook,
-      `proyek_${getDateF(filter.startDate)}_${getDateF(filter.endDate)}.xlsx`,
-      { compression: true }
-    );
-  };
-  const renderCell = useCallback(
-    (data, columnKey) => {
-      const cellValue = data[columnKey];
-      const date = new Date(data.tanggal);
-      const hutang = data.hutang ?? 0;
-      switch (columnKey) {
-        case "tanggal":
-          return getDateF(new Date(data.tanggal));
-        case "totalharga":
-          return data.jumlah * data.harga;
-        case "kategori":
-          return capitalizeEachWord(cellValue);
-        case "totaloperasionalkantor":
-          return (
-            <div className="text-right">
-              <Harga harga={data.totaloperasionalkantor} />
-            </div>
-          );
-        case "lastupdate":
-          return (data.namakaryawan || "nn") + ", " + getDateF(data.lastupdate);
-        case "aksi":
-          return (
-            <div className="relative flex items-center gap-2">
-              <Tooltip content="Edit">
-                <span
-                  onClick={() => editButtonPress(data)}
-                  className="text-lg text-default-400 cursor-pointer active:opacity-50"
-                >
-                  <EditIcon />
-                </span>
-              </Tooltip>
-              {sessionuser?.rank <= 10 && (
-                <>
-                  <LinkOpenNewTab
-                    content="Detail"
-                    link={`/proyek?id_instansi=${data.id}`}
-                    icon={<EyeIcon />}
-                  />
-                  <Tooltip content="Transfer">
-                    <span
-                      onClick={() => transferButtonPress(data)}
-                      className="text-lg text-default-400 cursor-pointer active:opacity-50"
-                    >
-                      <TransferIcon />
-                    </span>
-                  </Tooltip>
-                  <Tooltip color="danger" content="Delete">
-                    <span
-                      onClick={() => deleteButtonPress(data.id)}
-                      className="text-lg text-danger cursor-pointer active:opacity-50"
-                    >
-                      <DeleteIcon />
-                    </span>
-                  </Tooltip>
-                </>
-              )}
-            </div>
-          );
-        default:
-          return cellValue;
-      }
-    },
-    [session]
-  );
+  }, []);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const transfer = useDisclosure();
-  const report = useDisclosure();
-  console.log(operasionalkantor);
   for (const [name, data] of Object.entries(queries)) {
     if (data.error) return <div>Failed to load {name}</div>;
     if (data.isLoading) return <div>Loading {name}...</div>;
   }
-  // if (session.status === "loading") return <div>Session Loading...</div>;
-  // const isHighRole = highRoleCheck(sessUser.rank);
   const columns = [
     {
       key: "aksi",
       label: "Aksi",
     },
     {
-      key: "kategori",
+      key: "nama",
       label: "Kategori",
     },
     {
-      key: "totaloperasionalkantor",
+      key: "totaltransaksi",
+      label: "Jumlah Transaksi",
+    },
+    {
+      key: "totalbiaya",
       label: "Pengeluaran",
     },
   ];
-  console.log(form);
   return (
     <div className="flex flex-col">
       <div className="flex flex-row gap-2">
         <Button color="primary" onPress={tambahButtonPress}>
           Tambah
         </Button>
-        {/* <div>
-          <Link
-            className="bg-primary text-white p-2 rounded-lg inline-block"
-            href={"/proyek.xlsx"}
-          >
-            Download Format
-          </Link>
-        </div>
-        <FileUploader onFileUpload={handleFileUpload} />
-        <Button color="primary" onPress={handleButtonUploadExcelPress}>
-          Upload Excel
-        </Button> */}
       </div>
       <Table
         isStriped
@@ -326,7 +253,10 @@ export default function App() {
             </TableColumn>
           )}
         </TableHeader>
-        <TableBody items={operasionalkantor.data} emptyContent={"Kosong"}>
+        <TableBody
+          items={kategorioperasionalkantor.data}
+          emptyContent={"Kosong"}
+        >
           {(item) => (
             <TableRow key={item.id}>
               {(columnKey) => (
@@ -345,68 +275,15 @@ export default function App() {
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                {form.title} customer
+                {form.title} Kategori Operasional Kantor
               </ModalHeader>
               <ModalBody>
-                {/* <Select
-                  label="Swasta/Negri"
-                  variant="bordered"
-                  placeholder="Pilih swasta/negri!"
-                  selectedKeys={form.isSwasta}
-                  className="max-w-xs"
-                  onSelectionChange={(val) => {
-                    setForm({
-                      ...form,
-                      isSwasta: val,
-                      swasta: new Set(val).values().next().value,
-                    });
-                  }}
-                >
-                  {isSwasta.map((item) => (
-                    <SelectItem key={item.id} value={item.id}>
-                      {item.nama}
-                    </SelectItem>
-                  ))}
-                </Select> */}
                 <Input
                   type="text"
-                  label="Nama Instansi"
-                  placeholder="Masukkan nama instansi!"
+                  label="Nama"
+                  placeholder="Masukkan nama kategori!"
                   value={form.nama}
                   onValueChange={(val) => setForm({ ...form, nama: val })}
-                />
-                <Select
-                  label="S/N"
-                  placeholder="Pilih s/n!"
-                  className="max-w-xs"
-                  selectedKeys={form.selectSwasta}
-                  onSelectionChange={(val) =>
-                    setForm({
-                      ...form,
-                      selectSwasta: val,
-                      swasta: new Set(val).values().next().value,
-                    })
-                  }
-                >
-                  {LIST_SWASTA_NEGRI.map((item) => (
-                    <SelectItem key={item.id} value={item.id}>
-                      {item.nama}
-                    </SelectItem>
-                  ))}
-                </Select>
-                <Input
-                  type="text"
-                  label="Kota"
-                  placeholder="Masukkan kota!"
-                  value={form.kota}
-                  onValueChange={(val) => setForm({ ...form, kota: val })}
-                />
-                <Input
-                  type="text"
-                  label="Alamat"
-                  placeholder="Masukkan alamat!"
-                  value={form.alamat}
-                  onValueChange={(val) => setForm({ ...form, alamat: val })}
                 />
                 {/* <Textarea
                   label="Keterangan"
@@ -432,7 +309,7 @@ export default function App() {
         </ModalContent>
       </Modal>
       {/* transfer */}
-      <Modal
+      {/* <Modal
         isOpen={transfer.isOpen}
         onOpenChange={transfer.onOpenChange}
         scrollBehavior="inside"
@@ -445,60 +322,46 @@ export default function App() {
               </ModalHeader>
               <ModalBody>
                 <Input
-                  isDisabled
+                  isDisabled={1}
                   type="text"
                   label="Kategori asal"
-                  value={form.kategori}
+                  value={form.nama}
                   className="max-w-xs"
                 />
-                <Select
-                  label="Targer kategori"
+                <Autocomplete
+                  label="Target kategori"
                   variant="bordered"
                   placeholder="Pilih target kategori"
-                  selectedKeys={key2set(form.newid_kategorioperasionalkantor)}
+                  defaultItems={kategorioperasionalkantor.data}
+                  defaultSelectedKey={form.newid}
                   className="max-w-xs"
                   onSelectionChange={(val) => {
                     setForm({
                       ...form,
-                      newid_kategorioperasionalkantor: set2key(val),
+                      newid: val,
                     });
                   }}
                 >
-                  {operasionalkantor.data?.map((item) => (
-                    <SelectItem
-                      key={item.id_kategorioperasionalkantor}
-                      value={item.id_kategorioperasionalkantor}
-                    >
-                      {item.kategori}
-                    </SelectItem>
-                  ))}
-                </Select>
-                {/* <Input
-                  type="text"
-                  label="Alamat"
-                  placeholder="Masukkan alamat!"
-                  value={form.alamat}
-                  onValueChange={(val) => setForm({ ...form, alamat: val })}
-                /> */}
-                {/* <Textarea
-                  label="Keterangan"
-                  labelPlacement="inside"
-                  placeholder="Masukkan keterangan!"
-                  value={form.keterangan}
-                  onValueChange={(val) => setForm({ ...form, keterangan: val })}
-                /> */}
+                  {(item) => {
+                    const id = item.id;
+                    return (
+                      form.id != id && (
+                        <AutocompleteItem key={item.id}>
+                          {item.nama}
+                        </AutocompleteItem>
+                      )
+                    );
+                  }}
+                </Autocomplete>
               </ModalBody>
               <ModalFooter>
-                <Button
-                  color="danger"
-                  variant="light"
-                  onPress={transfer.onClose}
-                >
+                <Button color="danger" variant="light" onPress={onClose}>
                   Batal
                 </Button>
                 <Button
+                  isDisabled={!form.newid}
                   color="primary"
-                  onPress={() => saveTransferButtonPress(transfer.onClose)}
+                  onPress={() => saveTransferButtonPress(onClose)}
                 >
                   Simpan
                 </Button>
@@ -506,33 +369,20 @@ export default function App() {
             </>
           )}
         </ModalContent>
-      </Modal>
-      {/* upload report */}
-      <Modal
-        isOpen={report.isOpen}
-        onOpenChange={report.onOpenChange}
-        scrollBehavior="inside"
-      >
-        <ModalContent>
-          {(onClose) => (
-            <>
-              <ModalHeader className="flex flex-col gap-1">
-                Hasil Upload
-              </ModalHeader>
-              <ModalBody>
-                {reportList.map((r, i) => (
-                  <div key={i}>{r}</div>
-                ))}
-              </ModalBody>
-              <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
-                  Tutup
-                </Button>
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
-      </Modal>
+      </Modal> */}
+      <ModalTransferData
+        title="Kategori"
+        data={kategorioperasionalkantor.data}
+        isOpen={transfer.isOpen}
+        onOpenChange={transfer.onOpenChange}
+        id={id}
+        newId={newId}
+        setNewId={setNewId}
+        name={name}
+        valueKey={"id"}
+        labelKey={"nama"}
+        onSave={onSave}
+      />
     </div>
   );
 }

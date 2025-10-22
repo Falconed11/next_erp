@@ -46,14 +46,18 @@ import {
 } from "@/app/utils/date";
 import Harga from "@/components/harga";
 import { RangeDate } from "@/components/input";
-import KategoriOperasionalKantor from "./kategori";
+import Kategori from "./kategori";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { useSession } from "next-auth/react";
+import { highRoleCheck } from "@/app/utils/tools";
 
 const apiPath = getApiPath();
 const [startDate, endDate] = getCurFirstLastDay();
 
 export default function App() {
+  const session = useSession();
+  const sessUser = session.data?.user;
   const [filter, setFilter] = useState({
     startDate,
     endDate,
@@ -61,7 +65,7 @@ export default function App() {
   });
   const [current, setCurrent] = useState({});
   const [page, setPage] = React.useState(1);
-  const rowsPerPage = 10;
+  const rowsPerPage = 25;
   const kategorioperasionalkantor = useClientFetch("kategorioperasionalkantor");
   const karyawan = useClientFetch("karyawan");
   const operasionalkantor = useClientFetch(
@@ -73,6 +77,7 @@ export default function App() {
         : ""
     }`
   );
+  const queries = { kategorioperasionalkantor, karyawan, operasionalkantor };
   const pages = useMemo(() => {
     return operasionalkantor?.data
       ? Math.ceil(operasionalkantor?.data?.length / rowsPerPage)
@@ -254,9 +259,12 @@ export default function App() {
   const [reportList, setReportList] = useState([]);
   const report = useDisclosure();
 
-  const sources = [karyawan, kategorioperasionalkantor, operasionalkantor];
-  if (sources.some((o) => o.error)) return <div>failed to load</div>;
-  if (sources.some((o) => o.isLoading)) return <div>loading...</div>;
+  for (const [name, data] of Object.entries(queries)) {
+    if (data.error) return <div>Failed to load {name}</div>;
+    if (data.isLoading) return <div>Loading {name}...</div>;
+  }
+  if (session.status === "loading") return <div>Session Loading...</div>;
+  const isHighRole = highRoleCheck(sessUser.rank);
 
   const col = [
     {
@@ -418,7 +426,7 @@ export default function App() {
           </Table>
         </div>
         <div className="flex">
-          <KategoriOperasionalKantor />
+          <Kategori sessionuser={sessUser} />
         </div>
       </div>
       {/* Edit Operasional Kantor */}
@@ -507,6 +515,7 @@ const FormOperasionalKantor = ({
       <div className="bg-gray-100 p-3 rounded-lg">
         <div>Tanggal</div>
         <DatePicker
+          className="bg-white"
           placeholderText="Pilih tanggal"
           dateFormat="dd/MM/yyyy"
           selected={form.tanggal}
