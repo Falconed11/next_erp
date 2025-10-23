@@ -54,11 +54,12 @@ import { LinkOpenNewTab } from "@/components/mycomponent";
 import { FileUploader } from "@/components/input";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import ModalTransferData from "@/components/modaltransferdata";
 
 const apiPath = getApiPath();
 
 export default function App() {
-  const vendor = useClientFetch("hutangvendor");
+  const vendor = useClientFetch(`vendor?columnName=nama`);
   const [value, setValue] = React.useState("");
   const [form, setForm] = useState({});
   const [page, setPage] = React.useState(1);
@@ -80,7 +81,7 @@ export default function App() {
     onClose();
     //return alert(json.message);
   };
-  const saveTransferButtonPress = async (onClose) => {
+  const onSave = async (onClose) => {
     // if (form.isSwasta.size == 0) return alert("Swasta/Negri belum diisi");
     const res = await fetch(`${apiPath}transfervendor`, {
       method: "PUT",
@@ -88,10 +89,7 @@ export default function App() {
         "Content-Type": "application/json",
         // 'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: JSON.stringify({
-        currentId: form.currentId,
-        targetId: form.vendor,
-      }),
+      body: JSON.stringify({ id, newId }),
     });
     const json = await res.json();
     if (res.status == 400) return alert(json.message);
@@ -117,11 +115,13 @@ export default function App() {
     });
     onOpen();
   };
+  const [id, setId] = useState();
+  const [newId, setNewId] = useState();
+  const [name, setName] = useState();
   const transferButtonPress = (data) => {
-    setForm({
-      currentId: data.id,
-      nama: data.nama,
-    });
+    setId(data.id);
+    setNewId(null);
+    setName(data.nama);
     transfer.onOpen();
   };
   const deleteButtonPress = async (id) => {
@@ -195,17 +195,22 @@ export default function App() {
     const cellValue = data[columnKey];
     const date = new Date(data.tanggal);
     const hutang = data.hutang ?? 0;
+    const compCurrency = (v) => (
+      <div className="text-right">
+        <Harga harga={v} />
+      </div>
+    );
     switch (columnKey) {
       case "tanggal":
         return getDateF(new Date(data.tanggal));
       case "totalharga":
         return data.jumlah * data.harga;
       case "hutang":
-        return (
-          <div className="text-right">
-            <Harga harga={+hutang} />
-          </div>
-        );
+        return compCurrency(cellValue);
+      case "nprodukmasuk":
+        return compCurrency(cellValue);
+      case "nprodukkeluar":
+        return compCurrency(cellValue);
       case "aksi":
         return (
           <div className="relative flex items-center gap-2">
@@ -260,6 +265,10 @@ export default function App() {
 
   const columns = [
     {
+      key: "aksi",
+      label: "Aksi",
+    },
+    {
       key: "id",
       label: "Id",
     },
@@ -267,20 +276,24 @@ export default function App() {
       key: "nama",
       label: "Nama",
     },
+    // {
+    //   key: "hutang",
+    //   label: "Hutang",
+    // },
     {
-      key: "hutang",
-      label: "Hutang",
+      key: "nprodukmasuk",
+      label: "Produk Masuk",
+    },
+    {
+      key: "nprodukkeluar",
+      label: "Produk Keluar",
     },
     {
       key: "alamat",
       label: "Alamat",
     },
-    {
-      key: "aksi",
-      label: "Aksi",
-    },
   ];
-
+  console.log({ id, newId });
   return (
     <div className="flex flex-col">
       <div className="flex flex-row gap-2">
@@ -426,79 +439,19 @@ export default function App() {
         </ModalContent>
       </Modal>
       {/* transfer */}
-      <Modal
+      <ModalTransferData
+        title="Vendor"
+        data={vendor.data}
         isOpen={transfer.isOpen}
         onOpenChange={transfer.onOpenChange}
-        scrollBehavior="inside"
-      >
-        <ModalContent>
-          {(onClose) => (
-            <>
-              <ModalHeader className="flex flex-col gap-1">
-                Transfer Vendor
-              </ModalHeader>
-              <ModalBody>
-                <Input
-                  isDisabled
-                  type="text"
-                  label="Vendor asal"
-                  defaultValue={form.nama}
-                  className="max-w-xs"
-                />
-                <Select
-                  label="Targer vendor"
-                  variant="bordered"
-                  placeholder="Pilih target vendor"
-                  selectedKeys={form.selectedVendor}
-                  className="max-w-xs"
-                  onSelectionChange={(val) => {
-                    setForm({
-                      ...form,
-                      selectedVendor: val,
-                      vendor: new Set(val).values().next().value,
-                    });
-                  }}
-                >
-                  {vendor.data?.map((item) => (
-                    <SelectItem key={item.id} value={item.id}>
-                      {item.nama}
-                    </SelectItem>
-                  ))}
-                </Select>
-                {/* <Input
-                  type="text"
-                  label="Alamat"
-                  placeholder="Masukkan alamat!"
-                  value={form.alamat}
-                  onValueChange={(val) => setForm({ ...form, alamat: val })}
-                /> */}
-                {/* <Textarea
-                  label="Keterangan"
-                  labelPlacement="inside"
-                  placeholder="Masukkan keterangan!"
-                  value={form.keterangan}
-                  onValueChange={(val) => setForm({ ...form, keterangan: val })}
-                /> */}
-              </ModalBody>
-              <ModalFooter>
-                <Button
-                  color="danger"
-                  variant="light"
-                  onPress={transfer.onClose}
-                >
-                  Batal
-                </Button>
-                <Button
-                  color="primary"
-                  onPress={() => saveTransferButtonPress(transfer.onClose)}
-                >
-                  Simpan
-                </Button>
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
-      </Modal>
+        id={id}
+        newId={newId}
+        setNewId={setNewId}
+        name={name}
+        valueKey={"id"}
+        labelKey={"nama"}
+        onSave={onSave}
+      />
       {/* upload report */}
       <Modal
         isOpen={report.isOpen}

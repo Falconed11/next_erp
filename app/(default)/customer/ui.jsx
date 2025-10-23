@@ -65,9 +65,6 @@ export default function App() {
   const sessionuser = session.data?.user;
   const user = session.data?.user;
 
-  const [id, setId] = useState();
-  const [newId, setNewId] = useState();
-  const [name, setName] = useState();
   const [value, setValue] = React.useState("");
   const customer = useClientFetch("customer");
   const [form, setForm] = useState({});
@@ -123,6 +120,9 @@ export default function App() {
     });
     onOpen();
   };
+  const [id, setId] = useState();
+  const [newId, setNewId] = useState();
+  const [name, setName] = useState();
   const transferButtonPress = (data) => {
     setId(data.id);
     setNewId(null);
@@ -502,65 +502,6 @@ export default function App() {
         </ModalContent>
       </Modal>
       {/* transfer */}
-      {/* <Modal
-        isOpen={transfer.isOpen}
-        onOpenChange={transfer.onOpenChange}
-        scrollBehavior="inside"
-      >
-        <ModalContent>
-          {(onClose) => (
-            <>
-              <ModalHeader className="flex flex-col gap-1">
-                Transfer Customer
-              </ModalHeader>
-              <ModalBody>
-                <Input
-                  isDisabled
-                  type="text"
-                  label="Customer asal"
-                  defaultValue={form.nama}
-                  className="max-w-xs"
-                />
-                <Select
-                  label="Targer customer"
-                  variant="bordered"
-                  placeholder="Pilih target customer"
-                  selectedKeys={form.selectedId}
-                  className="max-w-xs"
-                  onSelectionChange={(val) => {
-                    setForm({
-                      ...form,
-                      selectedId: val,
-                      targetId: new Set(val).values().next().value,
-                    });
-                  }}
-                >
-                  {customer.data?.map((item) => (
-                    <SelectItem key={item.id} value={item.id}>
-                      {item.nama}
-                    </SelectItem>
-                  ))}
-                </Select>
-              </ModalBody>
-              <ModalFooter>
-                <Button
-                  color="danger"
-                  variant="light"
-                  onPress={transfer.onClose}
-                >
-                  Batal
-                </Button>
-                <Button
-                  color="primary"
-                  onPress={() => saveTransferButtonPress(transfer.onClose)}
-                >
-                  Simpan
-                </Button>
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
-      </Modal> */}
       <ModalTransferData
         title="Customer"
         data={customer.data}

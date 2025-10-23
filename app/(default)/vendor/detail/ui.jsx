@@ -42,22 +42,19 @@ import {
   getDateFId,
   getCurFirstLastDay,
 } from "@/app/utils/date";
-import { MyChip } from "@/components/mycomponent";
+import {
+  LinkOpenNewTab,
+  MyChip,
+  OpenBlueLinkInNewTab,
+} from "@/components/mycomponent";
 import Harga from "@/components/harga";
 import { Button } from "@heroui/react";
 import { Input } from "@heroui/react";
-import { Divider } from "@heroui/react";
-import { Spacer } from "@heroui/react";
 import { Select, SelectItem } from "@heroui/react";
-import { CheckboxGroup, Checkbox } from "@heroui/react";
-import Link from "next/link";
-import Image from "next/image";
-import logoBks from "@/public/logo-bks.jpeg";
-import logoSvt from "@/public/logo-svt.jpeg";
 import { useRouter } from "next/navigation";
-import { v4 as uuidv4 } from "uuid";
 import { FilterProduk } from "@/components/filter";
 import { RangeDate } from "@/components/input";
+import { capitalizeEachWord } from "@/app/utils/tools";
 
 const api_path = getApiPath();
 const [startDate, endDate] = getCurFirstLastDay();
@@ -78,8 +75,8 @@ export default function App({ id }) {
   const rowsPerPage = 25;
 
   const [current, setCurrent] = useState({
-    startDate,
-    endDate,
+    // startDate,
+    // endDate,
   });
 
   const pengeluaranproyek = useClientFetch(
@@ -207,6 +204,14 @@ export default function App({ id }) {
     keranjangproyek: React.useCallback((data, columnKey) => {
       const cellValue = data[columnKey];
       switch (columnKey) {
+        case "namaproyek":
+          return (
+            <OpenBlueLinkInNewTab
+              link={`/proyek/detail/proses?id=${data.id_proyek}`}
+            >
+              {capitalizeEachWord(cellValue) || "Link ..."}
+            </OpenBlueLinkInNewTab>
+          );
         case "lunas":
           return (
             <MyChip
@@ -216,6 +221,12 @@ export default function App({ id }) {
           );
         case "tanggal":
           return getDateFId(new Date(data.tanggal));
+        case "jumlah":
+          return (
+            <div className="text-right">
+              <Harga harga={cellValue} />
+            </div>
+          );
         case "hargamodal":
           return <Harga harga={data.hargamodal} />;
         case "hargapengeluaran":
@@ -287,6 +298,10 @@ export default function App({ id }) {
     {
       key: "tanggal",
       label: "Tanggal",
+    },
+    {
+      key: "namaproyek",
+      label: "Proyek",
     },
     {
       key: "instansi",
@@ -409,7 +424,7 @@ export default function App({ id }) {
             loadingState={loadingState}
           >
             {(item) => (
-              <TableRow key={item.id}>
+              <TableRow key={item.id_pengeluaranproyek}>
                 {(columnKey) => (
                   <TableCell>
                     {renderCell.keranjangproyek(item, columnKey)}

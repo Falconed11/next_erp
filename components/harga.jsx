@@ -1,10 +1,10 @@
 // import { UserIcon, DeleteIcon } from "./icon";
 
-export default function App({ harga, label, endContent }) {
+const Harga = ({ className, harga, label, endContent }) => {
   return (
-    <div className="inline-block text-right">
+    <span className={`text-right ${className}`}>
       {label} {harga ? (+harga).toLocaleString("id-ID") : 0} {endContent}
-    </div>
+    </span>
   );
 
   // harga ? (
@@ -14,4 +14,6 @@ export default function App({ harga, label, endContent }) {
   // ) : (
   //   0
   // );
-}
+};
+
+export default Harga;

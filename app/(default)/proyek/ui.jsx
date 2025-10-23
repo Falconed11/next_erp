@@ -604,192 +604,192 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
             <ShowHideComponent
               stat={stat}
               setStat={setStat}
-              component={
-                <div className="flex gap-2">
-                  {/* Filter */}
-                  <div className="flex flex-col gap-2">
-                    <div>Filter</div>
-                    <RadioGroup
-                      orientation="horizontal"
-                      value={sort}
-                      onValueChange={setSort}
-                    >
-                      <Radio value="tanggal_penawaran">Penawaran</Radio>
-                      <Radio value="tanggal">Proyek</Radio>
-                    </RadioGroup>
-                    <div className="flex flex-row gap-2">
-                      <div className="flex">
-                        <RangeDate
-                          current={current}
-                          setCurrent={setCurrent}
-                          setPage={setPage}
-                        />
+              openContent={"Buka Filter"}
+            >
+              <div className="flex gap-2">
+                {/* Filter */}
+                <div className="flex flex-col gap-2">
+                  <div>Filter</div>
+                  <RadioGroup
+                    orientation="horizontal"
+                    value={sort}
+                    onValueChange={setSort}
+                  >
+                    <Radio value="tanggal_penawaran">Penawaran</Radio>
+                    <Radio value="tanggal">Proyek</Radio>
+                  </RadioGroup>
+                  <div className="flex flex-row gap-2">
+                    <div className="flex">
+                      <RangeDate
+                        current={current}
+                        setCurrent={setCurrent}
+                        setPage={setPage}
+                      />
+                    </div>
+                  </div>
+                  <Select
+                    className="max-w-xs"
+                    label="Sales"
+                    placeholder="Pilih sales"
+                    selectedKeys={selectkaryawan}
+                    variant="bordered"
+                    onSelectionChange={(v) => {
+                      setSelectKaryawan(v);
+                      setPage(1);
+                    }}
+                  >
+                    {karyawan.data.map((v) => (
+                      <SelectItem key={v.id} textValue={v.nama || "NN"}>
+                        {v.nama || "NN"}
+                      </SelectItem>
+                    ))}
+                  </Select>
+                  <SelectStatusProyek
+                    select={selectStatusProyek}
+                    setSelect={setSelectStatusProyek}
+                  />
+                </div>
+                {/* Ringkasan */}
+                <div>
+                  <div>Ringkasan</div>
+                  <div className="flex gap-2">
+                    <div className="text-center text-sm">
+                      <div className="gap-2 flex flex-col">
+                        <div>Penawaran</div>
+                        <div className="px-2 py-1 text-white rounded-large bg-primary">
+                          <div>Total</div>
+                          <div>{nPenawaran}</div>
+                        </div>
+                        <div className="px-2 py-1 rounded-large bg-warning">
+                          <div>Waiting</div>
+                          <div>{summary.nOfferingWaiting}</div>
+                        </div>
+                        <div className="px-2 py-1 rounded-large bg-success">
+                          <div>Deal</div>
+                          <div>{summary.nOfferingDeal}</div>
+                        </div>
+                        <div className="px-2 py-1 text-white rounded-large bg-danger">
+                          <div>Reject</div>
+                          <div>{summary.nOfferingReject}</div>
+                        </div>
                       </div>
                     </div>
-                    <Select
-                      className="max-w-xs"
-                      label="Sales"
-                      placeholder="Pilih sales"
-                      selectedKeys={selectkaryawan}
-                      variant="bordered"
-                      onSelectionChange={(v) => {
-                        setSelectKaryawan(v);
-                        setPage(1);
-                      }}
-                    >
-                      {karyawan.data.map((v) => (
-                        <SelectItem key={v.id} textValue={v.nama || "NN"}>
-                          {v.nama || "NN"}
-                        </SelectItem>
-                      ))}
-                    </Select>
-                    <SelectStatusProyek
-                      select={selectStatusProyek}
-                      setSelect={setSelectStatusProyek}
-                    />
-                  </div>
-                  {/* Ringkasan */}
-                  <div>
-                    <div>Ringkasan</div>
-                    <div className="flex gap-2">
+                    {isHighRole && (
                       <div className="text-center text-sm">
                         <div className="gap-2 flex flex-col">
-                          <div>Penawaran</div>
-                          <div className="px-2 py-1 text-white rounded-large bg-primary">
-                            <div>Total</div>
-                            <div>{nPenawaran}</div>
-                          </div>
-                          <div className="px-2 py-1 rounded-large bg-warning">
-                            <div>Waiting</div>
-                            <div>{summary.nOfferingWaiting}</div>
-                          </div>
-                          <div className="px-2 py-1 rounded-large bg-success">
-                            <div>Deal</div>
-                            <div>{summary.nOfferingDeal}</div>
-                          </div>
-                          <div className="px-2 py-1 text-white rounded-large bg-danger">
-                            <div>Reject</div>
-                            <div>{summary.nOfferingReject}</div>
-                          </div>
-                        </div>
-                      </div>
-                      {isHighRole && (
-                        <div className="text-center text-sm">
-                          <div className="gap-2 flex flex-col">
-                            <div>Modal</div>
-                            <div className="px-2 py-1 text-white rounded-large bg-primary">
-                              <div>Total</div>
-                              <div>
-                                <Harga harga={summary.totalModal} />
-                              </div>
-                            </div>
-                            <div className="px-2 py-1 rounded-large bg-warning">
-                              <div>Waiting</div>
-                              <div>
-                                <Harga harga={summary.totalModalWaiting} />
-                              </div>
-                            </div>
-                            <div className="px-2 py-1 rounded-large bg-success">
-                              <div>Deal</div>
-                              <div>
-                                <Harga harga={summary.totalModalDeal} />
-                              </div>
-                            </div>
-                            <div className="px-2 py-1 text-white rounded-large bg-danger">
-                              <div>Reject</div>
-                              <div>
-                                <Harga harga={summary.totalModalReject} />
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                      <div className="text-center text-sm">
-                        <div className="gap-2 flex flex-col">
-                          <div>Nilai Penawaran</div>
+                          <div>Modal</div>
                           <div className="px-2 py-1 text-white rounded-large bg-primary">
                             <div>Total</div>
                             <div>
+                              <Harga harga={summary.totalModal} />
+                            </div>
+                          </div>
+                          <div className="px-2 py-1 rounded-large bg-warning">
+                            <div>Waiting</div>
+                            <div>
+                              <Harga harga={summary.totalModalWaiting} />
+                            </div>
+                          </div>
+                          <div className="px-2 py-1 rounded-large bg-success">
+                            <div>Deal</div>
+                            <div>
+                              <Harga harga={summary.totalModalDeal} />
+                            </div>
+                          </div>
+                          <div className="px-2 py-1 text-white rounded-large bg-danger">
+                            <div>Reject</div>
+                            <div>
+                              <Harga harga={summary.totalModalReject} />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    <div className="text-center text-sm">
+                      <div className="gap-2 flex flex-col">
+                        <div>Nilai Penawaran</div>
+                        <div className="px-2 py-1 text-white rounded-large bg-primary">
+                          <div>Total</div>
+                          <div>
+                            <Harga
+                              harga={
+                                +summary.totalPenawaranDeal +
+                                summary.totalPenawaranReject +
+                                summary.totalPenawaranWaiting
+                              }
+                            />
+                          </div>
+                        </div>
+                        <div className="px-2 py-1 rounded-large bg-warning">
+                          <div>Waiting</div>
+                          <div>
+                            <Harga harga={+summary.totalPenawaranWaiting} />
+                          </div>
+                        </div>
+                        <div className="px-2 py-1 rounded-large bg-success">
+                          <div>Deal</div>
+                          <div>
+                            <Harga harga={+summary.totalPenawaranDeal} />
+                          </div>
+                        </div>
+                        <div className="px-2 py-1 text-white rounded-large bg-danger">
+                          <div>Reject</div>
+                          <div>
+                            <Harga harga={+summary.totalPenawaranReject} />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    {isHighRole && (
+                      <div className="text-center text-sm">
+                        <div className="gap-2 flex flex-col">
+                          <div>Provit</div>
+                          <div className="px-2 py-1 text-white rounded-large bg-primary">
+                            <div>Total</div>
+                            <div>
+                              <Harga harga={summary.totalProvit} />
+                            </div>
+                          </div>
+                          <div className="px-2 py-1 rounded-large bg-warning">
+                            <div>Waiting</div>
+                            <div>
                               <Harga
                                 harga={
-                                  +summary.totalPenawaranDeal +
-                                  summary.totalPenawaranReject +
-                                  summary.totalPenawaranWaiting
+                                  summary.totalPenawaranWaiting -
+                                  summary.totalModalWaiting
                                 }
                               />
                             </div>
                           </div>
-                          <div className="px-2 py-1 rounded-large bg-warning">
-                            <div>Waiting</div>
-                            <div>
-                              <Harga harga={+summary.totalPenawaranWaiting} />
-                            </div>
-                          </div>
                           <div className="px-2 py-1 rounded-large bg-success">
                             <div>Deal</div>
                             <div>
-                              <Harga harga={+summary.totalPenawaranDeal} />
+                              <Harga
+                                harga={
+                                  summary.totalPenawaranDeal -
+                                  summary.totalModalDeal
+                                }
+                              />
                             </div>
                           </div>
                           <div className="px-2 py-1 text-white rounded-large bg-danger">
                             <div>Reject</div>
                             <div>
-                              <Harga harga={+summary.totalPenawaranReject} />
+                              <Harga
+                                harga={
+                                  summary.totalPenawaranReject -
+                                  summary.totalModalReject
+                                }
+                              />
                             </div>
                           </div>
                         </div>
                       </div>
-                      {isHighRole && (
-                        <div className="text-center text-sm">
-                          <div className="gap-2 flex flex-col">
-                            <div>Provit</div>
-                            <div className="px-2 py-1 text-white rounded-large bg-primary">
-                              <div>Total</div>
-                              <div>
-                                <Harga harga={summary.totalProvit} />
-                              </div>
-                            </div>
-                            <div className="px-2 py-1 rounded-large bg-warning">
-                              <div>Waiting</div>
-                              <div>
-                                <Harga
-                                  harga={
-                                    summary.totalPenawaranWaiting -
-                                    summary.totalModalWaiting
-                                  }
-                                />
-                              </div>
-                            </div>
-                            <div className="px-2 py-1 rounded-large bg-success">
-                              <div>Deal</div>
-                              <div>
-                                <Harga
-                                  harga={
-                                    summary.totalPenawaranDeal -
-                                    summary.totalModalDeal
-                                  }
-                                />
-                              </div>
-                            </div>
-                            <div className="px-2 py-1 text-white rounded-large bg-danger">
-                              <div>Reject</div>
-                              <div>
-                                <Harga
-                                  harga={
-                                    summary.totalPenawaranReject -
-                                    summary.totalModalReject
-                                  }
-                                />
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
+                    )}
                   </div>
                 </div>
-              }
-            />
+              </div>
+            </ShowHideComponent>
           </div>
         }
         bottomContent={

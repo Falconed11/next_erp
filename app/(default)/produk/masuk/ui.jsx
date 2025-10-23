@@ -760,17 +760,6 @@ const TabelProdukKeluar = ({ id_produk }) => {
             target="_blank"
             rel="noopener noreferrer"
           >
-            {/* <span
-              // onClick={() => detailButtonPress(data)}
-              role="link"
-              onClick={(e) => {
-                e.preventDefault();
-                window.open(`/proyek/detail/proses?id=${data.id}`);
-              }}
-              className="text-lg text-default-400 cursor-pointer active:opacity-50"
-            >
-              <ReportMoneyIcon />
-            </span> */}
             {data.nama_proyek}
           </Link>
         ) : (

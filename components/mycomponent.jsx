@@ -35,6 +35,18 @@ const LinkOpenNewTab = ({ content, link, icon }) => {
     </Tooltip>
   );
 };
+const OpenBlueLinkInNewTab = ({ link, children }) => {
+  return (
+    <Link
+      className="text-blue-600 underline"
+      href={link}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      {children}
+    </Link>
+  );
+};
 const NavLinkNewTab = ({ href, children }) => {
   return (
     <Link href={href} target="_blank" rel="noopener noreferrer">
@@ -142,6 +154,7 @@ const PrintWithHeader = ({ header, body }) => {
 
 export {
   MyChip,
+  OpenBlueLinkInNewTab,
   LinkOpenNewTab,
   NavLinkNewTab,
   BKSHeader,

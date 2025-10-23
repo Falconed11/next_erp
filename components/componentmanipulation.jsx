@@ -9,7 +9,13 @@ const AuthorizationComponent = ({ roles, user, component }) => {
   return roles.includes(user.peran) ? component : <></>;
 };
 
-const ShowHideComponent = ({ stat, setStat, component }) => {
+const ShowHideComponent = ({
+  stat,
+  setStat,
+  children,
+  openContent,
+  closeContent,
+}) => {
   // stat and setStat must be `const [stat, setStat] = useState(0)`;
   return (
     <div>
@@ -19,9 +25,9 @@ const ShowHideComponent = ({ stat, setStat, component }) => {
           setStat(stat == 0 ? 1 : 0);
         }}
       >
-        {stat == 0 ? "Buka" : "Sembunyikan"}
+        {stat == 0 ? openContent || "Buka" : closeContent || "Sembunyikan"}
       </Button>
-      <div className={`${stat == 0 ? "hidden" : ""}`}>{component}</div>
+      <div className={`${stat == 0 ? "hidden" : ""}`}>{children}</div>
     </div>
   );
 };
