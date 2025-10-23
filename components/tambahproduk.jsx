@@ -12,7 +12,8 @@ import {
 import { getDateF, getDateFId } from "@/app/utils/date";
 import Harga from "@/components/harga";
 import { useSession } from "next-auth/react";
-import { highRoleCheck } from "@/app/utils/tools";
+import { highRoleCheck, renderQueryStates } from "@/app/utils/tools";
+import { AutocompleteKategoriProduk } from "./myautocomplete";
 
 const api_path = getApiPath();
 
@@ -26,91 +27,69 @@ export default function TambahProduk({
   customInput,
   rank = 21,
 }) {
+  const idKategori = form.id_kategori;
   const session = useSession();
   const sessUser = session.data?.user;
   const [nama, setNama] = useState("");
   const [sVendor, setSVendor] = useState("");
   const kategori = useClientFetch(`kategoriproduk`);
   const produk = useClientFetch(
-    `produk?${
-      form.selectKategori?.size > 0
-        ? `kategori=${form.selectKategori.values().next().value}`
-        : ""
-    }`
+    `produk?${idKategori ? `kategori=${idKategori}` : ""}`
   );
   const vendor = useClientFetch("vendor");
   // const pilihProduk = useClientFetch(`produk`)
-  const queries = { kategori, produk, vendor };
   const errorsJumlah = [];
 
-  for (const [name, data] of Object.entries(queries)) {
-    if (data.error) return <div>Failed to load {name}</div>;
-    if (data.isLoading) return <div>Loading {name}...</div>;
-  }
-  if (session.status === "loading") return "Session Loading ...";
+  const queryStates = renderQueryStates({
+    queries: { kategori, produk, vendor },
+    session,
+  });
+  if (queryStates) return queryStates;
   const isHighRole = highRoleCheck(sessUser.rank);
   if ((form.jumlah < 1 || !form.jumlah) && form.selectProduk?.length > 0)
     errorsJumlah.push("Jumlah minimal 1");
   if (form.jumlah > form.stok && form.isSelected)
     errorsJumlah.push("Stok tidak cukup");
 
-  let data = produk.data;
-  data = data.filter(
-    (animal) =>
-      animal.nama.toLowerCase().includes(nama.toLowerCase()) ||
-      (animal.nmerek || "").toLowerCase().includes(nama.toLowerCase()) ||
-      animal.tipe.toLowerCase().includes(nama.toLowerCase()) ||
-      animal.id.toString().includes(nama.toLowerCase()) ||
-      animal.keterangan.toLowerCase().includes(nama.toLowerCase())
-  );
-  data = data.slice(0, 20);
+  // let data = produk.data;
+  // const lowerNama = nama.toLowerCase();
+  // data = data.filter((row) =>
+  //   ["nama", "nmerek", "tipe", "id", "keterangan"].some((key) =>
+  //     (row[key] ?? "").toString().toLowerCase().includes(lowerNama)
+  //   )
+  // );
+  // data = data.slice(0, 20);
 
   let fvendor = vendor.data;
-  fvendor = fvendor.filter((animal) =>
-    animal.nama.toLowerCase().includes(sVendor.toLowerCase())
+  fvendor = fvendor.filter((row) =>
+    row.nama.toLowerCase().includes(sVendor.toLowerCase())
   );
   fvendor = fvendor.slice(0, 100);
   const selectProduk = produk.data.filter((v) => v.id == form.selectProduk)[0];
   const hideComponent = isHighRole ? "" : "hidden";
   // console.log(form.selectProduk);
   // console.log({ nama });
+  const dataProduk = produk.data;
   const defStyleFormWidth = "w-2/12";
   return (
     <div className="w-max flex flex-wrap gap-3">
-      <Select
-        label="Kategori"
-        placeholder="Pilih kategori!"
-        className={defStyleFormWidth}
-        classNames={{ popoverContent: "w-fit" }}
-        selectedKeys={form.selectKategori}
-        onSelectionChange={(v) => {
-          setForm({
-            ...form,
-            selectProduk: new Set([]),
-            selectKategori: v,
-          });
-          //   setSelectProduk(new Set([]));
-          //   setSelectKategori(v);
-        }}
-      >
-        {kategori.data.map((item) => (
-          <SelectItem className="" key={item.id} value={item.id}>
-            {item.nama}
-          </SelectItem>
-        ))}
-      </Select>
+      <AutocompleteKategoriProduk form={form} setForm={setForm} />
       <Autocomplete
         popoverProps={{
           shouldCloseOnScroll: false,
         }}
         label="Produk"
         variant="bordered"
-        defaultItems={data}
+        defaultItems={
+          idKategori
+            ? dataProduk.filter((row) => row.id_kategori == idKategori)
+            : dataProduk
+        }
         placeholder="Cari produk"
         className="w-8/12"
         selectedKey={form.selectProduk}
         onSelectionChange={(v) => {
-          const selectedProduk = produk.data.filter((p) => p.id == v)[0];
+          const selectedProduk = dataProduk.filter((p) => p.id == v)[0];
           const harga = refHargaModal
             ? selectedProduk?.hargamodal ?? 0
             : selectedProduk?.hargajual ?? 0;
@@ -212,7 +191,7 @@ export default function TambahProduk({
       <Input
         type="text"
         value={`${form.stok ? form.stok : 0} ${form.satuan ?? ""}`}
-        disabled
+        isDisabled
         label="Stok"
         // placeholder="Masukkan jumlah!"
         className={defStyleFormWidth}

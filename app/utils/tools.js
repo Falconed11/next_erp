@@ -37,6 +37,13 @@ const capitalizeEachWord = (str = "") => {
     (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
   );
 };
+const renderQueryStates = ({ queries = {}, session }) => {
+  for (const [name, data] of Object.entries(queries)) {
+    if (data.error) return <div>Failed to load {name}</div>;
+    if (data.isLoading) return <div>Loading {name}...</div>;
+  }
+  if (session?.status === "loading") return <div>Session Loading...</div>;
+};
 export {
   capitalizeEachWord,
   rolesCheck,
@@ -45,4 +52,5 @@ export {
   key2set,
   set2key,
   getNextDomain,
+  renderQueryStates,
 };

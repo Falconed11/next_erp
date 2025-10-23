@@ -1697,9 +1697,9 @@ export default function App({ id, versi }) {
                 />
                 <div>Merek : {form.nmerek}</div>
                 <div>Tipe : {form.tipe}</div>
-                <div>Vendor : {form.nvendor}</div>
-                <div>Satuan : {form.satuan}</div>
-                <div>Stok : {form.stok}</div>
+                <div>
+                  Stok : {form.stok} {form.satuan}
+                </div>
                 <NumberInput
                   hideStepper
                   isWheelDisabled

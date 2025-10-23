@@ -62,12 +62,18 @@ import { getDate, getDateF, getDateFId } from "@/app/utils/date";
 import { LinkOpenNewTab } from "@/components/mycomponent";
 import { AuthorizationComponent } from "@/components/componentmanipulation";
 import {
+  AutocompleteKategoriProduk,
+  AutocompleteMerek,
+  AutocompleteVendor,
+  AutocompleteWithCustomValue,
+} from "@/components/myautocomplete";
+import {
   countPercentProvit,
   countPriceByPercentProfit,
   countPriceByProvitMarginPercent,
   countProvitMarginPercent,
 } from "@/app/utils/formula";
-import { highRoleCheck } from "@/app/utils/tools";
+import { highRoleCheck, renderQueryStates } from "@/app/utils/tools";
 import { useFilter } from "@react-aria/i18n";
 
 const apiPath = getApiPath();
@@ -109,13 +115,6 @@ export default function App() {
   const vendor = useClientFetch("vendor?columnName=nama");
   const metodepengeluaran = useClientFetch("metodepengeluaran");
   const kategori = useClientFetch("kategoriproduk");
-  const queries = {
-    produk,
-    merek,
-    vendor,
-    metodepengeluaran,
-    kategori,
-  };
 
   const [method, setMethod] = useState("POST");
   const [form, setForm] = useState({
@@ -459,11 +458,17 @@ export default function App() {
   }, [filteredData?.length, rowsPerPage]);
   const loadingState = produk.isLoading ? "loading" : "idle";
   const offset = (page - 1) * rowsPerPage;
-  for (const [name, data] of Object.entries(queries)) {
-    if (data.error) return <div>Failed to load {name}</div>;
-    if (data.isLoading) return <div>Loading {name}...</div>;
-  }
-  if (session.status === "loading") return <div>Session Loading...</div>;
+  const queryStates = renderQueryStates({
+    queries: {
+      produk,
+      merek,
+      vendor,
+      metodepengeluaran,
+      kategori,
+    },
+    session,
+  });
+  if (queryStates) return queryStates;
   const isHighRole = highRoleCheck(sessUser.rank);
 
   const col = [
@@ -571,6 +576,7 @@ export default function App() {
   //     if (item.id_kategoriproduk == form.id_kategori) return item;
   //   });
   // }
+  console.log(form);
   return (
     <div className="">
       <div className="flex flex-col gap-2">
@@ -688,16 +694,7 @@ export default function App() {
                 {form.modalmode} Produk
               </ModalHeader>
               <ModalBody>
-                <AutocompleteWithCustomValue
-                  title={"Kategori"}
-                  data={kategori.data}
-                  form={form}
-                  setForm={setForm}
-                  field={"kategoriproduk"}
-                  id={"id_kategori"}
-                  labelKey={"nama"}
-                  valueKey={"id"}
-                />
+                <AutocompleteKategoriProduk form={form} setForm={setForm} />
                 <Input
                   type="text"
                   label="Id"
@@ -712,16 +709,7 @@ export default function App() {
                   value={form.nama}
                   onValueChange={(val) => setForm({ ...form, nama: val })}
                 />
-                <AutocompleteWithCustomValue
-                  title={"Merek"}
-                  data={merek.data}
-                  form={form}
-                  setForm={setForm}
-                  field={"merek"}
-                  id={"id_merek"}
-                  labelKey={"nama"}
-                  valueKey={"id"}
-                />
+                <AutocompleteMerek form={form} setForm={setForm} />
                 <Input
                   type="text"
                   label="Tipe"
@@ -743,9 +731,8 @@ export default function App() {
                       value={form.stok}
                       onValueChange={(val) => setForm({ ...form, stok: val })}
                     />
-                    <AutocompleteWithCustomValueVendor
+                    <AutocompleteVendor
                       isDisabled={!form.stok}
-                      data={vendor.data}
                       form={form}
                       setForm={setForm}
                     />
@@ -1004,11 +991,7 @@ export default function App() {
                   {form.id_kustom} | {form.nama} | {form.nmerek} | {form.tipe} |
                   Stok: {form.stok}
                 </div>
-                <AutocompleteWithCustomValueVendor
-                  data={vendor.data}
-                  form={form}
-                  setForm={setForm}
-                />
+                <AutocompleteVendor form={form} setForm={setForm} />
                 <NumberInput
                   hideStepper
                   isWheelDisabled
@@ -1258,105 +1241,3 @@ export default function App() {
     </div>
   );
 }
-
-const LabelRecordCheck = ({ title, isNotAvailable }) => {
-  return (
-    <>
-      {title}
-      {isNotAvailable && (
-        <span className="text-danger">{" *Data tidak terdaftar"}</span>
-      )}
-    </>
-  );
-};
-
-const AutocompleteWithCustomValue = ({
-  isDisabled = undefined,
-  title,
-  data = [],
-  form,
-  setForm,
-  field,
-  id,
-  valueKey,
-  labelKey,
-}) => {
-  const [filteredData, setFilteredData] = useState(data);
-  const { contains } = useFilter({ sensitivity: "base" });
-  const handleSelectionChange = (key) => {
-    const selectedItem = data.find((item) => item[valueKey] == key);
-    setForm((prev) => ({
-      ...prev,
-      [field]: selectedItem?.[labelKey] || prev[field] || "",
-      [id]: key ?? prev[id],
-    }));
-  };
-
-  const handleInputChange = (value) => {
-    // filter items locally
-    setFilteredData(data.filter((o) => contains(o[labelKey], value)));
-
-    // update form value and id
-    const match = data.find(
-      (item) => item[labelKey]?.toLowerCase() == value.toLowerCase()
-    );
-    setForm((prev) => ({
-      ...prev,
-      [field]: value,
-      [id]: match != null ? match[valueKey] : null,
-    }));
-  };
-
-  const handleOpenChange = (isOpen) => {
-    if (isOpen) setFilteredData(data); // reset dropdown when opened
-  };
-
-  return (
-    <Autocomplete
-      isDisabled={isDisabled}
-      variant="bordered"
-      label={
-        <LabelRecordCheck
-          title={title}
-          isNotAvailable={form[field] && form[id] == null}
-        />
-      }
-      allowsCustomValue
-      items={filteredData}
-      placeholder={`Cari ${title}`}
-      className="max-w-xs"
-      inputValue={form[field] ?? ""}
-      selectedKey={form[id] ?? null}
-      onSelectionChange={handleSelectionChange}
-      onInputChange={handleInputChange}
-      onOpenChange={handleOpenChange}
-    >
-      {(item) => (
-        <AutocompleteItem key={item[valueKey]} textValue={item[labelKey]}>
-          {item[labelKey]}
-        </AutocompleteItem>
-      )}
-    </Autocomplete>
-  );
-};
-
-const AutocompleteWithCustomValueVendor = ({
-  form,
-  data,
-  setForm,
-  isDisabled = undefined,
-}) => {
-  return (
-    <AutocompleteWithCustomValue
-      isDisabled={isDisabled}
-      title={"Vendor"}
-      data={data}
-      form={form}
-      setForm={setForm}
-      field={"vendor"}
-      id={"id_vendor"}
-      labelKey={"nama"}
-      valueKey={"id"}
-    />
-  );
-};
