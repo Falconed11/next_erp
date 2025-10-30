@@ -147,12 +147,8 @@ export default function App({ id, versi }) {
     statusProyek,
     subProyek,
   };
-  const starterForm = {
-    selectProduk: new Set([]),
-    selectKategori: new Set([]),
-  };
-  const [form, setForm] = useState(starterForm);
-  const [formInstalasi, setFormInstalasi] = useState(starterForm);
+  const [form, setForm] = useState({});
+  const [formInstalasi, setFormInstalasi] = useState({});
   const PERSEN_PROVIT = 30;
   const [inputPersenProvit, setInputPersenProvit] = useState(PERSEN_PROVIT);
 
@@ -172,11 +168,7 @@ export default function App({ id, versi }) {
       body: JSON.stringify({
         ...form,
         id_proyek: id,
-        id_produk: form.selectProduk,
-        jumlah: form.jumlah,
-        harga: form.harga,
         instalasi: form.instalasi,
-        hargakustom: form.hargakustom,
         versi,
       }),
     });
@@ -953,7 +945,8 @@ export default function App({ id, versi }) {
   const hideComponent = isHighRole ? "" : "hidden";
   const defStyleFormWidth = "w-2/12";
   const fullPath = `${NEXT_DOMAIN}/proyek/detail?id=${id}&versi=${versi}`;
-  console.log(json);
+  const tambahWidth = "w-9/12-";
+  // console.log(json);
   return (
     <div className="flex gap-2 flex-col">
       <div className="flex gap-2">
@@ -1263,7 +1256,7 @@ export default function App({ id, versi }) {
                       condition={selectedProyek?.versi == 0}
                       component={
                         <>
-                          <div className="flex gap-2 w-9/12">
+                          <div className={`flex gap-2 ${tambahWidth}`}>
                             <TambahProduk
                               form={form}
                               setForm={setForm}
@@ -1440,7 +1433,7 @@ export default function App({ id, versi }) {
                       condition={selectedProyek?.versi == 0}
                       component={
                         <>
-                          <div className="flex gap-2 w-9/12">
+                          <div className={`flex gap-2 ${tambahWidth}`}>
                             <TambahProduk
                               form={formInstalasi}
                               setForm={setFormInstalasi}

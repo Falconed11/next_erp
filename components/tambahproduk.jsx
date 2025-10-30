@@ -13,7 +13,11 @@ import { getDateF, getDateFId } from "@/app/utils/date";
 import Harga from "@/components/harga";
 import { useSession } from "next-auth/react";
 import { highRoleCheck, renderQueryStates } from "@/app/utils/tools";
-import { AutocompleteKategoriProduk } from "./myautocomplete";
+import {
+  AutocompleteKategoriProduk,
+  AutocompleteMerek,
+  AutocompleteProduk,
+} from "./myautocomplete";
 
 const api_path = getApiPath();
 
@@ -26,6 +30,7 @@ export default function TambahProduk({
   refHargaModal,
   customInput,
   rank = 21,
+  className,
 }) {
   const idKategori = form.id_kategori;
   const session = useSession();
@@ -71,10 +76,16 @@ export default function TambahProduk({
   // console.log({ nama });
   const dataProduk = produk.data;
   const defStyleFormWidth = "w-2/12";
+  const variant = "bordered";
+  console.log(form);
   return (
-    <div className="w-max flex flex-wrap gap-3">
-      <AutocompleteKategoriProduk form={form} setForm={setForm} />
-      <Autocomplete
+    <div className={`flex flex-wrap gap-3 ${className}`}>
+      <AutocompleteKategoriProduk
+        form={form}
+        setForm={setForm}
+        className={defStyleFormWidth}
+      />
+      {/* <Autocomplete
         popoverProps={{
           shouldCloseOnScroll: false,
         }}
@@ -122,12 +133,25 @@ export default function TambahProduk({
             {getDateFId(item.tanggal)}
           </AutocompleteItem>
         )}
-      </Autocomplete>
+      </Autocomplete> */}
+      <AutocompleteProduk
+        id_kategori={form.id_kategori}
+        form={form}
+        setForm={setForm}
+        className="w-8/12"
+      />
+      <AutocompleteMerek
+        isDisabled={!!form.id_produk}
+        form={form}
+        setForm={setForm}
+        className={defStyleFormWidth}
+      />
       <>
         <Input
+          variant={variant}
           type="id"
           value={form.id_kustom}
-          disabled
+          isDisabled={!!form.id_produk}
           label="Id"
           placeholder="Masukkan id!"
           className={defStyleFormWidth}
@@ -146,7 +170,7 @@ export default function TambahProduk({
       ) : (
         <Autocomplete
           label="Vendor"
-          variant="bordered"
+          variant={variant}
           defaultItems={fvendor}
           placeholder="Pilih vendor"
           className={defStyleFormWidth}
@@ -188,26 +212,31 @@ export default function TambahProduk({
       ) : (
         <></>
       )}
-      <Input
-        type="text"
-        value={`${form.stok ? form.stok : 0} ${form.satuan ?? ""}`}
-        isDisabled
-        label="Stok"
-        // placeholder="Masukkan jumlah!"
-        className={defStyleFormWidth}
-        endContent={
-          <div className="pointer-events-none flex items-center">
-            <span className="text-default-400 text-small"></span>
-          </div>
-        }
-        onValueChange={(v) =>
-          setForm({
-            ...form,
-            jumlah: v,
-          })
-        }
-      />
+      {/* stok */}
+      {form.id_produk && (
+        <Input
+          variant={variant}
+          type="text"
+          value={`${form.stok ? form.stok : 0} ${form.satuan ?? ""}`}
+          isDisabled
+          label="Stok"
+          // placeholder="Masukkan jumlah!"
+          className={defStyleFormWidth}
+          endContent={
+            <div className="pointer-events-none flex items-center">
+              <span className="text-default-400 text-small"></span>
+            </div>
+          }
+          onValueChange={(v) =>
+            setForm({
+              ...form,
+              jumlah: v,
+            })
+          }
+        />
+      )}
       <NumberInput
+        variant={variant}
         hideStepper
         isWheelDisabled
         formatOptions={{
@@ -237,8 +266,25 @@ export default function TambahProduk({
           })
         }
       />
+      {!form.id_produk && (
+        <Input
+          // isDisabled={!!form.id_produk}
+          variant={variant}
+          value={form.satuan}
+          label="Satuan"
+          placeholder="Masukkan satuan!"
+          className={defStyleFormWidth}
+          onValueChange={(v) =>
+            setForm({
+              ...form,
+              satuan: v,
+            })
+          }
+        />
+      )}
       {disableStok ? (
         <NumberInput
+          variant={variant}
           hideStepper
           isWheelDisabled
           formatOptions={{
@@ -261,6 +307,7 @@ export default function TambahProduk({
         <></>
       )}
       <NumberInput
+        variant={variant}
         hideStepper
         isWheelDisabled
         formatOptions={{
