@@ -18,6 +18,7 @@ const useAutocompleteField = ({
   labelKey = "nama",
   valueKey = "id",
   className,
+  disableCustomValue,
   disableSelectOnChange,
   getCustomLabel,
   getCustomValue,
@@ -39,6 +40,7 @@ const useAutocompleteField = ({
       labelKey={labelKey}
       valueKey={valueKey}
       className={className}
+      disableCustomValue={disableCustomValue}
       disableSelectOnChange={disableSelectOnChange}
       getCustomLabel={getCustomLabel}
       getCustomValue={getCustomValue}
@@ -59,6 +61,7 @@ const AutocompleteWithCustomValue = ({
   valueKey,
   labelKey,
   className = "",
+  disableCustomValue,
   disableSelectOnChange,
   getCustomLabel,
   getCustomValue = (i) => i[labelKey],
@@ -68,7 +71,6 @@ const AutocompleteWithCustomValue = ({
   const { contains } = useFilter({ sensitivity: "base" });
   const handleSelectionChange = (key) => {
     // if (form[id] == key) return;
-    console.log({ key });
     const item = data.find((i) => i[valueKey] == key);
     // console.log(item);
     setForm((prev) => ({
@@ -84,7 +86,6 @@ const AutocompleteWithCustomValue = ({
       data.find(
         (i) => getCustomValue(i)?.toLowerCase() === value.toLowerCase()
       );
-    console.log({ match });
     setFilteredData(data.filter((i) => contains(getCustomValue(i), value)));
     setForm((prev) => ({
       ...prev,
@@ -160,7 +161,7 @@ const AutocompleteVendor = (props) => {
   });
   return component;
 };
-const AutocompleteProduk = ({ id_kategori, ...props }) => {
+const AutocompleteProduk = ({ id_kategori, disableCustomValue, ...props }) => {
   const { component } = useAutocompleteField({
     endpoint: `produk?${id_kategori ? `kategori=${id_kategori}` : ""}`,
     title: "Produk",
@@ -179,7 +180,6 @@ const AutocompleteProduk = ({ id_kategori, ...props }) => {
     ),
     getCustomValue: (item) =>
       [item.nama, item.nmerek, item.tipe, item.keterangan].join(" "),
-    ...props,
     getFormUpdateOnSelectionChange: (item) => ({
       ...item,
       oldHargaModal: item?.hargamodal,
@@ -187,6 +187,8 @@ const AutocompleteProduk = ({ id_kategori, ...props }) => {
       isSelected: false,
       merek: item?.nmerek,
     }),
+    disableCustomValue,
+    ...props,
   });
   return component;
 };

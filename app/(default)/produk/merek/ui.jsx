@@ -203,7 +203,13 @@ export default function App() {
       case "provit":
         return (
           <div className="text-right">
-            <Harga harga={+data.provit} />
+            <Harga harga={data.provit} />
+          </div>
+        );
+      case "nproduk":
+        return (
+          <div className="text-right">
+            <Harga harga={cellValue} />
           </div>
         );
       case "aksi":
@@ -269,6 +275,10 @@ export default function App() {
 
   const columns = [
     {
+      key: "aksi",
+      label: "Aksi",
+    },
+    {
       key: "id",
       label: "Id",
     },
@@ -277,8 +287,8 @@ export default function App() {
       label: "Nama",
     },
     {
-      key: "aksi",
-      label: "Aksi",
+      key: "nproduk",
+      label: "Jumlah Produk",
     },
   ];
 

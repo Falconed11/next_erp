@@ -31,6 +31,7 @@ export default function TambahProduk({
   customInput,
   rank = 21,
   className,
+  disableCustomValue,
 }) {
   const idKategori = form.id_kategori;
   const session = useSession();
@@ -70,17 +71,18 @@ export default function TambahProduk({
     row.nama.toLowerCase().includes(sVendor.toLowerCase())
   );
   fvendor = fvendor.slice(0, 100);
-  const selectProduk = produk.data.filter((v) => v.id == form.selectProduk)[0];
+  const selectProduk = produk.data.filter((v) => v.id == form.id_produk)[0];
   const hideComponent = isHighRole ? "" : "hidden";
   // console.log(form.selectProduk);
   // console.log({ nama });
   const dataProduk = produk.data;
   const defStyleFormWidth = "w-2/12";
   const variant = "bordered";
-  console.log(form);
+  const isProdukSelected = !!form.id_produk;
   return (
     <div className={`flex flex-wrap gap-3 ${className}`}>
       <AutocompleteKategoriProduk
+        disableCustomValue={disableCustomValue}
         form={form}
         setForm={setForm}
         className={defStyleFormWidth}
@@ -135,39 +137,49 @@ export default function TambahProduk({
         )}
       </Autocomplete> */}
       <AutocompleteProduk
+        disableCustomValue={disableCustomValue}
         id_kategori={form.id_kategori}
         form={form}
         setForm={setForm}
         className="w-8/12"
       />
       <AutocompleteMerek
-        isDisabled={!!form.id_produk}
+        isDisabled={isProdukSelected}
         form={form}
         setForm={setForm}
         className={defStyleFormWidth}
       />
-      <>
-        <Input
-          variant={variant}
-          type="id"
-          value={form.id_kustom}
-          isDisabled={!!form.id_produk}
-          label="Id"
-          placeholder="Masukkan id!"
-          className={defStyleFormWidth}
-          onValueChange={(v) =>
-            setForm({
-              ...form,
-              id_kustom: v,
-            })
-          }
-        />
-      </>
-      {disableVendor ? (
-        <></>
-      ) : form.isSelected == true ? (
-        <></>
-      ) : (
+      <Input
+        variant={variant}
+        type="text"
+        value={form.tipe || ""}
+        isDisabled={isProdukSelected}
+        label="Tipe"
+        placeholder="Masukkan tipe!"
+        className={defStyleFormWidth}
+        onValueChange={(v) =>
+          setForm({
+            ...form,
+            tipe: v,
+          })
+        }
+      />
+      <Input
+        variant={variant}
+        type="text"
+        value={form.id_kustom || ""}
+        isDisabled={isProdukSelected}
+        label="Id"
+        placeholder="Masukkan id!"
+        className={defStyleFormWidth}
+        onValueChange={(v) =>
+          setForm({
+            ...form,
+            id_kustom: v,
+          })
+        }
+      />
+      {!disableVendor && !form.isSelected == true && (
         <Autocomplete
           label="Vendor"
           variant={variant}
@@ -190,27 +202,21 @@ export default function TambahProduk({
           )}
         </Autocomplete>
       )}
-      {!disableStok ? (
-        selectProduk?.stok > 0 ? (
-          <Checkbox
-            isSelected={form.isSelected}
-            onValueChange={(v) => {
-              setForm({
-                ...form,
-                isSelected: v,
-                harga: refHargaModal
-                  ? selectProduk?.hargamodal ?? 0
-                  : selectProduk?.hargajual ?? 0,
-              });
-            }}
-          >
-            Pakai Stok
-          </Checkbox>
-        ) : (
-          <></>
-        )
-      ) : (
-        <></>
+      {!disableStok && selectProduk?.stok > 0 && (
+        <Checkbox
+          isSelected={form.isSelected}
+          onValueChange={(v) => {
+            setForm({
+              ...form,
+              isSelected: v,
+              harga: refHargaModal
+                ? selectProduk?.hargamodal ?? 0
+                : selectProduk?.hargajual ?? 0,
+            });
+          }}
+        >
+          Pakai Stok
+        </Checkbox>
       )}
       {/* stok */}
       {form.id_produk && (
@@ -235,6 +241,7 @@ export default function TambahProduk({
           }
         />
       )}
+      {/* jumlah */}
       <NumberInput
         variant={variant}
         hideStepper
@@ -242,23 +249,12 @@ export default function TambahProduk({
         formatOptions={{
           useGrouping: false,
         }}
-        // errorMessage={
-        //   <ul>
-        //     {errorsJumlah.map((error, i) => (
-        //       <li key={i}>{error}</li>
-        //     ))}
-        //   </ul>
-        // }
         isInvalid={errorsJumlah.length > 0}
-        value={form.jumlah}
+        value={form.jumlah || ""}
         label="Jumlah"
         placeholder="Masukkan jumlah!"
         className={defStyleFormWidth}
-        endContent={
-          <div className="pointer-events-none flex items-center">
-            <span className="text-default-400 text-small"></span>
-          </div>
-        }
+        endContent={isProdukSelected && form.satuan}
         onValueChange={(v) =>
           setForm({
             ...form,
@@ -266,11 +262,12 @@ export default function TambahProduk({
           })
         }
       />
+      {/* satuan */}
       {!form.id_produk && (
         <Input
-          // isDisabled={!!form.id_produk}
+          // isDisabled={isProdukSelected}
           variant={variant}
-          value={form.satuan}
+          value={form.satuan || ""}
           label="Satuan"
           placeholder="Masukkan satuan!"
           className={defStyleFormWidth}
@@ -282,7 +279,8 @@ export default function TambahProduk({
           }
         />
       )}
-      {disableStok ? (
+      {/* harga modal */}
+      {disableStok && (
         <NumberInput
           variant={variant}
           hideStepper
@@ -291,7 +289,7 @@ export default function TambahProduk({
             useGrouping: false,
           }}
           isDisabled={form.isSelected ? 1 : undefined}
-          value={form.hargamodal}
+          value={form.hargamodal || ""}
           label={<>Harga Modal (Ref: {<Harga harga={form.oldHargaModal} />})</>}
           placeholder="Masukkan harga!"
           className={`${defStyleFormWidth} ${hideComponent}`}
@@ -303,9 +301,8 @@ export default function TambahProduk({
             })
           }
         />
-      ) : (
-        <></>
       )}
+      {/* harga jual / satuan */}
       <NumberInput
         variant={variant}
         hideStepper
@@ -314,7 +311,7 @@ export default function TambahProduk({
           useGrouping: false,
         }}
         isDisabled={form.isSelected ? 1 : undefined}
-        value={form.harga}
+        value={form.harga || ""}
         label={
           <>
             Harga {disableStok ? "Jual" : "Satuan"} (Ref:{" "}

@@ -157,8 +157,10 @@ export default function App({ id, versi }) {
     keranjangProyekInstalasi.mutate();
   };
   const tambahButtonPress = async (form, setForm) => {
-    if (!form.selectProduk) return alert("Silahkan pilih produk");
-    if (form.jumlah <= 0) return alert("Jumlah belum diisi");
+    const jumlah = form.jumlah;
+    if (!form.selectProduk && !form.produk)
+      return alert("Silahkan pilih produk");
+    if (!jumlah) return alert("Jumlah belum diisi");
     const res = await fetch(`${api_path}keranjangproyek`, {
       method: "POST",
       headers: {
@@ -168,19 +170,12 @@ export default function App({ id, versi }) {
       body: JSON.stringify({
         ...form,
         id_proyek: id,
-        instalasi: form.instalasi,
         versi,
       }),
     });
     const json = await res.json();
     if (res.status == 400) return alert(json.message);
-    const newForm = {
-      selectProduk: "",
-      jumlah: "",
-      harga: "",
-      keterangan: "",
-      id_subproyek: null,
-    };
+    const newForm = {};
     if (form.instalasi) setFormInstalasi(newForm);
     else setForm(newForm);
     mutateKeranjang();
@@ -275,8 +270,6 @@ export default function App({ id, versi }) {
     if (res.status == 400) return alert(json.message);
     mutateKeranjang();
     onClose();
-    // console.log(json.message);
-    //return alert(json.message);
   };
   const terapkanButtonPress = async (e) => {
     e.preventDefault();
@@ -946,7 +939,6 @@ export default function App({ id, versi }) {
   const defStyleFormWidth = "w-2/12";
   const fullPath = `${NEXT_DOMAIN}/proyek/detail?id=${id}&versi=${versi}`;
   const tambahWidth = "w-9/12-";
-  // console.log(json);
   return (
     <div className="flex gap-2 flex-col">
       <div className="flex gap-2">

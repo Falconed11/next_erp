@@ -182,13 +182,8 @@ export default function App({ id }) {
         body: JSON.stringify({
           ...form,
           id_proyek: id,
-          id_produk: form.selectProduk,
           id_karyawan: selectKaryawan ?? 0,
           tanggal: form.startdate ? getDate(form.startdate) : "",
-          jumlah: form.jumlah,
-          harga: form.harga,
-          keterangan: form.keterangan ? form.keterangan : "",
-          status: form.status ? form.status : "",
         }),
       });
     } else {
@@ -247,10 +242,6 @@ export default function App({ id }) {
           // id_produk: form.selectProduk,
           // id_karyawan: selectKaryawan ?? 0,
           tanggal: data.startdate ? getDate(data.startdate) : "",
-          jumlah: data.jumlah,
-          harga: data.harga,
-          keterangan: data.keterangan ? data.keterangan : "",
-          status: data.status ? data.status : "",
         }),
       });
     } else
@@ -263,7 +254,6 @@ export default function App({ id }) {
         body: JSON.stringify({
           ...data,
           id: data.id_pengeluaranproyek,
-          keterangan: data.keterangan ? data.keterangan : "",
           tanggal: getDate(new Date(data.startdate)),
           // harga: data.hargajual,
         }),
@@ -582,6 +572,7 @@ export default function App({ id }) {
     );
   }, 0);
   const provit = omset - biayaProduksi;
+  console.log(form);
   return (
     <div className="flex flex-col gap-2 w-full-">
       <div className="flex gap-2">
@@ -723,6 +714,7 @@ export default function App({ id }) {
             <div className="flex-col gap-2">
               <div className="flex flex-row gap-2">
                 <TambahProduk
+                  disableCustomValue={true}
                   form={form}
                   setForm={setForm}
                   disableHargaKustom
@@ -806,6 +798,7 @@ export default function App({ id }) {
                 )}
 
                 <Button
+                  isDisabled={!form.id_produk}
                   onPress={() => {
                     tambahButtonPress({ selectProduk, selectKaryawan, form });
                   }}
