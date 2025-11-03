@@ -1871,7 +1871,7 @@ export default function App({ id, versi }) {
                   {/* {Logo} */}
                   <div className="flex flex-row items-center">
                     <Image
-                      src={`/${selectedProyek.logoperusahaan}`}
+                      src={selectedProyek.logoperusahaan}
                       alt="Company Logo"
                       width={40}
                       height={40}
