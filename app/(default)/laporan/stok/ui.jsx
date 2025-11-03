@@ -519,7 +519,7 @@ export default function App({ id_produk }) {
         <Button
           onPress={() => {
             const date = new Date();
-            const format = result.map((i) => ({
+            const format = result.map((i, index) => ({
               id: i.id,
               kategori: i.kategoriproduk,
               nama: i.nama,
@@ -538,19 +538,12 @@ export default function App({ id_produk }) {
               hutang: i.hutang,
               tanggalmasuk: i.tanggal ? getDate(new Date(i.tanggal)) : "",
               jatuhtempo: i.jatuhtempo ? getDate(new Date(i.jatuhtempo)) : "",
+              modal: { f: `J${index + 3}*M${index + 3}` },
             }));
-            const data = [
-              {
-                TOTAL_MODAL: format.reduce(
-                  (acc, cur) => acc + (cur.id > 0 ? cur.sisamodal : 0),
-                  0
-                ),
-              },
-              ...format,
-            ];
+            const data = [{ TOTAL_MODAL: { f: "SUM(T:T)" } }, ...format];
             return export2excel(
               data,
-              `Laporan Stok_${getDate(date)}_${getTime(date)}_${user.nama}`
+              `Laporan Stok_${getDate(date)}_${getTime(date)}_${user.peran}`
             );
           }}
           color="primary"
@@ -583,7 +576,7 @@ export default function App({ id_produk }) {
               <div className="flex gap-2">
                 <div>Laporan Stok</div>
                 <div>Tanggal: {getDateFId(new Date())}</div>
-                <div>User: {user.nama}</div>
+                <div>User: {user.peran}</div>
               </div>
               <div className="p-0 m-0">
                 Total Modal: <Harga harga={summary.modal} />

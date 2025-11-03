@@ -46,10 +46,7 @@ export default function TambahProduk({
   // const pilihProduk = useClientFetch(`produk`)
   const errorsJumlah = [];
 
-  const queryStates = renderQueryStates({
-    queries: { kategori, produk, vendor },
-    session,
-  });
+  const queryStates = renderQueryStates({ kategori, produk, vendor }, session);
   if (queryStates) return queryStates;
   const isHighRole = highRoleCheck(sessUser.rank);
   if ((form.jumlah < 1 || !form.jumlah) && form.selectProduk?.length > 0)

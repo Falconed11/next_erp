@@ -25,7 +25,7 @@ const useAutocompleteField = ({
   getFormUpdateOnSelectionChange,
 }) => {
   const query = useClientFetch(endpoint);
-  const queryStates = renderQueryStates({ queries: { [endpoint]: query } });
+  const queryStates = renderQueryStates({ [endpoint]: query });
   if (queryStates) return { component: queryStates };
   const data = query.data;
   const component = (

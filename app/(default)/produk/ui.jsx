@@ -60,6 +60,7 @@ import { Button } from "@heroui/react";
 import { Input, Textarea } from "@heroui/react";
 import { getDate, getDateF, getDateFId } from "@/app/utils/date";
 import { LinkOpenNewTab } from "@/components/mycomponent";
+import { FormProduct } from "@/components/produk";
 import { AuthorizationComponent } from "@/components/componentmanipulation";
 import {
   AutocompleteKategoriProduk,
@@ -78,7 +79,7 @@ import { useFilter } from "@react-aria/i18n";
 
 const apiPath = getApiPath();
 
-export default function App() {
+export default function App({ id_produk }) {
   const session = useSession();
   const sessUser = useMemo(() => session.data?.user, [session]);
   // dynamic input
@@ -109,7 +110,7 @@ export default function App() {
   const produk = useClientFetch(
     `produk?kategori=${selectKategori.values().next().value ?? ""}${
       isReadyStock ? `&isReadyStock=${isReadyStock}` : ""
-    }`
+    }${id_produk ? `&id=${id_produk}` : ""}`
   );
   const merek = useClientFetch("merek");
   const vendor = useClientFetch("vendor?columnName=nama");
@@ -458,16 +459,16 @@ export default function App() {
   }, [filteredData?.length, rowsPerPage]);
   const loadingState = produk.isLoading ? "loading" : "idle";
   const offset = (page - 1) * rowsPerPage;
-  const queryStates = renderQueryStates({
-    queries: {
+  const queryStates = renderQueryStates(
+    {
       produk,
       merek,
       vendor,
       metodepengeluaran,
       kategori,
     },
-    session,
-  });
+    session
+  );
   if (queryStates) return queryStates;
   const isHighRole = highRoleCheck(sessUser.rank);
 
@@ -694,242 +695,7 @@ export default function App() {
                 {form.modalmode} Produk
               </ModalHeader>
               <ModalBody>
-                <AutocompleteKategoriProduk form={form} setForm={setForm} />
-                <Input
-                  type="text"
-                  label="Id"
-                  placeholder="Masukkan id!"
-                  value={form.id_kustom}
-                  onValueChange={(val) => setForm({ ...form, id_kustom: val })}
-                />
-                <Input
-                  type="text"
-                  label="Nama"
-                  placeholder="Masukkan nama!"
-                  value={form.nama}
-                  onValueChange={(val) => setForm({ ...form, nama: val })}
-                />
-                <AutocompleteMerek form={form} setForm={setForm} />
-                <Input
-                  type="text"
-                  label="Tipe"
-                  placeholder="Masukkan tipe!"
-                  value={form.tipe}
-                  onValueChange={(val) => setForm({ ...form, tipe: val })}
-                />
-                {form.modalmode == "Tambah" ? (
-                  <>
-                    <NumberInput
-                      hideStepper
-                      isWheelDisabled
-                      formatOptions={{
-                        useGrouping: false,
-                      }}
-                      label="Stok"
-                      placeholder="Masukkan stok!"
-                      isReadOnly={form.modalmode == "Edit" ? true : undefined}
-                      value={form.stok}
-                      onValueChange={(val) => setForm({ ...form, stok: val })}
-                    />
-                    <AutocompleteVendor
-                      isDisabled={!form.stok}
-                      form={form}
-                      setForm={setForm}
-                    />
-                    <Textarea
-                      isDisabled={
-                        !form.stok || !form.vendor || form.id_vendor
-                          ? true
-                          : undefined
-                      }
-                      label="alamat"
-                      labelPlacement="inside"
-                      placeholder="Masukkan alamat!"
-                      value={form.alamat || ""}
-                      onValueChange={(val) => setForm({ ...form, alamat: val })}
-                    />
-                  </>
-                ) : (
-                  <></>
-                )}
-                <Input
-                  type="text"
-                  label="Satuan"
-                  placeholder="Masukkan satuan!"
-                  value={form.satuan}
-                  onValueChange={(val) => setForm({ ...form, satuan: val })}
-                />
-                <NumberInput
-                  hideStepper
-                  isWheelDisabled
-                  formatOptions={{
-                    useGrouping: false,
-                  }}
-                  className={classCompByRole}
-                  label="Harga Modal"
-                  placeholder="Masukkan harga modal!"
-                  value={form.hargamodal}
-                  onValueChange={(val) => setForm({ ...form, hargamodal: val })}
-                />
-                <NumberInput
-                  hideStepper
-                  isWheelDisabled
-                  formatOptions={{
-                    useGrouping: false,
-                  }}
-                  label="Harga Jual"
-                  placeholder="Masukkan harga jual!"
-                  value={form.hargajual}
-                  onValueChange={(val) => setForm({ ...form, hargajual: val })}
-                />
-                <NumberInput
-                  hideStepper
-                  isWheelDisabled
-                  formatOptions={{
-                    useGrouping: false,
-                  }}
-                  className={classCompByRole}
-                  label="Provit"
-                  // label={`Provit (${
-                  //   Math.round(
-                  //     countPercentProvit(
-                  //       form.hargamodal || 0,
-                  //       form.hargajual || 0
-                  //     ) * 100
-                  //   ) / 100
-                  // }%)`}
-                  placeholder="Masukkan Provit!"
-                  value={form.hargajual - form.hargamodal}
-                  onValueChange={(v) =>
-                    setForm({
-                      ...form,
-                      hargajual: (+form.hargamodal || 0) + (+v || 0),
-                    })
-                  }
-                />
-                <NumberInput
-                  hideStepper
-                  isWheelDisabled
-                  formatOptions={{
-                    useGrouping: false,
-                  }}
-                  className={classCompByRole}
-                  label="Persen Provit (%)"
-                  placeholder="Masukkan persen provit!"
-                  value={
-                    Math.round(
-                      countPercentProvit(form.hargamodal, form.hargajual) * 100
-                    ) / 100
-                  }
-                  onValueChange={(v) =>
-                    setForm({
-                      ...form,
-                      hargajual: Math.round(
-                        countPriceByPercentProfit(form.hargamodal, v)
-                      ),
-                    })
-                  }
-                />
-                {/* <NumberInput
-                  hideStepper
-                  isWheelDisabled
-                  label="Persen Provit"
-                  placeholder="Masukkan Persen Provit!"
-                  value={persenProvit}
-                  endContent={
-                    <Button
-                      ref={terapkanButton}
-                      size="sm"
-                      color="primary"
-                      type="button"
-                      onPress={() => {
-                        setForm({
-                          ...form,
-                          hargajual: Math.ceil(
-                            countPriceByPercentProfit(
-                              form.hargamodal,
-                              persenProvit
-                            )
-                          ),
-                        });
-                      }}
-                    >
-                      Terapkan
-                    </Button>
-                  }
-                  onKeyDown={(e) => {
-                    if (e.key == "Enter") {
-                      e.preventDefault();
-                      terapkanButton.current?.click();
-                    }
-                  }}
-                  onValueChange={setPersenProvit}
-                /> */}
-                <div className="bg-gray-100 p-3 rounded-lg z-40">
-                  <div>Tanggal</div>
-                  <DatePicker
-                    className="z-40"
-                    placeholderText="Pilih tanggal"
-                    dateFormat="dd/MM/yyyy"
-                    selected={form.startdate}
-                    onChange={(v) =>
-                      setForm({ ...form, startdate: v, tanggal: getDate(v) })
-                    }
-                  />
-                </div>
-                {form.modalmode == "Tambah" && form.stok > 0 ? (
-                  <>
-                    <RadioGroup
-                      orientation="horizontal"
-                      defaultValue={"1"}
-                      value={form.lunas}
-                      onValueChange={(v) => setForm({ ...form, lunas: v })}
-                    >
-                      <Radio value="1">Lunas</Radio>
-                      <Radio value="0">Hutang</Radio>
-                    </RadioGroup>
-                    {form.lunas == "0" ? (
-                      <>
-                        <div className="bg-gray-100 p-3 rounded-lg z-40">
-                          <div>Jatuh Tempo</div>
-                          <DatePicker
-                            className="z-40"
-                            placeholderText="Pilih tanggal"
-                            dateFormat="dd/MM/yyyy"
-                            selected={form.startdateJatuhtempo}
-                            onChange={(v) =>
-                              setForm({
-                                ...form,
-                                startdateJatuhtempo: v,
-                                jatuhtempo: getDate(v),
-                              })
-                            }
-                          />
-                        </div>
-                        <Input
-                          type="number"
-                          label="Terbayar"
-                          placeholder="Masukkan nominal!"
-                          value={form.terbayar}
-                          onValueChange={(val) =>
-                            setForm({ ...form, terbayar: val })
-                          }
-                        />
-                      </>
-                    ) : (
-                      <></>
-                    )}
-                  </>
-                ) : (
-                  <></>
-                )}
-                <Textarea
-                  label="Keterangan"
-                  labelPlacement="inside"
-                  placeholder="Masukkan keterangan! (Opsional)"
-                  value={form.keterangan}
-                  onValueChange={(val) => setForm({ ...form, keterangan: val })}
-                />
+                <FormProduct form={form} setForm={setForm} />
               </ModalBody>
               <ModalFooter>
                 <Button color="danger" variant="light" onPress={onClose}>

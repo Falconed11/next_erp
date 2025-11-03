@@ -50,6 +50,7 @@ import TambahProduk from "@/components/tambahproduk";
 import {
   BKSHeader,
   CompanyHeader,
+  LinkOpenNewTab,
   NavLinkNewTab,
   SVTHeader,
 } from "@/components/mycomponent";
@@ -92,6 +93,7 @@ import {
 } from "./rekap";
 import { NEXT_DOMAIN } from "@/app/utils/const";
 import { TemplateImportV2 } from "@/components/input";
+import { FormProduct } from "@/components/produk";
 
 const api_path = getApiPath();
 
@@ -518,6 +520,11 @@ export default function App({ id, versi }) {
                   <EditIcon />
                 </span>
               </Tooltip>
+              <LinkOpenNewTab
+                content={"Detail Produk"}
+                icon={<EyeIcon />}
+                link={`/produk?id=${data.id_produk || null}`}
+              />
               <Tooltip color="danger" content="Delete">
                 <span
                   onClick={() => deleteButtonPress(data.id_keranjangproyek)}
