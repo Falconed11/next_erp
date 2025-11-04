@@ -159,7 +159,6 @@ export default function App() {
   if (session.status === "loading") return <>Loading...</>;
   if (!rolesCheck(["admin", "super"], session.data.user.peran))
     return <div>Anda tidak memiliki akses pada laman ini.</div>;
-  console.log(perusahaan.data);
   return (
     <div>
       <Button onPress={tambahButtonPress} color="primary">

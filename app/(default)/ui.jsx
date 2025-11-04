@@ -1,6 +1,7 @@
 "use client";
 import { getCurFirstLastDay } from "@/app/utils/date";
 import { Penawaran, OperasionalKantor } from "@/components/laporan";
+import { StatusToDoList, ToDoList } from "@/components/mycomponent";
 import { useSession } from "next-auth/react";
 
 import "react-datepicker/dist/react-datepicker.css";
@@ -33,6 +34,8 @@ export default function App() {
       <div className="bg-white p-3 rounded-lg">
         <OperasionalKantor startDate={startDate} endDate={endDate} />
       </div>
+      <ToDoList />
+      <StatusToDoList />
     </div>
   );
 }
