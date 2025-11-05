@@ -95,9 +95,10 @@ export default function Rekapitulasi({
   const jual = rekapitulasiTotal.jual;
   const diskon = formInstalasi.diskon + formPeralatan.diskon || 0;
   const hargaDiskon = jual - diskon;
-  const pajak =
+  const pajak = Math.ceil(
     ((formPeralatan.jual - formPeralatan.diskon) * formPeralatan.pajakpersen) /
-    100;
+      100
+  );
   const hargaPajak = hargaDiskon + pajak;
   const provit = hargaDiskon - modal;
   const provitPersen = countPercentProvit(modal, hargaDiskon).toFixed(2);
@@ -206,7 +207,8 @@ const RecapBody = ({ title, Children }) => (
 
 const RekapHarga = ({ title, form, setForm, disablePajak }) => {
   const hargaDiskon = form.jual - form.diskon;
-  const pajak = (hargaDiskon * form.pajakpersen) / 100;
+  const plainPpajak = (hargaDiskon * form.pajakpersen) / 100;
+  const pajak = Math.ceil(plainPpajak);
   const totalHarga = hargaDiskon + pajak;
   return (
     <>
@@ -287,7 +289,7 @@ const RekapHarga = ({ title, form, setForm, disablePajak }) => {
           endContent={
             <div className="pointer-events-none flex items-center">
               <span className="text-default-400 text-small">
-                <Harga harga={pajak} />
+                <Harga harga={plainPpajak} />
               </span>
             </div>
           }

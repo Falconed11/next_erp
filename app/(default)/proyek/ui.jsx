@@ -1014,15 +1014,18 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
                     });
                   }}
                 >
-                  {karyawan.data.map((item) => (
-                    <SelectItem
-                      key={item.id}
-                      value={item.id}
-                      textValue={item.nama || "NN"}
-                    >
-                      {item.nama || "NN"}
-                    </SelectItem>
-                  ))}
+                  {karyawan.data.map(
+                    (item) =>
+                      item.id_statuskaryawan == 1 && (
+                        <SelectItem
+                          key={item.id}
+                          value={item.id}
+                          textValue={item.nama || "NN"}
+                        >
+                          {item.nama || "NN"}
+                        </SelectItem>
+                      )
+                  )}
                 </Select>
                 {form.id_statusproyek == 1 && (
                   <div className="bg-gray-100 p-3 rounded-lg">

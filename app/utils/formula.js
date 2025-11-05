@@ -27,7 +27,7 @@ const countRecapitulation = (
     );
   const countRekap = ({ modal, jual }, diskon, pajakPersen) => {
     const hargaDiskon = jual - diskon;
-    const pajakNominal = hargaDiskon * (pajakPersen / 100);
+    const pajakNominal = Math.ceil(hargaDiskon * (pajakPersen / 100));
     const hargaPajak = hargaDiskon + pajakNominal;
     const provit = hargaDiskon - modal;
     return {
