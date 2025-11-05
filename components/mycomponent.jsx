@@ -27,6 +27,7 @@ import { useSession } from "next-auth/react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { getDate, getDateFId } from "@/app/utils/date";
+import Harga from "./harga";
 
 const MyChip = ({ text, theme }) => {
   console.log(text, theme);
