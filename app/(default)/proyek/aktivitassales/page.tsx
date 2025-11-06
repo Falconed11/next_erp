@@ -1,16 +1,16 @@
-import { getApiPath } from "@/app/utils/apiconfig"
-import UI from "./ui"
+import { getApiPath } from "@/app/utils/apiconfig";
+import UI from "./ui";
 
-const api_path = getApiPath()
+const api_path = getApiPath();
 
-export default async function app(
-    props: {
-        searchParams: Promise<{ [key: string]: string | string[] | undefined }>
-    }
-) {
-    const searchParams = await props.searchParams;
-    const id = searchParams.id
-    return <>
-        <UI id={id} />
+export default async function app(props: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  const searchParams = await props.searchParams;
+  const id = searchParams.id;
+  return (
+    <>
+      <UI id={id} curDate={new Date()} />
     </>
+  );
 }

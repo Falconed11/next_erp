@@ -20,6 +20,7 @@ import {
   EyeIcon,
   UserIcon,
   IconScaleBalanced,
+  TransferIcon,
 } from "../../../components/icon";
 import {
   Modal,
@@ -34,6 +35,7 @@ import { FileUploader } from "@/components/input";
 import { Button, Select, SelectItem } from "@heroui/react";
 import { Input } from "@heroui/react";
 import Link from "next/link";
+import ModalTransferData from "@/components/modaltransferdata";
 
 const apiPath = getApiPath();
 
@@ -43,6 +45,9 @@ export default function App() {
   const [form, setForm] = useState({});
   const [json, setJson] = useState([]);
   const [method, setMethod] = useState();
+  const [id, setId] = useState();
+  const [newId, setNewId] = useState();
+  const [name, setName] = useState();
   const tambahButtonPress = () => {
     setForm({
       id: "",
@@ -89,6 +94,28 @@ export default function App() {
     karyawan.mutate();
     onClose();
     // return alert(json.message);
+  };
+  const transferButtonPress = (data) => {
+    setId(data.id);
+    setNewId(null);
+    setName(data.nama);
+    transfer.onOpen();
+  };
+  const onSave = async (onClose) => {
+    // if (form.isSwasta.size == 0) return alert("Swasta/Negri belum diisi");
+    const res = await fetch(`${apiPath}transferkaryawan`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        // 'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: JSON.stringify({ id, newId }),
+    });
+    const json = await res.json();
+    if (res.status == 400) return alert(json.message);
+    karyawan.mutate();
+    onClose();
+    //return alert(json.message);
   };
 
   const handleFileUpload = (jsonData) => {
@@ -151,6 +178,14 @@ export default function App() {
                   <EditIcon />
                 </span>
               </Tooltip>
+              <Tooltip content="Transfer">
+                <span
+                  onClick={() => transferButtonPress(data)}
+                  className="text-lg text-default-400 cursor-pointer active:opacity-50"
+                >
+                  <TransferIcon />
+                </span>
+              </Tooltip>
               <Tooltip color="danger" content="Delete">
                 <span
                   onClick={() =>
@@ -200,6 +235,7 @@ export default function App() {
   const modal = {
     karyawan: useDisclosure(),
   };
+  const transfer = useDisclosure();
   const [reportList, setReportList] = useState([]);
   const report = useDisclosure();
 
@@ -307,6 +343,19 @@ export default function App() {
           )}
         </ModalContent>
       </Modal>
+      <ModalTransferData
+        title="Karyawan"
+        data={karyawan.data}
+        isOpen={transfer.isOpen}
+        onOpenChange={transfer.onOpenChange}
+        id={id}
+        newId={newId}
+        setNewId={setNewId}
+        name={name}
+        valueKey={"id"}
+        labelKey={"nama"}
+        onSave={onSave}
+      />
       {/* upload report */}
       <Modal
         isOpen={report.isOpen}

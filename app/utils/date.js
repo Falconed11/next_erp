@@ -21,12 +21,12 @@ const getDate = (date) => {
   return `${year}-${month}-${day}`;
 };
 
-const getTime = (date) => {
+const getTime = (date, separator) => {
   date = new Date(date);
   const pad = (n) => n.toString().padStart(2, "0");
   const hours = pad(date.getHours());
   const minutes = pad(date.getMinutes());
-  return `${hours}-${minutes}`;
+  return `${hours}${separator || "-"}${minutes}`;
 };
 
 const getDateF = (date) => {

@@ -141,6 +141,16 @@ const AutocompleteKategoriProduk = (props) => {
   });
   return component;
 };
+const AutocompleteCustomer = (props) => {
+  const { component } = useAutocompleteField({
+    title: "Instansi",
+    endpoint: "customer",
+    field: "instansi",
+    id: "id_instansi",
+    ...props,
+  });
+  return component;
+};
 const AutocompleteMerek = (props) => {
   const { component } = useAutocompleteField({
     endpoint: "merek",
@@ -195,6 +205,7 @@ const AutocompleteProduk = ({ id_kategori, disableCustomValue, ...props }) => {
 
 export {
   AutocompleteWithCustomValue,
+  AutocompleteCustomer,
   AutocompleteKategoriProduk,
   AutocompleteMerek,
   AutocompleteProduk,

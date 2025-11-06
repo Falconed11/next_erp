@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useMemo } from "react";
 import {
   Table,
   TableHeader,
@@ -13,6 +13,9 @@ import {
   ChipProps,
   getKeyValue,
   Textarea,
+  Checkbox,
+  Pagination,
+  Spinner,
 } from "@heroui/react";
 import {
   AddIcon,
@@ -32,7 +35,7 @@ import {
 } from "@heroui/react";
 import { useReactToPrint } from "react-to-print";
 import { getApiPath, useClientFetch } from "@/app/utils/apiconfig";
-import { getDateF, getDateFId, getDate } from "@/app/utils/date";
+import { getDateF, getDateFId, getDate, getTime } from "@/app/utils/date";
 import Harga from "@/components/harga";
 import DetailProyek from "@/components/detailproyek";
 import TambahProduk from "@/components/tambahproduk";
@@ -48,21 +51,34 @@ import logo from "@/public/logofinal.jpg";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { NavLinkNewTab, LinkOpenNewTab } from "@/components/mycomponent";
-import { highRoleCheck } from "@/app/utils/tools";
+import { highRoleCheck, key2set, set2key } from "@/app/utils/tools";
 import { useSession } from "next-auth/react";
+import { AutocompleteCustomer } from "@/components/myautocomplete";
+import { RangeDate } from "@/components/input";
 
 const api_path = getApiPath();
 
-export default function App({ id }) {
+export default function App({ id, curDate }) {
   const session = useSession();
   const sessUser = session.data?.user;
+  const [current, setCurrent] = useState({
+    startDate: null,
+    endDate: null,
+  });
   const [form, setForm] = useState({});
-  const [selectStatusProyek, setSelectStatusProyek] = useState(id ? null : 3);
+  const [selectKaryawan, setSelectKaryawan] = useState(new Set([]));
+  useMemo(() => {
+    setSelectKaryawan(key2set(sessUser?.id_karyawan));
+  }, [sessUser]);
+  const [page, setPage] = React.useState(1);
+  const rowsPerPage = 25;
 
   const aktivitassales = useClientFetch(
-    `aktivitassales?${id ? `id_proyek=${id}` : "groupbyproyek=true"}${
-      selectStatusProyek ? `&id_statusproyek=${selectStatusProyek}` : ""
-    }`
+    `aktivitassales?${
+      id ? `id_proyek=${id}` : "groupbyproyek=true"
+    }&page=${page}&rowsPerPage=${rowsPerPage}&id_karyawan=${
+      set2key(selectKaryawan) || ""
+    }&start=${getDate(current.startDate)}&end=${getDate(current.endDate)}`
   );
   const karyawan = useClientFetch(`karyawan`);
   const proyek = useClientFetch(id ? `proyek?id=${id}` : "");
@@ -73,8 +89,25 @@ export default function App({ id }) {
     proyek,
   };
 
+  const dataAktivitasSales = aktivitassales?.data;
+  const pages = React.useMemo(() => {
+    return dataAktivitasSales?.count
+      ? Math.ceil(dataAktivitasSales.count / rowsPerPage)
+      : 0;
+  }, [dataAktivitasSales?.count, rowsPerPage]);
+  const loadingState = aktivitassales?.isLoading ? "loading" : "idle";
+
   const editButtonPress = (data) => {
-    setForm({ ...data, method: "PUT" });
+    const now = new Date(curDate);
+    setForm({
+      ...data,
+      method: "PUT",
+      instansi: data.namainstansi,
+      isValidTime:
+        now.getHours() >= 16 ||
+        new Date(data.tanggal).setHours(0, 0, 0, 0) < now.setHours(0, 0, 0, 0),
+      isSelected: !!data.tanggalselesai,
+    });
     modal.aktivitassales.onOpen();
   };
   const deleteButtonPress = async (data) => {
@@ -161,7 +194,11 @@ export default function App({ id }) {
         "Content-Type": "application/json",
         // 'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: JSON.stringify({ ...data, id_proyek: id }),
+      body: JSON.stringify({
+        ...data,
+        id_karyawan: sessUser.id_karyawan,
+        isSelesai: data.isSelected,
+      }),
     });
     const json = await res.json();
     if (res.status == 400) return alert(json.message);
@@ -181,7 +218,12 @@ export default function App({ id }) {
           case "status":
             return data.status == 1 ? "Lunas" : "Belum Lunas";
           case "tanggal":
-            return getDateF(new Date(data.tanggal));
+            return getDateF(new Date(cellValue));
+          case "tanggalselesai":
+            return (
+              cellValue &&
+              getDateF(new Date(cellValue)) + " " + getTime(cellValue, ":")
+            );
           case "harga":
             return (
               <div className="text-right">
@@ -246,33 +288,21 @@ export default function App({ id }) {
   const col = {
     aktivitassales: [
       {
+        key: "aksi",
+        label: "Aksi",
+      },
+      {
         key: "tanggal",
         label: "tanggal",
       },
       {
-        key: "karyawan",
+        key: "namakaryawan",
         label: "Karyawan",
       },
-      ...(id
-        ? []
-        : [
-            {
-              key: "statusproyek",
-              label: "Status",
-            },
-            {
-              key: "instansi",
-              label: "Instansi",
-            },
-            {
-              key: "kota",
-              label: "Kota",
-            },
-            {
-              key: "jumlahaktivitas",
-              label: "Jumlah Aktivitas",
-            },
-          ]),
+      {
+        key: "namainstansi",
+        label: "Instansi",
+      },
       {
         key: "aktivitas",
         label: "Aktivitas",
@@ -282,16 +312,12 @@ export default function App({ id }) {
         label: "Catatan",
       },
       {
-        key: "output",
-        label: "Output",
+        key: "pic",
+        label: "PIC",
       },
       {
-        key: "tindakanselanjutnya",
-        label: "Tindakan Selanjutnya",
-      },
-      {
-        key: "aksi",
-        label: "Aksi",
+        key: "tanggalselesai",
+        label: "Selesai",
       },
     ],
   };
@@ -302,60 +328,68 @@ export default function App({ id }) {
   if (session.status === "loading") return <>Session Loading ...</>;
   const isHighRole = highRoleCheck(sessUser.rank);
   const selectedProyek = proyek.data?.[0];
+  console.log(selectKaryawan);
   return (
     <div className="flex flex-col gap-2 w-full-">
       <div className="flex gap-2">{id && <DetailProyek id_proyek={id} />}</div>
       <div className="flex gap-2">
-        {id && (
-          <>
-            <div>
-              <Button
-                color="primary"
-                onPress={() => {
-                  setForm({ tanggal: new Date(), method: "POST" });
-                  modal.aktivitassales.onOpen();
-                }}
-              >
-                Tambah
-              </Button>
-            </div>
-            {/* <div className="flex gap-2">
-              <NavLinkNewTab
-                href={`/proyek/detail?id=${selectedProyek.id}&versi=${
-                  selectedProyek.versi <= 0 ? "1" : selectedProyek.versi
-                }`}
-              >
-                {"Penawaran ==>>"}
-              </NavLinkNewTab>
-            </div> */}
-          </>
-        )}
-      </div>
-      {/* tombol print */}
-      {/* <div className="flex flex-row gap-2">
         <div>
-          <Button onClick={modal.nota.onOpen} color="primary" className="mt-3">
-            Nota
+          <Button
+            color="primary"
+            onPress={() => {
+              setForm({ tanggal: new Date(), method: "POST" });
+              modal.aktivitassales.onOpen();
+            }}
+          >
+            Tambah
           </Button>
         </div>
-      </div> */}
-      {/* tabel pengeluaran proyek */}
+      </div>
       <Table
         className="z-10"
         aria-label="Example table with custom cells"
         topContent={
-          <div className="flex flex-col">
+          <div className="flex flex-col gap-2">
             <div>Aktivitas Sales</div>
-            {!id && (
-              <>
-                <div>Filter :</div>
-                <SelectStatusProyek
-                  select={selectStatusProyek}
-                  setSelect={setSelectStatusProyek}
-                />
-              </>
+            <div>Filter :</div>
+            <div className="flex">
+              <RangeDate
+                current={current}
+                setCurrent={setCurrent}
+                setPage={setPage}
+              />
+            </div>
+            {isHighRole && (
+              <Select
+                variant="bordered"
+                label="Pilih Karyawan"
+                placeholder="Pilih karyawan!"
+                selectedKeys={selectKaryawan}
+                onSelectionChange={setSelectKaryawan}
+              >
+                {karyawan.data.map((item) => (
+                  <SelectItem key={item.id} value={item.id}>
+                    {item.nama}
+                  </SelectItem>
+                ))}
+              </Select>
             )}
           </div>
+        }
+        bottomContent={
+          pages > 0 ? (
+            <div className="flex w-full justify-center">
+              <Pagination
+                isCompact
+                showControls
+                showShadow
+                color="primary"
+                page={page}
+                total={pages}
+                onChange={(page) => setPage(page)}
+              />
+            </div>
+          ) : null
         }
       >
         <TableHeader columns={col.aktivitassales}>
@@ -368,9 +402,14 @@ export default function App({ id }) {
             </TableColumn>
           )}
         </TableHeader>
-        <TableBody items={aktivitassales.data}>
+        <TableBody
+          items={dataAktivitasSales.results}
+          loadingContent={<Spinner />}
+          loadingState={loadingState}
+          emptyContent="Kosong ..."
+        >
           {(item) => (
-            <TableRow key={item.id_pengeluaranproyek}>
+            <TableRow key={item.id}>
               {(columnKey) => (
                 <TableCell>
                   {renderCell.aktivitassales(item, columnKey)}
@@ -393,7 +432,7 @@ export default function App({ id }) {
                 {form.method == "POST" ? "Tambah" : "Edit"} Aktivitas Sales
               </ModalHeader>
               <ModalBody>
-                <div className="bg-gray-100 p-3 rounded-lg z-50 w-fit border">
+                {/* <div className="bg-gray-100 p-3 rounded-lg z-50 w-fit border">
                   <div>Tanggal</div>
                   <DatePicker
                     className="bg-white"
@@ -404,8 +443,8 @@ export default function App({ id }) {
                     }
                     onChange={(v) => setForm({ ...form, tanggal: getDate(v) })}
                   />
-                </div>
-                <Select
+                </div> */}
+                {/* <Select
                   variant="bordered"
                   label="Karyawan"
                   placeholder="Pilih karyawan!"
@@ -425,7 +464,17 @@ export default function App({ id }) {
                       {item.nama}
                     </SelectItem>
                   ))}
-                </Select>
+                </Select> */}
+                {form.method == "PUT" && (
+                  <Input
+                    isDisabled
+                    variant="bordered"
+                    type="text"
+                    label="Tanggal"
+                    value={getDateFId(form.tanggal)}
+                  />
+                )}
+                <AutocompleteCustomer form={form} setForm={setForm} />
                 <Textarea
                   variant="bordered"
                   value={form.aktivitas}
@@ -452,32 +501,38 @@ export default function App({ id }) {
                     })
                   }
                 />
-                <Textarea
-                  variant="bordered"
-                  value={form.output}
-                  label="Output"
-                  placeholder="Masukkan output!"
-                  className=""
-                  onValueChange={(v) =>
-                    setForm({
-                      ...form,
-                      output: v,
-                    })
-                  }
-                />
-                <Textarea
-                  variant="bordered"
-                  value={form.tindakanselanjutnya}
-                  label="Tindakan Selanjutnya"
-                  placeholder="Masukkan tindakanselanjutnya!"
-                  className=""
-                  onValueChange={(v) =>
-                    setForm({
-                      ...form,
-                      tindakanselanjutnya: v,
-                    })
-                  }
-                />
+                {form.method == "PUT" && (
+                  <>
+                    <Input
+                      variant="bordered"
+                      type="text"
+                      label="PIC"
+                      placeholder="Masukkan PIC"
+                      value={form.pic}
+                      onValueChange={(val) => {
+                        setForm({ ...form, pic: val });
+                      }}
+                    />
+                    <Checkbox
+                      isDisabled={form.isValidTime ? undefined : true}
+                      isSelected={form.isSelected}
+                      onValueChange={(val) => {
+                        setForm({ ...form, isSelected: val });
+                      }}
+                    >
+                      Selesai
+                      {!form.isValidTime && (
+                        <span className="text-danger">*</span>
+                      )}
+                    </Checkbox>
+                    {!form.isValidTime && (
+                      <span className="text-danger">
+                        *Penyelesaian dihari yang sama hanya dapat dilakukan
+                        setelah pukul 16.00 WIB.
+                      </span>
+                    )}
+                  </>
+                )}
               </ModalBody>
               <ModalFooter>
                 <Button color="danger" variant="light" onPress={onClose}>
