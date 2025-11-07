@@ -29,7 +29,7 @@ const updateSwitch = async (
   referenceData.forEach((data) => data.mutate());
 };
 const highRoleCheck = (rank) => rank <= 20;
-const key2set = (key) => new Set(key ? [String(key)] : []);
+const key2set = (key) => new Set(key != null ? [String(key)] : []);
 const set2key = (set) => new Set(set).values().next().value || null;
 const capitalizeEachWord = (str = "") => {
   return str.replace(

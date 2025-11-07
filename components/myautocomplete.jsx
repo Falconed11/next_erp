@@ -147,6 +147,26 @@ const AutocompleteCustomer = (props) => {
     endpoint: "customer",
     field: "instansi",
     id: "id_instansi",
+    disableSelectOnChange: true,
+    getCustomLabel: (item) => (
+      <>
+        {item.nama} | {item.swasta ? "Swasta" : "Negri"} | {item.kota} |{" "}
+        {item.alamat}
+      </>
+    ),
+    getCustomValue: (item) =>
+      [
+        item.nama,
+        item.swasta ? "Swasta" : "Negri",
+        item.kota,
+        item.alamat,
+      ].join(" "),
+    getFormUpdateOnSelectionChange: (item) => ({
+      ...item,
+      swasta: item?.swasta,
+      kota: item?.kota,
+      alamat: item?.alamat,
+    }),
     ...props,
   });
   return component;

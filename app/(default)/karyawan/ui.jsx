@@ -36,6 +36,7 @@ import { Button, Select, SelectItem } from "@heroui/react";
 import { Input } from "@heroui/react";
 import Link from "next/link";
 import ModalTransferData from "@/components/modaltransferdata";
+import Harga from "@/components/harga";
 
 const apiPath = getApiPath();
 
@@ -154,9 +155,24 @@ export default function App() {
   const renderCell = {
     karyawan: React.useCallback((data, columnKey) => {
       const cellValue = data[columnKey];
+      const records = (
+        <div className="text-right">
+          <Harga harga={cellValue} />
+        </div>
+      );
       switch (columnKey) {
         case "totalharga-beli":
           return data.jumlah * data.harga;
+        case "noperasionalkantor":
+          return records;
+        case "npengeluaranproyek":
+          return records;
+        case "nproyek":
+          return records;
+        case "naktivitassales":
+          return records;
+        case "ntodolist":
+          return records;
         case "aksi":
           return (
             <div className="relative flex items-center gap-2">
@@ -215,6 +231,10 @@ export default function App() {
   const col = {
     karyawan: [
       {
+        key: "aksi",
+        label: "Aksi",
+      },
+      {
         key: "id",
         label: "Id",
       },
@@ -227,8 +247,24 @@ export default function App() {
         label: "Status",
       },
       {
-        key: "aksi",
-        label: "Aksi",
+        key: "noperasionalkantor",
+        label: "Operasional Kantor",
+      },
+      {
+        key: "npengeluaranproyek",
+        label: "Pengeluaran Proyek",
+      },
+      {
+        key: "nproyek",
+        label: "Proyek",
+      },
+      {
+        key: "naktivitassales",
+        label: "Aktivitas Sales",
+      },
+      {
+        key: "ntodolist",
+        label: "To Do List",
       },
     ],
   };

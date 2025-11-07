@@ -36,7 +36,7 @@ const ModalTransferData = ({
               <Input
                 isDisabled={1}
                 type="text"
-                label="Kategori asal"
+                label={`${title} Terpilih`}
                 value={capitalizeEachWord(name)}
                 className="max-w-xs"
               />
@@ -70,7 +70,7 @@ const ModalTransferData = ({
                 color="primary"
                 onPress={() => onSave(onClose)}
               >
-                Simpan
+                Transfer
               </Button>
             </ModalFooter>
           </>

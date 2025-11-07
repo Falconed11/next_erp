@@ -55,6 +55,7 @@ import { highRoleCheck, key2set, set2key } from "@/app/utils/tools";
 import { useSession } from "next-auth/react";
 import { AutocompleteCustomer } from "@/components/myautocomplete";
 import { RangeDate } from "@/components/input";
+import { LIST_SWASTA_NEGRI } from "@/app/utils/const";
 
 const api_path = getApiPath();
 
@@ -328,6 +329,7 @@ export default function App({ id, curDate }) {
   if (session.status === "loading") return <>Session Loading ...</>;
   const isHighRole = highRoleCheck(sessUser.rank);
   const selectedProyek = proyek.data?.[0];
+  const isInstansiSelectedOrEmpty = form.id_instansi != null || !form.instansi;
   console.log(selectKaryawan);
   return (
     <div className="flex flex-col gap-2 w-full-">
@@ -475,6 +477,44 @@ export default function App({ id, curDate }) {
                   />
                 )}
                 <AutocompleteCustomer form={form} setForm={setForm} />
+                <Select
+                  isDisabled={isInstansiSelectedOrEmpty}
+                  variant="bordered"
+                  label="Pilih Swasta/Negri"
+                  placeholder="Pilih S/N!"
+                  selectedKeys={key2set(form.swasta)}
+                  onSelectionChange={(val) => {
+                    setForm({ ...form, swasta: set2key(val) });
+                  }}
+                >
+                  {LIST_SWASTA_NEGRI.map((item) => (
+                    <SelectItem key={item.id} value={item.id}>
+                      {item.nama}
+                    </SelectItem>
+                  ))}
+                </Select>
+                <Input
+                  isDisabled={isInstansiSelectedOrEmpty}
+                  variant="bordered"
+                  type="text"
+                  label="Kota"
+                  placeholder="Masukkan kota!"
+                  value={form.kota}
+                  onValueChange={(val) => {
+                    setForm({ ...form, kota: val });
+                  }}
+                />
+                <Textarea
+                  isDisabled={isInstansiSelectedOrEmpty}
+                  variant="bordered"
+                  type="text"
+                  label="Alamat"
+                  placeholder="Masukkan alamat!"
+                  value={form.alamat}
+                  onValueChange={(val) => {
+                    setForm({ ...form, alamat: val });
+                  }}
+                />
                 <Textarea
                   variant="bordered"
                   value={form.aktivitas}
