@@ -93,6 +93,13 @@ const AutocompleteWithCustomValue = ({
       [id]: match ? match[valueKey] : null,
     }));
   };
+  const handleOnBlur = (data) => {
+    if (disableCustomValue)
+      setForm({
+        ...data,
+        ...(data[id] ? {} : { [id]: null, [field]: "" }),
+      });
+  };
   // ✅ Fix: detect null/undefined only, not falsy values like 0
   const isInvalid =
     form[field] && (form[id] === null || form[id] === undefined);
@@ -114,13 +121,14 @@ const AutocompleteWithCustomValue = ({
           )}
         </>
       }
-      allowsCustomValue
+      // allowsCustomValue={!disableCustomValue}
       items={filteredData}
       placeholder={`Cari ${title}`}
       inputValue={form[field] ?? ""}
       selectedKey={form[id] ?? null}
       onSelectionChange={handleSelectionChange}
       onInputChange={handleInputChange}
+      onBlur={() => handleOnBlur(form)}
       onOpenChange={(isOpen) => isOpen && setFilteredData(data)}
     >
       {(item) => (
@@ -200,7 +208,7 @@ const AutocompleteProduk = ({ id_kategori, disableCustomValue, ...props }) => {
     disableSelectOnChange: true,
     getCustomLabel: (item) => (
       <>
-        {item.nama} | {item.nmerek} | {item.tipe} |{" "}
+        {item.nama} | {item.kategoriproduk} | {item.nmerek} | {item.tipe} |{" "}
         <span className="p-1 bg-black text-white">
           {item.stok} {item.satuan}
         </span>{" "}

@@ -31,5 +31,32 @@ const ShowHideComponent = ({
     </div>
   );
 };
+const ShowHideComponent2 = ({
+  initialState = false,
+  children,
+  openContent,
+  closeContent,
+}) => {
+  // stat and setStat must be `const [stat, setStat] = useState(0)`;
+  const [isOpen, setIsOpen] = useState(initialState);
+  return (
+    <div>
+      <Button
+        color="primary"
+        onPress={() => {
+          setIsOpen(!isOpen);
+        }}
+      >
+        {isOpen ? openContent || "Sembunyikan" : closeContent || "Buka"}
+      </Button>
+      <div className={`${isOpen ? "" : "hidden"}`}>{children}</div>
+    </div>
+  );
+};
 
-export { ConditionalComponent, AuthorizationComponent, ShowHideComponent };
+export {
+  ConditionalComponent,
+  AuthorizationComponent,
+  ShowHideComponent,
+  ShowHideComponent2,
+};

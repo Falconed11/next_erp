@@ -165,7 +165,7 @@ export default function RootLayout({
       <div className="flex flex-row gap-3">
         <div></div>
         <div className="w-1/9-">
-          <Nav navLinks={links} className={""}></Nav>
+          <Nav navLinks={links} className={""} />
         </div>
         <div className="w-8/9-">{children}</div>
         <div></div>

@@ -45,7 +45,6 @@ export default function TambahProduk({
   const vendor = useClientFetch("vendor");
   // const pilihProduk = useClientFetch(`produk`)
   const errorsJumlah = [];
-
   const queryStates = renderQueryStates({ kategori, produk, vendor }, session);
   if (queryStates) return queryStates;
   const isHighRole = highRoleCheck(sessUser.rank);
@@ -141,6 +140,7 @@ export default function TambahProduk({
         className="w-8/12"
       />
       <AutocompleteMerek
+        disableCustomValue
         isDisabled={isProdukSelected}
         form={form}
         setForm={setForm}
@@ -307,7 +307,7 @@ export default function TambahProduk({
         formatOptions={{
           useGrouping: false,
         }}
-        isDisabled={form.isSelected ? 1 : undefined}
+        isDisabled={form.isSelected ? true : undefined}
         value={form.harga || ""}
         label={
           <>

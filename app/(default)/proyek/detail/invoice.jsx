@@ -378,54 +378,51 @@ const InvoiceTable = ({ title, data, compRecap }) => {
     },
   ];
   return (
-    <>
-      <Table
-        className={`m-0 p-0 border-b border-black overscroll-none`}
-        classNames={{
-          wrapper: "p-0 rounded-none gap-0 overscroll-none",
-          table:
-            "m-0 p-0 border-b border-black border-collapse rounded-none overscroll-none",
-          thead: "rounded-none bg-transparent [&>tr:last-child]:hidden",
-          th: "border-y border-black text-black bg-transparent px-0 py-0 h-0",
-          td: "px-0 py-0 text-xs leading-none- align-top",
-          tr: "m-0 p-0",
-          base: "rounded-none shadow-none overscroll-none",
-        }}
-        aria-label="Example table with custom cells"
-        shadow="none"
-        topContent={title}
-        bottomContent={compRecap}
-      >
-        <TableHeader columns={col}>
-          {(column) => (
-            <TableColumn
-              key={column.key}
-              align={
-                ["aksi", "no", "jumlah", "harga", "total"].includes(column.key)
-                  ? "center"
-                  : "start"
-              }
-              className={
-                { no: "w-[30px]", deskripsiitem: "w-1/2", jumlah: "w-1/10" }[
-                  column.key
-                ]
-              }
-              // className={`${column.key === "no" ? "w-[30px]" : ""}`}
-            >
-              {column.label}
-            </TableColumn>
-          )}
-        </TableHeader>
-        <TableBody items={data}>
-          {(item) => (
-            <TableRow key={item.no}>
-              {(columnKey) => (
-                <TableCell>{renderCell(item, columnKey)}</TableCell>
-              )}
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-    </>
+    <Table
+      className={`m-0 p-0 border-b border-black overscroll-none`}
+      classNames={{
+        wrapper: "p-0 rounded-none gap-0 overscroll-none",
+        table:
+          "m-0 p-0 border-b border-black border-collapse rounded-none overscroll-none",
+        thead: "rounded-none bg-transparent [&>tr:last-child]:hidden",
+        th: "border-y border-black text-black bg-transparent px-0 py-0 h-0",
+        td: "px-0 py-0 text-xs leading-none- align-top",
+        tr: "m-0 p-0",
+        base: "rounded-none shadow-none overscroll-none",
+      }}
+      aria-label="Example table with custom cells"
+      shadow="none"
+      topContent={title}
+      bottomContent={compRecap}
+    >
+      <TableHeader columns={col}>
+        {(column) => (
+          <TableColumn
+            key={column.key}
+            align={
+              ["aksi", "no", "jumlah", "harga", "total"].includes(column.key)
+                ? "center"
+                : "start"
+            }
+            className={
+              { no: "w-[30px]", deskripsiitem: "w-1/2", jumlah: "w-1/10" }[
+                column.key
+              ]
+            }
+          >
+            {column.label}
+          </TableColumn>
+        )}
+      </TableHeader>
+      <TableBody items={data}>
+        {(item) => (
+          <TableRow key={item.no}>
+            {(columnKey) => (
+              <TableCell>{renderCell(item, columnKey)}</TableCell>
+            )}
+          </TableRow>
+        )}
+      </TableBody>
+    </Table>
   );
 };

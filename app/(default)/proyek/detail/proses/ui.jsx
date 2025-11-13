@@ -47,8 +47,12 @@ import "react-datepicker/dist/react-datepicker.css";
 import { NavLinkNewTab } from "@/components/mycomponent";
 import PembayaranProyek from "./pembayaranproyek";
 import { countPercentProvit, countRecapitulation } from "@/app/utils/formula";
-import { highRoleCheck } from "@/app/utils/tools";
+import { highRoleCheck, renderQueryStates } from "@/app/utils/tools";
 import { useSession } from "next-auth/react";
+import {
+  ShowHideComponent,
+  ShowHideComponent2,
+} from "@/components/componentmanipulation";
 
 const api_path = getApiPath();
 
@@ -104,17 +108,6 @@ export default function App({ id }) {
   const rekapitulasiProyek = useClientFetch(
     `rekapitulasiproyek?id_proyek=${id}&versi=${selectedVersion}`
   );
-  const queries = {
-    proyek,
-    pengeluaranproyek,
-    pembayaranproyek,
-    kategori,
-    metodepembayaran,
-    produk,
-    keranjangPeralatan,
-    keranjangInstalasi,
-    rekapitulasiProyek,
-  };
 
   const editButtonPress = (data) => {
     const startdate = new Date(data.tanggalpengeluaran);
@@ -237,7 +230,7 @@ export default function App({ id }) {
           id: data.id_produkkeluar,
           metodepengeluaran: "proyek",
           id_produk: data.id,
-
+          keterangan: data.keteranganpenawaran,
           id_proyek: id,
           // id_produk: form.selectProduk,
           // id_karyawan: selectKaryawan ?? 0,
@@ -552,11 +545,22 @@ export default function App({ id }) {
       },
     ],
   };
-  for (const [name, data] of Object.entries(queries)) {
-    if (data.error) return <div>Failed to load {name}</div>;
-    if (data.isLoading) return <div>Loading {name}...</div>;
-  }
-  if (session.status === "loading") return <>Session Loading ...</>;
+  const queryStates = renderQueryStates(
+    {
+      proyek,
+      pengeluaranproyek,
+      pembayaranproyek,
+      karyawan,
+      kategori,
+      metodepembayaran,
+      produk,
+      keranjangPeralatan,
+      keranjangInstalasi,
+      rekapitulasiProyek,
+    },
+    session
+  );
+  if (queryStates) return queryStates;
   const selectedProyek = proyek.data[0];
   if (!selectedProyek) return <>Proyek tidak ditemukan</>;
   const { rekapitulasiPeralatan, rekapitulasiInstalasi, rekapitulasiTotal } =
@@ -572,12 +576,11 @@ export default function App({ id }) {
     );
   }, 0);
   const provit = omset - biayaProduksi;
-  console.log(form);
   return (
     <div className="flex flex-col gap-2 w-full-">
       <div className="flex gap-2">
         {/*Detail  */}
-        <div className="bg-white rounded-lg p-3 w-1/4">
+        <div className="bg-white rounded-lg p-3 ">
           <div>Detail</div>
           {[
             {
@@ -629,9 +632,34 @@ export default function App({ id }) {
             </div>
           ))}
         </div>
-        {/* tabel pembayaranproyek */}
+      </div>
+      <div className="flex gap-2">
+        <NavLinkNewTab
+          href={`/proyek/detail?id=${selectedProyek.id}&versi=${
+            selectedProyek.versi <= 0 ? "1" : selectedProyek.versi
+          }`}
+        >
+          {"Penawaran ==>>"}
+        </NavLinkNewTab>
+      </div>
+      {/* tombol print */}
+      {/* <div className="flex flex-row gap-2">
+        <div>
+          <Button onClick={modal.nota.onOpen} color="primary" className="mt-3">
+            Nota
+          </Button>
+        </div>
+      </div> */}
+      {/* tabel pembayaranproyek */}
+      <ShowHideComponent2
+        initialState
+        openContent="Tutup Pembayaran Proyek"
+        closeContent="Buka Pembayaran Proyek"
+      >
         <Table
-          className="z-10"
+          isStriped
+          isCompact
+          className="pt-2"
           aria-label="Example table with custom cells"
           topContent={
             <>
@@ -670,7 +698,15 @@ export default function App({ id }) {
                 key={column.key}
                 align={column.key === "aksi" ? "center" : "start"}
               >
-                {column.label}
+                <div
+                // className={
+                //   {
+                //     untukpembayaran: "w-48",
+                //   }[column.key]
+                // }
+                >
+                  {column.label}
+                </div>
               </TableColumn>
             )}
           </TableHeader>
@@ -686,27 +722,10 @@ export default function App({ id }) {
             )}
           </TableBody>
         </Table>
-      </div>
-      <div className="flex gap-2">
-        <NavLinkNewTab
-          href={`/proyek/detail?id=${selectedProyek.id}&versi=${
-            selectedProyek.versi <= 0 ? "1" : selectedProyek.versi
-          }`}
-        >
-          {"Penawaran ==>>"}
-        </NavLinkNewTab>
-      </div>
-      {/* tombol print */}
-      {/* <div className="flex flex-row gap-2">
-        <div>
-          <Button onClick={modal.nota.onOpen} color="primary" className="mt-3">
-            Nota
-          </Button>
-        </div>
-      </div> */}
+      </ShowHideComponent2>
       {/* tabel pengeluaran proyek */}
       <Table
-        className="z-10"
+        className="z-10 w-fit"
         aria-label="Example table with custom cells"
         topContent={
           <>
@@ -714,7 +733,7 @@ export default function App({ id }) {
             <div className="flex-col gap-2">
               <div className="flex flex-row gap-2">
                 <TambahProduk
-                  disableCustomValue={true}
+                  disableCustomValue
                   form={form}
                   setForm={setForm}
                   disableHargaKustom
@@ -746,14 +765,14 @@ export default function App({ id }) {
                 </Select>
                 <Input
                   type="text"
-                  value={form.keterangan}
+                  value={form.keteranganpenawaran}
                   label="Keterangan"
                   placeholder="Masukkan keterangan!"
                   className="w-2/12 pl-2"
                   onValueChange={(v) =>
                     setForm({
                       ...form,
-                      keterangan: v,
+                      keteranganpenawaran: v,
                     })
                   }
                 />
@@ -800,7 +819,11 @@ export default function App({ id }) {
                 <Button
                   isDisabled={!form.id_produk}
                   onPress={() => {
-                    tambahButtonPress({ selectProduk, selectKaryawan, form });
+                    tambahButtonPress({
+                      selectProduk,
+                      selectKaryawan,
+                      form,
+                    });
                   }}
                   color="primary"
                   className="ml-2"

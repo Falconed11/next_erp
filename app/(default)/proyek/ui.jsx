@@ -985,6 +985,7 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
                   onValueChange={(v) => setForm({ ...form, alamat: v })}
                 />
                 <Input
+                  variant="bordered"
                   type="text"
                   label="Klien"
                   placeholder="Masukkan klien! Contoh : Bapak Adi"
@@ -993,6 +994,7 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
                 />
                 {form.id_statusproyek == 1 && (
                   <Input
+                    variant="bordered"
                     type="text"
                     label="No PO"
                     placeholder="Masukkan no. PO!"
@@ -1028,9 +1030,10 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
                   )}
                 </Select>
                 {form.id_statusproyek == 1 && (
-                  <div className="bg-gray-100 p-3 rounded-lg">
+                  <div className="bg-gray-100 p-3 rounded-lg w-fit">
                     <div>Tanggal Penawaran</div>
                     <DatePicker
+                      className="bg-white rounded px-1"
                       placeholderText="Pilih tanggal"
                       dateFormat="dd/MM/yyyy"
                       selected={form.startdate}
@@ -1041,6 +1044,7 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
                   </div>
                 )}
                 <Textarea
+                  variant="bordered"
                   label="Keterangan"
                   labelPlacement="inside"
                   placeholder="Masukkan keterangan! (Opsional)"
