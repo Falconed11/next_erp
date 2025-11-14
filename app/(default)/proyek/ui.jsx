@@ -70,6 +70,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import SelectStatusProyek from "@/components/selectstatusproyek";
 import { LIST_SWASTA_NEGRI } from "@/app/utils/const";
+import { StatusProyek } from "./statusproyek";
 
 export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
   const [sort, setSort] = React.useState("tanggal_penawaran");
@@ -108,7 +109,8 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
   );
   const perusahaan = useClientFetch("perusahaan");
   const karyawan = useClientFetch("karyawan");
-  const statusproyek = useClientFetch("statusproyek?ids=1&ids=3");
+  // const statusproyek = useClientFetch("statusproyek?ids=1&ids=3");
+  const statusproyek = useClientFetch("statusproyek");
   const customer = useClientFetch(
     `customer?${id_instansi ? `id=${id_instansi}` : ""}`
   );
@@ -292,6 +294,7 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
     const date = new Date(data.tanggal);
     const versi = data.versi;
     const peran = data.peran;
+    console.log(data.progress);
     switch (columnKey) {
       case "no":
         return `${penawaran(data.id_kustom, date, data.id_karyawan)}`;
@@ -303,8 +306,12 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
             Reject
           </span>
         ) : data.versi > 0 ? (
-          <span className="p-2 rounded-sm bg-green-500 text-white font-bold">
-            Deal
+          <span
+            className={`p-2 rounded-sm bg-${
+              data.progress == 100 ? "indigo" : "green"
+            }-500 text-white font-bold`}
+          >
+            {data.statusproyek}
           </span>
         ) : data.jumlahbarangkeluar > 0 ? (
           <Tooltip
@@ -330,7 +337,13 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
       case "totalpenawaran":
         return (
           <div className="text-right">
-            <Harga harga={+cellValue} />
+            <Harga harga={cellValue} />
+          </div>
+        );
+      case "progress":
+        return (
+          <div className="text-right">
+            <Harga harga={cellValue} />
           </div>
         );
       case "tanggal":
@@ -500,6 +513,10 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
     {
       key: "status",
       label: "Status",
+    },
+    {
+      key: "progress",
+      label: "Progress (%)",
     },
     {
       key: "totalpenawaran",
@@ -787,6 +804,10 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
                       </div>
                     )}
                   </div>
+                </div>
+                {/* Status Proyek */}
+                <div>
+                  <StatusProyek />
                 </div>
               </div>
             </ShowHideComponent>
