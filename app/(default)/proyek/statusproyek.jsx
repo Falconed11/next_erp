@@ -1,6 +1,10 @@
 import { API_PATH, useClientFetch } from "@/app/utils/apiconfig";
 import { getDateF } from "@/app/utils/date";
-import { capitalizeEachWord, renderQueryStates } from "@/app/utils/tools";
+import {
+  capitalizeEachWord,
+  highRoleCheck,
+  renderQueryStates,
+} from "@/app/utils/tools";
 import Harga from "@/components/harga";
 import { AddIcon, DeleteIcon, EditIcon } from "@/components/icon";
 import {
@@ -21,9 +25,12 @@ import {
   Tooltip,
   useDisclosure,
 } from "@heroui/react";
+import { useSession } from "next-auth/react";
 import { useCallback, useState } from "react";
 
 const StatusProyek = () => {
+  const session = useSession();
+  const sessUser = session.data?.user;
   const statusproyek = useClientFetch("statusproyek");
   const [form, setForm] = useState({});
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -103,28 +110,35 @@ const StatusProyek = () => {
                 <EditIcon />
               </span>
             </Tooltip>
-            <Tooltip color="danger" content="Delete">
-              <span
-                onClick={() => deletePress(data)}
-                className="text-lg text-danger cursor-pointer active:opacity-50"
-              >
-                <DeleteIcon />
-              </span>
-            </Tooltip>
+            {![-1, 1, 2, 3].includes(data.id) && (
+              <Tooltip color="danger" content="Delete">
+                <span
+                  onClick={() => deletePress(data)}
+                  className="text-lg text-danger cursor-pointer active:opacity-50"
+                >
+                  <DeleteIcon />
+                </span>
+              </Tooltip>
+            )}
           </div>
         );
       default:
         return cellValue;
     }
   }, []);
-  const queryStates = renderQueryStates({ statusproyek });
+  const queryStates = renderQueryStates({ statusproyek }, session);
   if (queryStates) return queryStates;
+  const isHighRole = highRoleCheck(sessUser.rank);
   const loadingState = statusproyek.isLoading ? "loading" : "idle";
   const col = [
-    {
-      key: "aksi",
-      label: "Aksi",
-    },
+    ...(isHighRole
+      ? [
+          {
+            key: "aksi",
+            label: "Aksi",
+          },
+        ]
+      : []),
     {
       key: "id",
       label: "Id",

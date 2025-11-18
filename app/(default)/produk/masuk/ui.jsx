@@ -102,6 +102,7 @@ export default function App({ id_produk }) {
     });
     const json = await res.json();
     if (res.status == 400) return alert(json.message);
+    produkmasuk.mutate();
     onClose();
     // return alert(json.message);
   };
@@ -165,7 +166,7 @@ export default function App({ id_produk }) {
       });
       const json = await res.json();
       if (res.status == 400) return alert(json.message);
-      // return alert(await res.json().then((json) => json.message));
+      produkmasuk.mutate();
     }
   };
 

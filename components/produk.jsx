@@ -17,7 +17,6 @@ const FormProduct = ({ form, setForm }) => {
   const session = useSession();
   const queryStates = renderQueryStates(null, session);
   if (queryStates) return queryStates;
-  console.log(session);
   const sessUser = session.data.user;
   const isHighRole = highRoleCheck(sessUser.rank);
   const classCompByRole = isHighRole ? "" : "hidden";

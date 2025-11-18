@@ -170,7 +170,7 @@ export default function Invoice({
                           <div>
                             No. Invoice :{" "}
                             {invoice(
-                              proyek.id_kustom,
+                              proyek.id_second.split(".")[2],
                               new Date(proyek.tanggal)
                             )}
                           </div>

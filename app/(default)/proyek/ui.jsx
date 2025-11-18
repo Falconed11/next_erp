@@ -60,7 +60,11 @@ import {
   getDate,
   getDateF,
 } from "@/app/utils/date";
-import { highRoleCheck, rolesCheck } from "@/app/utils/tools";
+import {
+  highRoleCheck,
+  renderQueryStates,
+  rolesCheck,
+} from "@/app/utils/tools";
 import { FileUploader } from "@/components/input";
 import { RangeDate } from "@/components/input";
 import { LinkOpenNewTab } from "@/components/mycomponent";
@@ -110,12 +114,12 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
   const perusahaan = useClientFetch("perusahaan");
   const karyawan = useClientFetch("karyawan");
   // const statusproyek = useClientFetch("statusproyek?ids=1&ids=3");
-  const statusproyek = useClientFetch("statusproyek");
+  const statusproyek = useClientFetch("statusproyek?nids=2&nids=-1");
   const customer = useClientFetch(
     `customer?${id_instansi ? `id=${id_instansi}` : ""}`
   );
   const kategoriproyek = useClientFetch("kategoriproyek");
-  const queries = [
+  const queries = {
     proyek,
     penawaran,
     perusahaan,
@@ -123,7 +127,7 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
     statusproyek,
     customer,
     kategoriproyek,
-  ];
+  };
   const [form, setForm] = useState({});
   const [method, setMethod] = useState("POST");
   const [json, setJson] = useState([]);
@@ -171,7 +175,7 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
       selectkategoriproyek: "",
       // selectstatus: "",
       isSwasta: "",
-      tanggal: getDate(new Date()),
+      tanggal_penawaran: getDate(new Date()),
       startdate: new Date(),
       keterangan: "",
       id_statusproyek: 1,
@@ -185,7 +189,7 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
     setForm({
       ...data,
       modalmode: "Edit",
-      tanggal: getDate(startdate),
+      tanggal_penawaran: getDate(startdate),
       startdate,
       selectkaryawan: new Set([String(data.id_karyawan)]),
       selectperusahaan: new Set([String(data.id_perusahaan)]),
@@ -452,11 +456,8 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [reportList, setReportList] = useState([]);
   const report = useDisclosure();
-  for (const [name, data] of Object.entries(queries)) {
-    if (data.error) return <div>Failed to load {name}</div>;
-    if (data.isLoading) return <div>Loading {name}...</div>;
-  }
-  if (session.status === "loading") return <>Session Loading ...</>;
+  const queryStates = renderQueryStates(queries, session);
+  if (queryStates) return queryStates;
   const isHighRole = highRoleCheck(sessUser.rank);
   const columns = [
     {
@@ -468,7 +469,7 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
     //   label: "Id",
     // },
     {
-      key: "id_kustom",
+      key: "id_second",
       label: "Id Proyek",
     },
     {
@@ -1051,7 +1052,7 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
                   )}
                 </Select>
                 {form.id_statusproyek == 1 && (
-                  <div className="bg-gray-100 p-3 rounded-lg w-fit">
+                  <div className="bg-gray-100 p-3 rounded-lg w-fit z-40">
                     <div>Tanggal Penawaran</div>
                     <DatePicker
                       className="bg-white rounded px-1"
@@ -1059,7 +1060,11 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
                       dateFormat="dd/MM/yyyy"
                       selected={form.startdate}
                       onChange={(v) =>
-                        setForm({ ...form, startdate: v, tanggal: getDate(v) })
+                        setForm({
+                          ...form,
+                          startdate: v,
+                          tanggal_penawaran: getDate(v),
+                        })
                       }
                     />
                   </div>

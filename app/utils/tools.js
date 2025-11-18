@@ -39,7 +39,13 @@ const capitalizeEachWord = (str = "") => {
 };
 const renderQueryStates = (queries, session) => {
   for (const [name, data] of Object.entries(queries ?? {})) {
-    if (data.error) return <div>Failed to load {name}</div>;
+    const error = data.error;
+    if (error)
+      return (
+        <div>
+          Failed to load {name} {error.message}
+        </div>
+      );
     if (data.isLoading) return <div>Loading {name}...</div>;
   }
   if (session?.status === "loading") return <div>Session Loading...</div>;

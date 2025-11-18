@@ -256,7 +256,7 @@ export default function App({ id, versi }) {
   const simpanButtonPress = async (data, onClose) => {
     // if (data.jumlah <= 0) return alert("Jumlah belum diisi");
     if (data.provitmarginpersen > 99 && data.hargamodal)
-      return alert("Provit margin tidak boleh lebi dari 99.");
+      return alert("Provit margin tidak boleh lebih dari 99.");
     const res = await fetch(`${api_path}keranjangproyek`, {
       method: "PUT",
       headers: {
@@ -324,7 +324,7 @@ export default function App({ id, versi }) {
     // return alert(json.message);
   };
   const handleButtonSetAsDealClick = async () => {
-    const res = await fetch(`${api_path}updateversiproyek`, {
+    const res = await fetch(`${api_path}proyek`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -344,7 +344,7 @@ export default function App({ id, versi }) {
     proyek.mutate();
   };
   const handleButtonSetAsRejectClick = async () => {
-    const res = await fetch(`${api_path}updateversiproyek`, {
+    const res = await fetch(`${api_path}proyek`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -363,7 +363,7 @@ export default function App({ id, versi }) {
     proyek.mutate();
   };
   const handleButtonCancelDealRejectClick = async () => {
-    const res = await fetch(`${api_path}updateversiproyek`, {
+    const res = await fetch(`${api_path}proyek`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -946,6 +946,7 @@ export default function App({ id, versi }) {
   const defStyleFormWidth = "w-2/12";
   const fullPath = `${NEXT_DOMAIN}/proyek/detail?id=${id}&versi=${versi}`;
   const tambahWidth = "w-9/12-";
+  console.log(form);
   return (
     <div className="flex gap-2 flex-col">
       <div className="flex gap-2">
