@@ -61,6 +61,7 @@ import {
   getDateF,
 } from "@/app/utils/date";
 import {
+  capitalizeEachWord,
   highRoleCheck,
   renderQueryStates,
   rolesCheck,
@@ -298,24 +299,46 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
     const date = new Date(data.tanggal);
     const versi = data.versi;
     const peran = data.peran;
-    console.log(data.progress);
+    const idStatusProyek = data.id_statusproyek;
     switch (columnKey) {
       case "no":
         return `${penawaran(data.id_kustom, date, data.id_karyawan)}`;
       case "swasta":
         return data.swasta ? "swasta" : "negri";
-      case "status":
-        return data.id_statusproyek == -1 ? (
+      case "statusproyek":
+        return idStatusProyek == -1 ? (
           <span className="p-2 rounded-sm bg-red-600 text-white font-bold">
             Reject
           </span>
+        ) : idStatusProyek == 1 ? (
+          !data.jumlahbarangkeluar ? (
+            <span className="p-2 rounded-sm bg-blue-600 text-white font-bold">
+              {capitalizeEachWord(cellValue)}
+            </span>
+          ) : versi ? (
+            "Selesai"
+          ) : (
+            <Tooltip
+              color="warning"
+              content="Proyek Berjalan. Penawaran belum deal."
+            >
+              <div
+                // onClick={() => editButtonPress(data)}
+                className="text-4xl text-warning cursor-help active:opacity-50 text-center"
+              >
+                <DangerTriangleBrokenIcon />
+              </div>
+            </Tooltip>
+          )
         ) : data.versi > 0 ? (
           <span
-            className={`p-2 rounded-sm bg-${
-              data.progress == 100 ? "green" : "blue"
-            }-500 text-white font-bold`}
+            className={` ${
+              data.progress == 100
+                ? ""
+                : "p-2 rounded-sm shadow-lg bg-green-500 text-white"
+            } font-bold`}
           >
-            {data.statusproyek}
+            {capitalizeEachWord(data.statusproyek)}
           </span>
         ) : data.jumlahbarangkeluar > 0 ? (
           <Tooltip
@@ -464,10 +487,6 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
       key: "aksi",
       label: "Aksi",
     },
-    // {
-    //   key: "id",
-    //   label: "Id",
-    // },
     {
       key: "id_second",
       label: "Id Proyek",
@@ -480,21 +499,18 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
       key: "swasta",
       label: "Swasta/Negri",
     },
-    // {
-    //   key: "kategoriproyek",
-    //   label: "Kategori Proyek",
-    // },
     {
       key: "nama",
       label: "Nama Proyek",
     },
-  ];
-  if (!id_instansi)
-    columns.push({
-      key: "instansi",
-      label: "Customer",
-    });
-  columns.push(
+    ...(!id_instansi
+      ? [
+          {
+            key: "instansi",
+            label: "Customer",
+          },
+        ]
+      : []),
     {
       key: "klien",
       label: "Klien",
@@ -512,7 +528,7 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
       label: "Sales",
     },
     {
-      key: "status",
+      key: "statusproyek",
       label: "Status",
     },
     {
@@ -542,8 +558,8 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
     {
       key: "keterangan",
       label: "Keterangan",
-    }
-  );
+    },
+  ];
   const isSwasta = [
     { id: 0, nama: "negri" },
     { id: 1, nama: "swasta" },

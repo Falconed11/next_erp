@@ -160,7 +160,7 @@ const StatusProyek = () => {
     <>
       <Table
         isStriped
-        className=""
+        className="shadow-lg"
         topContent={
           <div className="flex justify-between items-center">
             <div className="text-lg font-bold">Status Proyek</div>

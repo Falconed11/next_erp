@@ -33,11 +33,6 @@ export default function RootLayout({
           },
         ]
       : []),
-    {
-      key: "aktivitassales",
-      name: "Aktivitas Sales",
-      href: "/aktivitassales",
-    },
     // {
     //     key: "kategori",
     //     name: "Kategori",
@@ -59,6 +54,7 @@ export default function RootLayout({
   //   );
   const links = [
     { href: "/", name: "Dashboard" },
+    { href: "/aktivitas", name: "Aktivitas" },
     {
       href: "/produk",
       name: "Produk",
