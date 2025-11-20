@@ -305,14 +305,14 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
       case "swasta":
         return data.swasta ? "swasta" : "negri";
       case "status":
-        return data.versi == -1 ? (
+        return data.id_statusproyek == -1 ? (
           <span className="p-2 rounded-sm bg-red-600 text-white font-bold">
             Reject
           </span>
         ) : data.versi > 0 ? (
           <span
             className={`p-2 rounded-sm bg-${
-              data.progress == 100 ? "indigo" : "green"
+              data.progress == 100 ? "green" : "blue"
             }-500 text-white font-bold`}
           >
             {data.statusproyek}

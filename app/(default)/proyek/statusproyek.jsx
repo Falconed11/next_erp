@@ -164,17 +164,19 @@ const StatusProyek = () => {
         topContent={
           <div className="flex justify-between items-center">
             <div className="text-lg font-bold">Status Proyek</div>
-            <Button
-              onPress={tambahPress}
-              variant="shadow"
-              size="sm"
-              color="primary"
-            >
-              <span className="text-xl font-bold">
-                <AddIcon />
-              </span>
-              Tambah
-            </Button>
+            {isHighRole && (
+              <Button
+                onPress={tambahPress}
+                variant="shadow"
+                size="sm"
+                color="primary"
+              >
+                <span className="text-xl font-bold">
+                  <AddIcon />
+                </span>
+                Tambah
+              </Button>
+            )}
           </div>
         }
         bottomContent={<></>}
@@ -231,8 +233,8 @@ const StatusProyek = () => {
                     useGrouping: false,
                   }}
                   variant="bordered"
-                  label="Status"
-                  placeholder="Masukkan status!"
+                  label="Progress"
+                  placeholder="Masukkan progress!"
                   value={form.progress}
                   onValueChange={(val) => setForm({ ...form, progress: val })}
                 />
