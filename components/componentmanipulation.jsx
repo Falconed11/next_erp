@@ -15,11 +15,18 @@ const ShowHideComponent = ({
   children,
   openContent,
   closeContent,
+  className,
+  btnClassName,
+  btnSize,
+  variant,
 }) => {
   // stat and setStat must be `const [stat, setStat] = useState(0)`;
   return (
     <div>
       <Button
+        variant={variant}
+        className={btnClassName}
+        size={btnSize}
         color="primary"
         onPress={() => {
           setStat(stat == 0 ? 1 : 0);

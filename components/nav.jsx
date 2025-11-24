@@ -19,8 +19,7 @@ export default function Navigation({ navLinks, className }) {
   const router = useRouter();
   const pathname = usePathname();
 
-  const split = pathname.split("/");
-  const title = split.at(-1);
+  const title = pathname.split("/").at(-1);
   useEffect(() => {
     document.title = title;
   }, [title]);
@@ -29,69 +28,68 @@ export default function Navigation({ navLinks, className }) {
   if (proyek.isLoading) return <div>loading...</div>;
 
   const numberProgressNoOffer = proyek.data.length;
+
+  const isActivePath = (href) =>
+    (pathname === "/" && href === "/") || pathname === href;
+
   return (
     <nav
-      className={`mx-3- flex flex-col rounded-lg columns-10 bg-background ${className}`}
+      className={`mx-3- flex flex-col rounded-lg bg-background ${className}`}
     >
       <ul>
         {navLinks.map((link) => {
-          const isActive =
-            (pathname == "/" && pathname == link.href) ||
-            (pathname == link.href && link.href != "/");
+          const active = isActivePath(link.href);
+          const baseClass = "p-2 cursor-pointer";
+          const activeClass = active ? "bg-slate-300 text-black" : "text-black";
+          const icon = link?.icon;
           if (link.dropdown) {
-            const dropdown = link.dropdown;
-            const customclass = isActive
-              ? "bg-slate-300 text-black cursor-pointer p-2"
-              : "text-black cursor-pointer p-2";
             return (
               <li key={link.name}>
-                {/* <Badge color="warning" content="5"> */}
-                <div className={customclass}>
+                <div className={`${baseClass} ${activeClass}`}>
                   <Dropdown>
                     <DropdownTrigger>
                       <Button className="p-0 m-0 bg-transparent text-left justify-start text-base h-fit">
-                        <div>{link.name}</div>
-                        <ProgressNoOfferNotification
-                          link={link}
-                          numberProgressNoOffer={numberProgressNoOffer}
-                        />
+                        <div className="flex items-center gap-2">
+                          <Icon icon={icon} />
+                          {link.name}
+                          <ProgressNoOfferNotification
+                            link={link}
+                            number={numberProgressNoOffer}
+                          />
+                        </div>
                       </Button>
                     </DropdownTrigger>
                     <DropdownMenu
-                      aria-label="Static Actions"
+                      aria-label="navigation dropdown"
                       onAction={(key) => {
-                        if (key == "data") {
-                          return router.push(link.href);
-                        }
-                        // return router.push(`/karyawan/${key}`);
-                        return router.push(`${link.href}/${key}`);
+                        const path =
+                          key === "data" ? link.href : `${link.href}/${key}`;
+                        router.push(path);
                       }}
                     >
-                      {dropdown.map((item) => (
-                        <DropdownItem textValue={item.name} key={item.key}>
+                      {link.dropdown.map((item) => (
+                        <DropdownItem key={item.key} textValue={item.name}>
                           {item.name}
                         </DropdownItem>
-                        //</Link>
                       ))}
                     </DropdownMenu>
                   </Dropdown>
                 </div>
-                {/* </Badge> */}
               </li>
             );
           }
-
           return (
             <li key={link.name}>
-              <div
-                className={isActive ? "p-2 bg-slate-300" : "p-2"}
-                key={link.name}
-              >
-                <Link className="text-black flex gap-2" href={link.href}>
-                  <div>{link.name}</div>
+              <div className={`${baseClass} ${activeClass}`}>
+                <Link
+                  className="text-black items-center flex gap-2"
+                  href={link.href}
+                >
+                  <Icon icon={icon} />
+                  {link.name}
                   <ProgressNoOfferNotification
                     link={link}
-                    numberProgressNoOffer={numberProgressNoOffer}
+                    number={numberProgressNoOffer}
                   />
                 </Link>
               </div>
@@ -103,16 +101,14 @@ export default function Navigation({ navLinks, className }) {
   );
 }
 
-const ProgressNoOfferNotification = ({ link, numberProgressNoOffer }) => {
+const ProgressNoOfferNotification = ({ link, number }) => {
+  if (link.name !== "Proyek" || number <= 0) return null;
+
   return (
-    <>
-      {link.name == "Proyek" && numberProgressNoOffer > 0 ? (
-        <div className="text-black bg-warning rounded-full px-2">
-          {numberProgressNoOffer}
-        </div>
-      ) : (
-        <></>
-      )}
-    </>
+    <div className="bg-warning text-black rounded-full px-2">{number}</div>
   );
+};
+
+const Icon = ({ icon }) => {
+  return icon && <span className="text-2xl">{icon}</span>;
 };

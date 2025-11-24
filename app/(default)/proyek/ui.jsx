@@ -63,8 +63,10 @@ import {
 import {
   capitalizeEachWord,
   highRoleCheck,
+  key2set,
   renderQueryStates,
   rolesCheck,
+  set2key,
 } from "@/app/utils/tools";
 import { FileUploader } from "@/components/input";
 import { RangeDate } from "@/components/input";
@@ -76,6 +78,8 @@ import "react-datepicker/dist/react-datepicker.css";
 import SelectStatusProyek from "@/components/selectstatusproyek";
 import { LIST_SWASTA_NEGRI } from "@/app/utils/const";
 import { StatusProyek } from "./statusproyek";
+import { AutocompleteCustomer } from "@/components/myautocomplete";
+import { BadgeStatusProyek } from "@/components/badgestatusproyek";
 
 export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
   const [sort, setSort] = React.useState("tanggal_penawaran");
@@ -163,6 +167,8 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
     //return alert(json.message);
   };
   const tambahButtonPress = () => {
+    const now = new Date();
+    const idKaryawan = sessUser.id_karyawan;
     setForm({
       modalmode: "Tambah",
       id: "",
@@ -170,14 +176,11 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
       klien: "",
       instansi: "",
       kota: "",
-      selectkaryawan: "",
-      selectperusahaan: "",
-      selectcustomer: "",
-      selectkategoriproyek: "",
-      // selectstatus: "",
+      selectkaryawan: key2set(idKaryawan),
+      id_karyawan: idKaryawan,
       isSwasta: "",
-      tanggal_penawaran: getDate(new Date()),
-      startdate: new Date(),
+      tanggal_penawaran: getDate(now),
+      startdate: now,
       keterangan: "",
       id_statusproyek: 1,
       last_user: sessUser?.nama,
@@ -187,12 +190,15 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
   };
   const editButtonPress = (data) => {
     const startdate = new Date(data.tanggal_penawaran);
+    const idKaryawan = data.id_karyawan;
+    const sessIdKaryawan = sessUser.id_karyawan;
     setForm({
       ...data,
       modalmode: "Edit",
       tanggal_penawaran: getDate(startdate),
       startdate,
-      selectkaryawan: new Set([String(data.id_karyawan)]),
+      selectkaryawan: key2set(idKaryawan || sessIdKaryawan),
+      id_karyawan: idKaryawan || sessIdKaryawan,
       selectperusahaan: new Set([String(data.id_perusahaan)]),
       id_instansi: data.id_instansi,
       instansi: data.instansi,
@@ -294,132 +300,91 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
       compression: true,
     });
   };
-  const renderCell = React.useCallback((data, columnKey) => {
-    const cellValue = data[columnKey];
-    const date = new Date(data.tanggal);
-    const versi = data.versi;
-    const peran = data.peran;
-    const idStatusProyek = data.id_statusproyek;
-    switch (columnKey) {
-      case "no":
-        return `${penawaran(data.id_kustom, date, data.id_karyawan)}`;
-      case "swasta":
-        return data.swasta ? "swasta" : "negri";
-      case "statusproyek":
-        return idStatusProyek == -1 ? (
-          <span className="p-2 rounded-sm bg-red-600 text-white font-bold">
-            Reject
-          </span>
-        ) : idStatusProyek == 1 ? (
-          !data.jumlahbarangkeluar ? (
-            <span className="p-2 rounded-sm bg-blue-600 text-white font-bold">
-              {capitalizeEachWord(cellValue)}
-            </span>
-          ) : versi ? (
-            "Selesai"
-          ) : (
-            <Tooltip
-              color="warning"
-              content="Proyek Berjalan. Penawaran belum deal."
-            >
-              <div
-                // onClick={() => editButtonPress(data)}
-                className="text-4xl text-warning cursor-help active:opacity-50 text-center"
-              >
-                <DangerTriangleBrokenIcon />
-              </div>
-            </Tooltip>
-          )
-        ) : data.versi > 0 ? (
-          <span
-            className={` ${
-              data.progress == 100
-                ? ""
-                : "p-2 rounded-sm shadow-lg bg-green-500 text-white"
-            } font-bold`}
-          >
-            {capitalizeEachWord(data.statusproyek)}
-          </span>
-        ) : data.jumlahbarangkeluar > 0 ? (
-          <Tooltip
-            color="warning"
-            content="Proyek Berjalan. Belum ada penawaran."
-          >
-            <div
-              // onClick={() => editButtonPress(data)}
-              className="text-4xl text-warning cursor-help active:opacity-50 text-center"
-            >
-              <DangerTriangleBrokenIcon />
+  const renderCell = React.useCallback(
+    (data, columnKey) => {
+      const cellValue = data[columnKey];
+      const date = new Date(data.tanggal);
+      const versi = data.versi;
+      const peran = data.peran;
+      const idStatusProyek = data.id_statusproyek;
+      switch (columnKey) {
+        case "no":
+          return `${penawaran(data.id_kustom, date, data.id_karyawan)}`;
+        case "swasta":
+          return data.swasta ? "swasta" : "negri";
+        case "statusproyek":
+          return (
+            <BadgeStatusProyek
+              idStatusProyek={idStatusProyek}
+              data={data}
+              versi={versi}
+            />
+          );
+        case "pengeluaranproyek":
+          return (
+            <div className="text-right">
+              <Harga harga={data.pengeluaranproyek} />
             </div>
-          </Tooltip>
-        ) : (
-          data.statusproyek
-        );
-      case "pengeluaranproyek":
-        return (
-          <div className="text-right">
-            <Harga harga={data.pengeluaranproyek} />
-          </div>
-        );
-      case "totalpenawaran":
-        return (
-          <div className="text-right">
-            <Harga harga={cellValue} />
-          </div>
-        );
-      case "progress":
-        return (
-          <div className="text-right">
-            <Harga harga={cellValue} />
-          </div>
-        );
-      case "tanggal":
-        return data.tanggal ? getDateF(new Date(data.tanggal)) : "";
-      case "tanggal_penawaran":
-        return getDateF(new Date(data.tanggal_penawaran));
-      case "totalharga":
-        return data.jumlah * data.harga;
-      case "id_kustom":
-        return data.versi > 0
-          ? fIdProyek(data.id_kustom, new Date(data.tanggal))
-          : "";
-      case "aksi":
-        return (
-          <div className="relative flex items-center gap-2">
-            <LinkOpenNewTab
+          );
+        case "totalpenawaran":
+          return (
+            <div className="text-right">
+              <Harga harga={cellValue} />
+            </div>
+          );
+        case "progress":
+          return (
+            <div className="text-right">
+              <Harga harga={cellValue} />
+            </div>
+          );
+        case "tanggal":
+          return data.tanggal ? getDateF(new Date(data.tanggal)) : "";
+        case "tanggal_penawaran":
+          return getDateF(new Date(data.tanggal_penawaran));
+        case "totalharga":
+          return data.jumlah * data.harga;
+        case "id_kustom":
+          return data.versi > 0
+            ? fIdProyek(data.id_kustom, new Date(data.tanggal))
+            : "";
+        case "aksi":
+          return (
+            <div className="relative flex items-center gap-2">
+              {/* <LinkOpenNewTab
               content="Aktivitas Sales"
               link={`/proyek/aktivitassales?id=${data.id}&versi=${
                 data.versi <= 0 ? "1" : data.versi
               }`}
               icon={<BusinessProgressBarIcon />}
-            />
-            <LinkOpenNewTab
-              content="Detail"
-              link={`/proyek/detail?id=${data.id}&versi=${
-                data.versi <= 0 ? "1" : data.versi
-              }`}
-              icon={<NoteIcon />}
-            />
-            {rolesCheck(["super", "admin", "sales"], peran) ? (
-              <Tooltip content="Pengeluaran & Pembayaran">
-                <Link href={`/proyek/detail/proses?id=${data.id}`}>
-                  <span
-                    // onClick={() => detailButtonPress(data)}
-                    role="link"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      window.open(`/proyek/detail/proses?id=${data.id}`);
-                    }}
-                    className="text-lg text-default-400 cursor-pointer active:opacity-50"
-                  >
-                    <ReportMoneyIcon />
-                  </span>
-                </Link>
-              </Tooltip>
-            ) : (
-              <></>
-            )}
-            {/* {versi > 0 ? (
+            /> */}
+              <LinkOpenNewTab
+                content="Detail"
+                link={`/proyek/detail?id=${data.id}&versi=${
+                  data.versi <= 0 ? "1" : data.versi
+                }`}
+                icon={<NoteIcon />}
+              />
+              {rolesCheck(["super", "admin", "sales"], peran) ? (
+                <Tooltip content="Pengeluaran & Pembayaran">
+                  <Link href={`/proyek/detail/proses?id=${data.id}`}>
+                    <span
+                      // onClick={() => detailButtonPress(data)}
+                      role="link"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        window.open(`/proyek/detail/proses?id=${data.id}`);
+                      }}
+                      className="text-lg text-default-400 cursor-pointer active:opacity-50"
+                    >
+                      <ReportMoneyIcon />
+                    </span>
+                  </Link>
+                </Tooltip>
+              ) : (
+                <></>
+              )}
+              {/* {versi > 0 ? (
               peran == "admin" || peran == "super" ? (
                 <Tooltip content="Pengeluaran Proyek">
                   <Link href={`/proyek/detail/proses?id=${data.id}`}>
@@ -442,15 +407,19 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
             ) : (
               <></>
             )} */}
-            <Tooltip content="Edit">
-              <span
-                onClick={() => editButtonPress(data)}
-                className="text-lg text-default-400 cursor-pointer active:opacity-50"
-              >
-                <EditIcon />
-              </span>
-            </Tooltip>
-            {/* <Tooltip content="Export">
+              {(!data.id_karyawan ||
+                (session && isHighRole) ||
+                sessUser.id_karyawan == data.id_karyawan) && (
+                <Tooltip content="Edit">
+                  <span
+                    onClick={() => editButtonPress(data)}
+                    className="text-lg text-default-400 cursor-pointer active:opacity-50"
+                  >
+                    <EditIcon />
+                  </span>
+                </Tooltip>
+              )}
+              {/* <Tooltip content="Export">
               <span
                 onClick={() => handleExportButtonPress(data)}
                 className="text-lg text-default-400 cursor-pointer active:opacity-50"
@@ -458,24 +427,26 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
                 <FileExportIcon />
               </span>
             </Tooltip> */}
-            {["super", "admin"].includes(peran) ? (
-              <Tooltip color="danger" content="Delete">
-                <span
-                  onClick={() => deleteButtonPress(data.id)}
-                  className="text-lg text-danger cursor-pointer active:opacity-50"
-                >
-                  <DeleteIcon />
-                </span>
-              </Tooltip>
-            ) : (
-              <></>
-            )}
-          </div>
-        );
-      default:
-        return cellValue;
-    }
-  }, []);
+              {["super", "admin"].includes(peran) ? (
+                <Tooltip color="danger" content="Delete">
+                  <span
+                    onClick={() => deleteButtonPress(data.id)}
+                    className="text-lg text-danger cursor-pointer active:opacity-50"
+                  >
+                    <DeleteIcon />
+                  </span>
+                </Tooltip>
+              ) : (
+                <></>
+              )}
+            </div>
+          );
+        default:
+          return cellValue;
+      }
+    },
+    [session]
+  );
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [reportList, setReportList] = useState([]);
   const report = useDisclosure();
@@ -608,7 +579,28 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
   summary.totalProvit = summary.totalPenawaran - summary.totalModal;
   const isCustomerSelected =
     form.id_instansi || !form.instansi ? true : undefined;
-  // console.log(form);
+
+  const Section = ({ title, items }) => (
+    <div className="text-center text-sm">
+      <div className="gap-2 flex flex-col">
+        <div>{title}</div>
+        {items.map((item, i) => (
+          <div
+            key={i}
+            className={`shadow-lg px-2 py-1 rounded-large ${
+              item.color === "primary" || item.color === "danger"
+                ? "text-white"
+                : ""
+            } bg-${item.color}`}
+          >
+            <div>{item.label}</div>
+            <div>{item.value}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+  console.log(form);
   return (
     <div className="flex flex-col gap-2 w-7/8- h-3/4 overscroll-auto">
       {id_instansi ? (
@@ -620,10 +612,21 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
       ) : (
         <></>
       )}
-      <div className="flex flex-row gap-2">
-        <Button color="primary" onPress={tambahButtonPress}>
-          Tambah
-        </Button>
+      <div className="bg-white p-2 rounded-lg flex gap-2 items-center">
+        <div className="font-bold text-lg">Proyek</div>
+        <div className="flex flex-row gap-2">
+          <Button
+            variant="shadow"
+            size="sm"
+            color="primary"
+            onPress={tambahButtonPress}
+          >
+            <span className="text-xl font-bold">
+              <AddIcon />
+            </span>
+            Tambah
+          </Button>
+        </div>
       </div>
       <Table
         isStriped
@@ -635,199 +638,212 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
         topContent={
           <div className="flex gap-2">
             {/* Filter & Report */}
-            <ShowHideComponent
-              stat={stat}
-              setStat={setStat}
-              openContent={"Buka Filter"}
-            >
-              <div className="flex gap-2">
-                {/* Filter */}
-                <div className="flex flex-col gap-2">
-                  <div>Filter</div>
-                  <RadioGroup
-                    orientation="horizontal"
-                    value={sort}
-                    onValueChange={setSort}
-                  >
-                    <Radio value="tanggal_penawaran">Penawaran</Radio>
-                    <Radio value="tanggal">Proyek</Radio>
-                  </RadioGroup>
-                  <div className="flex flex-row gap-2">
-                    <div className="flex">
-                      <RangeDate
-                        current={current}
-                        setCurrent={setCurrent}
-                        setPage={setPage}
-                      />
+            <div className="flex gap-2">
+              <ShowHideComponent
+                stat={stat}
+                setStat={setStat}
+                openContent={"Buka Filter"}
+                btnClassName="mb-2"
+                variant="shadow"
+                btnSize="sm"
+              >
+                <div className="flex gap-2">
+                  {/* Filter */}
+                  <div className="flex flex-col gap-2 shadow-lg border rounded-lg p-3">
+                    <div className="font-bold text-lg">Filter</div>
+                    <RadioGroup
+                      orientation="horizontal"
+                      value={sort}
+                      onValueChange={setSort}
+                    >
+                      <Radio value="tanggal_penawaran">Penawaran</Radio>
+                      <Radio value="tanggal">Proyek</Radio>
+                    </RadioGroup>
+                    <div className="flex flex-row gap-2">
+                      <div className="flex">
+                        <RangeDate
+                          current={current}
+                          setCurrent={setCurrent}
+                          setPage={setPage}
+                        />
+                      </div>
+                    </div>
+                    <Select
+                      className="max-w-xs"
+                      label="Sales"
+                      placeholder="Pilih sales"
+                      selectedKeys={selectkaryawan}
+                      variant="bordered"
+                      onSelectionChange={(v) => {
+                        setSelectKaryawan(v);
+                        setPage(1);
+                      }}
+                    >
+                      {karyawan.data.map((v) => (
+                        <SelectItem key={v.id} textValue={v.nama || "NN"}>
+                          {v.nama || "NN"}
+                        </SelectItem>
+                      ))}
+                    </Select>
+                    <SelectStatusProyek
+                      select={selectStatusProyek}
+                      setSelect={setSelectStatusProyek}
+                    />
+                  </div>
+                  {/* Ringkasan */}
+                  <div>
+                    <div className="text-lg shadow-lg border border-black- p-3 rounded-xl">
+                      <div className="font-bold">Ringkasan</div>
+                      <div className="flex gap-2">
+                        {/* PENAWARAN */}
+                        <Section
+                          title="Penawaran"
+                          items={[
+                            {
+                              label: "Total",
+                              value: nPenawaran,
+                              color: "primary",
+                            },
+                            {
+                              label: "Waiting",
+                              value: summary.nOfferingWaiting,
+                              color: "warning",
+                            },
+                            {
+                              label: "Deal",
+                              value: summary.nOfferingDeal,
+                              color: "success",
+                            },
+                            {
+                              label: "Reject",
+                              value: summary.nOfferingReject,
+                              color: "danger",
+                            },
+                          ]}
+                        />
+                        {/* MODAL */}
+                        {isHighRole && (
+                          <Section
+                            title="Modal"
+                            items={[
+                              {
+                                label: "Total",
+                                value: <Harga harga={summary.totalModal} />,
+                                color: "primary",
+                              },
+                              {
+                                label: "Waiting",
+                                value: (
+                                  <Harga harga={summary.totalModalWaiting} />
+                                ),
+                                color: "warning",
+                              },
+                              {
+                                label: "Deal",
+                                value: <Harga harga={summary.totalModalDeal} />,
+                                color: "success",
+                              },
+                              {
+                                label: "Reject",
+                                value: (
+                                  <Harga harga={summary.totalModalReject} />
+                                ),
+                                color: "danger",
+                              },
+                            ]}
+                          />
+                        )}
+                        {/* NILAI PENAWARAN */}
+                        <Section
+                          title="Nilai Penawaran"
+                          items={[
+                            {
+                              label: "Total",
+                              value: <Harga harga={summary.totalPenawaran} />,
+                              color: "primary",
+                            },
+                            {
+                              label: "Waiting",
+                              value: (
+                                <Harga harga={summary.totalPenawaranWaiting} />
+                              ),
+                              color: "warning",
+                            },
+                            {
+                              label: "Deal",
+                              value: (
+                                <Harga harga={summary.totalPenawaranDeal} />
+                              ),
+                              color: "success",
+                            },
+                            {
+                              label: "Reject",
+                              value: (
+                                <Harga harga={summary.totalPenawaranReject} />
+                              ),
+                              color: "danger",
+                            },
+                          ]}
+                        />
+                        {/* PROVIT */}
+                        {isHighRole && (
+                          <Section
+                            title="Provit"
+                            items={[
+                              {
+                                label: "Total",
+                                value: <Harga harga={summary.totalProvit} />,
+                                color: "primary",
+                              },
+                              {
+                                label: "Waiting",
+                                value: (
+                                  <Harga
+                                    harga={
+                                      summary.totalPenawaranWaiting -
+                                      summary.totalModalWaiting
+                                    }
+                                  />
+                                ),
+                                color: "warning",
+                              },
+                              {
+                                label: "Deal",
+                                value: (
+                                  <Harga
+                                    harga={
+                                      summary.totalPenawaranDeal -
+                                      summary.totalModalDeal
+                                    }
+                                  />
+                                ),
+                                color: "success",
+                              },
+                              {
+                                label: "Reject",
+                                value: (
+                                  <Harga
+                                    harga={
+                                      summary.totalPenawaranReject -
+                                      summary.totalModalReject
+                                    }
+                                  />
+                                ),
+                                color: "danger",
+                              },
+                            ]}
+                          />
+                        )}
+                      </div>
                     </div>
                   </div>
-                  <Select
-                    className="max-w-xs"
-                    label="Sales"
-                    placeholder="Pilih sales"
-                    selectedKeys={selectkaryawan}
-                    variant="bordered"
-                    onSelectionChange={(v) => {
-                      setSelectKaryawan(v);
-                      setPage(1);
-                    }}
-                  >
-                    {karyawan.data.map((v) => (
-                      <SelectItem key={v.id} textValue={v.nama || "NN"}>
-                        {v.nama || "NN"}
-                      </SelectItem>
-                    ))}
-                  </Select>
-                  <SelectStatusProyek
-                    select={selectStatusProyek}
-                    setSelect={setSelectStatusProyek}
-                  />
-                </div>
-                {/* Ringkasan */}
-                <div>
-                  <div>Ringkasan</div>
-                  <div className="flex gap-2">
-                    <div className="text-center text-sm">
-                      <div className="gap-2 flex flex-col">
-                        <div>Penawaran</div>
-                        <div className="px-2 py-1 text-white rounded-large bg-primary">
-                          <div>Total</div>
-                          <div>{nPenawaran}</div>
-                        </div>
-                        <div className="px-2 py-1 rounded-large bg-warning">
-                          <div>Waiting</div>
-                          <div>{summary.nOfferingWaiting}</div>
-                        </div>
-                        <div className="px-2 py-1 rounded-large bg-success">
-                          <div>Deal</div>
-                          <div>{summary.nOfferingDeal}</div>
-                        </div>
-                        <div className="px-2 py-1 text-white rounded-large bg-danger">
-                          <div>Reject</div>
-                          <div>{summary.nOfferingReject}</div>
-                        </div>
-                      </div>
-                    </div>
-                    {isHighRole && (
-                      <div className="text-center text-sm">
-                        <div className="gap-2 flex flex-col">
-                          <div>Modal</div>
-                          <div className="px-2 py-1 text-white rounded-large bg-primary">
-                            <div>Total</div>
-                            <div>
-                              <Harga harga={summary.totalModal} />
-                            </div>
-                          </div>
-                          <div className="px-2 py-1 rounded-large bg-warning">
-                            <div>Waiting</div>
-                            <div>
-                              <Harga harga={summary.totalModalWaiting} />
-                            </div>
-                          </div>
-                          <div className="px-2 py-1 rounded-large bg-success">
-                            <div>Deal</div>
-                            <div>
-                              <Harga harga={summary.totalModalDeal} />
-                            </div>
-                          </div>
-                          <div className="px-2 py-1 text-white rounded-large bg-danger">
-                            <div>Reject</div>
-                            <div>
-                              <Harga harga={summary.totalModalReject} />
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                    <div className="text-center text-sm">
-                      <div className="gap-2 flex flex-col">
-                        <div>Nilai Penawaran</div>
-                        <div className="px-2 py-1 text-white rounded-large bg-primary">
-                          <div>Total</div>
-                          <div>
-                            <Harga
-                              harga={
-                                +summary.totalPenawaranDeal +
-                                summary.totalPenawaranReject +
-                                summary.totalPenawaranWaiting
-                              }
-                            />
-                          </div>
-                        </div>
-                        <div className="px-2 py-1 rounded-large bg-warning">
-                          <div>Waiting</div>
-                          <div>
-                            <Harga harga={+summary.totalPenawaranWaiting} />
-                          </div>
-                        </div>
-                        <div className="px-2 py-1 rounded-large bg-success">
-                          <div>Deal</div>
-                          <div>
-                            <Harga harga={+summary.totalPenawaranDeal} />
-                          </div>
-                        </div>
-                        <div className="px-2 py-1 text-white rounded-large bg-danger">
-                          <div>Reject</div>
-                          <div>
-                            <Harga harga={+summary.totalPenawaranReject} />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    {isHighRole && (
-                      <div className="text-center text-sm">
-                        <div className="gap-2 flex flex-col">
-                          <div>Provit</div>
-                          <div className="px-2 py-1 text-white rounded-large bg-primary">
-                            <div>Total</div>
-                            <div>
-                              <Harga harga={summary.totalProvit} />
-                            </div>
-                          </div>
-                          <div className="px-2 py-1 rounded-large bg-warning">
-                            <div>Waiting</div>
-                            <div>
-                              <Harga
-                                harga={
-                                  summary.totalPenawaranWaiting -
-                                  summary.totalModalWaiting
-                                }
-                              />
-                            </div>
-                          </div>
-                          <div className="px-2 py-1 rounded-large bg-success">
-                            <div>Deal</div>
-                            <div>
-                              <Harga
-                                harga={
-                                  summary.totalPenawaranDeal -
-                                  summary.totalModalDeal
-                                }
-                              />
-                            </div>
-                          </div>
-                          <div className="px-2 py-1 text-white rounded-large bg-danger">
-                            <div>Reject</div>
-                            <div>
-                              <Harga
-                                harga={
-                                  summary.totalPenawaranReject -
-                                  summary.totalModalReject
-                                }
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
+                  {/* Status Proyek */}
+                  <div>
+                    <StatusProyek />
                   </div>
                 </div>
-                {/* Status Proyek */}
-                <div>
-                  <StatusProyek />
-                </div>
-              </div>
-            </ShowHideComponent>
+              </ShowHideComponent>
+            </div>
           </div>
         }
         bottomContent={
@@ -939,7 +955,8 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
                   value={form.nama}
                   onValueChange={(val) => setForm({ ...form, nama: val })}
                 />
-                <Autocomplete
+                <AutocompleteCustomer form={form} setForm={setForm} />
+                {/* <Autocomplete
                   label="Customer"
                   variant="bordered"
                   allowsCustomValue
@@ -977,7 +994,7 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
                       {item.kota}
                     </AutocompleteItem>
                   )}
-                </Autocomplete>
+                </Autocomplete> */}
                 <Select
                   label="S/N"
                   variant="bordered"
@@ -994,7 +1011,7 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
                   onSelectionChange={(v) => {
                     setForm({
                       ...form,
-                      swasta: new Set(v).values().next().value,
+                      swasta: set2key(v),
                     });
                   }}
                 >
@@ -1041,6 +1058,7 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
                   />
                 )}
                 <Select
+                  isDisabled={isHighRole ? undefined : true}
                   label="Sales"
                   variant="bordered"
                   placeholder="Pilih sales!"
@@ -1050,7 +1068,7 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
                     setForm({
                       ...form,
                       selectkaryawan: val,
-                      id_karyawan: new Set(val).values().next().value,
+                      id_karyawan: set2key(val),
                     });
                   }}
                 >
@@ -1083,6 +1101,21 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
                         })
                       }
                     />
+                    <Button
+                      onPress={() => {
+                        const now = new Date();
+                        setForm({
+                          ...form,
+                          startdate: now,
+                          tanggal_penawaran: getDate(now),
+                        });
+                      }}
+                      className="ml-2"
+                      size="sm"
+                      color="primary"
+                    >
+                      Sekarang
+                    </Button>
                   </div>
                 )}
                 <Textarea

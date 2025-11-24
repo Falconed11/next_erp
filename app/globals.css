@@ -13,15 +13,20 @@
 
   html,
   body {
-    height: 100%;
-    min-height: 100vh; /* 👈 ensures background fills the screen */
+    height: auto;
+    min-height: 100%;
     margin: 0;
     padding: 0;
     font-family: "Arial", sans-serif; /* merged from your second @layer */
   }
 
   body {
-    background: rgb(var(--background-start-rgb));
+    /* background: rgb(var(--background-start-rgb)); */
+    background: linear-gradient(
+      to bottom right,
+      rgb(var(--background-start-rgb)),
+      rgb(var(--background-end-rgb))
+    );
     /* color: rgb(var(--foreground-rgb)); */
   }
 

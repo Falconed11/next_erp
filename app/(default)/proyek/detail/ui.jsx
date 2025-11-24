@@ -950,8 +950,9 @@ export default function App({ id, versi }) {
   return (
     <div className="flex gap-2 flex-col">
       <div className="flex gap-2">
-        {/* detail  */}
+        {/* header  */}
         <div className="flex gap-2 flex-col">
+          {/* bagikan */}
           <div className="p-2 bg-white flex flex-col rounded-lg gap-2">
             Bagikan:
             <div className="flex gap-2">
@@ -979,6 +980,7 @@ export default function App({ id, versi }) {
               </Button>
             </div>
           </div>
+          {/* detail */}
           <div className="bg-white rounded-lg p-3">
             <div>Detail</div>
             {versiKeranjangProyek.data.length > 1 ? (

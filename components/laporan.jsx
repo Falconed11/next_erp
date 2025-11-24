@@ -22,9 +22,9 @@ import {
 import { getDate, getDateF, getMonthYear } from "@/app/utils/date";
 import Harga from "@/components/harga";
 import { RangeDate } from "@/components/input";
-
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { capitalizeEachWord } from "@/app/utils/tools";
 
 const OperasionalKantor = ({ startDate, endDate }) => {
   const kategori = useClientFetchNoInterval("kategorioperasionalkantor");
@@ -48,9 +48,13 @@ const OperasionalKantor = ({ startDate, endDate }) => {
         <RangeDate current={current} setCurrent={setCurrent} />
       </div>
       <div className="flex flex-row gap-2">
-        <div>
+        <div className="whitespace-nowrap">
           {kategori.data.map((v) => {
-            return <div key={v.id}>{v.nama}</div>;
+            return (
+              <div key={v.id} className="">
+                {capitalizeEachWord(v.nama)}
+              </div>
+            );
           })}
           <div>Total Operasional</div>
         </div>

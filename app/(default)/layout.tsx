@@ -4,6 +4,18 @@ import { useSession } from "next-auth/react";
 import Nav from "@/components/nav";
 import User from "@/components/user";
 import { rolesCheck } from "@/app/utils/tools";
+import { RiDashboard2Fill, RiDashboard2Line } from "react-icons/ri";
+import { AiOutlineProduct } from "react-icons/ai";
+import { BusinessProgressBarIcon } from "@/components/icon";
+import { VscGithubProject } from "react-icons/vsc";
+import { BsBank, BsHouseGear } from "react-icons/bs";
+import { LuBookUser } from "react-icons/lu";
+import { MdOutlineFactory } from "react-icons/md";
+import { HiOutlineOfficeBuilding, HiOutlineUserGroup } from "react-icons/hi";
+import { TbDeviceDesktopAnalytics } from "react-icons/tb";
+import { FaRegUser } from "react-icons/fa";
+import { LiaToolsSolid } from "react-icons/lia";
+import { GoSignOut } from "react-icons/go";
 
 export default function RootLayout({
   children,
@@ -53,11 +65,16 @@ export default function RootLayout({
   //     }
   //   );
   const links = [
-    { href: "/", name: "Dashboard" },
-    { href: "/aktivitas", name: "Aktivitas" },
+    { href: "/", name: "Dashboard", icon: <RiDashboard2Line /> },
+    {
+      href: "/aktivitas",
+      name: "Aktivitas",
+      icon: <BusinessProgressBarIcon />,
+    },
     {
       href: "/produk",
       name: "Produk",
+      icon: <AiOutlineProduct />,
       dropdown: [
         {
           key: "data",
@@ -80,21 +97,31 @@ export default function RootLayout({
   // if (rolesCheck(["head-sales", "sales"], user?.peran))
   //   links.push({ href: "/proyek", name: "Proyek", dropdown: proyek });
   // if (rolesCheck(["admin", "super"], user?.peran))
-  links.push({ href: "/proyek", name: "Proyek", dropdown: proyek });
+  links.push({
+    href: "/proyek",
+    name: "Proyek",
+    dropdown: proyek,
+    icon: <VscGithubProject />,
+  });
   if (user?.peran == "admin" || user?.peran == "super")
     links.push(
       // { href: "/nota", name: "Nota" },
       // { href: "/kwitansi", name: "Kwitansi" },
-      { href: "/operasionalkantor", name: "Operasional Kantor" }
+      {
+        href: "/operasionalkantor",
+        name: "Operasional Kantor",
+        icon: <BsHouseGear />,
+      }
     );
-  links.push({ href: "/customer", name: "Customer" });
+  links.push({ href: "/customer", name: "Customer", icon: <LuBookUser /> });
   if (rolesCheck(["admin", "super"], user?.peran))
     links.push(
-      { href: "/vendor", name: "Vendor" },
-      { href: "/bank", name: "Bank" },
+      { href: "/vendor", name: "Vendor", icon: <MdOutlineFactory /> },
+      { href: "/bank", name: "Bank", icon: <BsBank /> },
       {
         href: "/karyawan",
         name: "Karyawan",
+        icon: <HiOutlineUserGroup />,
         dropdown: [
           {
             key: "data",
@@ -111,6 +138,7 @@ export default function RootLayout({
       {
         href: "/laporan",
         name: "Laporan",
+        icon: <TbDeviceDesktopAnalytics />,
         dropdown: [
           // {
           //     key: "labarugi",
@@ -139,12 +167,21 @@ export default function RootLayout({
           },
         ],
       },
-      { href: "/perusahaan", name: "Perusahaan" }
+      {
+        href: "/perusahaan",
+        name: "Perusahaan",
+        icon: <HiOutlineOfficeBuilding />,
+      }
     );
   if (user?.peran == "super" || true)
-    links.push({ href: "/user", name: "User" });
-  if (user?.peran == "super") links.push({ href: "/alat", name: "Alat" });
-  links.push({ href: "/api/auth/signout", name: "Signout" });
+    links.push({ href: "/user", name: "User", icon: <FaRegUser /> });
+  if (user?.peran == "super")
+    links.push({ href: "/alat", name: "Alat", icon: <LiaToolsSolid /> });
+  links.push({
+    href: "/api/auth/signout",
+    name: "Signout",
+    icon: <GoSignOut />,
+  });
   return (
     <section className="flex flex-col gap-3">
       <div className=""></div>

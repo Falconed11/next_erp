@@ -76,6 +76,7 @@ const AutocompleteWithCustomValue = ({
     setForm((prev) => ({
       ...prev,
       ...getFormUpdateOnSelectionChange(item),
+      nama: prev.nama,
       [field]: item?.[labelKey] ?? prev[field] ?? "",
       [id]: key ?? prev[id],
     }));
@@ -151,7 +152,7 @@ const AutocompleteKategoriProduk = (props) => {
 };
 const AutocompleteCustomer = (props) => {
   const { component } = useAutocompleteField({
-    title: "Instansi",
+    title: "Customer",
     endpoint: "customer",
     field: "instansi",
     id: "id_instansi",
