@@ -27,6 +27,7 @@ export default function Rekapitulasi({
   idProyek,
   versi,
   selectedProyek,
+  isAuthorized,
 }) {
   const [formPeralatan, setFormPeralatan] = useState({});
   const [formInstalasi, setFormInstalasi] = useState({});
@@ -117,9 +118,13 @@ export default function Rekapitulasi({
           />
         </div>
         <RecapBody title="Total" Children={<RecapTable tableData={total} />} />
-        {selectedProyek.versi == 0 && (
+        {isAuthorized && (
           <div className="text-right">
-            <Button color="primary" onPress={editButtonPress}>
+            <Button
+              isDisabled={!isAuthorized}
+              color="primary"
+              onPress={editButtonPress}
+            >
               Edit
             </Button>
           </div>

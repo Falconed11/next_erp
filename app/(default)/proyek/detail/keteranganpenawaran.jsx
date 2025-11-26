@@ -17,15 +17,20 @@ import {
   ModalFooter,
   useDisclosure,
 } from "@heroui/react";
+import { API_PATH } from "@/app/utils/apiconfig";
 
-export default function KeteranganPenawaran({ keteranganPenawaran, idProyek }) {
+export default function KeteranganPenawaran({
+  keteranganPenawaran,
+  idProyek,
+  isAuthorized,
+}) {
   const [form, setForm] = useState();
   const data = keteranganPenawaran.data;
 
   const simpanButtonPress = async (data, onClose) => {
     // if (data.jumlah <= 0) return alert("Jumlah belum diisi");
     if (!data.keterangan) return alert("Keterangan belum diisi.");
-    const res = await fetch(`${api_path}keteranganpenawaran`, {
+    const res = await fetch(`${API_PATH}keteranganpenawaran`, {
       method: data.mode == "Tambah" ? "POST" : "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -49,10 +54,11 @@ export default function KeteranganPenawaran({ keteranganPenawaran, idProyek }) {
         const isChecked = !!data.id_proyek;
         return (
           <Checkbox
+            isDisabled={!isAuthorized}
             isSelected={isChecked}
             onValueChange={async (v) => {
               if (v === isChecked) return;
-              const res = await fetch(`${api_path}proyek_keteranganpenawaran`, {
+              const res = await fetch(`${API_PATH}proyek_keteranganpenawaran`, {
                 method: v ? "POST" : "DELETE",
                 headers: {
                   "Content-Type": "application/json",
@@ -96,7 +102,7 @@ export default function KeteranganPenawaran({ keteranganPenawaran, idProyek }) {
                 onClick={async () => {
                   if (confirm("Hapus keterangan?")) {
                     console.log(data.id);
-                    const res = await fetch(`${api_path}keteranganpenawaran`, {
+                    const res = await fetch(`${API_PATH}keteranganpenawaran`, {
                       method: "DELETE",
                       headers: {
                         "Content-Type": "application/json",
@@ -146,17 +152,19 @@ export default function KeteranganPenawaran({ keteranganPenawaran, idProyek }) {
         isCompact
         className=""
         topContent={
-          <div>
-            <Button
-              color="primary"
-              onPress={() => {
-                setForm({ ...form, mode: "Tambah" });
-                onOpen();
-              }}
-            >
-              Tambah
-            </Button>
-          </div>
+          isAuthorized && (
+            <div>
+              <Button
+                color="primary"
+                onPress={() => {
+                  setForm({ ...form, mode: "Tambah" });
+                  onOpen();
+                }}
+              >
+                Tambah
+              </Button>
+            </div>
+          )
         }
         // bottomContent={}
         aria-label="Example table with custom cells"

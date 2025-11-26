@@ -25,7 +25,7 @@ import {
 
 const api_path = getApiPath();
 
-export default function SubProyek({ id, selectedProyek }) {
+export default function SubProyek({ id, selectedProyek, isAuthorized }) {
   const [form, setForm] = useState({});
   const modal = useDisclosure();
 
@@ -95,7 +95,7 @@ export default function SubProyek({ id, selectedProyek }) {
   return (
     <div className="bg-white rounded-lg flex flex-col gap-2 p-3">
       <div>Sub Proyek</div>
-      {selectedProyek.versi == 0 ? (
+      {isAuthorized && (
         <div className="flex gap-2">
           <Input
             type="text"
@@ -126,15 +126,13 @@ export default function SubProyek({ id, selectedProyek }) {
             </Button>
           </div>
         </div>
-      ) : (
-        <></>
       )}
       <div className="flex gap-2">
         {subProyek.data.map((data, i) => (
           <Chip
             key={i}
             endContent={
-              selectedProyek.versi == 0 ? (
+              isAuthorized && (
                 <div className="flex gap-2">
                   <Tooltip content="Edit">
                     <span
@@ -153,8 +151,6 @@ export default function SubProyek({ id, selectedProyek }) {
                     </span>
                   </Tooltip>
                 </div>
-              ) : (
-                <div></div>
               )
             }
           >

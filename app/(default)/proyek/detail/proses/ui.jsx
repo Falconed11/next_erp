@@ -327,8 +327,12 @@ export default function App({ id }) {
     onClose();
     // return alert(json.message);
   };
-
+  const selectedProyek = proyek?.data?.[0];
   const isHighRole = highRoleCheck(sessUser?.rank);
+  const idKaryawan = selectedProyek?.id_karyawan;
+  const isAuthorized =
+    (isHighRole || !idKaryawan || idKaryawan == sessUser?.id_karyawan) &&
+    selectedProyek?.id_statusproyek == 1;
   const renderCell = {
     pengeluaranproyek: React.useCallback(
       (data, columnKey) => {
@@ -437,10 +441,14 @@ export default function App({ id }) {
   };
   const col = {
     pengeluaranproyek: [
-      {
-        key: "aksi",
-        label: "Aksi",
-      },
+      ...(isAuthorized
+        ? [
+            {
+              key: "aksi",
+              label: "Aksi",
+            },
+          ]
+        : []),
       {
         key: "tanggal",
         label: "tanggal",
@@ -487,10 +495,14 @@ export default function App({ id }) {
       },
     ],
     pembayaranproyek: [
-      {
-        key: "aksi",
-        label: "Aksi",
-      },
+      ...(isAuthorized
+        ? [
+            {
+              key: "aksi",
+              label: "Aksi",
+            },
+          ]
+        : []),
       {
         key: "tanggal",
         label: "tanggal",
@@ -561,7 +573,6 @@ export default function App({ id }) {
     session
   );
   if (queryStates) return queryStates;
-  const selectedProyek = proyek.data[0];
   if (!selectedProyek) return <>Proyek tidak ditemukan</>;
   const { rekapitulasiPeralatan, rekapitulasiInstalasi, rekapitulasiTotal } =
     countRecapitulation(
@@ -598,6 +609,10 @@ export default function App({ id }) {
             {
               key: "Nama Proyek",
               comp: selectedProyek.nama,
+            },
+            {
+              key: "Sales",
+              comp: selectedProyek.namakaryawan,
             },
             {
               key: "Biaya Produksi",
@@ -664,9 +679,9 @@ export default function App({ id }) {
           topContent={
             <>
               <div>Pembayaran Proyek</div>
-              <div className="flex-col gap-2">
-                <div className="grid grid-cols-6 gap-2 mt-3">
-                  {
+              {isAuthorized && (
+                <div className="flex-col gap-2">
+                  <div className="grid grid-cols-6 gap-2 mt-3">
                     <PembayaranProyek
                       isCreate
                       form={formPembayaran}
@@ -675,20 +690,20 @@ export default function App({ id }) {
                       rekap={rekapitulasiTotal}
                       totalPenagihan={totalPenagihan}
                     />
-                  }
-                  <div>
-                    <Button
-                      onPress={() => {
-                        tambahButtonPressPembayaran(formPembayaran);
-                      }}
-                      color="primary"
-                      className="ml-2"
-                    >
-                      Tambah
-                    </Button>
+                    <div>
+                      <Button
+                        onPress={() => {
+                          tambahButtonPressPembayaran(formPembayaran);
+                        }}
+                        color="primary"
+                        className="ml-2"
+                      >
+                        Tambah
+                      </Button>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
             </>
           }
         >
@@ -730,53 +745,54 @@ export default function App({ id }) {
         topContent={
           <>
             <div>Pengeluaran Proyek</div>
-            <div className="flex-col gap-2">
-              <div className="flex flex-row gap-2">
-                <TambahProduk
-                  disableCustomValue
-                  form={form}
-                  setForm={setForm}
-                  disableHargaKustom
-                  refHargaModal
-                />
-              </div>
-              <div className="flex flex-row gap-2 mt-3">
-                <div className="bg-gray-100 p-3 rounded-lg z-50">
-                  <div>Tanggal</div>
-                  <DatePicker
-                    placeholderText="Pilih tanggal"
-                    dateFormat="dd/MM/yyyy"
-                    selected={form.startdate}
-                    onChange={(v) => setForm({ ...form, startdate: v })}
+            {isAuthorized && (
+              <div className="flex-col gap-2">
+                <div className="flex flex-row gap-2">
+                  <TambahProduk
+                    disableCustomValue
+                    form={form}
+                    setForm={setForm}
+                    disableHargaKustom
+                    refHargaModal
                   />
                 </div>
-                <Select
-                  label="Karyawan"
-                  placeholder="Pilih karyawan!"
-                  className="w-2/12"
-                  selectedKeys={[selectKaryawan]}
-                  onChange={(e) => setSelectKaryawan(e.target.value)}
-                >
-                  {karyawan.data.map((item) => (
-                    <SelectItem key={item.id} value={item.id}>
-                      {item.nama}
-                    </SelectItem>
-                  ))}
-                </Select>
-                <Input
-                  type="text"
-                  value={form.keteranganpenawaran}
-                  label="Keterangan"
-                  placeholder="Masukkan keterangan!"
-                  className="w-2/12 pl-2"
-                  onValueChange={(v) =>
-                    setForm({
-                      ...form,
-                      keteranganpenawaran: v,
-                    })
-                  }
-                />
-                {/* <Input
+                <div className="flex flex-row gap-2 mt-3">
+                  <div className="bg-gray-100 p-3 rounded-lg z-50">
+                    <div>Tanggal</div>
+                    <DatePicker
+                      placeholderText="Pilih tanggal"
+                      dateFormat="dd/MM/yyyy"
+                      selected={form.startdate}
+                      onChange={(v) => setForm({ ...form, startdate: v })}
+                    />
+                  </div>
+                  <Select
+                    label="Karyawan"
+                    placeholder="Pilih karyawan!"
+                    className="w-2/12"
+                    selectedKeys={[selectKaryawan]}
+                    onChange={(e) => setSelectKaryawan(e.target.value)}
+                  >
+                    {karyawan.data.map((item) => (
+                      <SelectItem key={item.id} value={item.id}>
+                        {item.nama}
+                      </SelectItem>
+                    ))}
+                  </Select>
+                  <Input
+                    type="text"
+                    value={form.keteranganpenawaran}
+                    label="Keterangan"
+                    placeholder="Masukkan keterangan!"
+                    className="w-2/12 pl-2"
+                    onValueChange={(v) =>
+                      setForm({
+                        ...form,
+                        keteranganpenawaran: v,
+                      })
+                    }
+                  />
+                  {/* <Input
                   type="text"
                   value={form.status}
                   label="Status"
@@ -789,49 +805,49 @@ export default function App({ id }) {
                     })
                   }
                 /> */}
-                {!form.isSelected ? (
-                  <Select
-                    label="Status"
-                    placeholder="Pilih status!"
-                    className="w-2/12"
-                    selectedKeys={form.selectStatus}
-                    onSelectionChange={(v) =>
-                      setForm({
-                        ...form,
-                        selectStatus: v,
-                        status: v.values().next().value,
-                      })
-                    }
+                  {!form.isSelected ? (
+                    <Select
+                      label="Status"
+                      placeholder="Pilih status!"
+                      className="w-2/12"
+                      selectedKeys={form.selectStatus}
+                      onSelectionChange={(v) =>
+                        setForm({
+                          ...form,
+                          selectStatus: v,
+                          status: v.values().next().value,
+                        })
+                      }
+                    >
+                      {[
+                        { id: 0, nama: "Belum Lunas" },
+                        { id: 1, nama: "Lunas" },
+                      ].map((item) => (
+                        <SelectItem key={item.id} value={item.id}>
+                          {item.nama}
+                        </SelectItem>
+                      ))}
+                    </Select>
+                  ) : (
+                    <></>
+                  )}
+                  <Button
+                    isDisabled={!form.id_produk}
+                    onPress={() => {
+                      tambahButtonPress({
+                        selectProduk,
+                        selectKaryawan,
+                        form,
+                      });
+                    }}
+                    color="primary"
+                    className="ml-2"
                   >
-                    {[
-                      { id: 0, nama: "Belum Lunas" },
-                      { id: 1, nama: "Lunas" },
-                    ].map((item) => (
-                      <SelectItem key={item.id} value={item.id}>
-                        {item.nama}
-                      </SelectItem>
-                    ))}
-                  </Select>
-                ) : (
-                  <></>
-                )}
-
-                <Button
-                  isDisabled={!form.id_produk}
-                  onPress={() => {
-                    tambahButtonPress({
-                      selectProduk,
-                      selectKaryawan,
-                      form,
-                    });
-                  }}
-                  color="primary"
-                  className="ml-2"
-                >
-                  Tambah
-                </Button>
+                    Tambah
+                  </Button>
+                </div>
               </div>
-            </div>
+            )}
           </>
         }
       >

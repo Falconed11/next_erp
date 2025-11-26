@@ -37,7 +37,7 @@ import { invoice } from "@/app/utils/formatid";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
-export default function SuratJalan({ id_proyek, versi }) {
+export default function SuratJalan({ id_proyek, versi, isAuthorized }) {
   const componentRef = useRef(null);
   const handlePrintInvoice = useReactToPrint({
     contentRef: componentRef,
@@ -142,70 +142,75 @@ export default function SuratJalan({ id_proyek, versi }) {
                 Surat Jalan
               </ModalHeader>
               <ModalBody>
-                <div className="flex gap-2">
-                  <Textarea
-                    type="text"
-                    variant="bordered"
-                    className=""
-                    label="Alamat"
-                    placeholder="Masukkan alamat!"
-                    value={form.alamatsuratjalan || ""}
-                    onValueChange={(v) =>
-                      setForm({ ...form, alamatsuratjalan: v })
-                    }
-                  />
-                  <div className="bg-gray-100 p-3 rounded-lg">
-                    <div>Tanggal</div>
-                    <DatePicker
-                      className="bg-white"
-                      placeholderText="Pilih tanggal"
-                      dateFormat="dd/MM/yyyy"
-                      selected={
-                        form.tanggalsuratjalan
-                          ? new Date(form.tanggalsuratjalan)
-                          : null
-                      }
-                      onChange={(v) =>
-                        setForm({ ...form, tanggalsuratjalan: getDate(v) })
-                      }
-                    />
-                  </div>
-                </div>
-                <div className="flex gap-2 justify-end">
-                  <div>
-                    <Button
-                      color="primary"
-                      onPress={() => {
-                        setForm({
-                          alamatsuratjalan: selectedProyek.alamatsuratjalan,
-                          tanggalsuratjalan: selectedProyek.tanggalsuratjalan,
-                        });
-                      }}
-                    >
-                      Refresh
-                    </Button>
-                  </div>
-                  <div>
-                    <Button
-                      color="primary"
-                      onPress={async () => {
-                        const res = await fetch(`${apiPath}proyek`, {
-                          method: "PUT",
-                          headers: {
-                            "Content-Type": "application/json",
-                            // 'Content-Type': 'application/x-www-form-urlencoded',
-                          },
-                          body: JSON.stringify({ ...form, id: id_proyek }),
-                        });
-                        const json = await res.json();
-                        if (res.status == 400) return alert(json.message);
-                        proyek.mutate();
-                      }}
-                    >
-                      Update
-                    </Button>
-                  </div>
-                </div>
+                {isAuthorized && (
+                  <>
+                    <div className="flex gap-2">
+                      <Textarea
+                        type="text"
+                        variant="bordered"
+                        className=""
+                        label="Alamat"
+                        placeholder="Masukkan alamat!"
+                        value={form.alamatsuratjalan || ""}
+                        onValueChange={(v) =>
+                          setForm({ ...form, alamatsuratjalan: v })
+                        }
+                      />
+                      <div className="bg-gray-100 p-3 rounded-lg">
+                        <div>Tanggal</div>
+                        <DatePicker
+                          className="bg-white"
+                          placeholderText="Pilih tanggal"
+                          dateFormat="dd/MM/yyyy"
+                          selected={
+                            form.tanggalsuratjalan
+                              ? new Date(form.tanggalsuratjalan)
+                              : null
+                          }
+                          onChange={(v) =>
+                            setForm({ ...form, tanggalsuratjalan: getDate(v) })
+                          }
+                        />
+                      </div>
+                    </div>
+                    <div className="flex gap-2 justify-end">
+                      <div>
+                        <Button
+                          color="primary"
+                          onPress={() => {
+                            setForm({
+                              alamatsuratjalan: selectedProyek.alamatsuratjalan,
+                              tanggalsuratjalan:
+                                selectedProyek.tanggalsuratjalan,
+                            });
+                          }}
+                        >
+                          Refresh
+                        </Button>
+                      </div>
+                      <div>
+                        <Button
+                          color="primary"
+                          onPress={async () => {
+                            const res = await fetch(`${apiPath}proyek`, {
+                              method: "PUT",
+                              headers: {
+                                "Content-Type": "application/json",
+                                // 'Content-Type': 'application/x-www-form-urlencoded',
+                              },
+                              body: JSON.stringify({ ...form, id: id_proyek }),
+                            });
+                            const json = await res.json();
+                            if (res.status == 400) return alert(json.message);
+                            proyek.mutate();
+                          }}
+                        >
+                          Update
+                        </Button>
+                      </div>
+                    </div>
+                  </>
+                )}
                 <div ref={componentRef} className="bg-white text-xs">
                   <PrintWithHeader
                     header={

@@ -102,8 +102,7 @@ const AutocompleteWithCustomValue = ({
       });
   };
   // ✅ Fix: detect null/undefined only, not falsy values like 0
-  const isInvalid =
-    form[field] && (form[id] === null || form[id] === undefined);
+  const isInvalid = form[field] && form[id] == null;
   return (
     <Autocomplete
       popoverProps={{

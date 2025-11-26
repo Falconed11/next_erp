@@ -76,6 +76,7 @@ import {
   getNextDomain,
   highRoleCheck,
   key2set,
+  renderQueryStates,
   set2key,
   updateSwitch,
 } from "@/app/utils/tools";
@@ -94,6 +95,7 @@ import {
 import { NEXT_DOMAIN } from "@/app/utils/const";
 import { TemplateImportV2 } from "@/components/input";
 import { FormProduct } from "@/components/produk";
+import { BadgeStatusProyek } from "@/components/badgestatusproyek";
 
 const api_path = getApiPath();
 
@@ -173,6 +175,7 @@ export default function App({ id, versi }) {
         ...form,
         id_proyek: id,
         versi,
+        stok: 0, //
       }),
     });
     const json = await res.json();
@@ -381,164 +384,183 @@ export default function App({ id, versi }) {
     // return alert(json.message);
     proyek.mutate();
   };
+  const selectedProyek = proyek?.data?.[0];
+  const isHighRole = highRoleCheck(sessUser?.rank);
+  const idKaryawan = selectedProyek?.id_karyawan;
+  const isAuthorized =
+    (isHighRole || !idKaryawan || idKaryawan == sessUser?.id_karyawan) &&
+    selectedProyek?.id_statusproyek == 1;
   const renderCell = {
-    keranjangproyek: React.useCallback((data, columnKey) => {
-      const cellValue = data[columnKey];
-      const isChecked = (v) => {
-        return !!v;
-      };
-      const showMerek = isChecked(data.showmerek);
-      const showTipe = isChecked(data.showtipe);
-      switch (columnKey) {
-        case "nama":
-          return `${data.nama}${data.keterangan ? `(${data.keterangan})` : ""}`;
-          data.keterangan ? `${data.nama} (${data.keterangan})` : data.nama;
-        case "stok":
-          return (
-            <div
-              className={`text-right px-1 ${
-                data.jumlah > data.stok ? "text-white bg-danger rounded-sm" : ""
-              }`}
-            >
-              {cellValue}
-            </div>
-          );
-        case "jumlah":
-          return <div className="text-right">{cellValue}</div>;
-        case "temphargamodal":
-          return (
-            <div className="text-right">
-              <Harga harga={cellValue} />
-            </div>
-          );
-        case "refhargajualmargin":
-          return (
-            <div className="text-right">
-              <Harga harga={data.margin} />
-            </div>
-          );
-        case "harga":
-          return (
-            <div className="text-right">
-              <Harga harga={data.harga} />
-            </div>
-          );
-        case "hargakustom":
-          return data.hargakustom != null ? (
-            <Harga harga={data.hargakustom} />
-          ) : (
-            ""
-          );
-        case "totalharga-modal":
-          return (
-            <div className="text-right">
-              <Harga harga={data.jumlah * data.temphargamodal} />
-            </div>
-          );
-        case "totalharga-jual":
-          return (
-            <div className="text-right">
-              <Harga harga={data.jumlah * data.harga} />
-            </div>
-          );
-        case "profit":
-          return (
-            <div className="text-right">
-              <Harga harga={data.harga - data.temphargamodal} />
-            </div>
-          );
-        case "provitmarginpersen":
-          return (
-            Math.round(
-              ((data.harga - data.temphargamodal) / data.harga) * 100 * 100
-            ) / 100
-          );
-        case "persenprovit":
-          return (
-            Math.round(
-              countPercentProvit(data.temphargamodal, data.harga) * 100
-            ) / 100
-          );
-        case "totalprofit":
-          return (
-            <div className="text-right">
-              <Harga
-                harga={
-                  data.jumlah * data.harga - data.jumlah * data.temphargamodal
-                }
-              />
-            </div>
-          );
-        case "showmerek":
-          return (
-            <Switch
-              size="sm"
-              isSelected={showMerek}
-              onValueChange={async (v) => {
-                await updateSwitch(
-                  v,
-                  showMerek,
-                  "keranjangproyek",
-                  "PUT",
-                  {
-                    id: data.id_keranjangproyek,
-                    showmerek: v ? 1 : 0,
-                  },
-                  [keranjangProyek, keranjangProyekInstalasi]
-                );
-              }}
-            ></Switch>
-          );
-        case "showtipe":
-          return (
-            <Switch
-              size="sm"
-              isSelected={showTipe}
-              onValueChange={async (v) => {
-                await updateSwitch(
-                  v,
-                  showTipe,
-                  "keranjangproyek",
-                  "PUT",
-                  {
-                    id: data.id_keranjangproyek,
-                    showtipe: v ? 1 : 0,
-                  },
-                  [keranjangProyek, keranjangProyekInstalasi]
-                );
-              }}
-            ></Switch>
-          );
-        case "aksi":
-          return (
-            <div className="relative flex items-center gap-2">
-              <Tooltip content="Edit">
-                <span
-                  onClick={() => editButtonPress(data)}
-                  className="text-lg text-default-400 cursor-pointer active:opacity-50"
-                >
-                  <EditIcon />
-                </span>
-              </Tooltip>
-              <LinkOpenNewTab
-                content={"Detail Produk"}
-                icon={<EyeIcon />}
-                link={`/produk?id=${data.id_produk || null}`}
-              />
-              <Tooltip color="danger" content="Delete">
-                <span
-                  onClick={() => deleteButtonPress(data.id_keranjangproyek)}
-                  className="text-lg text-danger cursor-pointer active:opacity-50"
-                >
-                  <DeleteIcon />
-                </span>
-              </Tooltip>
-            </div>
-          );
-        default:
-          return cellValue;
-      }
-    }, []),
+    keranjangproyek: React.useCallback(
+      (data, columnKey) => {
+        const cellValue = data[columnKey];
+        const isChecked = (v) => {
+          return !!v;
+        };
+        const showMerek = isChecked(data.showmerek);
+        const showTipe = isChecked(data.showtipe);
+        switch (columnKey) {
+          case "nama":
+            return `${data.nama}${
+              data.keterangan ? `(${data.keterangan})` : ""
+            }`;
+            data.keterangan ? `${data.nama} (${data.keterangan})` : data.nama;
+          case "stok":
+            return (
+              <div
+                className={`text-right px-1 ${
+                  data.jumlah > data.stok
+                    ? "text-white bg-danger rounded-sm"
+                    : ""
+                }`}
+              >
+                {cellValue}
+              </div>
+            );
+          case "jumlah":
+            return <div className="text-right">{cellValue}</div>;
+          case "temphargamodal":
+            return (
+              <div className="text-right">
+                <Harga harga={cellValue} />
+              </div>
+            );
+          case "refhargajualmargin":
+            return (
+              <div className="text-right">
+                <Harga harga={data.margin} />
+              </div>
+            );
+          case "harga":
+            return (
+              <div className="text-right">
+                <Harga harga={data.harga} />
+              </div>
+            );
+          case "hargakustom":
+            return data.hargakustom != null ? (
+              <Harga harga={data.hargakustom} />
+            ) : (
+              ""
+            );
+          case "totalharga-modal":
+            return (
+              <div className="text-right">
+                <Harga harga={data.jumlah * data.temphargamodal} />
+              </div>
+            );
+          case "totalharga-jual":
+            return (
+              <div className="text-right">
+                <Harga harga={data.jumlah * data.harga} />
+              </div>
+            );
+          case "profit":
+            return (
+              <div className="text-right">
+                <Harga harga={data.harga - data.temphargamodal} />
+              </div>
+            );
+          case "provitmarginpersen":
+            return (
+              Math.round(
+                ((data.harga - data.temphargamodal) / data.harga) * 100 * 100
+              ) / 100
+            );
+          case "persenprovit":
+            return (
+              Math.round(
+                countPercentProvit(data.temphargamodal, data.harga) * 100
+              ) / 100
+            );
+          case "totalprofit":
+            return (
+              <div className="text-right">
+                <Harga
+                  harga={
+                    data.jumlah * data.harga - data.jumlah * data.temphargamodal
+                  }
+                />
+              </div>
+            );
+          case "showmerek":
+            return (
+              <Switch
+                isDisabled={!isAuthorized}
+                size="sm"
+                isSelected={showMerek}
+                onValueChange={async (v) => {
+                  await updateSwitch(
+                    v,
+                    showMerek,
+                    "keranjangproyek",
+                    "PUT",
+                    {
+                      id: data.id_keranjangproyek,
+                      showmerek: v ? 1 : 0,
+                    },
+                    [keranjangProyek, keranjangProyekInstalasi]
+                  );
+                }}
+              ></Switch>
+            );
+          case "showtipe":
+            return (
+              <Switch
+                isDisabled={!isAuthorized}
+                size="sm"
+                isSelected={showTipe}
+                onValueChange={async (v) => {
+                  await updateSwitch(
+                    v,
+                    showTipe,
+                    "keranjangproyek",
+                    "PUT",
+                    {
+                      id: data.id_keranjangproyek,
+                      showtipe: v ? 1 : 0,
+                    },
+                    [keranjangProyek, keranjangProyekInstalasi]
+                  );
+                }}
+              ></Switch>
+            );
+          case "aksi":
+            return (
+              <div className="relative flex items-center gap-2">
+                {isAuthorized && (
+                  <Tooltip content="Edit">
+                    <span
+                      onClick={() => editButtonPress(data)}
+                      className="text-lg text-default-400 cursor-pointer active:opacity-50"
+                    >
+                      <EditIcon />
+                    </span>
+                  </Tooltip>
+                )}
+                <LinkOpenNewTab
+                  content={"Detail Produk"}
+                  icon={<EyeIcon />}
+                  link={`/produk?id=${data.id_produk || null}`}
+                />
+                {isAuthorized && (
+                  <Tooltip color="danger" content="Delete">
+                    <span
+                      onClick={() => deleteButtonPress(data.id_keranjangproyek)}
+                      className="text-lg text-danger cursor-pointer active:opacity-50"
+                    >
+                      <DeleteIcon />
+                    </span>
+                  </Tooltip>
+                )}
+              </div>
+            );
+          default:
+            return cellValue;
+        }
+      },
+      [session, proyek]
+    ),
     penawaran: React.useCallback((data, columnKey) => {
       const cellValue = data[columnKey];
       let harga = data.hargakustom == null ? data.harga : data.hargakustom;
@@ -624,12 +646,8 @@ export default function App({ id, versi }) {
     }
     resultInstalasi.push(item);
   });
-  for (const [name, data] of Object.entries(queries)) {
-    if (data.error) return <div>Failed to load {name}</div>;
-    if (data.isLoading) return <div>Loading {name}...</div>;
-  }
-  if (session.status === "loading") return <>Session Loading ...</>;
-
+  const queryStates = renderQueryStates(queries, session);
+  if (queryStates) return queryStates;
   const keranjangProduk = keranjangProyek.data;
   const keranjangInstalasi = keranjangProyekInstalasi.data;
   const rekapitulasi = rekapitulasiProyek.data[0] || {
@@ -639,9 +657,7 @@ export default function App({ id, versi }) {
     diskoninstalasi: 0,
     pajak: 0,
   };
-  const selectedProyek = proyek.data[0];
   if (!selectedProyek) return <>Proyek tidak ditemukan</>;
-  const isHighRole = highRoleCheck(sessUser.rank);
   const col = {
     keranjangproyek: [
       ...(selectedProyek?.versi
@@ -1005,7 +1021,7 @@ export default function App({ id, versi }) {
               <div>
                 <div>No.</div>
                 <div>Perusahaan</div>
-                <div>Nama Proyek{"  "}</div>
+                <div>Nama Proyek</div>
                 <div>Tanggal</div>
                 <div>Klien</div>
                 <div>Instansi</div>
@@ -1032,17 +1048,11 @@ export default function App({ id, versi }) {
                 <div>: {selectedProyek?.namakaryawan} </div>
                 <div>
                   :{" "}
-                  {selectedProyek?.versi == -1 ? (
-                    <span className="bg-red-600 text-white p-1 rounded-sm font-bold">
-                      REJECT
-                    </span>
-                  ) : selectedProyek?.versi == selectedVersion ? (
-                    <span className="bg-green-400 text-white p-1 rounded-sm font-bold">
-                      DEAL
-                    </span>
-                  ) : (
-                    "penawaran"
-                  )}
+                  <BadgeStatusProyek
+                    data={selectedProyek}
+                    idStatusProyek={selectedProyek.id_statusproyek}
+                    versi={selectedProyek.versi}
+                  />
                 </div>
               </div>
             </div>
@@ -1075,23 +1085,27 @@ export default function App({ id, versi }) {
           <></>
         )}
         {/* rekapitulasi */}
-        <Rekapitulasi
-          peralatan={tabelPeralatan}
-          instalasi={tabelInstalasi}
-          total={tabelTotal}
-          rekapitulasiPeralatan={rekapitulasiPeralatan}
-          rekapitulasiInstalasi={rekapitulasiInstalasi}
-          rekapitulasiTotal={rekapitulasiTotal}
-          rekapitulasi={rekapitulasi}
-          idProyek={id}
-          versi={versi}
-          selectedProyek={selectedProyek}
-        />
+        <div>
+          <Rekapitulasi
+            peralatan={tabelPeralatan}
+            instalasi={tabelInstalasi}
+            total={tabelTotal}
+            rekapitulasiPeralatan={rekapitulasiPeralatan}
+            rekapitulasiInstalasi={rekapitulasiInstalasi}
+            rekapitulasiTotal={rekapitulasiTotal}
+            rekapitulasi={rekapitulasi}
+            idProyek={id}
+            versi={versi}
+            selectedProyek={selectedProyek}
+            isAuthorized={isAuthorized}
+          />
+        </div>
         {/* tabel keterangan penawaran */}
         <div>
           <KeteranganPenawaran
             keteranganPenawaran={keteranganPenawaran}
             idProyek={selectedProyek?.id}
+            isAuthorized={isAuthorized}
           />
         </div>
       </div>
@@ -1187,6 +1201,7 @@ export default function App({ id, versi }) {
                 <SuratJalan
                   id_proyek={id}
                   versi={selectVersi.values().next().value}
+                  isAuthorized={isAuthorized}
                 />
               </div>
               {/* Kwitansi */}
@@ -1202,50 +1217,51 @@ export default function App({ id, versi }) {
                 {"Pengeluaran & Pembayaran ==>>"}
               </NavLinkNewTab>
             </div>
-            {id &&
-              versi &&
-              selectedProyek.statusproyek.toLowerCase() ==
-                "penawaran".toLowerCase() && (
-                <div>
-                  <TemplateImportV2
-                    json={json}
-                    setJson={setJson}
-                    name={"Import Produk"}
-                    apiendpoint={"importproduk"}
-                    isLoading={isLoading}
-                    isDisabled={
-                      selectInstalasi.size && json?.length ? undefined : true
-                    }
-                    setIsLoading={setIsLoading}
-                    formatLink={"/produk.xlsx"}
-                    editRow={(row) => ({
-                      ...row,
-                      id_proyek: id,
-                      instalasi: set2key(selectInstalasi),
-                      versi,
-                    })}
-                  >
-                    <div className="w-1/12">
-                      <Select
-                        label="Peralatan / Instalasi"
-                        placeholder="Pilih opsi"
-                        selectedKeys={selectInstalasi}
-                        onSelectionChange={setSelectInstalasi}
-                      >
-                        {[
-                          { key: 0, label: "Peralatan" },
-                          { key: 1, label: "Instalasi" },
-                        ].map((data) => (
-                          <SelectItem key={data.key}>{data.label}</SelectItem>
-                        ))}
-                      </Select>
-                    </div>
-                  </TemplateImportV2>
-                </div>
-              )}
+            {id && versi && isAuthorized && (
+              <div>
+                <TemplateImportV2
+                  json={json}
+                  setJson={setJson}
+                  name={"Import Produk"}
+                  apiendpoint={"importproduk"}
+                  isLoading={isLoading}
+                  isDisabled={
+                    selectInstalasi.size && json?.length ? undefined : true
+                  }
+                  setIsLoading={setIsLoading}
+                  formatLink={"/produk.xlsx"}
+                  editRow={(row) => ({
+                    ...row,
+                    id_proyek: id,
+                    instalasi: set2key(selectInstalasi),
+                    versi,
+                  })}
+                >
+                  <div className="w-1/12">
+                    <Select
+                      label="Peralatan / Instalasi"
+                      placeholder="Pilih opsi"
+                      selectedKeys={selectInstalasi}
+                      onSelectionChange={setSelectInstalasi}
+                    >
+                      {[
+                        { key: 0, label: "Peralatan" },
+                        { key: 1, label: "Instalasi" },
+                      ].map((data) => (
+                        <SelectItem key={data.key}>{data.label}</SelectItem>
+                      ))}
+                    </Select>
+                  </div>
+                </TemplateImportV2>
+              </div>
+            )}
             <div className="w-9/12-">
               {/* sub proyek */}
-              <SubProyek id={id} selectedProyek={selectedProyek} />
+              <SubProyek
+                id={id}
+                selectedProyek={selectedProyek}
+                isAuthorized={isAuthorized}
+              />
               {/* tabel peralatan */}
               <Table
                 isStriped
@@ -1255,7 +1271,7 @@ export default function App({ id, versi }) {
                   <>
                     <div>Peralatan</div>
                     <ConditionalComponent
-                      condition={selectedProyek?.versi == 0}
+                      condition={isAuthorized}
                       component={
                         <>
                           <div className={`flex gap-2 ${tambahWidth}`}>
@@ -1432,7 +1448,7 @@ export default function App({ id, versi }) {
                   <>
                     <div>Instalasi</div>
                     <ConditionalComponent
-                      condition={selectedProyek?.versi == 0}
+                      condition={isAuthorized}
                       component={
                         <>
                           <div className={`flex gap-2 ${tambahWidth}`}>

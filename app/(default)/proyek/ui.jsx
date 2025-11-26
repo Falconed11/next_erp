@@ -300,6 +300,8 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
       compression: true,
     });
   };
+
+  const isHighRole = highRoleCheck(sessUser?.rank);
   const renderCell = React.useCallback(
     (data, columnKey) => {
       const cellValue = data[columnKey];
@@ -408,7 +410,7 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
               <></>
             )} */}
               {(!data.id_karyawan ||
-                (session && isHighRole) ||
+                isHighRole ||
                 sessUser.id_karyawan == data.id_karyawan) && (
                 <Tooltip content="Edit">
                   <span
@@ -452,7 +454,6 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
   const report = useDisclosure();
   const queryStates = renderQueryStates(queries, session);
   if (queryStates) return queryStates;
-  const isHighRole = highRoleCheck(sessUser.rank);
   const columns = [
     {
       key: "aksi",
