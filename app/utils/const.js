@@ -31,5 +31,6 @@ const LIST_SWASTA_NEGRI = [
   { id: 0, nama: "negri" },
 ];
 const NEXT_DOMAIN = getNextDomain();
+const TITLE_STYLE = "text-lg font-bold";
 
-export { LIST_SWASTA_NEGRI, NEXT_DOMAIN };
+export { LIST_SWASTA_NEGRI, NEXT_DOMAIN, TITLE_STYLE };

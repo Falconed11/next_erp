@@ -964,7 +964,7 @@ export default function App({ id, versi }) {
   const tambahWidth = "w-9/12-";
   console.log(form);
   return (
-    <div className="flex gap-2 flex-col">
+    <div className="flex gap-2 flex-col item-start">
       <div className="flex gap-2">
         {/* header  */}
         <div className="flex gap-2 flex-col">
@@ -999,7 +999,7 @@ export default function App({ id, versi }) {
           {/* detail */}
           <div className="bg-white rounded-lg p-3">
             <div>Detail</div>
-            {versiKeranjangProyek.data.length > 1 ? (
+            {/* {versiKeranjangProyek.data.length > 1 && (
               <Select
                 label="Versi"
                 placeholder="Pilih versi!"
@@ -1014,14 +1014,33 @@ export default function App({ id, versi }) {
                   </SelectItem>
                 ))}
               </Select>
-            ) : (
-              <></>
-            )}
+            )} */}
+            {[
+              {
+                label: "No.",
+                value: penawaran(
+                  selectedProyek?.id_penawaran,
+                  new Date(selectedProyek?.tanggal_penawaran)
+                ),
+              },
+              {
+                label: "Perusahaan",
+                value: selectedProyek?.namaperusahaan,
+              },
+              {
+                label: "Nama Proyek",
+                value: selectedProyek?.nama,
+              },
+            ].map((data, i) => (
+              <div key={i} className="grid grid-cols-2">
+                <div className="">{data.label}</div>
+                <div className="">
+                  : {<span className="text-right">{data.value}</span>}
+                </div>
+              </div>
+            ))}
             <div className="flex">
               <div>
-                <div>No.</div>
-                <div>Perusahaan</div>
-                <div>Nama Proyek</div>
                 <div>Tanggal</div>
                 <div>Klien</div>
                 <div>Instansi</div>
@@ -1030,15 +1049,6 @@ export default function App({ id, versi }) {
                 <div>Status</div>
               </div>
               <div>
-                <div>
-                  :{" "}
-                  {penawaran(
-                    selectedProyek?.id_penawaran,
-                    new Date(selectedProyek?.tanggal_penawaran)
-                  )}{" "}
-                </div>
-                <div>: {selectedProyek?.namaperusahaan} </div>
-                <div>: {selectedProyek?.nama} </div>
                 <div>
                   : {getDateFId(new Date(selectedProyek?.tanggal_penawaran))}{" "}
                 </div>
@@ -1060,26 +1070,28 @@ export default function App({ id, versi }) {
         </div>
         {/* alat */}
         {selectedProyek?.versi == 0 && sessUser.rank <= 10 ? (
-          <div className="bg-white rounded-lg p-3 flex flex-col gap-2">
-            <div>Alat</div>
-            <Form onSubmit={terapkanButtonPress}>
-              <NumberInput
-                hideStepper
-                isWheelDisabled
-                formatOptions={{
-                  useGrouping: false,
-                }}
-                label="Persen Provit"
-                placeholder="Masukkan persen provit"
-                value={inputPersenProvit}
-                onValueChange={setInputPersenProvit}
-              />
-              <div>
-                <Button type="submit" color="primary">
-                  Terapkan
-                </Button>
-              </div>
-            </Form>
+          <div>
+            <div className="bg-white rounded-lg p-3 flex flex-col gap-2">
+              <div>Alat</div>
+              <Form onSubmit={terapkanButtonPress}>
+                <NumberInput
+                  hideStepper
+                  isWheelDisabled
+                  formatOptions={{
+                    useGrouping: false,
+                  }}
+                  label="Persen Provit"
+                  placeholder="Masukkan persen provit"
+                  value={inputPersenProvit}
+                  onValueChange={setInputPersenProvit}
+                />
+                <div>
+                  <Button type="submit" color="primary">
+                    Terapkan
+                  </Button>
+                </div>
+              </Form>
+            </div>
           </div>
         ) : (
           <></>
