@@ -140,7 +140,7 @@ export default function TambahProduk({
         className="w-8/12"
       />
       <AutocompleteMerek
-        disableCustomValue
+        disableCustomValue={disableCustomValue}
         isDisabled={isProdukSelected}
         form={form}
         setForm={setForm}

@@ -13,8 +13,6 @@
 
   html,
   body {
-    height: auto;
-    min-height: 100%;
     margin: 0;
     padding: 0;
     font-family: "Arial", sans-serif; /* merged from your second @layer */

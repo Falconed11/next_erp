@@ -183,13 +183,14 @@ export default function RootLayout({
     icon: <GoSignOut />,
   });
   return (
-    <section className="flex flex-col gap-3">
-      <div className=""></div>
-      <div className="flex flex-row py-2 mx-3 mb-3- rounded-lg bg-background">
-        <div className="basis-3/4">
+    <section className="flex flex-col gap-3 shrink-0">
+      <div></div>
+      <div className="grid grid-cols-2 py-2 mx-3 rounded-lg bg-background">
+        <div className="basis-3/4-">
           <div className="p-3">ERP{pathname}</div>
         </div>
-        <div className="basis-1/4 flex flex-row-reverse ">
+        {/* <div className="basis-1/4- flex flex-row-reverse"> */}
+        <div className="text-right">
           <div className="px-3">
             <User user={session} />
           </div>
@@ -200,7 +201,7 @@ export default function RootLayout({
         <div className="w-1/9-">
           <Nav navLinks={links} className={""} />
         </div>
-        <div className="w-8/9-">{children}</div>
+        <div className="w-8/9- shrink-0-">{children}</div>
         <div></div>
       </div>
     </section>

@@ -967,7 +967,7 @@ export default function App({ id, versi }) {
     <div className="flex gap-2 flex-col item-start">
       <div className="flex gap-2">
         {/* header  */}
-        <div className="flex gap-2 flex-col">
+        <div className="flex gap-2 flex-col shrink-0">
           {/* bagikan */}
           <div className="p-2 bg-white flex flex-col rounded-lg gap-2">
             Bagikan:
@@ -1015,56 +1015,63 @@ export default function App({ id, versi }) {
                 ))}
               </Select>
             )} */}
-            {[
-              {
-                label: "No.",
-                value: penawaran(
-                  selectedProyek?.id_penawaran,
-                  new Date(selectedProyek?.tanggal_penawaran)
-                ),
-              },
-              {
-                label: "Perusahaan",
-                value: selectedProyek?.namaperusahaan,
-              },
-              {
-                label: "Nama Proyek",
-                value: selectedProyek?.nama,
-              },
-            ].map((data, i) => (
-              <div key={i} className="grid grid-cols-2">
-                <div className="">{data.label}</div>
-                <div className="">
-                  : {<span className="text-right">{data.value}</span>}
+            <div className="table">
+              {[
+                {
+                  label: "No.",
+                  value: penawaran(
+                    selectedProyek?.id_penawaran,
+                    new Date(selectedProyek?.tanggal_penawaran)
+                  ),
+                },
+                {
+                  label: "Perusahaan",
+                  value: selectedProyek?.namaperusahaan,
+                },
+                {
+                  label: "Nama Proyek",
+                  value: selectedProyek?.nama,
+                },
+                {
+                  label: "Tanggal",
+                  value: getDateFId(
+                    new Date(selectedProyek?.tanggal_penawaran)
+                  ),
+                },
+                {
+                  label: "Klien",
+                  value: selectedProyek?.klien,
+                },
+                {
+                  label: "Instansi",
+                  value: selectedProyek?.instansi,
+                },
+                {
+                  label: "Kota",
+                  value: selectedProyek?.kota,
+                },
+                {
+                  label: "Sales",
+                  value: selectedProyek?.namakaryawan,
+                },
+                {
+                  label: "Status",
+                  value: (
+                    <BadgeStatusProyek
+                      data={selectedProyek}
+                      idStatusProyek={selectedProyek.id_statusproyek}
+                      versi={selectedProyek.versi}
+                    />
+                  ),
+                },
+              ].map((data, i) => (
+                <div key={i} className="table-row">
+                  <div className="table-cell">{data.label} </div>
+                  <div className="table-cell">
+                    : {<span className="text-right">{data.value}</span>}
+                  </div>
                 </div>
-              </div>
-            ))}
-            <div className="flex">
-              <div>
-                <div>Tanggal</div>
-                <div>Klien</div>
-                <div>Instansi</div>
-                <div>Kota</div>
-                <div>Sales</div>
-                <div>Status</div>
-              </div>
-              <div>
-                <div>
-                  : {getDateFId(new Date(selectedProyek?.tanggal_penawaran))}{" "}
-                </div>
-                <div>: {selectedProyek?.klien} </div>
-                <div>: {selectedProyek?.instansi} </div>
-                <div>: {selectedProyek?.kota} </div>
-                <div>: {selectedProyek?.namakaryawan} </div>
-                <div>
-                  :{" "}
-                  <BadgeStatusProyek
-                    data={selectedProyek}
-                    idStatusProyek={selectedProyek.id_statusproyek}
-                    versi={selectedProyek.versi}
-                  />
-                </div>
-              </div>
+              ))}
             </div>
           </div>
         </div>
@@ -1097,7 +1104,7 @@ export default function App({ id, versi }) {
           <></>
         )}
         {/* rekapitulasi */}
-        <div>
+        <div className="shrink-0">
           <Rekapitulasi
             peralatan={tabelPeralatan}
             instalasi={tabelInstalasi}
@@ -1900,23 +1907,24 @@ export default function App({ id, versi }) {
                     </span>
                   </div> */}
                   {/* {Logo} */}
-                  <div className="flex flex-row items-center">
-                    <Image
-                      src={selectedProyek.logoperusahaan}
-                      alt="Company Logo"
-                      width={40}
-                      height={40}
-                    />
-                    <div className="flex flex-col pl-2 text-xs">
-                      <CompanyHeader
-                        titleClassname="text-bold text-base"
-                        name={selectedProyek.namaperusahaan}
-                        description={selectedProyek.deskripsiperusahaan}
-                        address={selectedProyek.alamatperusahaan}
-                        contact={selectedProyek.kontakperusahaan}
+                  {selectedProyek.logoperusahaan ? (
+                    <div className="flex flex-row items-center">
+                      <Image
+                        src={selectedProyek.logoperusahaan || null}
+                        alt="Company Logo"
+                        width={40}
+                        height={40}
                       />
-                    </div>
-                    {/* {selectedProyek.id_perusahaan == 1 ? (
+                      <div className="flex flex-col pl-2 text-xs">
+                        <CompanyHeader
+                          titleClassname="text-bold text-base"
+                          name={selectedProyek.namaperusahaan}
+                          description={selectedProyek.deskripsiperusahaan}
+                          address={selectedProyek.alamatperusahaan}
+                          contact={selectedProyek.kontakperusahaan}
+                        />
+                      </div>
+                      {/* {selectedProyek.id_perusahaan == 1 ? (
                       <>
                         <Image src={logoBks} alt="Company Logo" width={40} />
                         <div className="flex flex-col pl-2 text-xs">
@@ -1948,7 +1956,10 @@ export default function App({ id, versi }) {
                         </div>
                       </>
                     )} */}
-                  </div>
+                    </div>
+                  ) : (
+                    "Perusahaan Belum Dipilih"
+                  )}
                   <Divider className="bg-sky-500 my-1 py-1" />
                   {/* <hr className="my-3 bg-sky-500 h-5" /> */}
                   <div className="pt-1 text-xs">
