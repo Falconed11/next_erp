@@ -22,7 +22,7 @@ import {
 } from "@heroui/react";
 import { Link } from "@heroui/react";
 import { useCallback, useMemo, useState } from "react";
-import { DeleteIcon, EditIcon, EyeIcon } from "./icon";
+import { AddIcon, DeleteIcon, EditIcon, EyeIcon } from "./icon";
 import { useSession } from "next-auth/react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -323,9 +323,7 @@ const ToDoList = () => {
         topContent={
           <div className="flex justify-between items-center">
             <div>To Do List</div>
-            <Button color="primary" onPress={tambahButtonPress}>
-              Tambah
-            </Button>
+            <MyAddButton onPress={tambahButtonPress} />
           </div>
         }
         aria-label="Example table with custom cells"
@@ -554,9 +552,7 @@ const StatusToDoList = () => {
         topContent={
           <div className="flex justify-between items-center">
             <div>Status To Do List</div>
-            <Button color="primary" onPress={tambahButtonPress}>
-              Tambah
-            </Button>
+            <MyAddButton onPress={tambahButtonPress} />
           </div>
         }
         aria-label="Example table with custom cells"
@@ -639,6 +635,16 @@ const StatusToDoList = () => {
     </>
   );
 };
+const MyAddButton = ({ onPress }) => {
+  return (
+    <Button variant="shadow" size="sm" color="primary" onPress={onPress}>
+      <span className="text-xl font-bold">
+        <AddIcon />
+      </span>
+      Tambah
+    </Button>
+  );
+};
 
 export {
   MyChip,
@@ -651,4 +657,5 @@ export {
   PrintWithHeader,
   StatusToDoList,
   ToDoList,
+  MyAddButton,
 };

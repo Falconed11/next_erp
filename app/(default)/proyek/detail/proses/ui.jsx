@@ -332,7 +332,7 @@ export default function App({ id }) {
   const idKaryawan = selectedProyek?.id_karyawan;
   const isAuthorized =
     (isHighRole || !idKaryawan || idKaryawan == sessUser?.id_karyawan) &&
-    selectedProyek?.id_statusproyek == 1;
+    [1, 2].includes(selectedProyek?.id_statusproyek);
   const renderCell = {
     pengeluaranproyek: React.useCallback(
       (data, columnKey) => {
@@ -861,7 +861,7 @@ export default function App({ id }) {
             </TableColumn>
           )}
         </TableHeader>
-        <TableBody items={pengeluaranproyek.data}>
+        <TableBody items={pengeluaranproyek.data} emptyContent={"Kosong"}>
           {(item) => (
             <TableRow key={item.id_pengeluaranproyek}>
               {(columnKey) => (

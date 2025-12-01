@@ -603,7 +603,7 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
   );
   console.log(form);
   return (
-    <div className="flex flex-col gap-2 w-7/8- h-3/4 overscroll-auto">
+    <div className="flex flex-col gap-2 w-7/8- h-3/4">
       {id_instansi ? (
         <div className="flex">
           <div className="bg-white rounded-lg p-3">
@@ -613,9 +613,9 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
       ) : (
         <></>
       )}
-      <div className="bg-white p-2 rounded-lg flex gap-2 items-center">
-        <div className="font-bold text-lg">Proyek</div>
-        <div className="flex flex-row gap-2">
+      <div>
+        <div className="bg-white p-2 rounded-lg inline-flex gap-2 items-center">
+          <div className="font-bold text-lg">Proyek</div>
           <Button
             variant="shadow"
             size="sm"

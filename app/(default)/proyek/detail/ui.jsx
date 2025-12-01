@@ -175,6 +175,7 @@ export default function App({ id, versi }) {
         ...form,
         id_proyek: id,
         versi,
+        tanggal: null,
         stok: 0, //
       }),
     });
@@ -258,8 +259,6 @@ export default function App({ id, versi }) {
   };
   const simpanButtonPress = async (data, onClose) => {
     // if (data.jumlah <= 0) return alert("Jumlah belum diisi");
-    if (data.provitmarginpersen > 99 && data.hargamodal)
-      return alert("Provit margin tidak boleh lebih dari 99.");
     const res = await fetch(`${api_path}keranjangproyek`, {
       method: "PUT",
       headers: {
@@ -471,7 +470,7 @@ export default function App({ id, versi }) {
             return (
               Math.round(
                 countPercentProvit(data.temphargamodal, data.harga) * 100
-              ) / 100
+              ) / 100 || ""
             );
           case "totalprofit":
             return (
@@ -962,7 +961,7 @@ export default function App({ id, versi }) {
   const defStyleFormWidth = "w-2/12";
   const fullPath = `${NEXT_DOMAIN}/proyek/detail?id=${id}&versi=${versi}`;
   const tambahWidth = "w-9/12-";
-  console.log(form);
+  // console.log(form);
   return (
     <div className="flex gap-2 flex-col item-start">
       <div className="flex gap-2">
@@ -1351,7 +1350,7 @@ export default function App({ id, versi }) {
                                   />
                                   <Input
                                     type="text"
-                                    value={form.keterangan}
+                                    value={form.namakustom}
                                     label="Nama Kustom"
                                     placeholder="Masukkan nama kustom! (Opsional)"
                                     // placeholder="Masukkan jumlah!"
@@ -1359,7 +1358,7 @@ export default function App({ id, versi }) {
                                     onValueChange={(v) =>
                                       setForm({
                                         ...form,
-                                        keterangan: v,
+                                        namakustom: v,
                                       })
                                     }
                                   />
@@ -1447,7 +1446,7 @@ export default function App({ id, versi }) {
                     </TableColumn>
                   )}
                 </TableHeader>
-                <TableBody items={keranjangProduk}>
+                <TableBody items={keranjangProduk} emptyContent={"Kosong"}>
                   {(item) => (
                     <TableRow key={item.id_keranjangproyek}>
                       {(columnKey) => (
@@ -1532,7 +1531,7 @@ export default function App({ id, versi }) {
                                   />
                                   <Input
                                     type="text"
-                                    value={formInstalasi.keterangan}
+                                    value={formInstalasi.namakustom}
                                     label="Nama Kustom"
                                     placeholder="Masukkan nama kustom! (Opsional)"
                                     // placeholder="Masukkan jumlah!"
@@ -1540,7 +1539,7 @@ export default function App({ id, versi }) {
                                     onValueChange={(v) =>
                                       setFormInstalasi({
                                         ...formInstalasi,
-                                        keterangan: v,
+                                        namakustom: v,
                                       })
                                     }
                                   />
@@ -1635,7 +1634,7 @@ export default function App({ id, versi }) {
                     </TableColumn>
                   )}
                 </TableHeader>
-                <TableBody items={keranjangInstalasi}>
+                <TableBody items={keranjangInstalasi} emptyContent={"Kosong"}>
                   {(item) => (
                     <TableRow key={item.id_keranjangproyek}>
                       {(columnKey) => (

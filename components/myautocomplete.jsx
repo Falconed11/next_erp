@@ -2,7 +2,7 @@ import { API_PATH, useClientFetch } from "@/app/utils/apiconfig";
 import { renderQueryStates } from "@/app/utils/tools";
 import { Autocomplete, AutocompleteItem } from "@heroui/react";
 import { useFilter } from "@react-aria/i18n";
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import Harga from "./harga";
 import { getDateFId } from "@/app/utils/date";
 
@@ -67,50 +67,51 @@ const AutocompleteWithCustomValue = ({
   getCustomValue = (i) => i[labelKey],
   getFormUpdateOnSelectionChange = () => {},
 }) => {
-  const [filteredData, setFilteredData] = useState(data);
   const { contains } = useFilter({ sensitivity: "base" });
+  const filteredData = useMemo(
+    () => data.filter((i) => contains(getCustomValue(i), form[field] ?? "")),
+    [data, form[field]] // more specific dependency
+  );
   const handleSelectionChange = (key) => {
-    // if (form[id] == key) return;
     const item = data.find((i) => i[valueKey] == key);
-    // console.log(item);
     setForm((prev) => ({
       ...prev,
       ...getFormUpdateOnSelectionChange(item),
       nama: prev.nama,
-      [field]: item?.[labelKey] ?? prev[field] ?? "",
+      [field]: item?.[labelKey] ?? prev[field],
       [id]: key ?? prev[id],
     }));
   };
   const handleInputChange = (value) => {
     const match =
       !disableSelectOnChange &&
-      data.find(
+      filteredData.find(
         (i) => getCustomValue(i)?.toLowerCase() === value.toLowerCase()
       );
-    setFilteredData(data.filter((i) => contains(getCustomValue(i), value)));
     setForm((prev) => ({
       ...prev,
       [field]: value,
       [id]: match ? match[valueKey] : null,
     }));
   };
-  const handleOnBlur = (data) => {
-    if (disableCustomValue)
-      setForm({
-        ...data,
-        ...(data[id] ? {} : { [id]: null, [field]: "" }),
-      });
+  const handleOnBlur = () => {
+    // If custom value not allowed, force reset
+    setForm((prev) => {
+      if (!disableCustomValue) return prev;
+      if (prev[id] != null) return prev; // valid selection
+      return {
+        ...prev,
+        [id]: null,
+        [field]: "",
+      };
+    });
   };
-  // ✅ Fix: detect null/undefined only, not falsy values like 0
   const isInvalid = form[field] && form[id] == null;
+  console.log({ filteredData });
   return (
     <Autocomplete
-      popoverProps={{
-        shouldCloseOnScroll: false,
-      }}
-      className={`${className}`}
-      // classNames={{ popoverContent: "w-2" }}
-      // className="max-w-xs"
+      popoverProps={{ shouldCloseOnScroll: false }}
+      className={className}
       isDisabled={isDisabled}
       variant="bordered"
       label={
@@ -121,15 +122,13 @@ const AutocompleteWithCustomValue = ({
           )}
         </>
       }
-      // allowsCustomValue={!disableCustomValue}
       items={filteredData}
       placeholder={`Cari ${title}`}
       inputValue={form[field] ?? ""}
       selectedKey={form[id] ?? null}
       onSelectionChange={handleSelectionChange}
       onInputChange={handleInputChange}
-      onBlur={() => handleOnBlur(form)}
-      onOpenChange={(isOpen) => isOpen && setFilteredData(data)}
+      onBlur={handleOnBlur}
     >
       {(item) => (
         <AutocompleteItem key={item[valueKey]} textValue={item[labelKey]}>
@@ -139,6 +138,7 @@ const AutocompleteWithCustomValue = ({
     </Autocomplete>
   );
 };
+
 const AutocompleteKategoriProduk = (props) => {
   const { component } = useAutocompleteField({
     endpoint: "kategoriproduk",

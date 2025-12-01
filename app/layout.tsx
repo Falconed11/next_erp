@@ -17,7 +17,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="">
-      <body className="h-screen- min-h-screen">
+      <body className="h-screen- min-h-screen w-fit ">
         <Providers>
           <AuthProvider>{children}</AuthProvider>
         </Providers>

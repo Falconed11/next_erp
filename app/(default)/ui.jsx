@@ -28,8 +28,13 @@ export default function App() {
 
   return (
     <div className="flex flex-row gap-3">
-      <div className="bg-white p-3 rounded-lg">
-        <Penawaran start={firstDayOfCurrentMonth} end={lastDayOfCurrentMonth} />
+      <div>
+        <div className="bg-white p-3 rounded-lg">
+          <Penawaran
+            start={firstDayOfCurrentMonth}
+            end={lastDayOfCurrentMonth}
+          />
+        </div>
       </div>
       <div className="bg-white p-3 rounded-lg">
         <OperasionalKantor startDate={startDate} endDate={endDate} />
