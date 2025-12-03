@@ -961,7 +961,7 @@ export default function App({ id, versi }) {
   const defStyleFormWidth = "w-2/12";
   const fullPath = `${NEXT_DOMAIN}/proyek/detail?id=${id}&versi=${versi}`;
   const tambahWidth = "w-9/12-";
-  // console.log(form);
+  console.log(form);
   return (
     <div className="flex gap-2 flex-col item-start">
       <div className="flex gap-2">

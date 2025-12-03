@@ -2,7 +2,14 @@ import { API_PATH, useClientFetch } from "@/app/utils/apiconfig";
 import { renderQueryStates } from "@/app/utils/tools";
 import { Autocomplete, AutocompleteItem } from "@heroui/react";
 import { useFilter } from "@react-aria/i18n";
-import { useCallback, useMemo, useState } from "react";
+import {
+  Children,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import Harga from "./harga";
 import { getDateFId } from "@/app/utils/date";
 
@@ -68,26 +75,39 @@ const AutocompleteWithCustomValue = ({
   getFormUpdateOnSelectionChange = () => {},
 }) => {
   const { contains } = useFilter({ sensitivity: "base" });
-  const filteredData = useMemo(
-    () => data.filter((i) => contains(getCustomValue(i), form[field] ?? "")),
-    [data, form[field]] // more specific dependency
-  );
+  const [items, setItems] = useState(data);
+  // const filteredData = useMemo(
+  //   () => data.filter((i) => contains(getCustomValue(i), form[field] ?? "")),
+  //   [data, form[field]] // more specific dependency
+  // );
   const handleSelectionChange = (key) => {
-    const item = data.find((i) => i[valueKey] == key);
+    // const item = data.find((i) => i[valueKey] == key);
+    console.log("selectionTrigerred!");
+    let item;
+    setItems((prev) => {
+      item = prev.find((i) => i[valueKey] == key);
+      return data.filter((i) => contains(i[labelKey], item?.[labelKey] || ""));
+    });
+    console.log({ item });
     setForm((prev) => ({
       ...prev,
-      ...getFormUpdateOnSelectionChange(item),
+      ...(item ? getFormUpdateOnSelectionChange(item) : {}),
       nama: prev.nama,
       [field]: item?.[labelKey] ?? prev[field],
       [id]: key ?? prev[id],
     }));
   };
   const handleInputChange = (value) => {
-    const match =
-      !disableSelectOnChange &&
-      filteredData.find(
-        (i) => getCustomValue(i)?.toLowerCase() === value.toLowerCase()
-      );
+    console.log("Change triggered!");
+    let match;
+    setItems((prev) => {
+      match =
+        !disableSelectOnChange &&
+        prev.find(
+          (i) => getCustomValue(i)?.toLowerCase() === value.toLowerCase()
+        );
+      return data.filter((i) => contains(i[labelKey], value));
+    });
     setForm((prev) => ({
       ...prev,
       [field]: value,
@@ -95,6 +115,7 @@ const AutocompleteWithCustomValue = ({
     }));
   };
   const handleOnBlur = () => {
+    console.log("Blur triggered!");
     // If custom value not allowed, force reset
     setForm((prev) => {
       if (!disableCustomValue) return prev;
@@ -107,13 +128,14 @@ const AutocompleteWithCustomValue = ({
     });
   };
   const isInvalid = form[field] && form[id] == null;
-  console.log({ filteredData });
+  // console.log({ items });
   return (
     <Autocomplete
       popoverProps={{ shouldCloseOnScroll: false }}
       className={className}
       isDisabled={isDisabled}
       variant="bordered"
+      allowsCustomValue={disableCustomValue ? undefined : true}
       label={
         <>
           {title}
@@ -122,12 +144,12 @@ const AutocompleteWithCustomValue = ({
           )}
         </>
       }
-      items={filteredData}
+      items={items}
       placeholder={`Cari ${title}`}
       inputValue={form[field] ?? ""}
       selectedKey={form[id] ?? null}
-      onSelectionChange={handleSelectionChange}
       onInputChange={handleInputChange}
+      onSelectionChange={handleSelectionChange}
       onBlur={handleOnBlur}
     >
       {(item) => (

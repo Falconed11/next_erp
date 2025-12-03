@@ -17,6 +17,8 @@ import {
   AutocompleteKategoriProduk,
   AutocompleteMerek,
   AutocompleteProduk,
+  MyAutocomplete,
+  MyAutocompleteItem,
 } from "./myautocomplete";
 
 const api_path = getApiPath();
@@ -38,6 +40,7 @@ export default function TambahProduk({
   const sessUser = session.data?.user;
   const [nama, setNama] = useState("");
   const [sVendor, setSVendor] = useState("");
+  const [idProduk, setIdProduk] = useState(null);
   const kategori = useClientFetch(`kategoriproduk`);
   const produk = useClientFetch(
     `produk?${idKategori ? `kategori=${idKategori}` : ""}`
