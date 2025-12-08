@@ -20,7 +20,7 @@ export default function SelectStatusProyek({ select, setSelect }) {
     >
       {statusproyek.data.map((item) => (
         <SelectItem key={item.id} value={item.id}>
-          {item.nama}
+          {item.nama} {item.progress}%
         </SelectItem>
       ))}
     </Select>

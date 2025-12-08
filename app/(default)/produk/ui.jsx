@@ -59,7 +59,7 @@ import { getApiPath, useClientFetch } from "@/app/utils/apiconfig";
 import { Button } from "@heroui/react";
 import { Input, Textarea } from "@heroui/react";
 import { getDate, getDateF, getDateFId } from "@/app/utils/date";
-import { LinkOpenNewTab } from "@/components/mycomponent";
+import { LinkOpenNewTab, OpenBlueLinkInNewTab } from "@/components/mycomponent";
 import { FormProduct } from "@/components/produk";
 import { AuthorizationComponent } from "@/components/componentmanipulation";
 import {
@@ -360,6 +360,11 @@ export default function App({ id_produk }) {
 
   const renderCell = React.useCallback((data, columnKey) => {
     const cellValue = data[columnKey];
+    const harga = (harga) => (
+      <div className="text-right">
+        <Harga harga={harga} />
+      </div>
+    );
     switch (columnKey) {
       case "hargamodal":
         return (
@@ -387,6 +392,16 @@ export default function App({ id_produk }) {
             <Harga harga={data.hargajual * data.stok} />
           </div>
         );
+      case "nkeranjangproyek":
+        return (
+          <div className="text-right">
+            <OpenBlueLinkInNewTab link={`/proyek?id_produk=${data.id}`}>
+              <Harga harga={cellValue} />
+            </OpenBlueLinkInNewTab>
+          </div>
+        );
+      case "nprodukmasuk":
+        return harga(cellValue);
       case "aksi":
         return (
           <div className="relative flex items-center gap-2">
@@ -540,6 +555,14 @@ export default function App({ id_produk }) {
     {
       key: "keterangan",
       label: "Keterangan",
+    },
+    {
+      key: "nkeranjangproyek",
+      label: "Jumlah Penawaran",
+    },
+    {
+      key: "nprodukmasuk",
+      label: "Jumlah Produk Masuk",
     },
   ];
 

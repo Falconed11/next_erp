@@ -81,7 +81,13 @@ import { StatusProyek } from "./statusproyek";
 import { AutocompleteCustomer } from "@/components/myautocomplete";
 import { BadgeStatusProyek } from "@/components/badgestatusproyek";
 
-export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
+export default function App({
+  id_instansi,
+  id_karyawan,
+  startDate,
+  endDate,
+  id_produk,
+}) {
   const [sort, setSort] = React.useState("tanggal_penawaran");
   const session = useSession();
   const sessUser = session.data?.user;
@@ -100,6 +106,7 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
   const rowsPerPage = 10;
   const [filteredData, setFilteredData] = useState([]);
   const [selectStatusProyek, setSelectStatusProyek] = useState();
+  const produk = useClientFetch(id_produk ? `produk?id=${id_produk}` : null);
   const proyek = useClientFetch(
     `proyek?${id_instansi ? `id_instansi=${id_instansi}` : ""}${
       selectkaryawan.size > 0
@@ -109,7 +116,7 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
       current.endDate ? `&end=${getDate(current.endDate)}` : ""
     }${
       selectStatusProyek ? `&id_statusproyek=${selectStatusProyek}` : ""
-    }&sort=${sort}`
+    }&sort=${sort}&id_produk=${id_produk || ""}`
   );
   const penawaran = useClientFetch(
     `exportpenawaran?start=${getDate(current.startDate)}&end=${getDate(
@@ -125,6 +132,7 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
   );
   const kategoriproyek = useClientFetch("kategoriproyek");
   const queries = {
+    produk,
     proyek,
     penawaran,
     perusahaan,
@@ -328,6 +336,18 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
               <Harga harga={data.pengeluaranproyek} />
             </div>
           );
+        case "totalpembayaranproyek":
+          return (
+            <div className="text-right">
+              <Harga harga={cellValue} />
+            </div>
+          );
+        case "totalmodal":
+          return (
+            <div className="text-right">
+              <Harga harga={cellValue} />
+            </div>
+          );
         case "totalpenawaran":
           return (
             <div className="text-right">
@@ -460,6 +480,14 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
       label: "Aksi",
     },
     {
+      key: "tanggal_penawaran",
+      label: "Tanggal Penawaran",
+    },
+    {
+      key: "tanggal",
+      label: "Tanggal Proyek",
+    },
+    {
       key: "id_second",
       label: "Id Proyek",
     },
@@ -507,6 +535,14 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
       key: "progress",
       label: "Progress (%)",
     },
+    ...(isHighRole
+      ? [
+          {
+            key: "totalmodal",
+            label: "Estimasi Modal",
+          },
+        ]
+      : []),
     {
       key: "totalpenawaran",
       label: "Penawaran",
@@ -520,12 +556,8 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
         ]
       : []),
     {
-      key: "tanggal_penawaran",
-      label: "Tanggal Penawaran",
-    },
-    {
-      key: "tanggal",
-      label: "Tanggal Proyek",
+      key: "totalpembayaranproyek",
+      label: "Total Pembayaran",
     },
     {
       key: "keterangan",
@@ -601,7 +633,8 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
       </div>
     </div>
   );
-  console.log(form);
+  const selectedProduct = produk.data?.[0];
+  console.log({ produk });
   return (
     <div className="flex flex-col gap-2 w-7/8- h-3/4">
       {id_instansi ? (
@@ -652,44 +685,68 @@ export default function App({ id_instansi, id_karyawan, startDate, endDate }) {
                   {/* Filter */}
                   <div className="flex flex-col gap-2 shadow-lg border rounded-lg p-3">
                     <div className="font-bold text-lg">Filter</div>
-                    <RadioGroup
-                      orientation="horizontal"
-                      value={sort}
-                      onValueChange={setSort}
-                    >
-                      <Radio value="tanggal_penawaran">Penawaran</Radio>
-                      <Radio value="tanggal">Proyek</Radio>
-                    </RadioGroup>
-                    <div className="flex flex-row gap-2">
-                      <div className="flex">
-                        <RangeDate
-                          current={current}
-                          setCurrent={setCurrent}
-                          setPage={setPage}
+                    <div className="flex gap-2">
+                      <div className="flex flex-col gap-2">
+                        <RadioGroup
+                          orientation="horizontal"
+                          value={sort}
+                          onValueChange={setSort}
+                        >
+                          <Radio value="tanggal_penawaran">Penawaran</Radio>
+                          <Radio value="tanggal">Proyek</Radio>
+                        </RadioGroup>
+                        <div className="flex flex-row gap-2">
+                          <div className="flex">
+                            <RangeDate
+                              current={current}
+                              setCurrent={setCurrent}
+                              setPage={setPage}
+                            />
+                          </div>
+                        </div>
+                        <Select
+                          className="max-w-xs"
+                          label="Sales"
+                          placeholder="Pilih sales"
+                          selectedKeys={selectkaryawan}
+                          variant="bordered"
+                          onSelectionChange={(v) => {
+                            setSelectKaryawan(v);
+                            setPage(1);
+                          }}
+                        >
+                          {karyawan.data.map((v) => (
+                            <SelectItem key={v.id} textValue={v.nama || "NN"}>
+                              {v.nama || "NN"}
+                            </SelectItem>
+                          ))}
+                        </Select>
+                        <SelectStatusProyek
+                          select={selectStatusProyek}
+                          setSelect={setSelectStatusProyek}
                         />
                       </div>
+                      {selectedProduct && (
+                        <div>
+                          <div className="font-bold text-lg">Produk</div>
+                          {[
+                            { label: "Id", value: selectedProduct.id },
+                            { label: "Nama", value: selectedProduct.nama },
+                            { label: "Merek", value: selectedProduct.nmerek },
+                            { label: "Tipe", value: selectedProduct.tipe },
+                            { label: "Satuan", value: selectedProduct.satuan },
+                            {
+                              label: "Keterangan",
+                              value: selectedProduct.keterangan,
+                            },
+                          ].map((o, i) => (
+                            <div key={i}>
+                              {o.label} : {o.value}
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                    <Select
-                      className="max-w-xs"
-                      label="Sales"
-                      placeholder="Pilih sales"
-                      selectedKeys={selectkaryawan}
-                      variant="bordered"
-                      onSelectionChange={(v) => {
-                        setSelectKaryawan(v);
-                        setPage(1);
-                      }}
-                    >
-                      {karyawan.data.map((v) => (
-                        <SelectItem key={v.id} textValue={v.nama || "NN"}>
-                          {v.nama || "NN"}
-                        </SelectItem>
-                      ))}
-                    </Select>
-                    <SelectStatusProyek
-                      select={selectStatusProyek}
-                      setSelect={setSelectStatusProyek}
-                    />
                   </div>
                   {/* Ringkasan */}
                   <div>

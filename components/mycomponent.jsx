@@ -63,10 +63,10 @@ const LinkOpenNewTab = ({ content, link, icon }) => {
     </Tooltip>
   );
 };
-const OpenBlueLinkInNewTab = ({ link, children }) => {
+const OpenBlueLinkInNewTab = ({ link, children, className }) => {
   return (
     <Link
-      className="text-blue-600 underline"
+      className={`text-blue-600 underline ${className}`}
       href={link}
       target="_blank"
       rel="noopener noreferrer"
