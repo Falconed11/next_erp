@@ -40,6 +40,7 @@ import {
   EyeIcon,
   UserIcon,
   MinIcon,
+  TransferIcon,
 } from "@/components/icon";
 import {
   Modal,
@@ -76,6 +77,7 @@ import {
 } from "@/app/utils/formula";
 import { highRoleCheck, renderQueryStates } from "@/app/utils/tools";
 import { useFilter } from "@react-aria/i18n";
+import ModalTransferData from "@/components/modaltransferdata";
 
 const apiPath = getApiPath();
 
@@ -141,6 +143,7 @@ export default function App({ id_produk }) {
   const [isLoading, setIsLoading] = useState(0);
   const [reportList, setReportList] = useState([]);
   const report = useDisclosure();
+  const transfer = useDisclosure();
 
   const modal = { masuk: useDisclosure(), keluar: useDisclosure() };
   const saveButtonPress = async (onClose) => {
@@ -219,6 +222,32 @@ export default function App({ id_produk }) {
       produk.mutate();
       // return alert(await res.json().then((json) => json.message));
     }
+  };
+
+  const [curId, setCurId] = useState();
+  const [newId, setNewId] = useState();
+  const [name, setName] = useState();
+  const transferButtonPress = (data) => {
+    setCurId(data.id);
+    setNewId(null);
+    setName(data.nama);
+    transfer.onOpen();
+  };
+  const onSave = async (onClose) => {
+    // if (form.isSwasta.size == 0) return alert("Swasta/Negri belum diisi");
+    const res = await fetch(`${apiPath}transferproduk`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        // 'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: JSON.stringify({ curId, newId }),
+    });
+    const json = await res.json();
+    if (res.status == 400) return alert(json.message);
+    produk.mutate();
+    onClose();
+    //return alert(json.message);
   };
 
   const handleFileUpload = (jsonData) => {
@@ -421,6 +450,14 @@ export default function App({ id_produk }) {
                 className="text-lg text-default-400 cursor-pointer active:opacity-50"
               >
                 <EditIcon />
+              </span>
+            </Tooltip>
+            <Tooltip content="Transfer">
+              <span
+                onClick={() => transferButtonPress(data)}
+                className="text-lg text-default-400 cursor-pointer active:opacity-50"
+              >
+                <TransferIcon />
               </span>
             </Tooltip>
             <Tooltip content="Produk Masuk">
@@ -1027,6 +1064,23 @@ export default function App({ id_produk }) {
           )}
         </ModalContent>
       </Modal>
+      {/* transfer */}
+      <ModalTransferData
+        title="Produk"
+        data={produk.data}
+        isOpen={transfer.isOpen}
+        onOpenChange={transfer.onOpenChange}
+        id={curId}
+        newId={newId}
+        setNewId={setNewId}
+        name={name}
+        valueKey={"id"}
+        labelKey={"nama"}
+        onSave={onSave}
+        customLabel={(item) =>
+          [item.merek, item.tipe, item.satuan, item.keterangan].join(" | ")
+        }
+      />
     </div>
   );
 }
