@@ -25,7 +25,7 @@ const ModalTransferData = ({
   onSave,
   customLabel,
 }) => {
-  const selected = data.find((o) => o.id == id)[0];
+  const selected = data?.find((o) => o.id == id);
   return (
     <Modal isOpen={isOpen} onOpenChange={onOpenChange} scrollBehavior="inside">
       <ModalContent>
@@ -35,7 +35,7 @@ const ModalTransferData = ({
               Transfer {title}
             </ModalHeader>
             <ModalBody>
-              <Input
+              {/* <Input
                 isDisabled={1}
                 type="text"
                 label={`${title} Terpilih`}
@@ -45,8 +45,14 @@ const ModalTransferData = ({
                   </>
                 }
                 className="max-w-xs"
-              />
+              /> */}
+              <div>{title} Terpilih :</div>
+              <div>
+                {capitalizeEachWord(name)}{" "}
+                {customLabel && " | " + customLabel(selected)}
+              </div>
               <Autocomplete
+                isVirtualized={false}
                 label={`Target ${title}`}
                 variant="bordered"
                 placeholder={`Pilih target ${title}`}
@@ -57,11 +63,13 @@ const ModalTransferData = ({
               >
                 {(item) => {
                   const idOpt = item[valueKey];
-                  const label = customLabel?.(item);
+                  const label =
+                    capitalizeEachWord(item[labelKey]) +
+                    (customLabel ? " | " + customLabel(item) : "");
                   return (
                     id != idOpt && (
                       <AutocompleteItem key={idOpt} textValue={label}>
-                        {capitalizeEachWord(item[labelKey])} {label}
+                        {label}
                       </AutocompleteItem>
                     )
                   );

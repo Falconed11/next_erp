@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { Button, Checkbox, Input, Tooltip } from "@heroui/react";
 import { EditIcon, DeleteIcon } from "@/components/icon";
 import {
@@ -42,91 +42,102 @@ export default function KeteranganPenawaran({
     });
     const json = await res.json();
     if (res.status == 400) return alert(json.message);
+    keteranganPenawaran.mutate();
     onClose();
     // console.log(json.message);
     //return alert(json.message);
   };
 
-  const renderCell = React.useCallback((data, columnKey) => {
-    const cellValue = data[columnKey];
-    switch (columnKey) {
-      case "status":
-        const isChecked = !!data.id_proyek;
-        return (
-          <Checkbox
-            isDisabled={!isAuthorized}
-            isSelected={isChecked}
-            onValueChange={async (v) => {
-              if (v === isChecked) return;
-              const res = await fetch(`${API_PATH}proyek_keteranganpenawaran`, {
-                method: v ? "POST" : "DELETE",
-                headers: {
-                  "Content-Type": "application/json",
-                  // 'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: JSON.stringify({
-                  idProyek,
-                  idKeteranganPenawaran: data.id,
-                }),
-              });
-              const json = await res.json();
-              // if (res.status == 400) console.log(json.message);
-              // if (res.status == 400) return alert(json.message);
-              // console.log(json.message);
-              //return alert(json.message);
-              keteranganPenawaran.mutate();
-            }}
-          ></Checkbox>
-        );
-      case "aksi":
-        return (
-          <div className="relative flex items-center gap-2">
-            <Tooltip content="Edit">
-              <span
-                onClick={() => {
-                  setForm({
-                    ...form,
-                    mode: "Edit",
-                    id: data.id,
-                    keterangan: data.keterangan,
-                  });
-                  onOpen();
-                }}
-                className="text-lg text-default-400 cursor-pointer active:opacity-50"
-              >
-                <EditIcon />
-              </span>
-            </Tooltip>
-            <Tooltip color="danger" content="Delete">
-              <span
-                onClick={async () => {
-                  if (confirm("Hapus keterangan?")) {
-                    console.log(data.id);
-                    const res = await fetch(`${API_PATH}keteranganpenawaran`, {
-                      method: "DELETE",
-                      headers: {
-                        "Content-Type": "application/json",
-                        // 'Content-Type': 'application/x-www-form-urlencoded',
-                      },
-                      body: JSON.stringify({ id: data.id }),
-                    });
-                    const json = await res.json();
-                    if (res.status == 400) return alert(json.message);
-                    return;
-                    // return alert(json.message);
+  const renderCell = useCallback(
+    (data, columnKey) => {
+      const cellValue = data[columnKey];
+      switch (columnKey) {
+        case "status":
+          const isChecked = !!data.id_proyek;
+          return (
+            <Checkbox
+              isDisabled={!isAuthorized}
+              isSelected={isChecked}
+              onValueChange={async (v) => {
+                if (v === isChecked) return;
+                const res = await fetch(
+                  `${API_PATH}proyek_keteranganpenawaran`,
+                  {
+                    method: v ? "POST" : "DELETE",
+                    headers: {
+                      "Content-Type": "application/json",
+                      // 'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: JSON.stringify({
+                      idProyek,
+                      idKeteranganPenawaran: data.id,
+                    }),
                   }
-                }}
-                className="text-lg text-danger cursor-pointer active:opacity-50"
-              >
-                <DeleteIcon />
-              </span>
-            </Tooltip>
-          </div>
-        );
-      default:
-        return cellValue;
-    }
-  }, []);
+                );
+                const json = await res.json();
+                // if (res.status == 400) console.log(json.message);
+                // if (res.status == 400) return alert(json.message);
+                // console.log(json.message);
+                //return alert(json.message);
+                keteranganPenawaran.mutate();
+              }}
+            ></Checkbox>
+          );
+        case "aksi":
+          return (
+            <div className="relative flex items-center gap-2">
+              <Tooltip content="Edit">
+                <span
+                  onClick={() => {
+                    setForm({
+                      ...form,
+                      mode: "Edit",
+                      id: data.id,
+                      keterangan: data.keterangan,
+                    });
+                    onOpen();
+                  }}
+                  className="text-lg text-default-400 cursor-pointer active:opacity-50"
+                >
+                  <EditIcon />
+                </span>
+              </Tooltip>
+              <Tooltip color="danger" content="Delete">
+                <span
+                  onClick={async () => {
+                    if (confirm("Hapus keterangan?")) {
+                      console.log(data.id);
+                      const res = await fetch(
+                        `${API_PATH}keteranganpenawaran`,
+                        {
+                          method: "DELETE",
+                          headers: {
+                            "Content-Type": "application/json",
+                            // 'Content-Type': 'application/x-www-form-urlencoded',
+                          },
+                          body: JSON.stringify({ id: data.id }),
+                        }
+                      );
+                      const json = await res.json();
+                      if (res.status == 400) return alert(json.message);
+                      keteranganPenawaran.mutate();
+                      return;
+                      // return alert(json.message);
+                    }
+                  }}
+                  className="text-lg text-danger cursor-pointer active:opacity-50"
+                >
+                  <DeleteIcon />
+                </span>
+              </Tooltip>
+            </div>
+          );
+        default:
+          return cellValue;
+      }
+    },
+    [isAuthorized]
+  );
 
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
@@ -148,23 +159,22 @@ export default function KeteranganPenawaran({
   return (
     <>
       <Table
+        key={isAuthorized}
         isStriped
         isCompact
         className=""
         topContent={
-          isAuthorized && (
-            <div>
-              <Button
-                color="primary"
-                onPress={() => {
-                  setForm({ ...form, mode: "Tambah" });
-                  onOpen();
-                }}
-              >
-                Tambah
-              </Button>
-            </div>
-          )
+          <div>
+            <Button
+              color="primary"
+              onPress={() => {
+                setForm({ ...form, mode: "Tambah" });
+                onOpen();
+              }}
+            >
+              Tambah
+            </Button>
+          </div>
         }
         // bottomContent={}
         aria-label="Example table with custom cells"

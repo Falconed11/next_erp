@@ -33,7 +33,12 @@ import {
 import { invoice } from "@/app/utils/formatid";
 import { getDateFId } from "@/app/utils/date";
 import { nominalToText } from "@/app/utils/number";
-import { BKSHeader, CompanyHeader, SVTHeader } from "@/components/mycomponent";
+import {
+  BKSHeader,
+  CompanyHeader,
+  OpenBlueLinkInNewTab,
+  SVTHeader,
+} from "@/components/mycomponent";
 import { EditIcon, DeleteIcon } from "@/components/icon";
 import Harga from "@/components/harga";
 import Image from "next/image";
@@ -90,17 +95,34 @@ export default function Invoice({
   );
   return (
     <>
-      <Button
-        isDisabled={!lengthPembayaran}
-        onPress={() => {
-          setVersi(lengthPembayaran - 1);
-          onOpen();
-        }}
-        color="primary"
-        className=""
+      <Tooltip
+        content={
+          <div>
+            Pastikan sudah ada{" "}
+            <OpenBlueLinkInNewTab
+              link={`/proyek/detail/proses?id=${proyek.id}`}
+            >
+              pembayaran
+            </OpenBlueLinkInNewTab>{" "}
+            untuk dapat mengakses invoice!
+          </div>
+        }
+        isDisabled={!!lengthPembayaran}
       >
-        Invoice
-      </Button>
+        <div>
+          <Button
+            isDisabled={!lengthPembayaran}
+            onPress={() => {
+              setVersi(lengthPembayaran - 1);
+              onOpen();
+            }}
+            color="primary"
+            className=""
+          >
+            Invoice
+          </Button>
+        </div>
+      </Tooltip>
       <Modal
         scrollBehavior="inside"
         size="4xl"

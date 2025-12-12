@@ -386,9 +386,9 @@ export default function App({ id, versi }) {
   const selectedProyek = proyek?.data?.[0];
   const isHighRole = highRoleCheck(sessUser?.rank);
   const idKaryawan = selectedProyek?.id_karyawan;
-  const isAuthorized =
-    (isHighRole || !idKaryawan || idKaryawan == sessUser?.id_karyawan) &&
-    selectedProyek?.id_statusproyek == 1;
+  const isRoleAuthorized =
+    isHighRole || !idKaryawan || idKaryawan == sessUser?.id_karyawan;
+  const isAuthorized = isRoleAuthorized && selectedProyek?.id_statusproyek == 1;
   const renderCell = {
     keranjangproyek: React.useCallback(
       (data, columnKey) => {
@@ -1219,7 +1219,7 @@ export default function App({ id, versi }) {
                 <SuratJalan
                   id_proyek={id}
                   versi={selectVersi.values().next().value}
-                  isAuthorized={isAuthorized}
+                  isAuthorized={isRoleAuthorized}
                 />
               </div>
               {/* Kwitansi */}

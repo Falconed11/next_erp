@@ -241,7 +241,7 @@ export default function SuratJalan({ id_proyek, versi, isAuthorized }) {
                             <div>
                               No. Invoice :{" "}
                               {invoice(
-                                selectedProyek.id_kustom,
+                                selectedProyek.id_penawaran,
                                 new Date(selectedProyek.tanggal)
                               )}
                             </div>

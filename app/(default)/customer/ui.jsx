@@ -55,7 +55,7 @@ import Harga from "@/components/harga";
 import { FileUploader } from "@/components/input";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { LinkOpenNewTab } from "@/components/mycomponent";
+import { LinkOpenNewTab, OpenBlueLinkInNewTab } from "@/components/mycomponent";
 import ModalTransferData from "@/components/modaltransferdata";
 
 const apiPath = getApiPath();
@@ -213,7 +213,9 @@ export default function App() {
         case "jumlah_proyek":
           return (
             <div className="text-right">
-              <Harga harga={cellValue} />
+              <OpenBlueLinkInNewTab link={`/proyek?id_instansi=${data.id}`}>
+                <Harga harga={cellValue} />
+              </OpenBlueLinkInNewTab>
             </div>
           );
         case "provit":
@@ -514,6 +516,9 @@ export default function App() {
         valueKey={"id"}
         labelKey={"nama"}
         onSave={onSave}
+        customLabel={(item) =>
+          [item.swasta ? "Swasta" : "Negri", item.kota, item.alamat].join(" | ")
+        }
       />
       {/* upload report */}
       <Modal

@@ -246,6 +246,7 @@ export default function App({ id_produk }) {
     const json = await res.json();
     if (res.status == 400) return alert(json.message);
     produk.mutate();
+    alert(json.message);
     onClose();
     //return alert(json.message);
   };

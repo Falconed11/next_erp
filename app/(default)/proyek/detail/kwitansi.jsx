@@ -1,6 +1,6 @@
-import { RadioGroup, Radio } from "@heroui/react";
+import { RadioGroup, Radio, Tooltip } from "@heroui/react";
 import { getDateFId } from "@/app/utils/date";
-import { CompanyHeader } from "@/components/mycomponent";
+import { CompanyHeader, OpenBlueLinkInNewTab } from "@/components/mycomponent";
 import Harga from "@/components/harga";
 import {
   Modal,
@@ -31,19 +31,37 @@ export default function Kwitansi({ proyek, nilaiProyek }) {
   if (pembayaranProyek.isLoading) return <div>loading...</div>;
   const pembayaran = pembayaranProyek.data;
   const lengthPembayaran = pembayaran.length;
+  const isPrintable = !!pembayaran[versi]?.status;
   return (
     <>
-      <Button
-        isDisabled={!lengthPembayaran}
-        onPress={() => {
-          setVersi(lengthPembayaran - 1);
-          onOpen();
-        }}
-        className=""
-        color="primary"
+      <Tooltip
+        content={
+          <div>
+            Pastikan sudah ada{" "}
+            <OpenBlueLinkInNewTab
+              link={`/proyek/detail/proses?id=${proyek.id}`}
+            >
+              pembayaran
+            </OpenBlueLinkInNewTab>{" "}
+            untuk dapat mengakses kwitansi!
+          </div>
+        }
+        isDisabled={!!lengthPembayaran}
       >
-        Kwitansi
-      </Button>
+        <div>
+          <Button
+            isDisabled={!lengthPembayaran}
+            onPress={() => {
+              setVersi(lengthPembayaran - 1);
+              onOpen();
+            }}
+            className=""
+            color="primary"
+          >
+            Kwitansi
+          </Button>
+        </div>
+      </Tooltip>
       <Modal
         scrollBehavior="inside"
         size="4xl"
@@ -162,13 +180,30 @@ export default function Kwitansi({ proyek, nilaiProyek }) {
                 <Button color="danger" variant="light" onPress={onClose}>
                   Tutup
                 </Button>
-                <Button
-                  color="primary"
-                  isDisabled={!pembayaran[versi]?.status}
-                  onPress={handlePrintInvoice}
+                <Tooltip
+                  content={
+                    <div>
+                      Pastikan status{" "}
+                      <OpenBlueLinkInNewTab
+                        link={`/proyek/detail/proses?id=${proyek.id}`}
+                      >
+                        pembayaran
+                      </OpenBlueLinkInNewTab>{" "}
+                      lunas untuk dapat mencetak kwitansi!
+                    </div>
+                  }
+                  isDisabled={isPrintable}
                 >
-                  Cetak
-                </Button>
+                  <div>
+                    <Button
+                      color="primary"
+                      isDisabled={!isPrintable}
+                      onPress={handlePrintInvoice}
+                    >
+                      Cetak
+                    </Button>
+                  </div>
+                </Tooltip>
               </ModalFooter>
             </>
           )}

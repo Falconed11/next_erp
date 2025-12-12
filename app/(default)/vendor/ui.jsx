@@ -451,6 +451,7 @@ export default function App() {
         valueKey={"id"}
         labelKey={"nama"}
         onSave={onSave}
+        customLabel={(item) => item.alamat}
       />
       {/* upload report */}
       <Modal

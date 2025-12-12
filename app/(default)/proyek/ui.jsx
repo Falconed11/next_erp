@@ -2,7 +2,7 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import * as XLSX from "xlsx";
-import { RadioGroup, Radio } from "@heroui/react";
+import { RadioGroup, Radio, Badge } from "@heroui/react";
 import { useClientFetch, getApiPath } from "@/app/utils/apiconfig";
 const apiPath = getApiPath();
 import { fIdProyek } from "@/app/utils/formatid";
@@ -80,6 +80,7 @@ import { LIST_SWASTA_NEGRI } from "@/app/utils/const";
 import { StatusProyek } from "./statusproyek";
 import { AutocompleteCustomer } from "@/components/myautocomplete";
 import { BadgeStatusProyek } from "@/components/badgestatusproyek";
+import { label } from "framer-motion/client";
 
 export default function App({
   id_instansi,
@@ -107,6 +108,7 @@ export default function App({
   const [filteredData, setFilteredData] = useState([]);
   const [selectStatusProyek, setSelectStatusProyek] = useState();
   const produk = useClientFetch(id_produk ? `produk?id=${id_produk}` : null);
+  const customer = useClientFetch(`customer`);
   const proyek = useClientFetch(
     `proyek?${id_instansi ? `id_instansi=${id_instansi}` : ""}${
       selectkaryawan.size > 0
@@ -127,9 +129,6 @@ export default function App({
   const karyawan = useClientFetch("karyawan");
   // const statusproyek = useClientFetch("statusproyek?ids=1&ids=3");
   const statusproyek = useClientFetch("statusproyek?nids=2&nids=-1");
-  const customer = useClientFetch(
-    `customer?${id_instansi ? `id=${id_instansi}` : ""}`
-  );
   const kategoriproyek = useClientFetch("kategoriproyek");
   const queries = {
     produk,
@@ -381,14 +380,14 @@ export default function App({
               icon={<BusinessProgressBarIcon />}
             /> */}
               <LinkOpenNewTab
-                content="Detail"
+                content="Detail (Penawaran, Invoice, Surat Jalan, & Kwitansi)"
                 link={`/proyek/detail?id=${data.id}&versi=${
                   data.versi <= 0 ? "1" : data.versi
                 }`}
                 icon={<NoteIcon />}
               />
               {rolesCheck(["super", "admin", "sales"], peran) ? (
-                <Tooltip content="Pengeluaran & Pembayaran">
+                <Tooltip content="Proses (Pengeluaran & Pembayaran)">
                   <Link href={`/proyek/detail/proses?id=${data.id}`}>
                     <span
                       // onClick={() => detailButtonPress(data)}
@@ -634,18 +633,10 @@ export default function App({
     </div>
   );
   const selectedProduct = produk.data?.[0];
-  console.log({ produk });
+  const selectedCustomer = customer.data.find((item) => item.id == id_instansi);
+  console.log(selectedCustomer);
   return (
     <div className="flex flex-col gap-2 w-7/8- h-3/4">
-      {id_instansi ? (
-        <div className="flex">
-          <div className="bg-white rounded-lg p-3">
-            Customer: {customer.data[0].nama}
-          </div>
-        </div>
-      ) : (
-        <></>
-      )}
       <div>
         <div className="bg-white p-2 rounded-lg inline-flex gap-2 items-center">
           <div className="font-bold text-lg">Proyek</div>
@@ -744,6 +735,21 @@ export default function App({
                               {o.label} : {o.value}
                             </div>
                           ))}
+                        </div>
+                      )}
+                      {selectedCustomer && (
+                        <div>
+                          <FilterCard
+                            title={"Customer"}
+                            arrayContent={[
+                              { label: "Id", value: selectedCustomer.id },
+                              { label: "Nama", value: selectedCustomer.nama },
+                              {
+                                label: "Alamat",
+                                value: selectedCustomer.alamat,
+                              },
+                            ]}
+                          />
                         </div>
                       )}
                     </div>
@@ -1229,3 +1235,25 @@ export default function App({
     </div>
   );
 }
+
+const FilterCard = ({ title, arrayContent = [], link }) => {
+  return (
+    <Badge
+      color="danger"
+      content={
+        <Link className="px-1" href={`proyek?`}>
+          Hapus
+        </Link>
+      }
+    >
+      <div className="flex flex-col gap-2 p-2 border shadow-lg rounded-lg">
+        <div className="font-bold text-lg">{title}</div>
+        {arrayContent.map((o, i) => (
+          <div key={i}>
+            {o.label} : {o.value}
+          </div>
+        ))}
+      </div>
+    </Badge>
+  );
+};
