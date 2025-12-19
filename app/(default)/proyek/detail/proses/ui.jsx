@@ -46,6 +46,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { NavLinkNewTab } from "@/components/mycomponent";
 import PembayaranProyek from "./pembayaranproyek";
+import ProdukMenunggu from "./produkmenunggu";
 import { countPercentProvit, countRecapitulation } from "@/app/utils/formula";
 import { highRoleCheck, renderQueryStates } from "@/app/utils/tools";
 import { useSession } from "next-auth/react";
@@ -745,6 +746,7 @@ export default function App({ id }) {
         topContent={
           <>
             <div>Pengeluaran Proyek</div>
+            <ProdukMenunggu id_proyek={id} />
             {isAuthorized && (
               <div className="flex-col gap-2">
                 <div className="flex flex-row gap-2">
