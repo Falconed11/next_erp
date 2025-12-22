@@ -48,7 +48,12 @@ import { NavLinkNewTab } from "@/components/mycomponent";
 import PembayaranProyek from "./pembayaranproyek";
 import ProdukMenunggu from "./produkmenunggu";
 import { countPercentProvit, countRecapitulation } from "@/app/utils/formula";
-import { highRoleCheck, renderQueryStates } from "@/app/utils/tools";
+import {
+  highRoleCheck,
+  key2set,
+  renderQueryStates,
+  set2key,
+} from "@/app/utils/tools";
 import { useSession } from "next-auth/react";
 import {
   ShowHideComponent,
@@ -87,9 +92,6 @@ export default function App({ id }) {
   const pembayaranproyek = useClientFetch(`pembayaranproyek?id_proyek=${id}`);
   const kategori = useClientFetch(`kategoriproduk`);
   const metodepembayaran = useClientFetch(`metodepembayaran`);
-  const produk = useClientFetch(
-    `produk?kategori=${selectKategori.values().next().value}`
-  );
   const selectedVersion = proyek.data?.[0]?.versi || 0;
   const sums = (pembayaranproyek?.data ?? []).reduce(
     (acc, v) => {
@@ -162,10 +164,11 @@ export default function App({ id }) {
   };
   const tambahButtonPress = async ({ selectProduk, selectKaryawan, form }) => {
     // if (select.size == 0) return alert("Produk belum dipilih.");
-    if (!selectKaryawan) return alert("Karyawan belum dipilih");
+    if (!form.id_karyawan) return alert("Karyawan belum dipilih");
     if (form.isSelected && form.stok < form.jumlah)
       return alert("Jumlah melebihi stok.");
     let res;
+    const keteranganpengeluaranproyek = form.keteranganpengeluaranproyek;
     if (form.isSelected) {
       res = await fetch(`${api_path}produkkeluar`, {
         method: "POST",
@@ -176,8 +179,8 @@ export default function App({ id }) {
         body: JSON.stringify({
           ...form,
           id_proyek: id,
-          id_karyawan: selectKaryawan ?? 0,
           tanggal: form.startdate ? getDate(form.startdate) : "",
+          keterangan: keteranganpengeluaranproyek,
         }),
       });
     } else {
@@ -190,14 +193,9 @@ export default function App({ id }) {
         body: JSON.stringify({
           ...form,
           id_proyek: id,
-          id_produk: form.selectProduk,
-          id_karyawan: selectKaryawan ?? 0,
           id_vendor: form.selectVendor,
           tanggal: form.startdate ? getDate(form.startdate) : "",
-          jumlah: form.jumlah,
-          harga: form.harga,
-          keterangan: form.keterangan ? form.keterangan : "",
-          status: form.status ? form.status : "",
+          keterangan: keteranganpengeluaranproyek,
         }),
       });
     }
@@ -566,7 +564,6 @@ export default function App({ id }) {
       karyawan,
       kategori,
       metodepembayaran,
-      produk,
       keranjangPeralatan,
       keranjangInstalasi,
       rekapitulasiProyek,
@@ -588,6 +585,7 @@ export default function App({ id }) {
     );
   }, 0);
   const provit = omset - biayaProduksi;
+  console.log(form);
   return (
     <div className="flex flex-col gap-2 w-full-">
       <div className="flex gap-2">
@@ -746,7 +744,7 @@ export default function App({ id }) {
         topContent={
           <>
             <div>Pengeluaran Proyek</div>
-            <ProdukMenunggu id_proyek={id} />
+            <ProdukMenunggu id_proyek={id} form={form} setForm={setForm} />
             {isAuthorized && (
               <div className="flex-col gap-2">
                 <div className="flex flex-row gap-2">
@@ -772,8 +770,10 @@ export default function App({ id }) {
                     label="Karyawan"
                     placeholder="Pilih karyawan!"
                     className="w-2/12"
-                    selectedKeys={[selectKaryawan]}
-                    onChange={(e) => setSelectKaryawan(e.target.value)}
+                    selectedKeys={key2set(form.id_karyawan)}
+                    onSelectionChange={(val) =>
+                      setForm({ ...form, id_karyawan: set2key(val) })
+                    }
                   >
                     {karyawan.data.map((item) => (
                       <SelectItem key={item.id} value={item.id}>
@@ -783,14 +783,14 @@ export default function App({ id }) {
                   </Select>
                   <Input
                     type="text"
-                    value={form.keteranganpenawaran}
+                    value={form.keteranganpengeluaranproyek}
                     label="Keterangan"
                     placeholder="Masukkan keterangan!"
                     className="w-2/12 pl-2"
                     onValueChange={(v) =>
                       setForm({
                         ...form,
-                        keteranganpenawaran: v,
+                        keteranganpengeluaranproyek: v,
                       })
                     }
                   />

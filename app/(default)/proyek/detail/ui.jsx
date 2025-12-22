@@ -181,7 +181,7 @@ export default function App({ id, versi }) {
     });
     const json = await res.json();
     if (res.status == 400) return alert(json.message);
-    const newForm = {};
+    const newForm = { namakustom: "" };
     if (form.instalasi) setFormInstalasi(newForm);
     else setForm(newForm);
     mutateKeranjang();
