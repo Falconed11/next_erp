@@ -213,7 +213,7 @@ const AutocompleteMerek = (props) => {
 };
 const AutocompleteVendor = (props) => {
   const { component } = useAutocompleteField({
-    endpoint: "vendor",
+    endpoint: "vendor?columnName=nama",
     title: "Vendor",
     field: "vendor",
     id: "id_vendor",

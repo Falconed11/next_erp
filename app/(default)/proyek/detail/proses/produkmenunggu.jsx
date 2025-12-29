@@ -74,6 +74,10 @@ const ProdukMenunggu = ({ id_proyek, form, setForm }) => {
       label: "Aksi",
     },
     {
+      key: "kategoriproduk",
+      label: "Kategori",
+    },
+    {
       key: "nama",
       label: "Produk",
     },
@@ -115,13 +119,15 @@ const ProdukMenunggu = ({ id_proyek, form, setForm }) => {
         )}
       </TableHeader>
       <TableBody items={produkmenunggu.data.data} emptyContent={"Kosong"}>
-        {(item) => (
-          <TableRow key={item.id}>
-            {(columnKey) => (
-              <TableCell>{renderCell(item, columnKey)}</TableCell>
-            )}
-          </TableRow>
-        )}
+        {(item) =>
+          item.produkmenunggu != 0 && (
+            <TableRow key={item.id}>
+              {(columnKey) => (
+                <TableCell>{renderCell(item, columnKey)}</TableCell>
+              )}
+            </TableRow>
+          )
+        }
       </TableBody>
     </Table>
   );

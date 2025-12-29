@@ -193,7 +193,7 @@ export default function App({ id }) {
         body: JSON.stringify({
           ...form,
           id_proyek: id,
-          id_vendor: form.selectVendor,
+          // id_vendor: form.selectVendor,
           tanggal: form.startdate ? getDate(form.startdate) : "",
           keterangan: keteranganpengeluaranproyek,
         }),

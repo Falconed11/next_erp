@@ -17,6 +17,7 @@ import {
   AutocompleteKategoriProduk,
   AutocompleteMerek,
   AutocompleteProduk,
+  AutocompleteVendor,
   MyAutocomplete,
   MyAutocompleteItem,
 } from "./myautocomplete";
@@ -180,27 +181,33 @@ export default function TambahProduk({
         }
       />
       {!disableVendor && !form.isSelected == true && (
-        <Autocomplete
-          label="Vendor"
-          variant={variant}
-          defaultItems={fvendor}
-          placeholder="Pilih vendor"
+        // <Autocomplete
+        //   label="Vendor"
+        //   variant={variant}
+        //   defaultItems={fvendor}
+        //   placeholder="Pilih vendor"
+        //   className={defStyleFormWidth}
+        //   selectedKey={form.selectVendor}
+        //   onSelectionChange={(v) => {
+        //     setForm({
+        //       ...form,
+        //       selectVendor: v,
+        //     });
+        //   }}
+        //   onValueChange={setSVendor}
+        // >
+        //   {(item) => (
+        //     <AutocompleteItem key={item.id} textValue={item.nama}>
+        //       {item.nama}
+        //     </AutocompleteItem>
+        //   )}
+        // </Autocomplete>
+        <AutocompleteVendor
           className={defStyleFormWidth}
-          selectedKey={form.selectVendor}
-          onSelectionChange={(v) => {
-            setForm({
-              ...form,
-              selectVendor: v,
-            });
-          }}
-          onValueChange={setSVendor}
-        >
-          {(item) => (
-            <AutocompleteItem key={item.id} textValue={item.nama}>
-              {item.nama}
-            </AutocompleteItem>
-          )}
-        </Autocomplete>
+          disableCustomValue={true}
+          form={form}
+          setForm={setForm}
+        />
       )}
       {!disableStok && selectProduk?.stok > 0 && (
         <Checkbox
