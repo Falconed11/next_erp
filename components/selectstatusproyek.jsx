@@ -19,7 +19,11 @@ export default function SelectStatusProyek({ select, setSelect }) {
       onSelectionChange={(v) => setSelect(v.values().next().value)}
     >
       {statusproyek.data.map((item) => (
-        <SelectItem key={item.id} value={item.id}>
+        <SelectItem
+          key={item.id}
+          value={item.id}
+          textValue={`${item.nama} ${item.progress}%`}
+        >
           {item.nama} {item.progress}%
         </SelectItem>
       ))}

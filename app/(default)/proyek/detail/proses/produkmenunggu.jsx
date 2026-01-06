@@ -18,7 +18,8 @@ import Harga from "@/components/harga";
 import { getApiPath, useClientFetch } from "@/app/utils/apiconfig";
 import { key2set, set2key, renderQueryStates } from "@/app/utils/tools";
 import { useCallback } from "react";
-import { DeleteIcon, EditIcon } from "@/components/icon";
+import { AddIcon, DeleteIcon, EditIcon } from "@/components/icon";
+import { OpenBlueLinkInNewTab } from "@/components/mycomponent";
 const apiPath = getApiPath();
 
 const ProdukMenunggu = ({ id_proyek, form, setForm, onScroll = () => {} }) => {
@@ -48,10 +49,18 @@ const ProdukMenunggu = ({ id_proyek, form, setForm, onScroll = () => {} }) => {
             <Harga harga={cellValue} />
           </div>
         );
+      case "id":
+        return (
+          <div className={`text-right`}>
+            <OpenBlueLinkInNewTab link={`/produk?id=${cellValue}`}>
+              {cellValue}
+            </OpenBlueLinkInNewTab>
+          </div>
+        );
       case "aksi":
         return (
           <div className="relative flex items-center gap-2">
-            <Tooltip content="Edit">
+            <Tooltip content="Tambah ke Pengeluaran">
               <span
                 onClick={() => {
                   setForm({
@@ -68,7 +77,7 @@ const ProdukMenunggu = ({ id_proyek, form, setForm, onScroll = () => {} }) => {
                 }}
                 className="text-lg text-default-400 cursor-pointer active:opacity-50"
               >
-                <EditIcon />
+                <AddIcon />
               </span>
             </Tooltip>
           </div>
@@ -83,6 +92,10 @@ const ProdukMenunggu = ({ id_proyek, form, setForm, onScroll = () => {} }) => {
     {
       key: "aksi",
       label: "Aksi",
+    },
+    {
+      key: "id",
+      label: "ID",
     },
     {
       key: "kategoriproduk",
