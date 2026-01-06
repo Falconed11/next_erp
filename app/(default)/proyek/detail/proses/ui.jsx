@@ -73,6 +73,12 @@ export default function App({ id }) {
     pageStyle: "p-10",
   });
   const now = new Date();
+  const addProductRef = useRef(null);
+  const scroll2AddProduct = () => {
+    addProductRef.current?.scrollIntoView({
+      behavior: "smooth",
+    });
+  };
   const [selectKategori, setSelectKategori] = useState(new Set([]));
   const [selectProduk, setSelectProduk] = useState(new Set([]));
   const karyawan = useClientFetch(`karyawan`);
@@ -744,10 +750,15 @@ export default function App({ id }) {
         topContent={
           <>
             <div>Pengeluaran Proyek</div>
-            <ProdukMenunggu id_proyek={id} form={form} setForm={setForm} />
+            <ProdukMenunggu
+              id_proyek={id}
+              form={form}
+              setForm={setForm}
+              onScroll={scroll2AddProduct}
+            />
             {isAuthorized && (
               <div className="flex-col gap-2">
-                <div className="flex flex-row gap-2">
+                <div ref={addProductRef} className="flex flex-row gap-2">
                   <TambahProduk
                     disableCustomValue
                     form={form}

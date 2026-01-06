@@ -21,7 +21,7 @@ import { useCallback } from "react";
 import { DeleteIcon, EditIcon } from "@/components/icon";
 const apiPath = getApiPath();
 
-const ProdukMenunggu = ({ id_proyek, form, setForm }) => {
+const ProdukMenunggu = ({ id_proyek, form, setForm, onScroll = () => {} }) => {
   const produkmenunggu = useClientFetch(
     `v2/proyek/${id_proyek}/produkmenunggu`
   );
@@ -38,12 +38,22 @@ const ProdukMenunggu = ({ id_proyek, form, setForm }) => {
             <Harga harga={cellValue} />
           </div>
         );
+      case "stok":
+        return (
+          <div
+            className={`text-right${
+              data.produkmenunggu > cellValue ? " text-red-500" : ""
+            }`}
+          >
+            <Harga harga={cellValue} />
+          </div>
+        );
       case "aksi":
         return (
           <div className="relative flex items-center gap-2">
             <Tooltip content="Edit">
               <span
-                onClick={() =>
+                onClick={() => {
                   setForm({
                     ...form,
                     ...data,
@@ -53,8 +63,9 @@ const ProdukMenunggu = ({ id_proyek, form, setForm }) => {
                     id_kategori: data.idkategoriproduk,
                     id_merek: data.idmerek,
                     harga: data.hargamodal,
-                  })
-                }
+                  });
+                  onScroll();
+                }}
                 className="text-lg text-default-400 cursor-pointer active:opacity-50"
               >
                 <EditIcon />
@@ -92,6 +103,10 @@ const ProdukMenunggu = ({ id_proyek, form, setForm }) => {
     {
       key: "produkmenunggu",
       label: "Produk Menunggu",
+    },
+    {
+      key: "stok",
+      label: "Stok",
     },
     {
       key: "keterangan",
