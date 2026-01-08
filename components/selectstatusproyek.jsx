@@ -1,6 +1,6 @@
 import { useClientFetch } from "@/app/utils/apiconfig";
 import { Select, SelectItem } from "@heroui/react";
-export default function SelectStatusProyek({ select, setSelect }) {
+export default function SelectStatusProyek({ select, setSelect, setPage }) {
   const statusproyek = useClientFetch("statusproyek");
   const queries = {
     statusproyek,
@@ -16,7 +16,10 @@ export default function SelectStatusProyek({ select, setSelect }) {
       className=""
       selectedKeys={new Set(select ? [String(select)] : [])}
       variant="bordered"
-      onSelectionChange={(v) => setSelect(v.values().next().value)}
+      onSelectionChange={(v) => {
+        setSelect(v.values().next().value);
+        setPage(1);
+      }}
     >
       {statusproyek.data.map((item) => (
         <SelectItem

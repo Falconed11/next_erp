@@ -715,6 +715,7 @@ export default function App({
                         <SelectStatusProyek
                           select={selectStatusProyek}
                           setSelect={setSelectStatusProyek}
+                          setPage={setPage}
                         />
                       </div>
                       {selectedProduct && (

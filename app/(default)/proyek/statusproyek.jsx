@@ -44,7 +44,7 @@ const StatusProyek = () => {
   };
   const simpanPress = async (onClose) => {
     const progress = form?.progress;
-    if (!progress || progress > 100 || progress < 0)
+    if (progress == null || progress > 100 || progress < 0)
       return alert("Progres tidak valid. (0-100)");
     const res = await fetch(`${API_PATH}statusproyek`, {
       method: form.method,
@@ -156,6 +156,7 @@ const StatusProyek = () => {
       label: "Jumlah Proyek",
     },
   ];
+  console.log(form.progress);
   return (
     <>
       <Table

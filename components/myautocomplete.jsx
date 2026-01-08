@@ -106,7 +106,7 @@ const AutocompleteWithCustomValue = ({
         prev.find(
           (i) => getCustomValue(i)?.toLowerCase() === value.toLowerCase()
         );
-      return data.filter((i) => contains(i[labelKey], value));
+      return data.filter((i) => contains(getCustomValue(i), value));
     });
     setForm((prev) => ({
       ...prev,

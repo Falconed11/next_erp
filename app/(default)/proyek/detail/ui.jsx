@@ -192,6 +192,7 @@ export default function App({ id, versi }) {
     console.log({ data });
     setForm({
       ...data,
+      namakustom: data.keterangan,
       id: data.id_keranjangproyek,
       profit: data.harga - data.temphargamodal,
       oldHargaModal: data.temphargamodal,
@@ -1716,11 +1717,11 @@ export default function App({ id, versi }) {
                   type="text"
                   label="Nama Kustom (Opsional)"
                   placeholder="Masukkan nama kustom!"
-                  value={form.keterangan}
+                  value={form.namakustom}
                   onValueChange={(v) =>
                     setForm({
                       ...form,
-                      keterangan: v,
+                      namakustom: v,
                     })
                   }
                 />
