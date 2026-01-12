@@ -387,9 +387,11 @@ export default function App({ id, versi }) {
   const selectedProyek = proyek?.data?.[0];
   const isHighRole = highRoleCheck(sessUser?.rank);
   const idKaryawan = selectedProyek?.id_karyawan;
+  const selectedProgress = selectedProyek?.progress;
   const isRoleAuthorized =
     isHighRole || !idKaryawan || idKaryawan == sessUser?.id_karyawan;
-  const isAuthorized = isRoleAuthorized && selectedProyek?.id_statusproyek == 1;
+  const isAuthorized =
+    isRoleAuthorized && selectedProgress >= 10 && selectedProgress < 100;
   const renderCell = {
     keranjangproyek: React.useCallback(
       (data, columnKey) => {
@@ -660,14 +662,18 @@ export default function App({ id, versi }) {
   if (!selectedProyek) return <>Proyek tidak ditemukan</>;
   const col = {
     keranjangproyek: [
-      ...(selectedProyek?.versi
-        ? []
-        : [
-            {
-              key: "aksi",
-              label: "Aksi",
-            },
-          ]),
+      // ...(selectedProyek?.versi
+      //   ? []
+      //   : [
+      //       {
+      //         key: "aksi",
+      //         label: "Aksi",
+      //       },
+      //     ]),
+      {
+        key: "aksi",
+        label: "Aksi",
+      },
       {
         key: "kategoriproduk",
         label: "Kategori",
@@ -762,14 +768,18 @@ export default function App({ id, versi }) {
         : []),
     ],
     instalasi: [
-      ...(selectedProyek?.versi
-        ? []
-        : [
-            {
-              key: "aksi",
-              label: "Aksi",
-            },
-          ]),
+      // ...(selectedProyek?.versi
+      //   ? []
+      //   : [
+      //       {
+      //         key: "aksi",
+      //         label: "Aksi",
+      //       },
+      //     ]),
+      {
+        key: "aksi",
+        label: "Aksi",
+      },
       {
         key: "kategoriproduk",
         label: "Kategori",
@@ -1076,7 +1086,7 @@ export default function App({ id, versi }) {
           </div>
         </div>
         {/* alat */}
-        {selectedProyek?.versi == 0 && sessUser.rank <= 10 ? (
+        {isAuthorized ? (
           <div>
             <div className="bg-white rounded-lg p-3 flex flex-col gap-2">
               <div>Alat</div>
@@ -1283,6 +1293,7 @@ export default function App({ id, versi }) {
               />
               {/* tabel peralatan */}
               <Table
+                key={selectedProgress}
                 isStriped
                 isCompact
                 className="pt-3"
@@ -1461,6 +1472,7 @@ export default function App({ id, versi }) {
               </Table>
               {/* tabel instalasi */}
               <Table
+                key={`${selectedProgress}-instalasi`}
                 isStriped
                 isCompact
                 topContent={

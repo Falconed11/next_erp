@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import * as XLSX from "xlsx";
 import { RadioGroup, Radio, Badge } from "@heroui/react";
@@ -78,9 +78,11 @@ import "react-datepicker/dist/react-datepicker.css";
 import SelectStatusProyek from "@/components/selectstatusproyek";
 import { LIST_SWASTA_NEGRI } from "@/app/utils/const";
 import { StatusProyek } from "./statusproyek";
+import PrintDaftarProyek from "./printdaftarproyek";
 import { AutocompleteCustomer } from "@/components/myautocomplete";
 import { BadgeStatusProyek } from "@/components/badgestatusproyek";
 import { label } from "framer-motion/client";
+import { useReactToPrint } from "react-to-print";
 
 export default function App({
   id_instansi,
@@ -89,11 +91,11 @@ export default function App({
   endDate,
   id_produk,
 }) {
-  const [sort, setSort] = React.useState("tanggal_penawaran");
+  const [sort, setSort] = useState("tanggal_penawaran");
   const session = useSession();
   const sessUser = session.data?.user;
 
-  const [selectedKeys, setSelectedKeys] = React.useState(new Set([]));
+  const [selectedKeys, setSelectedKeys] = useState(new Set([]));
   const [current, setCurrent] = useState({
     startDate: startDate ? new Date(startDate) : null,
     endDate: endDate ? new Date(endDate) : null,
@@ -107,6 +109,13 @@ export default function App({
   const rowsPerPage = 10;
   const [filteredData, setFilteredData] = useState([]);
   const [selectStatusProyek, setSelectStatusProyek] = useState();
+  const printProyekRef = useRef(null);
+  const handlePrintProyek = useReactToPrint({
+    // content: () => printProyekRef.current,
+    contentRef: printProyekRef,
+    pageStyle: "bg-white block",
+    documentTitle: "Daftar Proyek",
+  });
   const produk = useClientFetch(id_produk ? `produk?id=${id_produk}` : null);
   const customer = useClientFetch(`customer`);
   const proyek = useClientFetch(
@@ -316,6 +325,8 @@ export default function App({
       const versi = data.versi;
       const peran = data.peran;
       const idStatusProyek = data.id_statusproyek;
+      const tanggalReject = data.tanggal_reject;
+      const sTanggal = "text-white font-bold p-1 rounded";
       switch (columnKey) {
         case "no":
           return `${penawaran(data.id_kustom, date, data.id_karyawan)}`;
@@ -360,7 +371,25 @@ export default function App({
             </div>
           );
         case "tanggal":
-          return data.tanggal ? getDateF(new Date(data.tanggal)) : "";
+          return (
+            <div>
+              {data.id_statusproyek == -1 ? (
+                tanggalReject ? (
+                  <span className={`bg-red-600 ${sTanggal}`}>
+                    {getDateF(new Date(tanggalReject))}
+                  </span>
+                ) : (
+                  ""
+                )
+              ) : cellValue && data.progress == 100 ? (
+                <span className={`bg-green-400 ${sTanggal}`}>
+                  {getDateF(new Date(cellValue))}
+                </span>
+              ) : (
+                ""
+              )}
+            </div>
+          );
         case "tanggal_penawaran":
           return getDateF(new Date(data.tanggal_penawaran));
         case "totalharga":
@@ -484,7 +513,7 @@ export default function App({
     },
     {
       key: "tanggal",
-      label: "Tanggal Proyek",
+      label: "Tanggal Deal/Reject",
     },
     {
       key: "id_second",
@@ -634,10 +663,9 @@ export default function App({
   );
   const selectedProduct = produk.data?.[0];
   const selectedCustomer = customer.data.find((item) => item.id == id_instansi);
-  console.log(selectedCustomer);
   return (
     <div className="flex flex-col gap-2 w-7/8- h-3/4">
-      <div>
+      {/* <div>
         <div className="bg-white p-2 rounded-lg inline-flex gap-2 items-center">
           <div className="font-bold text-lg">Proyek</div>
           <Button
@@ -651,8 +679,19 @@ export default function App({
             </span>
             Tambah
           </Button>
+          <Button
+            variant="shadow"
+            size="sm"
+            color="primary"
+            onPress={handlePrintProyek}
+          >
+            <span className="text-xl font-bold">
+              <AddIcon />
+            </span>
+            Print
+          </Button>
         </div>
-      </div>
+      </div> */}
       <Table
         isStriped
         className=""
@@ -663,7 +702,7 @@ export default function App({
         topContent={
           <div className="flex gap-2">
             {/* Filter & Report */}
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-col">
               <ShowHideComponent
                 stat={stat}
                 setStat={setStat}
@@ -908,6 +947,27 @@ export default function App({
                   </div>
                 </div>
               </ShowHideComponent>
+              <div className="flex gap-2">
+                <Button
+                  variant="shadow"
+                  size="sm"
+                  color="primary"
+                  onPress={tambahButtonPress}
+                >
+                  <span className="text-xl font-bold">
+                    <AddIcon />
+                  </span>
+                  Tambah
+                </Button>
+                <Button
+                  variant="shadow"
+                  size="sm"
+                  color="primary"
+                  onPress={handlePrintProyek}
+                >
+                  Print
+                </Button>
+              </div>
             </div>
           </div>
         }
@@ -1233,6 +1293,12 @@ export default function App({
           )}
         </ModalContent>
       </Modal>
+      <PrintDaftarProyek
+        ref={printProyekRef}
+        data={proyek.data}
+        idInstansi={id_instansi}
+        loadingState={loadingState}
+      />
     </div>
   );
 }

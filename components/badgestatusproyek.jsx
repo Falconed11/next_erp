@@ -24,13 +24,9 @@ const BadgeStatusProyek = ({ idStatusProyek, data, versi }) => {
         </div>
       </Tooltip>
     )
-  ) : versi > 0 ? (
+  ) : data.progress == 100 ? (
     <span
-      className={` ${
-        data.progress == 100
-          ? ""
-          : "p-2 rounded-sm shadow-lg bg-green-500 text-white"
-      } font-bold`}
+      className={`p-2 rounded-sm shadow-lg bg-green-500 text-white font-bold`}
     >
       {capitalizeEachWord(data.statusproyek)}
     </span>
