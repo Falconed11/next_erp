@@ -1,6 +1,8 @@
 // components/TablePrint.jsx
+import { useClientFetch } from "@/app/utils/apiconfig";
 import { getDateF } from "@/app/utils/date";
 import { fIdProyek } from "@/app/utils/formatid";
+import { renderQueryStates } from "@/app/utils/tools";
 import Harga from "@/components/harga";
 import {
   Table,
@@ -18,24 +20,16 @@ const PrintDaftarProyek = forwardRef(
       data,
       idInstansi,
       loadingState,
-      //   idKaryawan,
-      //   idStatusProyek,
-      //   sort,
-      //   idProduk,
-      //   startDate,
-      //   endDate,
+      idKaryawan,
+      idStatusProyek,
+      startDate,
+      endDate,
     },
     ref
   ) => {
-    // const proyek = useClientFetch(
-    //   `proyek?${idInstansi ? `id_instansi=${idInstansi}` : ""}${
-    //     idKaryawan ? `id_karyawan=${idKaryawan}` : ""
-    //   }${startDate ? `&start=${getDate(startDate)}` : ""}${
-    //     endDate ? `&end=${getDate(endDate)}` : ""
-    //   }${
-    //     idStatusProyek ? `&id_statusproyek=${idStatusProyek}` : ""
-    //   }&sort=${sort}&id_produk=${idProduk || ""}`
-    // );
+    console.log(idKaryawan);
+    const karyawan = useClientFetch(`karyawan?id=${idKaryawan}`);
+    const status = useClientFetch(`statusproyek?id=${idStatusProyek}`);
     const renderCell = useCallback((data, columnKey) => {
       const cellValue = data[columnKey];
       const date = new Date(data.tanggal);
@@ -141,6 +135,8 @@ const PrintDaftarProyek = forwardRef(
         label: "Keterangan",
       },
     ];
+    const QueryState = renderQueryStates({ karyawan, status });
+    if (QueryState) return QueryState;
     const textSize = "text-[9px]";
     return (
       <div ref={ref} className="hidden print:block">
@@ -159,7 +155,30 @@ const PrintDaftarProyek = forwardRef(
           }}
           aria-label="Project Table for Print"
           // selectionMode="multiple"
-          topContent={<div>Daftar Proyek</div>}
+          topContent={
+            <div>
+              <div>Daftar Proyek</div>
+              {[
+                { label: "Tanggal Cetak", value: getDateF(new Date()) },
+                ...(idKaryawan
+                  ? [{ label: "Sales", value: karyawan.data[0]?.nama }]
+                  : []),
+                ...(idStatusProyek
+                  ? [{ label: "Status", value: status.data[0]?.nama }]
+                  : []),
+                ...(startDate
+                  ? [{ label: "Tanggal Awal", value: getDateF(startDate) }]
+                  : []),
+                ...(endDate
+                  ? [{ label: "Tanggal Akhir", value: getDateF(endDate) }]
+                  : []),
+              ].map((o, i) => (
+                <div key={i}>
+                  {o.label} : {o.value}
+                </div>
+              ))}
+            </div>
+          }
         >
           <TableHeader columns={columns}>
             {(column) => (

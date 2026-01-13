@@ -1296,8 +1296,11 @@ export default function App({
       <PrintDaftarProyek
         ref={printProyekRef}
         data={proyek.data}
-        idInstansi={id_instansi}
         loadingState={loadingState}
+        idKaryawan={set2key(selectkaryawan)}
+        idStatusProyek={selectStatusProyek}
+        startDate={current.startDate}
+        endDate={current.endDate}
       />
     </div>
   );
