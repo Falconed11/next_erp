@@ -43,7 +43,7 @@ import {
   EyeIcon,
   UserIcon,
 } from "@/components/icon";
-import { MyChip } from "@/components/mycomponent";
+import { LinkOpenNewTab, MyChip } from "@/components/mycomponent";
 
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -238,7 +238,7 @@ export default function UI() {
       case "aksi":
         return (
           <div className="relative flex items-center gap-2">
-            <Tooltip content="Edit">
+            {/* <Tooltip content="Edit">
               <span
                 onClick={() => editButtonPress(data)}
                 className="text-lg text-default-400 cursor-pointer active:opacity-50"
@@ -253,7 +253,12 @@ export default function UI() {
               >
                 <DeleteIcon />
               </span>
-            </Tooltip>
+            </Tooltip> */}
+            <LinkOpenNewTab
+              content="detail"
+              icon={<EyeIcon />}
+              link={`/proyek/detail/proses?id=${data.id_proyek}`}
+            />
           </div>
         );
       default:
@@ -269,6 +274,10 @@ export default function UI() {
   if (pengeluaran.isLoading) return <div>loading...</div>;
 
   const col = [
+    {
+      key: "aksi",
+      label: "Aksi",
+    },
     {
       key: "tanggal",
       label: "tanggal",
@@ -324,10 +333,6 @@ export default function UI() {
     {
       key: "lunas",
       label: "Status",
-    },
-    {
-      key: "aksi",
-      label: "Aksi",
     },
   ];
   return (

@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { getApiPath } from "./apiconfig";
 const api_path = getApiPath();
 const getNextDomain = () => {
@@ -50,6 +51,14 @@ const renderQueryStates = (queries, session) => {
   }
   if (session?.status === "loading") return <div>Session Loading...</div>;
 };
+const useDebounce = (value, delay = 1000) => {
+  const [debounced, setDebounced] = useState(value);
+  useEffect(() => {
+    const timer = setTimeout(() => setDebounced(value), delay);
+    return () => clearTimeout(timer);
+  }, [value, delay]);
+  return debounced;
+};
 export {
   capitalizeEachWord,
   rolesCheck,
@@ -59,4 +68,5 @@ export {
   set2key,
   getNextDomain,
   renderQueryStates,
+  useDebounce,
 };

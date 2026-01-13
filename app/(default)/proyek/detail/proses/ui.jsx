@@ -12,6 +12,7 @@ import {
   Tooltip,
   ChipProps,
   getKeyValue,
+  NumberInput,
 } from "@heroui/react";
 import {
   AddIcon,
@@ -44,7 +45,7 @@ import Image from "next/image";
 import logo from "@/public/logofinal.jpg";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { NavLinkNewTab } from "@/components/mycomponent";
+import { NavLinkNewTab, OpenBlueLinkInNewTab } from "@/components/mycomponent";
 import PembayaranProyek from "./pembayaranproyek";
 import ProdukMenunggu from "./produkmenunggu";
 import { countPercentProvit, countRecapitulation } from "@/app/utils/formula";
@@ -209,6 +210,7 @@ export default function App({ id }) {
     if (res.status == 400) return alert(json.message);
     setForm({
       ...form,
+      vendor: "",
       stok: 0,
       satuan: "",
       jumlah: 0,
@@ -335,9 +337,11 @@ export default function App({ id }) {
   const selectedProyek = proyek?.data?.[0];
   const isHighRole = highRoleCheck(sessUser?.rank);
   const idKaryawan = selectedProyek?.id_karyawan;
+  const selectedProgress = selectedProyek?.progress;
   const isAuthorized =
     (isHighRole || !idKaryawan || idKaryawan == sessUser?.id_karyawan) &&
-    [1, 2].includes(selectedProyek?.id_statusproyek);
+    selectedProgress >= 10 &&
+    selectedProgress < 100;
   const renderCell = {
     pengeluaranproyek: React.useCallback(
       (data, columnKey) => {
@@ -369,6 +373,14 @@ export default function App({ id }) {
                   "Sistem"
                 )}
               </div>
+            );
+          case "id_produkmasuk":
+            return (
+              <OpenBlueLinkInNewTab
+                link={`/produk/masuk?id_produk=${data.id}&id_produkmasuk=${cellValue}`}
+              >
+                {cellValue}
+              </OpenBlueLinkInNewTab>
             );
           case "aksi":
             return (
@@ -483,6 +495,10 @@ export default function App({ id }) {
         label: "Vendor",
       },
       {
+        key: "id_produkmasuk",
+        label: "ID Produk Masuk",
+      },
+      {
         key: "jumlah",
         label: "Jumlah",
       },
@@ -591,6 +607,7 @@ export default function App({ id }) {
     );
   }, 0);
   const provit = omset - biayaProduksi;
+  const variant = "bordered";
   console.log(form);
   return (
     <div className="flex flex-col gap-2 w-full-">
@@ -755,6 +772,7 @@ export default function App({ id }) {
               form={form}
               setForm={setForm}
               onScroll={scroll2AddProduct}
+              isAuthorized={isAuthorized}
             />
             {isAuthorized && (
               <div className="flex-col gap-2">
@@ -925,8 +943,13 @@ export default function App({ id }) {
                 />
                 <div>Merek : {form.merek}</div>
                 <div>Tipe : {form.tipe}</div>
-                <Input
-                  type="number"
+                <NumberInput
+                  variant={variant}
+                  hideStepper
+                  isWheelDisabled
+                  formatOptions={{
+                    useGrouping: false,
+                  }}
                   label={`Jumlah ${
                     form.id_produkkeluar &&
                     `(Maks : ${form.stok + form.oldJumlah})`
@@ -941,9 +964,14 @@ export default function App({ id }) {
                   }
                 />
                 {/* <div>Harga Modal : {form.hargamodal}</div> */}
-                <Input
-                  type="number"
-                  disabled={form.id_produkkeluar ? true : undefined}
+                <NumberInput
+                  variant={variant}
+                  hideStepper
+                  isWheelDisabled
+                  formatOptions={{
+                    useGrouping: false,
+                  }}
+                  isDisabled={form.id_produkkeluar ? true : undefined}
                   value={form.harga}
                   label={`Harga Satuan (${form.oldHarga})`}
                   placeholder="Masukkan harga!"

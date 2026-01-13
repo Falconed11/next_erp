@@ -16,6 +16,7 @@ import {
   ModalFooter,
   ModalHeader,
   NumberInput,
+  Pagination,
   Table,
   TableBody,
   TableCell,
@@ -31,7 +32,13 @@ import { useCallback, useState } from "react";
 const StatusProyek = () => {
   const session = useSession();
   const sessUser = session.data?.user;
-  const statusproyek = useClientFetch("statusproyek");
+  const [page, setPage] = useState(1);
+  const rowsPerPage = 5;
+  const offset = (page - 1) * rowsPerPage;
+  const statusproyek = useClientFetch(
+    `statusproyek?limit=${rowsPerPage}&offset=${offset}`
+  );
+  const pages = Math.ceil(statusproyek?.data?.[0]?.nstatusproyek / rowsPerPage);
   const [form, setForm] = useState({});
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const tambahPress = () => {
@@ -160,6 +167,7 @@ const StatusProyek = () => {
   return (
     <>
       <Table
+        className="min-h-64"
         isStriped
         shadow="md"
         topContent={
@@ -180,7 +188,21 @@ const StatusProyek = () => {
             )}
           </div>
         }
-        bottomContent={<></>}
+        bottomContent={
+          pages > 0 ? (
+            <div className="flex w-full justify-center">
+              <Pagination
+                isCompact
+                showControls
+                showShadow
+                color="primary"
+                page={page}
+                total={pages}
+                onChange={(page) => setPage(page)}
+              />
+            </div>
+          ) : null
+        }
       >
         <TableHeader columns={col}>
           {(column) => (

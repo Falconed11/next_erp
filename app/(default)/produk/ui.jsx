@@ -75,7 +75,11 @@ import {
   countPriceByProvitMarginPercent,
   countProvitMarginPercent,
 } from "@/app/utils/formula";
-import { highRoleCheck, renderQueryStates } from "@/app/utils/tools";
+import {
+  highRoleCheck,
+  renderQueryStates,
+  useDebounce,
+} from "@/app/utils/tools";
 import { useFilter } from "@react-aria/i18n";
 import ModalTransferData from "@/components/modaltransferdata";
 
@@ -144,6 +148,9 @@ export default function App({ id_produk }) {
   const [reportList, setReportList] = useState([]);
   const report = useDisclosure();
   const transfer = useDisclosure();
+
+  const debounceSearchByName = useDebounce(nama, 300);
+  const debounceSearchById = useDebounce(id, 300);
 
   const modal = { masuk: useDisclosure(), keluar: useDisclosure() };
   const saveButtonPress = async (onClose) => {
@@ -499,14 +506,12 @@ export default function App({ id_produk }) {
     if (!produk?.data) return [];
     return produk.data.filter(
       (row) =>
-        (row.nama.toLowerCase().includes(nama.toLowerCase()) ||
-          row.nmerek?.toLowerCase().includes(nama.toLowerCase()) ||
-          row.tipe?.toLowerCase().includes(nama.toLowerCase()) ||
-          row.vendor?.toLowerCase().includes(nama.toLowerCase()) ||
-          row.keterangan?.toLowerCase().includes(nama.toLowerCase())) &&
-        row.id_kustom.toLowerCase().includes(id.toLowerCase())
+        (row.nama + row.nmerek + row.tipe + row.keterangan)
+          .toLowerCase()
+          .includes(debounceSearchByName.toLowerCase()) &&
+        row.id_kustom.toLowerCase().includes(debounceSearchById.toLowerCase())
     );
-  }, [produk?.data, nama, id]);
+  }, [produk?.data, debounceSearchByName, debounceSearchById]);
   const pages = useMemo(() => {
     return filteredData ? Math.ceil(filteredData?.length / rowsPerPage) : 0;
   }, [filteredData?.length, rowsPerPage]);

@@ -47,6 +47,7 @@ import {
 
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { LinkOpenNewTab } from "@/components/mycomponent";
 
 const api_path = getApiPath();
 const [startDate, endDate] = getCurFirstLastDay();
@@ -194,7 +195,12 @@ export default function UI() {
       case "aksi":
         return (
           <div className="relative flex items-center gap-2">
-            <Tooltip content="Edit">
+            <LinkOpenNewTab
+              content="detail"
+              icon={<EyeIcon />}
+              link={`/proyek/detail/proses?id=${data.id_proyek}`}
+            />
+            {/* <Tooltip content="Edit">
               <span
                 onClick={() => editButtonPress(data)}
                 className="text-lg text-default-400 cursor-pointer active:opacity-50"
@@ -209,7 +215,7 @@ export default function UI() {
               >
                 <DeleteIcon />
               </span>
-            </Tooltip>
+            </Tooltip> */}
           </div>
         );
       default:
@@ -234,6 +240,14 @@ export default function UI() {
     {
       key: "tanggal",
       label: "tanggal",
+    },
+    {
+      key: "nama",
+      label: "Nama Proyek",
+    },
+    {
+      key: "instansi",
+      label: "Instansi",
     },
     {
       key: "id_second",

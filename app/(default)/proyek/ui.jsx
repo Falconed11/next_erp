@@ -107,6 +107,7 @@ export default function App({
   const [stat, setStat] = useState(1);
   const [page, setPage] = useState(1);
   const rowsPerPage = 10;
+  const offset = (page - 1) * rowsPerPage;
   const [filteredData, setFilteredData] = useState([]);
   const [selectStatusProyek, setSelectStatusProyek] = useState();
   const printProyekRef = useRef(null);
@@ -165,7 +166,6 @@ export default function App({
     return filteredData ? Math.ceil(filteredData?.length / rowsPerPage) : 0;
   }, [filteredData?.length, rowsPerPage]);
   const loadingState = proyek.isLoading ? "loading" : "idle";
-  const offset = (page - 1) * rowsPerPage;
   const saveButtonPress = async (onClose) => {
     // if (form.isSwasta.size == 0) return alert("Swasta/Negri belum diisi");
     const res = await fetch(`${apiPath}proyek`, {
@@ -723,7 +723,7 @@ export default function App({
                           onValueChange={setSort}
                         >
                           <Radio value="tanggal_penawaran">Penawaran</Radio>
-                          <Radio value="tanggal">Proyek</Radio>
+                          <Radio value="tanggal">Deal</Radio>
                         </RadioGroup>
                         <div className="flex flex-row gap-2">
                           <div className="flex">

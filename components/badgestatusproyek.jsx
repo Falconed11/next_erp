@@ -12,8 +12,6 @@ const BadgeStatusProyek = ({ idStatusProyek, data, versi }) => {
       <span className="p-2 rounded-sm bg-blue-500 shadow-lg text-white font-bold">
         {capitalizeEachWord(data.statusproyek)}
       </span>
-    ) : versi ? (
-      "Selesai"
     ) : (
       <Tooltip color="warning" content="Proyek Berjalan. Penawaran belum deal.">
         <div

@@ -22,7 +22,13 @@ import { AddIcon, DeleteIcon, EditIcon } from "@/components/icon";
 import { OpenBlueLinkInNewTab } from "@/components/mycomponent";
 const apiPath = getApiPath();
 
-const ProdukMenunggu = ({ id_proyek, form, setForm, onScroll = () => {} }) => {
+const ProdukMenunggu = ({
+  id_proyek,
+  form,
+  setForm,
+  isAuthorized,
+  onScroll = () => {},
+}) => {
   const produkmenunggu = useClientFetch(
     `v2/proyek/${id_proyek}/produkmenunggu`
   );
@@ -89,10 +95,14 @@ const ProdukMenunggu = ({ id_proyek, form, setForm, onScroll = () => {} }) => {
   const queryStates = renderQueryStates({ produkmenunggu });
   if (queryStates) return queryStates;
   const col = [
-    {
-      key: "aksi",
-      label: "Aksi",
-    },
+    ...(isAuthorized
+      ? [
+          {
+            key: "aksi",
+            label: "Aksi",
+          },
+        ]
+      : []),
     {
       key: "id",
       label: "ID",
