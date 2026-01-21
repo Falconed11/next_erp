@@ -34,6 +34,11 @@ export default function RootLayout({
     ...(rolesCheck(["admin", "super"], user?.peran)
       ? [
           {
+            key: "jenisproyek",
+            name: "Jenis Proyek",
+            href: "/jenisproyek",
+          },
+          {
             key: "pengeluaran",
             name: "Pengeluaran",
             href: "/pengeluaran",
@@ -111,7 +116,7 @@ export default function RootLayout({
         href: "/operasionalkantor",
         name: "Operasional Kantor",
         icon: <BsHouseGear />,
-      }
+      },
     );
   links.push({ href: "/customer", name: "Customer", icon: <LuBookUser /> });
   if (rolesCheck(["admin", "super"], user?.peran))
@@ -140,16 +145,16 @@ export default function RootLayout({
         name: "Laporan",
         icon: <TbDeviceDesktopAnalytics />,
         dropdown: [
-          // {
-          //     key: "labarugi",
-          //     name: "Laba Rugi",
-          //     href: "/labarugi"
-          // },
-          // {
-          //     key: "proyekbulanan",
-          //     name: "Proyek Bulanan",
-          //     href: "/proyekbulanan"
-          // },
+          {
+            key: "labarugi",
+            name: "Laba Rugi",
+            href: "/labarugi",
+          },
+          {
+            key: "proyekbulanan",
+            name: "Proyek Bulanan",
+            href: "/proyekbulanan",
+          },
           {
             key: "omset",
             name: "Omset",
@@ -171,17 +176,12 @@ export default function RootLayout({
         href: "/perusahaan",
         name: "Perusahaan",
         icon: <HiOutlineOfficeBuilding />,
-      }
+      },
     );
   if (user?.peran == "super" || true)
     links.push({ href: "/user", name: "User", icon: <FaRegUser /> });
   if (user?.peran == "super")
     links.push({ href: "/alat", name: "Alat", icon: <LiaToolsSolid /> });
-  links.push({
-    href: "/api/auth/signout",
-    name: "Signout",
-    icon: <GoSignOut />,
-  });
   return (
     <section className="inline-flex- flex flex-col gap-3">
       <div></div>

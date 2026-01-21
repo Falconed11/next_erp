@@ -231,17 +231,9 @@ export default function App({ sessionuser }) {
         isStriped
         className="pt-3"
         aria-label="Example table with custom cells"
-        // topContent={
-        //   <>
-        //     <div>Filter</div>
-        //     <Input
-        //       label="Nama"
-        //       placeholder="Masukkan nama!"
-        //       value={value}
-        //       onValueChange={setValue}
-        //     />
-        //   </>
-        // }
+        topContent={
+          <div className="font-bold text-lg">Kategori Operasional Kantor</div>
+        }
       >
         <TableHeader columns={columns}>
           {(column) => (

@@ -27,16 +27,24 @@ import {
   useDisclosure,
 } from "@heroui/react";
 import { useSession } from "next-auth/react";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
+import {
+  deleteStatusProyek,
+  saveStatusProyek,
+} from "@/services/status-proyek.service";
+import { renderStatusProyekCell } from "@/components/status-proyek/StatusProyekTableCell";
+import { StatusProyekModal } from "@/components/status-proyek/StatusProyekModal";
+import { useStatusProyekColumns } from "@/hooks/useStatusProyekColumns";
+import { isValidProgress } from "@/app/utils/validation";
 
 const StatusProyek = () => {
-  const session = useSession();
-  const sessUser = session.data?.user;
+  const { data: session } = useSession();
+  const sessUser = session?.user;
   const [page, setPage] = useState(1);
   const rowsPerPage = 5;
   const offset = (page - 1) * rowsPerPage;
   const statusproyek = useClientFetch(
-    `statusproyek?limit=${rowsPerPage}&offset=${offset}`
+    `statusproyek?limit=${rowsPerPage}&offset=${offset}`,
   );
   const pages = Math.ceil(statusproyek?.data?.[0]?.nstatusproyek / rowsPerPage);
   const [form, setForm] = useState({});
@@ -50,17 +58,11 @@ const StatusProyek = () => {
     onOpen();
   };
   const simpanPress = async (onClose) => {
-    const progress = form?.progress;
-    if (progress == null || progress > 100 || progress < 0)
-      return alert("Progres tidak valid. (0-100)");
-    const res = await fetch(`${API_PATH}statusproyek`, {
-      method: form.method,
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify(form),
-    });
+    if (!isValidProgress(form.progress)) {
+      alert("Progres tidak valid. (0–100)");
+      return;
+    }
+    const res = await saveStatusProyek(form);
     const json = await res.json();
     if (res.status == 400) return alert(json.message);
     statusproyek.mutate();
@@ -68,102 +70,17 @@ const StatusProyek = () => {
   };
   const deletePress = async ({ id, nama }) => {
     if (confirm(`Hapus status proyek id: ${id} nama: ${nama}?`)) {
-      const res = await fetch(`${API_PATH}statusproyek`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          // 'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: JSON.stringify({ id }),
-      });
+      const res = await deleteStatusProyek(id);
       const json = await res.json();
       if (res.status == 400) return alert(json.message);
       statusproyek.mutate();
     }
   };
-  const renderCell = useCallback((data, columnKey) => {
-    const cellValue = data[columnKey];
-    switch (columnKey) {
-      case "id":
-        return (
-          <div className="text-right">
-            <Harga harga={cellValue} />
-          </div>
-        );
-      case "nproyek":
-        return (
-          <div className="text-right">
-            <Harga harga={cellValue} />
-          </div>
-        );
-      case "progress":
-        return (
-          <div className="text-right">
-            <Harga harga={cellValue} />
-          </div>
-        );
-      case "nama":
-        return capitalizeEachWord(cellValue);
-      case "tanggal":
-        return data.tanggal ? getDateF(new Date(data.tanggal)) : "";
-      case "aksi":
-        return (
-          <div className="relative flex items-center gap-2">
-            <Tooltip content="Edit">
-              <span
-                onClick={() => editPress(data)}
-                className="text-lg text-default-400 cursor-pointer active:opacity-50"
-              >
-                <EditIcon />
-              </span>
-            </Tooltip>
-            {![-1, 1, 2, 3].includes(data.id) && (
-              <Tooltip color="danger" content="Delete">
-                <span
-                  onClick={() => deletePress(data)}
-                  className="text-lg text-danger cursor-pointer active:opacity-50"
-                >
-                  <DeleteIcon />
-                </span>
-              </Tooltip>
-            )}
-          </div>
-        );
-      default:
-        return cellValue;
-    }
-  }, []);
+  const isHighRole = highRoleCheck(sessUser?.rank);
+  const col = useStatusProyekColumns(isHighRole);
   const queryStates = renderQueryStates({ statusproyek }, session);
   if (queryStates) return queryStates;
-  const isHighRole = highRoleCheck(sessUser.rank);
   const loadingState = statusproyek.isLoading ? "loading" : "idle";
-  const col = [
-    ...(isHighRole
-      ? [
-          {
-            key: "aksi",
-            label: "Aksi",
-          },
-        ]
-      : []),
-    {
-      key: "id",
-      label: "Id",
-    },
-    {
-      key: "nama",
-      label: "Status",
-    },
-    {
-      key: "progress",
-      label: "Progress (%)",
-    },
-    {
-      key: "nproyek",
-      label: "Jumlah Proyek",
-    },
-  ];
-  console.log(form.progress);
   return (
     <>
       <Table
@@ -223,57 +140,26 @@ const StatusProyek = () => {
           {(item) => (
             <TableRow key={item.id}>
               {(columnKey) => (
-                <TableCell>{renderCell(item, columnKey)}</TableCell>
+                <TableCell>
+                  {renderStatusProyekCell({
+                    data: item,
+                    columnKey,
+                    onEdit: editPress,
+                    onDelete: deletePress,
+                  })}
+                </TableCell>
               )}
             </TableRow>
           )}
         </TableBody>
       </Table>
-      <Modal
+      <StatusProyekModal
         isOpen={isOpen}
         onOpenChange={onOpenChange}
-        scrollBehavior="inside"
-      >
-        <ModalContent>
-          {(onClose) => (
-            <>
-              <ModalHeader className="flex flex-col gap-1">
-                {form.title} Status Proyek
-              </ModalHeader>
-              <ModalBody>
-                <Input
-                  type="text"
-                  variant="bordered"
-                  label="Status"
-                  placeholder="Masukkan status!"
-                  value={form.nama}
-                  onValueChange={(val) => setForm({ ...form, nama: val })}
-                />
-                <NumberInput
-                  hideStepper
-                  isWheelDisabled
-                  formatOptions={{
-                    useGrouping: false,
-                  }}
-                  variant="bordered"
-                  label="Progress"
-                  placeholder="Masukkan progress!"
-                  value={form.progress}
-                  onValueChange={(val) => setForm({ ...form, progress: val })}
-                />
-              </ModalBody>
-              <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
-                  Batal
-                </Button>
-                <Button color="primary" onPress={() => simpanPress(onClose)}>
-                  Simpan
-                </Button>
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
-      </Modal>
+        form={form}
+        setForm={setForm}
+        onSave={simpanPress}
+      />
     </>
   );
 };

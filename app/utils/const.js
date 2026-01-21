@@ -1,15 +1,15 @@
 import { getApiPath } from "./apiconfig";
 import { getNextDomain } from "./tools";
 
-const api_path = getApiPath();
+export const api_path = getApiPath();
 
-const updateSwitch = async (
+export const updateSwitch = async (
   switchValue,
   currentValue,
   apiEndPoint,
   method,
   data,
-  referenceData
+  referenceData,
 ) => {
   if (switchValue === currentValue) return;
   const res = await fetch(`${api_path}${apiEndPoint}`, {
@@ -26,11 +26,12 @@ const updateSwitch = async (
   referenceData.forEach((data) => data.mutate());
 };
 
-const LIST_SWASTA_NEGRI = [
+export const LIST_SWASTA_NEGRI = [
   { id: 1, nama: "swasta" },
   { id: 0, nama: "negri" },
 ];
-const NEXT_DOMAIN = getNextDomain();
-const TITLE_STYLE = "text-lg font-bold";
-
-export { LIST_SWASTA_NEGRI, NEXT_DOMAIN, TITLE_STYLE };
+export const NEXT_DOMAIN = getNextDomain();
+export const TITLE_STYLE = "text-lg font-bold";
+export const headers = {
+  "Content-Type": "application/json",
+};

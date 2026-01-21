@@ -28,8 +28,9 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { getDate, getDateFId } from "@/app/utils/date";
 import Harga from "./harga";
+import { TITLE_STYLE } from "@/app/utils/const";
 
-const MyChip = ({ text, theme }) => {
+export const MyChip = ({ text, theme }) => {
   console.log(text, theme);
   if (theme == "danger")
     return (
@@ -44,7 +45,7 @@ const MyChip = ({ text, theme }) => {
       </span>
     );
 };
-const LinkOpenNewTab = ({ content, link, icon }) => {
+export const LinkOpenNewTab = ({ content, link, icon }) => {
   return (
     <Tooltip content={content}>
       <Link href={link}>
@@ -63,7 +64,7 @@ const LinkOpenNewTab = ({ content, link, icon }) => {
     </Tooltip>
   );
 };
-const OpenBlueLinkInNewTab = ({ link, children, className }) => {
+export const OpenBlueLinkInNewTab = ({ link, children, className }) => {
   return (
     <Link
       className={`text-blue-600 underline ${className}`}
@@ -75,14 +76,14 @@ const OpenBlueLinkInNewTab = ({ link, children, className }) => {
     </Link>
   );
 };
-const NavLinkNewTab = ({ href, children }) => {
+export const NavLinkNewTab = ({ href, children }) => {
   return (
     <Link href={href} target="_blank" rel="noopener noreferrer">
       {children}
     </Link>
   );
 };
-const company = {
+export const company = {
   1: {
     name: "Belga Karya Semesta",
     description:
@@ -99,7 +100,7 @@ const company = {
     contact: "Telp 08121553765 - 081578861740",
   },
 };
-const BKSHeader = ({ titleClassname }) => {
+export const BKSHeader = ({ titleClassname }) => {
   return (
     <div className="flex flex-col">
       <div className={`${titleClassname}`}>Belga Karya Semesta</div>
@@ -108,7 +109,7 @@ const BKSHeader = ({ titleClassname }) => {
     </div>
   );
 };
-const SVTHeader = ({ titleClassname }) => {
+export const SVTHeader = ({ titleClassname }) => {
   return (
     <div className="flex flex-col">
       <div className={`${titleClassname}`}>Satu Visi Teknikatama</div>
@@ -123,7 +124,7 @@ const SVTHeader = ({ titleClassname }) => {
     </div>
   );
 };
-const FormatHeader = ({
+export const FormatHeader = ({
   titleClassname,
   name,
   description,
@@ -144,7 +145,7 @@ const FormatHeader = ({
     </div>
   );
 };
-const CompanyHeader = ({
+export const CompanyHeader = ({
   name,
   description,
   address,
@@ -163,7 +164,7 @@ const CompanyHeader = ({
     />
   );
 };
-const PrintWithHeader = ({ header, body }) => {
+export const PrintWithHeader = ({ header, body }) => {
   return (
     <table className="border-collapse w-full overscroll-none">
       <thead className="">
@@ -179,12 +180,12 @@ const PrintWithHeader = ({ header, body }) => {
     </table>
   );
 };
-const ToDoList = () => {
+export const ToDoList = () => {
   const session = useSession();
   const sessUser = session.data?.user;
   const userId = sessUser?.id;
   const todolist = useClientFetch(
-    userId ? `todolist?id_user=${sessUser?.id}` : null
+    userId ? `todolist?id_user=${sessUser?.id}` : null,
   );
   const status = useClientFetch("statustodolist");
   const [form, setForm] = useState({});
@@ -442,7 +443,7 @@ const ToDoList = () => {
     </>
   );
 };
-const StatusToDoList = () => {
+export const StatusToDoList = () => {
   const status = useClientFetch("statustodolist");
   const [form, setForm] = useState({});
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -635,7 +636,7 @@ const StatusToDoList = () => {
     </>
   );
 };
-const MyAddButton = ({ onPress }) => {
+export const MyAddButton = ({ onPress }) => {
   return (
     <Button variant="shadow" size="sm" color="primary" onPress={onPress}>
       <span className="text-xl font-bold">
@@ -645,17 +646,16 @@ const MyAddButton = ({ onPress }) => {
     </Button>
   );
 };
-
-export {
-  MyChip,
-  OpenBlueLinkInNewTab,
-  LinkOpenNewTab,
-  NavLinkNewTab,
-  BKSHeader,
-  SVTHeader,
-  CompanyHeader,
-  PrintWithHeader,
-  StatusToDoList,
-  ToDoList,
-  MyAddButton,
-};
+export const TableHeaderWithAddButton = ({ title, onPress, isHighRole }) => (
+  <div className="flex justify-between items-center">
+    <div className={TITLE_STYLE}>{title}</div>
+    {isHighRole && (
+      <Button onPress={onPress} variant="shadow" size="sm" color="primary">
+        <span className="text-xl font-bold">
+          <AddIcon />
+        </span>
+        Tambah
+      </Button>
+    )}
+  </div>
+);
