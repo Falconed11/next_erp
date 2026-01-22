@@ -1,15 +1,13 @@
 import { useClientFetch } from "@/app/utils/apiconfig";
 import { useMemo } from "react";
 
-const endPoint = "v2/jenis-proyek";
-
-export function useJenisProyek({ limit, offset }) {
+export function useDefaultFetch({ endPoint, limit, offset }) {
   return useClientFetch(
     `${endPoint}?${limit != null && offset != null ? `limit=${limit}&offset=${offset}` : ""}`,
   );
 }
 
-export function useJenisProyekColumns(isHighRole) {
+export function useDefaultColumns(isHighRole) {
   return useMemo(
     () => [
       ...(isHighRole ? [{ key: "aksi", label: "Aksi" }] : []),

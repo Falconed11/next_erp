@@ -1,0 +1,19 @@
+import { API_PATH } from "@/app/utils/apiconfig";
+import { headers } from "@/app/utils/const";
+export function defaultSave(endPoint, form) {
+  return fetch(
+    `${API_PATH}${endPoint}${form.method == "PATCH" ? `/${form.id}` : ""}`,
+    {
+      method: form.method,
+      headers,
+      body: JSON.stringify(form),
+    },
+  );
+}
+export function defaultDelete(endPoint, id) {
+  return fetch(`${API_PATH}${endPoint}/${id}`, {
+    method: "DELETE",
+    headers,
+    // body: JSON.stringify({ id }),
+  });
+}

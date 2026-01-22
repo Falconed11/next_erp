@@ -1,32 +1,20 @@
-import Harga from "@/components/harga";
 import { EditIcon, DeleteIcon } from "@/components/icon";
 import { Tooltip } from "@heroui/react";
 import { capitalizeEachWord } from "@/app/utils/tools";
-import { getDateF, getDateFId, getTime } from "@/app/utils/date";
+import { getDateFId, getTime } from "@/app/utils/date";
 
-export default function renderJenisProyekCell({
+export default function renderDefaultTableCell({
   data,
   columnKey,
   onEdit,
   onDelete,
 }) {
-  console.log(data);
   const cellValue = data[columnKey];
-
   switch (columnKey) {
-    case "progress":
-      return (
-        <div className="text-right">
-          <Harga harga={cellValue} />
-        </div>
-      );
-
     case "nama":
       return capitalizeEachWord(cellValue);
-
     case "lastupdate":
       return `${getDateFId(cellValue)} ${getTime(cellValue)}`;
-
     case "aksi":
       return (
         <div className="flex items-center gap-2 text-lg">
@@ -40,7 +28,7 @@ export default function renderJenisProyekCell({
           </Tooltip>
           <Tooltip color="danger" content="Delete">
             <span
-              onClick={() => onDelete(data)}
+              onClick={() => onDelete(data.id)}
               className="cursor-pointer text-danger"
             >
               <DeleteIcon />
@@ -48,7 +36,6 @@ export default function renderJenisProyekCell({
           </Tooltip>
         </div>
       );
-
     default:
       return cellValue;
   }

@@ -8,12 +8,13 @@ import {
   ModalHeader,
 } from "@heroui/react";
 
-export default function JenisProyekModal({
+export default function DefaultModal({
   isOpen,
   onOpenChange,
   form,
   setForm,
   onSave,
+  name,
 }) {
   return (
     <Modal isOpen={isOpen} onOpenChange={onOpenChange} scrollBehavior="inside">
@@ -21,14 +22,14 @@ export default function JenisProyekModal({
         {(onClose) => (
           <>
             <ModalHeader className="flex flex-col gap-1">
-              {form.title} Status Proyek
+              {form.title} {name}
             </ModalHeader>
             <ModalBody>
               <Input
                 type="text"
                 variant="bordered"
-                label="Jenis Proyek"
-                placeholder="Masukkan jenis proyek!"
+                label={name}
+                placeholder={`Masukkan nama ${name}!`}
                 value={form.nama}
                 onValueChange={(val) => setForm({ ...form, nama: val })}
               />
