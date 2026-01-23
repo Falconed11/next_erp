@@ -87,10 +87,10 @@ export default function App() {
   const pages = Math.ceil(dataJenisProyek.data[0]?.total / rowsPerPage);
   console.log(dataJenisProyek);
   return (
-    <div className="flex flex-col gap-2 w-7/8- h-3/4">
+    <div className="flex flex-col gap-2">
       <Table
         isStriped
-        className=""
+        className="min-h-[40px]"
         aria-label="Example table with custom cells"
         topContent={
           <TableHeaderWithAddButton
