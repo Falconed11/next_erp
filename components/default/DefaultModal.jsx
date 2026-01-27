@@ -9,13 +9,25 @@ import {
 } from "@heroui/react";
 
 export default function DefaultModal({
+  data,
   isOpen,
   onOpenChange,
   form,
   setForm,
   onSave,
   name,
+  id_karyawan,
 }) {
+  const saveButtonPress = async (onClose) => {
+    const res = await onSave({
+      ...form,
+      id_karyawan,
+    });
+    const json = await res.json();
+    if (!res.ok) return alert(json.message);
+    data.mutate();
+    onClose();
+  };
   return (
     <Modal isOpen={isOpen} onOpenChange={onOpenChange} scrollBehavior="inside">
       <ModalContent>
@@ -38,7 +50,7 @@ export default function DefaultModal({
               <Button color="danger" variant="light" onPress={onClose}>
                 Batal
               </Button>
-              <Button color="primary" onPress={() => onSave(onClose)}>
+              <Button color="primary" onPress={() => saveButtonPress(onClose)}>
                 Simpan
               </Button>
             </ModalFooter>

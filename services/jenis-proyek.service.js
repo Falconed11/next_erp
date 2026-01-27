@@ -1,10 +1,10 @@
 import { defaultDelete, defaultSave } from "./default.service";
 
-const endPoint = "v2/jenis-proyek";
+export const JENIS_PROYEK_ENDPOINT = "v2/jenis-proyek";
 
 export const saveJenisProyek = (form) => {
-  return defaultSave(endPoint, form);
+  return defaultSave(JENIS_PROYEK_ENDPOINT, form);
 };
 export const deleteJenisProyek = (id) => {
-  return defaultDelete(endPoint, id);
+  return defaultDelete(JENIS_PROYEK_ENDPOINT, id);
 };
