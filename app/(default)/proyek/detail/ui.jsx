@@ -121,23 +121,23 @@ export default function App({ id, versi }) {
   const keranjangProyek = useClientFetch(
     `keranjangproyek?id_proyek=${id}&instalasi=0&versi=${
       selectVersi.values().next().value
-    }`
+    }`,
   );
   const keranjangProyekInstalasi = useClientFetch(
     `keranjangproyek?id_proyek=${id}&instalasi=1&versi=${
       selectVersi.values().next().value
-    }`
+    }`,
   );
   const rekapitulasiProyek = useClientFetch(
     `rekapitulasiproyek?id_proyek=${id}&versi=${
       selectVersi.values().next().value
-    }`
+    }`,
   );
   const keteranganPenawaran = useClientFetch(
-    `keteranganpenawaran?idProyek=${id}`
+    `keteranganpenawaran?idProyek=${id}`,
   );
   const versiKeranjangProyek = useClientFetch(
-    `versikeranjangproyek?id_proyek=${id}`
+    `versikeranjangproyek?id_proyek=${id}`,
   );
   const statusProyek = useClientFetch(`statusproyek?ids=1&ids=3`);
   const subProyek = useClientFetch(`subproyek?id_proyek=${id}`);
@@ -200,7 +200,7 @@ export default function App({ id, versi }) {
       oldHarga: data.harga,
       provitmarginpersen: countProvitMarginPercent(
         data.temphargamodal,
-        data.harga
+        data.harga,
       ),
     });
     modal.produk.onOpen();
@@ -294,7 +294,7 @@ export default function App({ id, versi }) {
           id_proyek: id,
           persenProvit: inputPersenProvit,
         }),
-      }
+      },
     );
     const json = await res.json();
     if (res.status >= 400 && res.status < 500) return alert(json.message);
@@ -466,13 +466,13 @@ export default function App({ id, versi }) {
           case "provitmarginpersen":
             return (
               Math.round(
-                ((data.harga - data.temphargamodal) / data.harga) * 100 * 100
+                ((data.harga - data.temphargamodal) / data.harga) * 100 * 100,
               ) / 100
             );
           case "persenprovit":
             return (
               Math.round(
-                countPercentProvit(data.temphargamodal, data.harga) * 100
+                countPercentProvit(data.temphargamodal, data.harga) * 100,
               ) / 100 || ""
             );
           case "totalprofit":
@@ -501,7 +501,7 @@ export default function App({ id, versi }) {
                       id: data.id_keranjangproyek,
                       showmerek: v ? 1 : 0,
                     },
-                    [keranjangProyek, keranjangProyekInstalasi]
+                    [keranjangProyek, keranjangProyekInstalasi],
                   );
                 }}
               ></Switch>
@@ -522,7 +522,7 @@ export default function App({ id, versi }) {
                       id: data.id_keranjangproyek,
                       showtipe: v ? 1 : 0,
                     },
-                    [keranjangProyek, keranjangProyekInstalasi]
+                    [keranjangProyek, keranjangProyekInstalasi],
                   );
                 }}
               ></Switch>
@@ -561,7 +561,7 @@ export default function App({ id, versi }) {
             return cellValue;
         }
       },
-      [session, proyek]
+      [session, proyek],
     ),
     penawaran: React.useCallback((data, columnKey) => {
       const cellValue = data[columnKey];
@@ -922,13 +922,13 @@ export default function App({ id, versi }) {
     (total, currentValue) => {
       return total + currentValue.jumlah * currentValue.harga;
     },
-    0
+    0,
   );
   const subTotalHargaInstalasi = keranjangProyekInstalasi.data.reduce(
     (total, currentValue) => {
       return total + currentValue.jumlah * currentValue.harga;
     },
-    0
+    0,
   );
   const selectedVersion = selectVersi.values().next().value;
   const formatTable = {
@@ -943,7 +943,7 @@ export default function App({ id, versi }) {
       rekapitulasi.diskon,
       rekapitulasi.pajak,
       0,
-      isPenawaran
+      isPenawaran,
     );
   const dataTabelInstalasi = (isPenawaran) =>
     createRecapTable(
@@ -951,7 +951,7 @@ export default function App({ id, versi }) {
       rekapitulasi.diskoninstalasi,
       0,
       0,
-      isPenawaran
+      isPenawaran,
     );
   const dataTabelTotal = (isPenawaran) =>
     createRecapTableTotal(rekapitulasiTotal, isPenawaran);
@@ -1031,7 +1031,7 @@ export default function App({ id, versi }) {
                   label: "No.",
                   value: penawaran(
                     selectedProyek?.id_penawaran,
-                    new Date(selectedProyek?.tanggal_penawaran)
+                    new Date(selectedProyek?.tanggal_penawaran),
                   ),
                 },
                 {
@@ -1045,7 +1045,7 @@ export default function App({ id, versi }) {
                 {
                   label: "Tanggal",
                   value: getDateFId(
-                    new Date(selectedProyek?.tanggal_penawaran)
+                    new Date(selectedProyek?.tanggal_penawaran),
                   ),
                 },
                 {
@@ -1154,7 +1154,7 @@ export default function App({ id, versi }) {
                 </Button>
               </div> */}
               {["admin", "super"].includes(sessUser?.peran) ? (
-                selectedProyek?.versi <= 0 ? (
+                selectedProyek?.statusproyek.toLowerCase() != "deal" ? (
                   <div>
                     <Button
                       onPress={handleButtonSetAsDealClick}
@@ -1179,7 +1179,7 @@ export default function App({ id, versi }) {
                 <></>
               )}
               {["admin", "super"].includes(sessUser?.peran) ? (
-                selectedProyek?.versi != -1 ? (
+                selectedProyek?.statusproyek.toLowerCase() != "reject" ? (
                   <div>
                     <Button
                       onPress={handleButtonSetAsRejectClick}
@@ -1341,8 +1341,8 @@ export default function App({ id, versi }) {
                                       Math.round(
                                         countPercentProvit(
                                           form.hargamodal,
-                                          form.harga
-                                        ) * 100
+                                          form.harga,
+                                        ) * 100,
                                       ) / 100 || ""
                                     }
                                     label={"Provit (%)"}
@@ -1354,8 +1354,8 @@ export default function App({ id, versi }) {
                                           Math.round(
                                             countPriceByPercentProfit(
                                               form.hargamodal,
-                                              v
-                                            )
+                                              v,
+                                            ),
                                           ) || "",
                                       });
                                     }}
@@ -1420,7 +1420,7 @@ export default function App({ id, versi }) {
                                       currentValue.temphargamodal
                                   );
                                 },
-                                0
+                                0,
                               )}
                               label="Sub Total Harga Modal :"
                             />
@@ -1437,7 +1437,7 @@ export default function App({ id, versi }) {
                                         currentValue.temphargamodal)
                                   );
                                 },
-                                0
+                                0,
                               )}
                             />
                           </div>
@@ -1523,8 +1523,8 @@ export default function App({ id, versi }) {
                                       Math.round(
                                         countPercentProvit(
                                           formInstalasi.hargamodal,
-                                          formInstalasi.harga
-                                        ) * 100
+                                          formInstalasi.harga,
+                                        ) * 100,
                                       ) / 100 || ""
                                     }
                                     label={"Provit (%)"}
@@ -1536,8 +1536,8 @@ export default function App({ id, versi }) {
                                           Math.round(
                                             countPriceByPercentProfit(
                                               formInstalasi.hargamodal,
-                                              v
-                                            )
+                                              v,
+                                            ),
                                           ) || "",
                                       });
                                     }}
@@ -1574,7 +1574,7 @@ export default function App({ id, versi }) {
                                     ...formInstalasi,
                                     instalasi: 1,
                                   },
-                                  setFormInstalasi
+                                  setFormInstalasi,
                                 );
                               }}
                               color="primary"
@@ -1608,7 +1608,7 @@ export default function App({ id, versi }) {
                                       currentValue.temphargamodal
                                   );
                                 },
-                                0
+                                0,
                               )}
                               label="Sub Total Harga Modal :"
                             />
@@ -1625,7 +1625,7 @@ export default function App({ id, versi }) {
                                         currentValue.temphargamodal)
                                   );
                                 },
-                                0
+                                0,
                               )}
                             />
                           </div>
@@ -1835,8 +1835,8 @@ export default function App({ id, versi }) {
                     Math.round(
                       countPercentProvit(
                         form.temphargamodal || 0,
-                        form.harga || 0
-                      ) * 100
+                        form.harga || 0,
+                      ) * 100,
                     ) / 100 || ""
                   }
                   // label={`Harga Jual (Ref: ${form.refHarga})`}
@@ -1986,7 +1986,7 @@ export default function App({ id, versi }) {
                         <div>
                           Yogyakarta,{" "}
                           {getDateFId(
-                            new Date(selectedProyek.tanggal_penawaran)
+                            new Date(selectedProyek.tanggal_penawaran),
                           )}
                         </div>
                         <div>
@@ -1994,7 +1994,7 @@ export default function App({ id, versi }) {
                           {penawaran(
                             selectedProyek.id_penawaran,
                             new Date(selectedProyek.tanggal_penawaran),
-                            selectedProyek.id_karyawan
+                            selectedProyek.id_karyawan,
                           )}
                           {/* /{selectedVersion} */}
                         </div>

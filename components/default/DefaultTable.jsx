@@ -34,6 +34,8 @@ export const renderDefaultTableCell = ({
       return capitalizeEachWord(cellValue);
     case "lastupdate":
       return `${getDateFId(cellValue)} ${getTime(cellValue)}`;
+    case "creationdate":
+      return `${getDateFId(cellValue)}`;
     case "aksi":
       return (
         <div className="flex items-center gap-2 text-lg">
@@ -119,7 +121,7 @@ export const DefaultTable = ({
         aria-label="Example table with custom cells"
         topContent={
           <TableHeaderWithAddButton
-            title="Jenis Proyek"
+            title={name}
             isHighRole={isHighRole}
             onPress={tambahButtonPress}
           />

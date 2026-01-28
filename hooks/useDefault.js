@@ -13,7 +13,11 @@ export function useDefaultColumns(isHighRole) {
       ...(isHighRole ? [{ key: "aksi", label: "Aksi" }] : []),
       { key: "id", label: "Id" },
       { key: "nama", label: "Nama" },
+      { key: "keterangan", label: "Keterangan" },
+      { key: "creationdate", label: "Tanggal Dibuat" },
+      { key: "authorid_karyawan", label: "User Pembuat" },
       { key: "lastupdate", label: "Terakhir Diubah" },
+      { key: "lastid_karyawan", label: "User Terakhir" },
     ],
     [isHighRole],
   );

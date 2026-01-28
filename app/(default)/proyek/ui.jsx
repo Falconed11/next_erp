@@ -79,7 +79,10 @@ import SelectStatusProyek from "@/components/selectstatusproyek";
 import { LIST_SWASTA_NEGRI } from "@/app/utils/const";
 import { StatusProyek } from "./statusproyek";
 import PrintDaftarProyek from "./printdaftarproyek";
-import { AutocompleteCustomer } from "@/components/myautocomplete";
+import {
+  AutocompleteCustomer,
+  AutocompleteJenisProyek,
+} from "@/components/myautocomplete";
 import { BadgeStatusProyek } from "@/components/badgestatusproyek";
 import { label } from "framer-motion/client";
 import { useReactToPrint } from "react-to-print";
@@ -101,7 +104,7 @@ export default function App({
     endDate: endDate ? new Date(endDate) : null,
   });
   const [selectkaryawan, setSelectKaryawan] = useState(
-    new Set([id_karyawan ? id_karyawan : ""])
+    new Set([id_karyawan ? id_karyawan : ""]),
     // new Set([])
   );
   const [stat, setStat] = useState(1);
@@ -128,12 +131,12 @@ export default function App({
       current.endDate ? `&end=${getDate(current.endDate)}` : ""
     }${
       selectStatusProyek ? `&id_statusproyek=${selectStatusProyek}` : ""
-    }&sort=${sort}&id_produk=${id_produk || ""}`
+    }&sort=${sort}&id_produk=${id_produk || ""}`,
   );
   const penawaran = useClientFetch(
     `exportpenawaran?start=${getDate(current.startDate)}&end=${getDate(
-      current.endDate
-    )}`
+      current.endDate,
+    )}`,
   );
   const perusahaan = useClientFetch("perusahaan");
   const karyawan = useClientFetch("karyawan");
@@ -265,11 +268,11 @@ export default function App({
               // 'Content-Type': 'application/x-www-form-urlencoded',
             },
             body: JSON.stringify({ ...v, id_second: v.id }),
-          })
-        )
+          }),
+        ),
       );
       const dataArray = await Promise.all(
-        responses.map((response) => response.json())
+        responses.map((response) => response.json()),
       );
       setReportList(dataArray.map((v, i) => `${i + 1}. ${v.message}`));
     } catch (e) {
@@ -289,7 +292,7 @@ export default function App({
     XLSX.writeFile(
       workbook,
       `proyek_${getDateF(filter.startDate)}_${getDateF(filter.endDate)}.xlsx`,
-      { compression: true }
+      { compression: true },
     );
   };
   const handleExportButtonPress = (proyek) => {
@@ -307,7 +310,7 @@ export default function App({
   const exportPenawaran = () => {
     if (selectedKeys.size == 0) return alert("Proyek belum dipilih");
     const data = penawaran.data.filter((v) =>
-      selectedKeys.has(String(v.id_proyek))
+      selectedKeys.has(String(v.id_proyek)),
     );
     const worksheet = XLSX.utils.json_to_sheet(data);
     const workbook = XLSX.utils.book_new();
@@ -495,7 +498,7 @@ export default function App({
           return cellValue;
       }
     },
-    [session]
+    [session],
   );
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [reportList, setReportList] = useState([]);
@@ -518,6 +521,10 @@ export default function App({
     {
       key: "id_second",
       label: "Id Proyek",
+    },
+    {
+      key: "jenisproyek",
+      label: "Jenis Proyek",
     },
     {
       key: "namaperusahaan",
@@ -627,7 +634,7 @@ export default function App({
       totalModalDeal: 0,
       totalModalReject: 0,
       totalModalWaiting: 0,
-    }
+    },
   );
   summary.totalModal =
     summary.totalModalDeal +
@@ -1033,7 +1040,9 @@ export default function App({
                   disallowEmptySelection
                   selectedKeys={
                     new Set(
-                      form.id_statusproyek ? [String(form.id_statusproyek)] : []
+                      form.id_statusproyek
+                        ? [String(form.id_statusproyek)]
+                        : [],
                     )
                   }
                   className="max-w-xs"
@@ -1080,6 +1089,7 @@ export default function App({
                   value={form.nama}
                   onValueChange={(val) => setForm({ ...form, nama: val })}
                 />
+                <AutocompleteJenisProyek form={form} setForm={setForm} />
                 <AutocompleteCustomer form={form} setForm={setForm} />
                 {/* <Autocomplete
                   label="Customer"
@@ -1129,7 +1139,7 @@ export default function App({
                     new Set(
                       form.swasta || form.swasta == 0
                         ? [String(form.swasta)]
-                        : []
+                        : [],
                     )
                   }
                   className="max-w-xs"
@@ -1207,7 +1217,7 @@ export default function App({
                         >
                           {item.nama || "NN"}
                         </SelectItem>
-                      )
+                      ),
                   )}
                 </Select>
                 {form.id_statusproyek == 1 && (

@@ -21,7 +21,8 @@ export default function DefaultModal({
   const saveButtonPress = async (onClose) => {
     const res = await onSave({
       ...form,
-      id_karyawan,
+      lastid_karyawan: id_karyawan,
+      ...(form.method == "POST" ? { authorid_karyawan: id_karyawan } : {}),
     });
     const json = await res.json();
     if (!res.ok) return alert(json.message);

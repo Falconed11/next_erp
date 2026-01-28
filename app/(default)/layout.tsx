@@ -3,7 +3,7 @@ import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Nav from "@/components/nav";
 import User from "@/components/user";
-import { rolesCheck } from "@/app/utils/tools";
+import { highRoleCheck, rolesCheck } from "@/app/utils/tools";
 import { RiDashboard2Fill, RiDashboard2Line } from "react-icons/ri";
 import { AiOutlineProduct } from "react-icons/ai";
 import { BusinessProgressBarIcon } from "@/components/icon";
@@ -16,6 +16,7 @@ import { TbDeviceDesktopAnalytics } from "react-icons/tb";
 import { FaRegUser } from "react-icons/fa";
 import { LiaToolsSolid } from "react-icons/lia";
 import { GoSignOut } from "react-icons/go";
+import { Spinner } from "@heroui/react";
 
 export default function RootLayout({
   children,
@@ -25,6 +26,7 @@ export default function RootLayout({
   const session = useSession();
   const user = session.data?.user;
   const pathname = usePathname();
+  const isHighRole = highRoleCheck(user?.rank);
   const proyek = [
     {
       key: "data",
@@ -84,17 +86,14 @@ export default function RootLayout({
         {
           key: "data",
           name: "Produk",
-          href: "/produk",
         },
         {
           key: "merek",
           name: "Merek",
-          href: "/produk/merek",
         },
         {
           key: "kategori",
           name: "Kategori",
-          href: "/produk/kategori",
         },
       ],
     },
@@ -105,7 +104,7 @@ export default function RootLayout({
   links.push({
     href: "/proyek",
     name: "Proyek",
-    dropdown: proyek,
+    ...(isHighRole ? { dropdown: proyek } : {}),
     icon: <VscGithubProject />,
   });
   if (user?.peran == "admin" || user?.peran == "super")
@@ -118,7 +117,29 @@ export default function RootLayout({
         icon: <BsHouseGear />,
       },
     );
-  links.push({ href: "/customer", name: "Customer", icon: <LuBookUser /> });
+  links.push({
+    href: "/customer",
+    name: "Customer",
+    icon: <LuBookUser />,
+    ...(isHighRole
+      ? {
+          dropdown: [
+            {
+              key: "data",
+              name: "Customer",
+            },
+            {
+              key: "jenis-instansi",
+              name: "Jenis Instansi",
+            },
+            {
+              key: "golongan-instansi",
+              name: "Golongan Instansi",
+            },
+          ],
+        }
+      : {}),
+  });
   if (rolesCheck(["admin", "super"], user?.peran))
     links.push(
       { href: "/vendor", name: "Vendor", icon: <MdOutlineFactory /> },
@@ -131,12 +152,10 @@ export default function RootLayout({
           {
             key: "data",
             name: "Data",
-            href: "/karyawan",
           },
           {
             key: "status",
             name: "Status",
-            href: "/karyawan/status",
           },
         ],
       },
@@ -148,27 +167,22 @@ export default function RootLayout({
           {
             key: "labarugi",
             name: "Laba Rugi",
-            href: "/labarugi",
           },
           {
             key: "proyekbulanan",
             name: "Proyek Bulanan",
-            href: "/proyekbulanan",
           },
           {
             key: "omset",
             name: "Omset",
-            href: "/omset",
           },
           {
             key: "stok",
             name: "Stok",
-            href: "/stok",
           },
           {
             key: "penawaran",
             name: "Penawaran",
-            href: "/penawaran",
           },
         ],
       },
@@ -205,7 +219,15 @@ export default function RootLayout({
         <div className="w-1/9-">
           <Nav navLinks={links} className={""} />
         </div>
-        <div className="w-8/9- shrink-0-">{children}</div>
+        <div className="w-8/9- shrink-0-">
+          {session.status == "loading" ? (
+            <Spinner />
+          ) : session ? (
+            children
+          ) : (
+            "Login Needed!"
+          )}
+        </div>
         <div></div>
       </div>
     </section>

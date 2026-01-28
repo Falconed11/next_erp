@@ -12,9 +12,10 @@ import {
 } from "react";
 import Harga from "./harga";
 import { getDateFId } from "@/app/utils/date";
+import { JENIS_PROYEK_ENDPOINT } from "@/services/jenis-proyek.service";
 
 // ✅ Reusable Hook
-const useAutocompleteField = ({
+export const useAutocompleteField = ({
   isDisabled,
   endpoint,
   title,
@@ -34,7 +35,7 @@ const useAutocompleteField = ({
   const query = useClientFetch(endpoint);
   const queryStates = renderQueryStates({ [endpoint]: query });
   if (queryStates) return { component: queryStates };
-  const data = query.data;
+  const data = query.data.data ?? query.data;
   const component = (
     <AutocompleteWithCustomValue
       isDisabled={isDisabled}
@@ -57,7 +58,7 @@ const useAutocompleteField = ({
   return { component };
 };
 // ✅ Core Component
-const AutocompleteWithCustomValue = ({
+export const AutocompleteWithCustomValue = ({
   isDisabled,
   title,
   data = [],
@@ -82,13 +83,11 @@ const AutocompleteWithCustomValue = ({
   // );
   const handleSelectionChange = (key) => {
     // const item = data.find((i) => i[valueKey] == key);
-    console.log("selectionTrigerred!");
     let item;
     setItems((prev) => {
       item = prev.find((i) => i[valueKey] == key);
       return data.filter((i) => contains(i[labelKey], item?.[labelKey] || ""));
     });
-    console.log({ item });
     setForm((prev) => ({
       ...prev,
       ...(item ? getFormUpdateOnSelectionChange(item) : {}),
@@ -98,13 +97,12 @@ const AutocompleteWithCustomValue = ({
     }));
   };
   const handleInputChange = (value) => {
-    console.log("Change triggered!");
     let match;
     setItems((prev) => {
       match =
         !disableSelectOnChange &&
         prev.find(
-          (i) => getCustomValue(i)?.toLowerCase() === value.toLowerCase()
+          (i) => getCustomValue(i)?.toLowerCase() === value.toLowerCase(),
         );
       return data.filter((i) => contains(getCustomValue(i), value));
     });
@@ -115,7 +113,6 @@ const AutocompleteWithCustomValue = ({
     }));
   };
   const handleOnBlur = () => {
-    console.log("Blur triggered!");
     // If custom value not allowed, force reset
     setForm((prev) => {
       if (!disableCustomValue) return prev;
@@ -144,7 +141,7 @@ const AutocompleteWithCustomValue = ({
           )}
         </>
       }
-      items={items}
+      items={items || []}
       placeholder={`Cari ${title}`}
       inputValue={form[field] ?? ""}
       selectedKey={form[id] ?? null}
@@ -161,7 +158,7 @@ const AutocompleteWithCustomValue = ({
   );
 };
 
-const AutocompleteKategoriProduk = (props) => {
+export const AutocompleteKategoriProduk = (props) => {
   const { component } = useAutocompleteField({
     endpoint: "kategoriproduk",
     title: "Kategori",
@@ -171,7 +168,7 @@ const AutocompleteKategoriProduk = (props) => {
   });
   return component;
 };
-const AutocompleteCustomer = (props) => {
+export const AutocompleteCustomer = (props) => {
   const { component } = useAutocompleteField({
     title: "Customer",
     endpoint: "customer",
@@ -201,7 +198,7 @@ const AutocompleteCustomer = (props) => {
   });
   return component;
 };
-const AutocompleteMerek = (props) => {
+export const AutocompleteMerek = (props) => {
   const { component } = useAutocompleteField({
     endpoint: "merek",
     title: "Merek",
@@ -211,7 +208,17 @@ const AutocompleteMerek = (props) => {
   });
   return component;
 };
-const AutocompleteVendor = (props) => {
+export const AutocompleteJenisProyek = (props) => {
+  const { component } = useAutocompleteField({
+    endpoint: JENIS_PROYEK_ENDPOINT,
+    title: "Jenis Proyek",
+    field: "jenisproyek",
+    id: "id_jenisproyek",
+    ...props,
+  });
+  return component;
+};
+export const AutocompleteVendor = (props) => {
   const { component } = useAutocompleteField({
     endpoint: "vendor?columnName=nama",
     title: "Vendor",
@@ -221,7 +228,11 @@ const AutocompleteVendor = (props) => {
   });
   return component;
 };
-const AutocompleteProduk = ({ id_kategori, disableCustomValue, ...props }) => {
+export const AutocompleteProduk = ({
+  id_kategori,
+  disableCustomValue,
+  ...props
+}) => {
   const { component } = useAutocompleteField({
     endpoint: `produk?${id_kategori ? `kategori=${id_kategori}` : ""}`,
     title: "Produk",
@@ -251,13 +262,4 @@ const AutocompleteProduk = ({ id_kategori, disableCustomValue, ...props }) => {
     ...props,
   });
   return component;
-};
-
-export {
-  AutocompleteWithCustomValue,
-  AutocompleteCustomer,
-  AutocompleteKategoriProduk,
-  AutocompleteMerek,
-  AutocompleteProduk,
-  AutocompleteVendor,
 };

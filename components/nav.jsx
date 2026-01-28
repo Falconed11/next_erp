@@ -8,6 +8,7 @@ import {
   DropdownMenu,
   DropdownItem,
   Button,
+  Spinner,
 } from "@heroui/react";
 // import { Badge, Avatar } from "@heroui/react";
 import { useRouter } from "next/navigation";
@@ -25,7 +26,7 @@ export default function Navigation({ navLinks, className }) {
   }, [title]);
 
   if (proyek.error) return <div>failed to load</div>;
-  if (proyek.isLoading) return <div>loading...</div>;
+  if (proyek.isLoading) return <Spinner />;
 
   const numberProgressNoOffer = proyek.data.length;
 

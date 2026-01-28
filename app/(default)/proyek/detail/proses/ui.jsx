@@ -106,17 +106,17 @@ export default function App({ id }) {
       acc.totalPenagihan += v.nominal;
       return acc;
     },
-    { omset: 0, totalPenagihan: 0 }
+    { omset: 0, totalPenagihan: 0 },
   );
   const { omset, totalPenagihan } = sums;
   const keranjangPeralatan = useClientFetch(
-    `keranjangproyek?id_proyek=${id}&instalasi=0&versi=${selectedVersion}`
+    `keranjangproyek?id_proyek=${id}&instalasi=0&versi=${selectedVersion}`,
   );
   const keranjangInstalasi = useClientFetch(
-    `keranjangproyek?id_proyek=${id}&instalasi=1&versi=${selectedVersion}`
+    `keranjangproyek?id_proyek=${id}&instalasi=1&versi=${selectedVersion}`,
   );
   const rekapitulasiProyek = useClientFetch(
-    `rekapitulasiproyek?id_proyek=${id}&versi=${selectedVersion}`
+    `rekapitulasiproyek?id_proyek=${id}&versi=${selectedVersion}`,
   );
 
   const editButtonPress = (data) => {
@@ -341,7 +341,7 @@ export default function App({ id }) {
   const isAuthorized =
     (isHighRole || !idKaryawan || idKaryawan == sessUser?.id_karyawan) &&
     selectedProgress >= 10 &&
-    selectedProgress < 100;
+    String(selectedProyek?.statusproyek).toLowerCase() != "selesai";
   const renderCell = {
     pengeluaranproyek: React.useCallback(
       (data, columnKey) => {
@@ -407,7 +407,7 @@ export default function App({ id }) {
             return cellValue;
         }
       },
-      [sessUser?.rank]
+      [sessUser?.rank],
     ),
     pembayaranproyek: React.useCallback((data, columnKey) => {
       const cellValue = data[columnKey];
@@ -590,7 +590,7 @@ export default function App({ id }) {
       keranjangInstalasi,
       rekapitulasiProyek,
     },
-    session
+    session,
   );
   if (queryStates) return queryStates;
   if (!selectedProyek) return <>Proyek tidak ditemukan</>;
@@ -598,7 +598,7 @@ export default function App({ id }) {
     countRecapitulation(
       keranjangPeralatan.data,
       keranjangInstalasi.data,
-      rekapitulasiProyek.data[0] ?? {}
+      rekapitulasiProyek.data[0] ?? {},
     );
   const biayaProduksi = pengeluaranproyek.data.reduce((total, v) => {
     return (
@@ -657,7 +657,7 @@ export default function App({ id }) {
                   {
                     key: "Provit Persen",
                     comp: `${countPercentProvit(biayaProduksi, omset).toFixed(
-                      2
+                      2,
                     )}%`,
                   },
                 ]
