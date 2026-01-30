@@ -13,6 +13,8 @@ import {
 import Harga from "./harga";
 import { getDateFId } from "@/app/utils/date";
 import { JENIS_PROYEK_ENDPOINT } from "@/services/jenis-proyek.service";
+import { JENIS_INSTANSI_ENDPOINT } from "@/services/jenis-instansi.service";
+import { GOLONGAN_INSTANSI_ENDPOINT } from "@/services/golongan-instansi.service";
 
 // ✅ Reusable Hook
 export const useAutocompleteField = ({
@@ -214,6 +216,26 @@ export const AutocompleteJenisProyek = (props) => {
     title: "Jenis Proyek",
     field: "jenisproyek",
     id: "id_jenisproyek",
+    ...props,
+  });
+  return component;
+};
+export const AutocompleteJenisInstansi = (props) => {
+  const { component } = useAutocompleteField({
+    endpoint: JENIS_INSTANSI_ENDPOINT,
+    title: "Jenis Instansi",
+    field: "jenisinstansi",
+    id: "id_jenisinstansi",
+    ...props,
+  });
+  return component;
+};
+export const AutocompleteGolonganInstansi = (props) => {
+  const { component } = useAutocompleteField({
+    endpoint: GOLONGAN_INSTANSI_ENDPOINT,
+    title: "Golongan Instansi",
+    field: "golonganinstansi",
+    id: "id_golonganinstansi",
     ...props,
   });
   return component;

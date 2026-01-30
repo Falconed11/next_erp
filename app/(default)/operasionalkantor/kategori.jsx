@@ -50,7 +50,8 @@ import {
 import Harga from "@/components/harga";
 import ModalTransferData from "@/components/modaltransferdata";
 import "react-datepicker/dist/react-datepicker.css";
-import { capitalizeEachWord } from "@/app/utils/tools";
+import { capitalizeEachWord, highRoleCheck } from "@/app/utils/tools";
+import { TableHeaderWithAddButton } from "@/components/mycomponent";
 
 const apiPath = getApiPath();
 
@@ -221,18 +222,17 @@ export default function App({ sessionuser }) {
     },
   ];
   return (
-    <div className="flex flex-col">
-      <div className="flex flex-row gap-2">
-        <Button color="primary" onPress={tambahButtonPress}>
-          Tambah
-        </Button>
-      </div>
+    <>
       <Table
         isStriped
-        className="pt-3"
+        className=""
         aria-label="Example table with custom cells"
         topContent={
-          <div className="font-bold text-lg">Kategori Operasional Kantor</div>
+          <TableHeaderWithAddButton
+            isHighRole={highRoleCheck(sessionuser.rank)}
+            title="Kategori Operasional Kantor"
+            onPress={tambahButtonPress}
+          />
         }
       >
         <TableHeader columns={columns}>
@@ -300,68 +300,6 @@ export default function App({ sessionuser }) {
           )}
         </ModalContent>
       </Modal>
-      {/* transfer */}
-      {/* <Modal
-        isOpen={transfer.isOpen}
-        onOpenChange={transfer.onOpenChange}
-        scrollBehavior="inside"
-      >
-        <ModalContent>
-          {(onClose) => (
-            <>
-              <ModalHeader className="flex flex-col gap-1">
-                Transfer Kategori
-              </ModalHeader>
-              <ModalBody>
-                <Input
-                  isDisabled={1}
-                  type="text"
-                  label="Kategori asal"
-                  value={form.nama}
-                  className="max-w-xs"
-                />
-                <Autocomplete
-                  label="Target kategori"
-                  variant="bordered"
-                  placeholder="Pilih target kategori"
-                  defaultItems={kategorioperasionalkantor.data}
-                  defaultSelectedKey={form.newid}
-                  className="max-w-xs"
-                  onSelectionChange={(val) => {
-                    setForm({
-                      ...form,
-                      newid: val,
-                    });
-                  }}
-                >
-                  {(item) => {
-                    const id = item.id;
-                    return (
-                      form.id != id && (
-                        <AutocompleteItem key={item.id}>
-                          {item.nama}
-                        </AutocompleteItem>
-                      )
-                    );
-                  }}
-                </Autocomplete>
-              </ModalBody>
-              <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
-                  Batal
-                </Button>
-                <Button
-                  isDisabled={!form.newid}
-                  color="primary"
-                  onPress={() => saveTransferButtonPress(onClose)}
-                >
-                  Simpan
-                </Button>
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
-      </Modal> */}
       <ModalTransferData
         title="Kategori"
         data={kategorioperasionalkantor.data}
@@ -375,6 +313,6 @@ export default function App({ sessionuser }) {
         labelKey={"nama"}
         onSave={onSave}
       />
-    </div>
+    </>
   );
 }

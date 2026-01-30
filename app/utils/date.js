@@ -22,6 +22,7 @@ const getDate = (date) => {
 };
 
 const getTime = (date, separator) => {
+  if (!date) return "";
   date = new Date(date);
   const pad = (n) => n.toString().padStart(2, "0");
   const hours = pad(date.getHours());
@@ -38,6 +39,7 @@ const getDateF = (date) => {
 };
 
 const getDateFId = (date, format) => {
+  if (!date) return "";
   date = new Date(date);
   const year = date.getFullYear();
   const month = date.getMonth();
@@ -75,12 +77,12 @@ const getCurFirstLastDay = () => {
   const nextMonthFirstDay = new Date(
     currentDate.getFullYear(),
     currentMonth + 1,
-    1
+    1,
   );
   const currentMonthFirstDay = new Date(
     currentDate.getFullYear(),
     currentMonth,
-    1
+    1,
   );
   const lastDayOfCurrentMonth = new Date(nextMonthFirstDay - 1);
   const firstDayOfCurrentMonth = new Date(currentMonthFirstDay);

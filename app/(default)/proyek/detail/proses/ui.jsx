@@ -32,17 +32,11 @@ import {
 import { useReactToPrint } from "react-to-print";
 import { getApiPath, useClientFetch } from "@/app/utils/apiconfig";
 import { getDateF, getDateFId, getDate } from "@/app/utils/date";
-import { penawaran } from "@/app/utils/formatid";
 import Harga from "@/components/harga";
 import TambahProduk from "@/components/tambahproduk";
 import { Button } from "@heroui/react";
 import { Input } from "@heroui/react";
-import { Divider } from "@heroui/react";
-import { Spacer } from "@heroui/react";
 import { Select, SelectItem } from "@heroui/react";
-import Link from "next/link";
-import Image from "next/image";
-import logo from "@/public/logofinal.jpg";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { NavLinkNewTab, OpenBlueLinkInNewTab } from "@/components/mycomponent";
@@ -80,7 +74,6 @@ export default function App({ id }) {
       behavior: "smooth",
     });
   };
-  const [selectKategori, setSelectKategori] = useState(new Set([]));
   const [selectProduk, setSelectProduk] = useState(new Set([]));
   const karyawan = useClientFetch(`karyawan`);
   const [selectKaryawan, setSelectKaryawan] = useState("");
@@ -98,7 +91,6 @@ export default function App({ id }) {
   const pengeluaranproyek = useClientFetch(`pengeluaranproyek?id_proyek=${id}`);
   const pembayaranproyek = useClientFetch(`pembayaranproyek?id_proyek=${id}`);
   const kategori = useClientFetch(`kategoriproduk`);
-  const metodepembayaran = useClientFetch(`metodepembayaran`);
   const selectedVersion = proyek.data?.[0]?.versi || 0;
   const sums = (pembayaranproyek?.data ?? []).reduce(
     (acc, v) => {
@@ -585,7 +577,6 @@ export default function App({ id }) {
       pembayaranproyek,
       karyawan,
       kategori,
-      metodepembayaran,
       keranjangPeralatan,
       keranjangInstalasi,
       rekapitulasiProyek,
@@ -608,7 +599,6 @@ export default function App({ id }) {
   }, 0);
   const provit = omset - biayaProduksi;
   const variant = "bordered";
-  console.log(form);
   return (
     <div className="flex flex-col gap-2 w-full-">
       <div className="flex gap-2">
@@ -708,7 +698,6 @@ export default function App({ id }) {
                       isCreate
                       form={formPembayaran}
                       setForm={setFormPembayaran}
-                      metodepembayaran={metodepembayaran}
                       rekap={rekapitulasiTotal}
                       totalPenagihan={totalPenagihan}
                     />
@@ -1059,7 +1048,6 @@ export default function App({ id }) {
                 <PembayaranProyek
                   form={formPembayaran}
                   setForm={setFormPembayaran}
-                  metodepembayaran={metodepembayaran}
                   rekap={rekapitulasiTotal}
                   totalPenagihan={totalPenagihan}
                 />

@@ -57,6 +57,11 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { LinkOpenNewTab, OpenBlueLinkInNewTab } from "@/components/mycomponent";
 import ModalTransferData from "@/components/modaltransferdata";
+import {
+  AutocompleteGolonganInstansi,
+  AutocompleteJenisInstansi,
+} from "@/components/myautocomplete";
+import { key2set } from "@/app/utils/tools";
 
 const apiPath = getApiPath();
 
@@ -114,7 +119,7 @@ export default function App() {
   const editButtonPress = (data) => {
     setForm({
       ...data,
-      selectSwasta: new Set([String(data.swasta)]),
+      selectSwasta: key2set(data.swasta),
       method: "PUT",
       title: "Edit",
     });
@@ -169,11 +174,11 @@ export default function App() {
               // 'Content-Type': 'application/x-www-form-urlencoded',
             },
             body: JSON.stringify({ ...v, id_second: v.id }),
-          })
-        )
+          }),
+        ),
       );
       const dataArray = await Promise.all(
-        responses.map((response) => response.json())
+        responses.map((response) => response.json()),
       );
       setReportList(dataArray.map((v, i) => `${i + 1}. ${v.message}`));
     } catch (e) {
@@ -193,7 +198,7 @@ export default function App() {
     XLSX.writeFile(
       workbook,
       `proyek_${getDateF(filter.startDate)}_${getDateF(filter.endDate)}.xlsx`,
-      { compression: true }
+      { compression: true },
     );
   };
 
@@ -268,14 +273,14 @@ export default function App() {
           return cellValue;
       }
     },
-    [sessionuser?.rank]
+    [sessionuser?.rank],
   );
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const transfer = useDisclosure();
   const report = useDisclosure();
 
   const data = customer.data?.filter((row) =>
-    row.nama.toLowerCase().includes(value.toLowerCase())
+    row.nama.toLowerCase().includes(value.toLowerCase()),
   );
   const pages = useMemo(() => {
     return data ? Math.ceil(data?.length / rowsPerPage) : 0;
@@ -297,6 +302,14 @@ export default function App() {
       key: "nama",
       label: "Nama",
     },
+    {
+      key: "jenisinstansi",
+      label: "Jenis Instansi",
+    },
+    {
+      key: "golonganinstansi",
+      label: "Golongan Instansi",
+    },
   ];
   const privilege = ["admin", "super"];
   if (privilege.includes(user?.peran))
@@ -308,7 +321,7 @@ export default function App() {
       {
         key: "provit",
         label: "Provit",
-      }
+      },
     );
   columns.push(
     {
@@ -330,7 +343,7 @@ export default function App() {
             label: "Update Terakhir",
           },
         ]
-      : [])
+      : []),
   );
 
   return (
@@ -466,6 +479,8 @@ export default function App() {
                     </SelectItem>
                   ))}
                 </Select>
+                <AutocompleteJenisInstansi form={form} setForm={setForm} />
+                <AutocompleteGolonganInstansi form={form} setForm={setForm} />
                 <Input
                   type="text"
                   label="Kota"

@@ -142,8 +142,24 @@ export default function RootLayout({
   });
   if (rolesCheck(["admin", "super"], user?.peran))
     links.push(
-      { href: "/vendor", name: "Vendor", icon: <MdOutlineFactory /> },
-      { href: "/bank", name: "Bank", icon: <BsBank /> },
+      {
+        href: "/vendor",
+        name: "Vendor",
+        icon: <MdOutlineFactory />,
+      },
+      {
+        href: "/bank",
+        name: "Bank",
+        icon: <BsBank />,
+        ...(isHighRole
+          ? {
+              dropdown: [
+                { key: "data", name: "Bank" },
+                { key: "transfer-bank", name: "Transfer Bank" },
+              ],
+            }
+          : {}),
+      },
       {
         href: "/karyawan",
         name: "Karyawan",

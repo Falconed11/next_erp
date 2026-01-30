@@ -1091,45 +1091,6 @@ export default function App({
                 />
                 <AutocompleteJenisProyek form={form} setForm={setForm} />
                 <AutocompleteCustomer form={form} setForm={setForm} />
-                {/* <Autocomplete
-                  label="Customer"
-                  variant="bordered"
-                  allowsCustomValue
-                  defaultItems={customer.data}
-                  placeholder="Cari customer"
-                  className="max-w-xs"
-                  selectedKey={form.id_instansi}
-                  defaultSelectedKey={form.id_instansi}
-                  defaultInputValue={form.instansi || ""}
-                  onInputChange={(v) => {
-                    const nextForm = { ...form, instansi: v };
-                    if (!form.id_instansi) {
-                      nextForm.swasta = "";
-                      nextForm.kota = "";
-                      nextForm.alamat = "";
-                    }
-                    setForm(nextForm);
-                  }}
-                  onSelectionChange={(v) => {
-                    const selectedInstansi = customer.data.find(
-                      (o) => o.id == v
-                    );
-                    setForm({
-                      ...form,
-                      id_instansi: v,
-                      swasta: selectedInstansi?.swasta,
-                      kota: selectedInstansi?.kota,
-                      alamat: selectedInstansi?.alamat,
-                    });
-                  }}
-                >
-                  {(item) => (
-                    <AutocompleteItem key={item.id} textValue={item.nama}>
-                      {item.nama} | {item.swasta ? "Swasta" : "Negri"} |{" "}
-                      {item.kota}
-                    </AutocompleteItem>
-                  )}
-                </Autocomplete> */}
                 <Select
                   label="S/N"
                   variant="bordered"

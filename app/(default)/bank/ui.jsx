@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import * as XLSX from "xlsx";
 import { useClientFetch, getApiPath } from "@/app/utils/apiconfig";
 import {
@@ -46,14 +46,21 @@ import {
   getDateF,
 } from "@/app/utils/date";
 import Harga from "@/components/harga";
-import { LinkOpenNewTab } from "@/components/mycomponent";
+import {
+  LinkOpenNewTab,
+  TableHeaderWithAddButton,
+} from "@/components/mycomponent";
 import { FileUploader } from "@/components/input";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { useSession } from "next-auth/react";
+import { highRoleCheck, renderQueryStates } from "@/app/utils/tools";
 
 const apiPath = getApiPath();
 
 export default function App() {
+  const session = useSession();
+  const sessUser = session?.data?.user;
   const bank = useClientFetch("bank");
   const metodepembayaran = useClientFetch("metodepembayaran");
   const [form, setForm] = useState({});
@@ -159,11 +166,11 @@ export default function App() {
               // 'Content-Type': 'application/x-www-form-urlencoded',
             },
             body: JSON.stringify({ ...v, id_second: v.id }),
-          })
-        )
+          }),
+        ),
       );
       const dataArray = await Promise.all(
-        responses.map((response) => response.json())
+        responses.map((response) => response.json()),
       );
       setReportList(dataArray.map((v, i) => `${i + 1}. ${v.message}`));
     } catch (e) {
@@ -183,7 +190,7 @@ export default function App() {
     XLSX.writeFile(
       workbook,
       `proyek_${getDateF(filter.startDate)}_${getDateF(filter.endDate)}.xlsx`,
-      { compression: true }
+      { compression: true },
     );
   };
 
@@ -260,10 +267,12 @@ export default function App() {
   // if (metodepembayaran.isLoading) return <div>loading...</div>;
   // if (bank.error) return <div>failed to load</div>;
   // if (bank.isLoading) return <div>loading...</div>;
+
+  const isHighRole = highRoleCheck(sessUser?.rank);
+
   if (isLoading) return <div>loading...</div>;
-  const sources = [bank, metodepembayaran];
-  if (sources.some((o) => o.error)) return <div>failed to load</div>;
-  if (sources.some((o) => o.isLoading)) return <div>loading...</div>;
+  const QueryState = renderQueryStates({ bank, metodepembayaran }, session);
+  if (QueryState) return QueryState;
   const columns = [
     {
       key: "id",
@@ -298,28 +307,31 @@ export default function App() {
     <div className="flex gap-2">
       <Bank bank={bank} />
       <div className="flex flex-col gap-2">
-        <div className="flex flex-row gap-2">
-          <Button color="primary" onPress={tambahButtonPress}>
-            Tambah
+        {/* <div className="flex flex-row gap-2">
+          <div>
+            <Link
+              className="bg-primary text-white p-2 rounded-lg inline-block"
+              href={"/proyek.xlsx"}
+            >
+              Download Format
+            </Link>
+          </div>
+          <FileUploader onFileUpload={handleFileUpload} />
+          <Button color="primary" onPress={handleButtonUploadExcelPress}>
+            Upload Excel
           </Button>
-          {/* <div>
-          <Link
-            className="bg-primary text-white p-2 rounded-lg inline-block"
-            href={"/proyek.xlsx"}
-          >
-            Download Format
-          </Link>
-        </div>
-        <FileUploader onFileUpload={handleFileUpload} />
-        <Button color="primary" onPress={handleButtonUploadExcelPress}>
-          Upload Excel
-        </Button> */}
-        </div>
+        </div> */}
         <Table
           isStriped
           className=""
           aria-label="Example table with custom cells"
-          topContent={<></>}
+          topContent={
+            <TableHeaderWithAddButton
+              isHighRole={isHighRole}
+              onPress={tambahButtonPress}
+              title="Metode Pembayaran"
+            />
+          }
         >
           <TableHeader columns={columns}>
             {(column) => (
@@ -534,6 +546,8 @@ export default function App() {
 }
 
 const Bank = ({ bank }) => {
+  const session = useSession();
+  const sessUser = session?.data.user;
   const [form, setForm] = useState();
 
   const onSubmit = async (e, onClose) => {
@@ -584,7 +598,7 @@ const Bank = ({ bank }) => {
     }
   };
 
-  const renderCell = React.useCallback((data, columnKey) => {
+  const renderCell = useCallback((data, columnKey) => {
     const cellValue = data[columnKey];
     const date = new Date(data.tanggal);
     switch (columnKey) {
@@ -616,6 +630,11 @@ const Bank = ({ bank }) => {
 
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
+  const isHighRole = highRoleCheck(sessUser?.rank);
+
+  const QueryState = renderQueryStates({}, session);
+  if (QueryState) return QueryState;
+
   const columns = [
     {
       key: "id",
@@ -631,16 +650,17 @@ const Bank = ({ bank }) => {
     },
   ];
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex flex-row gap-2">
-        <Button color="primary" onPress={tambahButtonPress}>
-          Tambah
-        </Button>
-      </div>
+    <>
       <Table
         isStriped
         aria-label="Example table with custom cells"
-        topContent={<></>}
+        topContent={
+          <TableHeaderWithAddButton
+            isHighRole={isHighRole}
+            onPress={tambahButtonPress}
+            title="Bank"
+          />
+        }
       >
         <TableHeader columns={columns}>
           {(column) => (
@@ -693,6 +713,6 @@ const Bank = ({ bank }) => {
           )}
         </ModalContent>
       </Modal>
-    </div>
+    </>
   );
 };

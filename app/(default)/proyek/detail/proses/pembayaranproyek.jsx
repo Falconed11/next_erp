@@ -10,13 +10,13 @@ import { getDate } from "@/app/utils/date";
 import Harga from "@/components/harga";
 import { getApiPath, useClientFetch } from "@/app/utils/apiconfig";
 import { key2set, set2key } from "@/app/utils/tools";
+import SelectMetodePembayaran from "@/components/metode-pembayaran/SelectMetodePembayaran";
 const apiPath = getApiPath();
 
 export default function PembayaranProyek({
   isCreate,
   form,
   setForm,
-  metodepembayaran,
   rekap,
   totalPenagihan,
 }) {
@@ -68,29 +68,7 @@ export default function PembayaranProyek({
           })
         }
       />
-      <Select
-        label="Metode Pembayaran"
-        placeholder="Pilih metode pembayaran!"
-        className=""
-        selectedKeys={form.selectMetodePembayaran}
-        onSelectionChange={(v) => {
-          setForm({
-            ...form,
-            selectMetodePembayaran: v,
-            id_metodepembayaran: new Set(v).values().next().value,
-          });
-        }}
-      >
-        {metodepembayaran.data.map((item) => (
-          <SelectItem
-            key={item.id}
-            value={item.id}
-            textValue={`${item.nama} ${item.namabank} ${item.norekening} ${item.atasnama}`}
-          >
-            {item.nama} {item.namabank} {item.norekening} {item.atasnama}
-          </SelectItem>
-        ))}
-      </Select>
+      <SelectMetodePembayaran form={form} setForm={setForm} />
       <Select
         label="Invoice"
         placeholder="Pilih karyawan!"

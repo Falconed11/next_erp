@@ -17,12 +17,15 @@ import {
 } from "@/app/utils/tools";
 import { getDateFId, getTime } from "@/app/utils/date";
 import { TableHeaderWithAddButton } from "../mycomponent";
-import { useDefaultColumns, useDefaultFetch } from "@/hooks/useDefault";
 import { useState } from "react";
-import DefaultModal from "./DefaultModal";
+import { TransferBankModal } from "@/components/transfer-bank/TransferBankModal";
 import { useSession } from "next-auth/react";
+import {
+  useTransferBankColumns,
+  useTransferBankFetch,
+} from "@/hooks/transfer-bank-hooks";
 
-export const renderDefaultTableCell = ({
+export const renderTransferBankTableCell = ({
   data,
   columnKey,
   onEdit,
@@ -30,11 +33,9 @@ export const renderDefaultTableCell = ({
 }) => {
   const cellValue = data[columnKey];
   switch (columnKey) {
-    case "nama":
-      return capitalizeEachWord(cellValue);
-    case "lastupdate":
+    case "updated_at":
       return `${getDateFId(cellValue)} ${getTime(cellValue)}`;
-    case "creationdate":
+    case "created_at":
       return `${getDateFId(cellValue)}`;
     case "aksi":
       return (
@@ -61,13 +62,8 @@ export const renderDefaultTableCell = ({
       return cellValue;
   }
 };
-export const DefaultTable = ({
-  endPoint,
-  rowsPerPage,
-  onDelete,
-  onSave,
-  name,
-}) => {
+export const TransferBankTable = ({ rowsPerPage, onDelete, onSave }) => {
+  const name = "Transfer Bank";
   const session = useSession();
   const sessUser = session?.data?.user;
 
@@ -76,7 +72,7 @@ export const DefaultTable = ({
   const offset = (page - 1) * rowsPerPage;
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
-  const data = useDefaultFetch({ endPoint, limit: rowsPerPage, offset });
+  const data = useTransferBankFetch({ limit: rowsPerPage, offset });
   const items = data?.data?.data;
 
   const loadingState = data.isLoading ? "loading" : "idle";
@@ -84,6 +80,7 @@ export const DefaultTable = ({
     setForm({
       method: "POST",
       nama: "",
+      tanggal: new Date(),
     });
     onOpen();
   };
@@ -96,7 +93,7 @@ export const DefaultTable = ({
     onOpen();
   };
   const deleteButtonPress = async (id) => {
-    if (confirm("Hapus jenis proyek?")) {
+    if (confirm("Hapus transfer bank?")) {
       const res = await onDelete(id);
       const json = await res.json();
       if (!res.ok) return alert(json.message);
@@ -105,11 +102,9 @@ export const DefaultTable = ({
     }
   };
   const isHighRole = highRoleCheck(sessUser?.rank);
-  const columns = useDefaultColumns(isHighRole);
+  const columns = useTransferBankColumns(isHighRole);
   const QueryState = renderQueryStates({ data }, session);
   if (QueryState) return QueryState;
-
-  const id_karyawan = sessUser.id_karyawan;
 
   const pages = Math.ceil(items[0]?.total / rowsPerPage);
   return (
@@ -163,7 +158,7 @@ export const DefaultTable = ({
               <TableRow key={item.id}>
                 {(columnKey) => (
                   <TableCell>
-                    {renderDefaultTableCell({
+                    {renderTransferBankTableCell({
                       data: item,
                       columnKey,
                       onEdit: editButtonPress,
@@ -176,15 +171,13 @@ export const DefaultTable = ({
           }}
         </TableBody>
       </Table>
-      <DefaultModal
+      <TransferBankModal
         data={data}
         form={form}
-        id_karyawan={id_karyawan}
+        setForm={setForm}
         isOpen={isOpen}
-        name={name}
         onOpenChange={onOpenChange}
         onSave={onSave}
-        setForm={setForm}
       />
     </>
   );

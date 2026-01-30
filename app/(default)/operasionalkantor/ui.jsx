@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { useClientFetch, getApiPath } from "../../utils/apiconfig";
 import { penawaran } from "../../utils/formatid";
 import {
@@ -50,7 +50,15 @@ import Kategori from "./kategori";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useSession } from "next-auth/react";
-import { highRoleCheck } from "@/app/utils/tools";
+import {
+  highRoleCheck,
+  key2set,
+  renderQueryStates,
+  set2key,
+} from "@/app/utils/tools";
+import SelectMetodePembayaran from "@/components/metode-pembayaran/SelectMetodePembayaran";
+import { SelectPerusahaan } from "@/components/perusahaan/perusahaan";
+import useOperasionalKantorColumns from "@/hooks/useOperasionalKantorColumns";
 
 const apiPath = getApiPath();
 const [startDate, endDate] = getCurFirstLastDay();
@@ -64,20 +72,19 @@ export default function App() {
     selectKategori: new Set([]),
   });
   const [current, setCurrent] = useState({});
-  const [page, setPage] = React.useState(1);
+  const [page, setPage] = useState(1);
   const rowsPerPage = 25;
   const kategorioperasionalkantor = useClientFetch("kategorioperasionalkantor");
   const karyawan = useClientFetch("karyawan");
   const operasionalkantor = useClientFetch(
     `operasionalkantor?start=${getDate(current.startDate)}&end=${getDate(
-      current.endDate
+      current.endDate,
     )}&id_kategori=${
       filter.selectKategori.values().next().value
         ? filter.selectKategori.values().next().value
         : ""
-    }`
+    }`,
   );
-  const queries = { kategorioperasionalkantor, karyawan, operasionalkantor };
   const pages = useMemo(() => {
     return operasionalkantor?.data
       ? Math.ceil(operasionalkantor?.data?.length / rowsPerPage)
@@ -116,11 +123,11 @@ export default function App() {
               keterangan: v.keterangan ?? "",
               biaya: v.biaya ?? "",
             }),
-          })
-        )
+          }),
+        ),
       );
       const dataArray = await Promise.all(
-        responses.map((response) => response.json())
+        responses.map((response) => response.json()),
       );
       setReportList(dataArray.map((v, i) => `${i}. ${v.message}`));
     } catch (e) {
@@ -144,15 +151,22 @@ export default function App() {
     XLSX.writeFile(
       workbook,
       `operasionalkantor_${getDateF(filter.startDate)}_${getDateF(
-        filter.endDate
+        filter.endDate,
       )}.xlsx`,
-      { compression: true }
+      { compression: true },
     );
   };
   const tambahButtonPress = async (method) => {
     // if (select.size == 0) return alert("Produk belum dipilih.");
-    if (!form.tanggal || !form.id_karyawan || !form.biaya)
-      return alert("Data belum lengkap");
+    if (
+      !form.biaya ||
+      !form.id_perusahaan ||
+      !form.id_metodepembayaran ||
+      !form.id_kategorioperasionalkantor
+    )
+      return alert(
+        "Perusahaan, Kategori, Biaya, dan Metode Pembayaran wajib diisi.",
+      );
     const res = await fetch(`${apiPath}operasionalkantor`, {
       method,
       headers: {
@@ -161,11 +175,10 @@ export default function App() {
       },
       body: JSON.stringify({
         ...form,
-        id_kategorioperasionalkantor: form.id_kategorioperasionalkantor
-          ?.values()
-          ?.next()?.value,
-        id_karyawan: form.id_karyawan?.values()?.next()?.value,
-        tanggal: getDate(form.tanggal),
+        id_kategorioperasionalkantor: set2key(
+          form.id_kategorioperasionalkantor,
+        ),
+        id_karyawan: sessUser?.id_karyawan,
       }),
     });
     const json = await res.json();
@@ -201,7 +214,7 @@ export default function App() {
       // return alert(await res.json().then((json) => json.message));
     }
   };
-  const renderCell = React.useCallback((data, columnKey) => {
+  const renderCell = useCallback((data, columnKey) => {
     const cellValue = data[columnKey];
     const date = new Date(data.tanggal);
     switch (columnKey) {
@@ -259,43 +272,14 @@ export default function App() {
   const [reportList, setReportList] = useState([]);
   const report = useDisclosure();
 
-  for (const [name, data] of Object.entries(queries)) {
-    if (data.error) return <div>Failed to load {name}</div>;
-    if (data.isLoading) return <div>Loading {name}...</div>;
-  }
-  if (session.status === "loading") return <div>Session Loading...</div>;
-  const isHighRole = highRoleCheck(sessUser.rank);
+  const isHighRole = highRoleCheck(sessUser?.rank);
+  const col = useOperasionalKantorColumns(isHighRole);
 
-  const col = [
-    {
-      key: "aksi",
-      label: "Aksi",
-    },
-    {
-      key: "tanggal",
-      label: "Tanggal",
-    },
-    {
-      key: "karyawan",
-      label: "Karyawan",
-    },
-    {
-      key: "kategori",
-      label: "Kategori",
-    },
-    {
-      key: "keterangan",
-      label: "Keterangan",
-    },
-    {
-      key: "biaya",
-      label: "Biaya",
-    },
-  ];
-
-  // const sumBiaya = operasionalkantor.data.reduce((acc, v) => {
-  //   return acc + v.biaya;
-  // });
+  const QueryState = renderQueryStates(
+    { kategorioperasionalkantor, karyawan, operasionalkantor },
+    session,
+  );
+  if (QueryState) return QueryState;
   return (
     <>
       <div className="flex gap-2">
@@ -303,7 +287,7 @@ export default function App() {
           <div className="bg-white p-3 rounded-lg">
             <div>Operasional Kantor</div>
             <div className="flex flex-col gap-2">
-              <div className="flex gap-2 w-full">
+              <div className="flex flex-col gap-2 w-full">
                 <FormOperasionalKantor
                   form={form}
                   setForm={setForm}
@@ -311,7 +295,7 @@ export default function App() {
                   karyawan={karyawan}
                 />
               </div>
-              <div className="flex flex-row gap-2">
+              <div className="flex flex-row gap-2 justify-end">
                 <Button
                   onPress={() => {
                     tambahButtonPress("POST");
@@ -325,23 +309,23 @@ export default function App() {
             </div>
           </div>
           {/* <div className="flex flex-row gap-2">
-        <div>
-          <Link
-            className="bg-primary text-white p-2 rounded-lg inline-block"
-            href={"/operasionalkantor.xlsx"}
-          >
-            Download Format
-          </Link>
-        </div>
-        <FileUploader onFileUpload={handleFileUpload} />
-        <Button
-          color="primary"
-          className=""
-          onPress={handleButtonUploadExcelPress}
-        >
-          Upload Excel
-        </Button>
-      </div> */}
+            <div>
+              <Link
+                className="bg-primary text-white p-2 rounded-lg inline-block"
+                href={"/operasionalkantor.xlsx"}
+              >
+                Download Format
+              </Link>
+            </div>
+            <FileUploader onFileUpload={handleFileUpload} />
+            <Button
+              color="primary"
+              className=""
+              onPress={handleButtonUploadExcelPress}
+            >
+              Upload Excel
+            </Button>
+          </div> */}
           <Table
             isStriped
             className="h-full w-full"
@@ -512,7 +496,7 @@ const FormOperasionalKantor = ({
 }) => {
   return (
     <>
-      <div className="bg-gray-100 p-3 rounded-lg">
+      {/* <div className="bg-gray-100 p-3 rounded-lg">
         <div>Tanggal</div>
         <DatePicker
           className="bg-white"
@@ -521,7 +505,8 @@ const FormOperasionalKantor = ({
           selected={form.tanggal}
           onChange={(v) => setForm({ ...form, tanggal: v })}
         />
-      </div>
+      </div> */}
+      <SelectPerusahaan form={form} setForm={setForm} />
       <Select
         label="Kategori"
         placeholder="Pilih kategori!"
@@ -537,7 +522,7 @@ const FormOperasionalKantor = ({
           </SelectItem>
         ))}
       </Select>
-      <Select
+      {/* <Select
         label="Karyawan"
         placeholder="Pilih karyawan!"
         className=""
@@ -549,7 +534,7 @@ const FormOperasionalKantor = ({
             {item.nama}
           </SelectItem>
         ))}
-      </Select>
+      </Select> */}
       <NumberInput
         hideStepper
         isWheelDisabled
@@ -562,6 +547,7 @@ const FormOperasionalKantor = ({
         className=""
         onValueChange={(v) => setForm({ ...form, biaya: v })}
       />
+      <SelectMetodePembayaran form={form} setForm={setForm} />
       <Textarea
         label="Keterangan"
         labelPlacement="inside"
