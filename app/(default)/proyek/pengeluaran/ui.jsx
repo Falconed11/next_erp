@@ -60,8 +60,8 @@ export default function UI() {
   });
   const pengeluaran = useClientFetch(
     `pengeluaranproyek?start=${getDate(filter.startDate)}&end=${getDate(
-      filter.endDate
-    )}`
+      filter.endDate,
+    )}`,
   );
   const [form, setForm] = useState({});
   const [json, setJson] = useState([]);
@@ -147,11 +147,11 @@ export default function UI() {
               // 'Content-Type': 'application/x-www-form-urlencoded',
             },
             body: JSON.stringify({ ...v, id_second: v.id }),
-          })
-        )
+          }),
+        ),
       );
       const dataArray = await Promise.all(
-        responses.map((response) => response.json())
+        responses.map((response) => response.json()),
       );
       setReportList(dataArray.map((v, i) => `${i + 1}. ${v.message}`));
     } catch (e) {
@@ -192,9 +192,9 @@ export default function UI() {
     XLSX.writeFile(
       workbook,
       `pengeluaran_${getDateF(filter.startDate)}_${getDateF(
-        filter.endDate
+        filter.endDate,
       )}.xlsx`,
-      { compression: true }
+      { compression: true },
     );
   };
 

@@ -1,4 +1,4 @@
-import { API_PATH, useClientFetch } from "@/app/utils/apiconfig";
+import { API_PATH } from "@/app/utils/apiconfig";
 import { getDateF } from "@/app/utils/date";
 import {
   capitalizeEachWord,
@@ -36,6 +36,7 @@ import { renderStatusProyekCell } from "@/components/status-proyek/StatusProyekT
 import { StatusProyekModal } from "@/components/status-proyek/StatusProyekModal";
 import { useStatusProyekColumns } from "@/hooks/useStatusProyekColumns";
 import { isValidProgress } from "@/app/utils/validation";
+import { useClientFetch } from "@/hooks/useClientFetch";
 
 const StatusProyek = () => {
   const { data: session } = useSession();

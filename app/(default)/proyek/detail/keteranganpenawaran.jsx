@@ -72,7 +72,7 @@ export default function KeteranganPenawaran({
                       idProyek,
                       idKeteranganPenawaran: data.id,
                     }),
-                  }
+                  },
                 );
                 const json = await res.json();
                 // if (res.status == 400) console.log(json.message);
@@ -116,7 +116,7 @@ export default function KeteranganPenawaran({
                             // 'Content-Type': 'application/x-www-form-urlencoded',
                           },
                           body: JSON.stringify({ id: data.id }),
-                        }
+                        },
                       );
                       const json = await res.json();
                       if (res.status == 400) return alert(json.message);
@@ -136,7 +136,7 @@ export default function KeteranganPenawaran({
           return cellValue;
       }
     },
-    [isAuthorized]
+    [isAuthorized],
   );
 
   const { isOpen, onOpen, onOpenChange } = useDisclosure();

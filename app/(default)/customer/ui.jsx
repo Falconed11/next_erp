@@ -1,12 +1,8 @@
 "use client";
-import React, { useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { useSession } from "next-auth/react";
 import * as XLSX from "xlsx";
-import {
-  useClientFetch,
-  getApiPath,
-  useClientFetchPagination,
-} from "@/app/utils/apiconfig";
+import { getApiPath } from "@/app/utils/apiconfig";
 import {
   Table,
   TableHeader,
@@ -31,9 +27,7 @@ import {
   useDisclosure,
 } from "@heroui/react";
 import { Input } from "@heroui/react";
-import { Textarea } from "@heroui/react";
 import { Select, SelectItem } from "@heroui/react";
-import Link from "next/link";
 import {
   AddIcon,
   EditIcon,
@@ -52,8 +46,6 @@ import {
 } from "@/app/utils/date";
 import { LIST_SWASTA_NEGRI } from "@/app/utils/const";
 import Harga from "@/components/harga";
-import { FileUploader } from "@/components/input";
-import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { LinkOpenNewTab, OpenBlueLinkInNewTab } from "@/components/mycomponent";
 import ModalTransferData from "@/components/modaltransferdata";
@@ -62,6 +54,7 @@ import {
   AutocompleteJenisInstansi,
 } from "@/components/myautocomplete";
 import { key2set } from "@/app/utils/tools";
+import { useClientFetch } from "@/hooks/useClientFetch";
 
 const apiPath = getApiPath();
 
@@ -70,10 +63,10 @@ export default function App() {
   const sessionuser = session.data?.user;
   const user = session.data?.user;
 
-  const [value, setValue] = React.useState("");
+  const [value, setValue] = useState("");
   const customer = useClientFetch("customer");
   const [form, setForm] = useState({});
-  const [page, setPage] = React.useState(1);
+  const [page, setPage] = useState(1);
   const rowsPerPage = 25;
 
   const saveButtonPress = async (onClose) => {

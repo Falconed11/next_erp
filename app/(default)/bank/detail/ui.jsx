@@ -31,11 +31,7 @@ import {
   ModalFooter,
   useDisclosure,
 } from "@heroui/react";
-import {
-  getApiPath,
-  useClientFetch,
-  useClientFetchNoInterval,
-} from "@/app/utils/apiconfig";
+import { getApiPath } from "@/app/utils/apiconfig";
 import {
   getDate,
   getDateF,
@@ -58,6 +54,7 @@ import { useRouter } from "next/navigation";
 import { v4 as uuidv4 } from "uuid";
 import { FilterProduk } from "@/components/filter";
 import { RangeDate } from "@/components/input";
+import { useClientFetch } from "@/hooks/useClientFetch";
 
 const api_path = getApiPath();
 const [startDate, endDate] = getCurFirstLastDay();
@@ -84,10 +81,10 @@ export default function App({ id }) {
 
   const pembayaranproyek = useClientFetch(
     `pembayaranproyek?id_metodepembayaran=${id}&start=${getDate(
-      current.startDate
+      current.startDate,
     )}&end=${getDate(current.endDate)}&id_kategori=${
       selectKategori.values().next().value ?? ""
-    }`
+    }`,
   );
   const metodepembayaran = useClientFetch(`metodepembayaran?id=${id}`);
 

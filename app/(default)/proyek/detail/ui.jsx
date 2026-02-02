@@ -36,11 +36,7 @@ import {
   useDisclosure,
 } from "@heroui/react";
 import { useReactToPrint } from "react-to-print";
-import {
-  getApiPath,
-  useClientFetch,
-  useClientFetchNoInterval,
-} from "@/app/utils/apiconfig";
+import { getApiPath } from "@/app/utils/apiconfig";
 import { getDate, getDateF, getDateFId } from "@/app/utils/date";
 import { invoice, penawaran } from "@/app/utils/formatid";
 import { removePrefixIfMatchIgnoreCase } from "@/app/utils/stringmanipulation";
@@ -61,9 +57,6 @@ import { Select, SelectItem } from "@heroui/react";
 import { CheckboxGroup, Checkbox } from "@heroui/react";
 import { Form } from "@heroui/form";
 import Image from "next/image";
-import logoBks from "@/public/logo-bks.jpeg";
-import logoSavista from "@/public/logo-savista.png";
-import logoSvt from "@/public/logo-svt.jpeg";
 import { useRouter } from "next/navigation";
 import { v4 as uuidv4 } from "uuid";
 import {
@@ -94,8 +87,8 @@ import {
 } from "./rekap";
 import { NEXT_DOMAIN } from "@/app/utils/const";
 import { TemplateImportV2 } from "@/components/input";
-import { FormProduct } from "@/components/produk";
 import { BadgeStatusProyek } from "@/components/badgestatusproyek";
+import { useClientFetch } from "@/hooks/useClientFetch";
 
 const api_path = getApiPath();
 

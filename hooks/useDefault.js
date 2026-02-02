@@ -1,5 +1,5 @@
-import { useClientFetch } from "@/app/utils/apiconfig";
 import { useMemo } from "react";
+import { useClientFetch } from "./useClientFetch";
 
 export function useDefaultFetch({ endPoint, limit, offset }) {
   return useClientFetch(

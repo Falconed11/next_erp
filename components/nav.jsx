@@ -12,7 +12,7 @@ import {
 } from "@heroui/react";
 // import { Badge, Avatar } from "@heroui/react";
 import { useRouter } from "next/navigation";
-import { useClientFetch } from "@/app/utils/apiconfig";
+import { useClientFetch } from "@/hooks/useClientFetch";
 import { useEffect } from "react";
 
 export default function Navigation({ navLinks, className }) {

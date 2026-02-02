@@ -1,9 +1,9 @@
 // components/TablePrint.jsx
-import { useClientFetch } from "@/app/utils/apiconfig";
 import { getDateF } from "@/app/utils/date";
 import { fIdProyek } from "@/app/utils/formatid";
 import { renderQueryStates } from "@/app/utils/tools";
 import Harga from "@/components/harga";
+import { useClientFetch } from "@/hooks/useClientFetch";
 import {
   Table,
   TableBody,
@@ -25,7 +25,7 @@ const PrintDaftarProyek = forwardRef(
       startDate,
       endDate,
     },
-    ref
+    ref,
   ) => {
     console.log(idKaryawan);
     const karyawan = useClientFetch(`karyawan?id=${idKaryawan}`);
@@ -207,7 +207,7 @@ const PrintDaftarProyek = forwardRef(
         </Table>
       </div>
     );
-  }
+  },
 );
 
 PrintDaftarProyek.displayName = "PrintDaftarProyek";

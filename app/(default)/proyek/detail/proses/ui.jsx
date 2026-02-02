@@ -30,7 +30,7 @@ import {
   useDisclosure,
 } from "@heroui/react";
 import { useReactToPrint } from "react-to-print";
-import { getApiPath, useClientFetch } from "@/app/utils/apiconfig";
+import { getApiPath } from "@/app/utils/apiconfig";
 import { getDateF, getDateFId, getDate } from "@/app/utils/date";
 import Harga from "@/components/harga";
 import TambahProduk from "@/components/tambahproduk";
@@ -54,6 +54,7 @@ import {
   ShowHideComponent,
   ShowHideComponent2,
 } from "@/components/componentmanipulation";
+import { useClientFetch } from "@/hooks/useClientFetch";
 
 const api_path = getApiPath();
 

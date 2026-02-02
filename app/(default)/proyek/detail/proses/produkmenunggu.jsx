@@ -15,11 +15,12 @@ import {
 } from "@heroui/react";
 import { getDate } from "@/app/utils/date";
 import Harga from "@/components/harga";
-import { getApiPath, useClientFetch } from "@/app/utils/apiconfig";
+import { getApiPath } from "@/app/utils/apiconfig";
 import { key2set, set2key, renderQueryStates } from "@/app/utils/tools";
 import { useCallback } from "react";
 import { AddIcon, DeleteIcon, EditIcon } from "@/components/icon";
 import { OpenBlueLinkInNewTab } from "@/components/mycomponent";
+import { useClientFetch } from "@/hooks/useClientFetch";
 const apiPath = getApiPath();
 
 const ProdukMenunggu = ({
@@ -30,7 +31,7 @@ const ProdukMenunggu = ({
   onScroll = () => {},
 }) => {
   const produkmenunggu = useClientFetch(
-    `v2/proyek/${id_proyek}/produkmenunggu`
+    `v2/proyek/${id_proyek}/produkmenunggu`,
   );
   const renderCell = useCallback((data, columnKey) => {
     const cellValue = data[columnKey];

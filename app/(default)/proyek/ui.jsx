@@ -3,7 +3,7 @@ import React, { useState, useMemo, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import * as XLSX from "xlsx";
 import { RadioGroup, Radio, Badge } from "@heroui/react";
-import { useClientFetch, getApiPath } from "@/app/utils/apiconfig";
+import { getApiPath } from "@/app/utils/apiconfig";
 const apiPath = getApiPath();
 import { fIdProyek } from "@/app/utils/formatid";
 import { Autocomplete, AutocompleteItem } from "@heroui/react";
@@ -84,8 +84,8 @@ import {
   AutocompleteJenisProyek,
 } from "@/components/myautocomplete";
 import { BadgeStatusProyek } from "@/components/badgestatusproyek";
-import { label } from "framer-motion/client";
 import { useReactToPrint } from "react-to-print";
+import { useClientFetch } from "@/hooks/useClientFetch";
 
 export default function App({
   id_instansi,

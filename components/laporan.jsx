@@ -1,38 +1,22 @@
 "use client";
-import { useState, useCallback } from "react";
-import {
-  Table,
-  TableHeader,
-  TableColumn,
-  TableBody,
-  TableRow,
-  TableCell,
-  User,
-  Chip,
-  Tooltip,
-  ChipProps,
-  getKeyValue,
-} from "@heroui/react";
-import { Button } from "@heroui/react";
-import * as XLSX from "xlsx";
+import { useState } from "react";
+import { getDate } from "@/app/utils/date";
+import Harga from "@/components/harga";
+import { RangeDate } from "@/components/input";
+import "react-datepicker/dist/react-datepicker.css";
+import { capitalizeEachWord } from "@/app/utils/tools";
 import {
   useClientFetch,
   useClientFetchNoInterval,
-} from "@/app/utils/apiconfig";
-import { getDate, getDateF, getMonthYear } from "@/app/utils/date";
-import Harga from "@/components/harga";
-import { RangeDate } from "@/components/input";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import { capitalizeEachWord } from "@/app/utils/tools";
+} from "@/hooks/useClientFetch";
 
 const OperasionalKantor = ({ startDate, endDate }) => {
   const kategori = useClientFetchNoInterval("kategorioperasionalkantor");
   const [current, setCurrent] = useState({ startDate, endDate });
   const operasional = useClientFetchNoInterval(
     `totaloperasional?startDate=${getDate(current.startDate)}&endDate=${getDate(
-      current.endDate
-    )}`
+      current.endDate,
+    )}`,
   );
   if (kategori.error) return <div>failed to load</div>;
   if (kategori.isLoading) return <div>loading...</div>;
@@ -80,16 +64,16 @@ const Penawaran = ({ start, end }) => {
   const mulai = getDate(current.startDate);
   const selesai = getDate(current.endDate);
   const totalPenawaran = useClientFetch(
-    `sumPenawaran?startdate=${mulai}&enddate=${selesai}`
+    `sumPenawaran?startdate=${mulai}&enddate=${selesai}`,
   );
   const totalPenawaranSwasta = useClientFetch(
-    `sumPenawaran?startdate=${mulai}&enddate=${selesai}&swasta=1`
+    `sumPenawaran?startdate=${mulai}&enddate=${selesai}&swasta=1`,
   );
   const totalPenawaranReject = useClientFetch(
-    `sumPenawaran?startdate=${mulai}&enddate=${selesai}&versi=-1`
+    `sumPenawaran?startdate=${mulai}&enddate=${selesai}&versi=-1`,
   );
   const totalPenawaranWaiting = useClientFetch(
-    `sumPenawaran?startdate=${mulai}&enddate=${selesai}&versi=0`
+    `sumPenawaran?startdate=${mulai}&enddate=${selesai}&versi=0`,
   );
 
   if (totalPenawaran.error) return <div>failed to load</div>;

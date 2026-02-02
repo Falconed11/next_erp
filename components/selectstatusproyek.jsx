@@ -1,4 +1,4 @@
-import { useClientFetch } from "@/app/utils/apiconfig";
+import { useClientFetch } from "@/hooks/useClientFetch";
 import { Select, SelectItem } from "@heroui/react";
 export default function SelectStatusProyek({ select, setSelect, setPage }) {
   const statusproyek = useClientFetch("statusproyek");

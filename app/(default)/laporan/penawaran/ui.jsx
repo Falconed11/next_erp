@@ -3,7 +3,7 @@ import React, { useState, useMemo } from "react";
 import { useSession } from "next-auth/react";
 import * as XLSX from "xlsx";
 import { RadioGroup, Radio } from "@heroui/react";
-import { useClientFetch, getApiPath } from "@/app/utils/apiconfig";
+import { getApiPath } from "@/app/utils/apiconfig";
 import { fIdProyek } from "@/app/utils/formatid";
 import { Autocomplete, AutocompleteItem } from "@heroui/react";
 import {
@@ -56,6 +56,7 @@ import { LinkOpenNewTab } from "@/components/mycomponent";
 import Harga from "@/components/harga";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { useClientFetch } from "@/hooks/useClientFetch";
 
 const apiPath = getApiPath();
 const [startDate, endDate] = getCurFirstLastDay();
@@ -71,7 +72,7 @@ export default function App({ id_instansi }) {
   const laporan = useClientFetch(
     `laporanpenawaran?${
       current.startDate ? `&start=${getDate(current.startDate)}` : ""
-    }${current.endDate ? `&end=${getDate(current.endDate)}` : ""}`
+    }${current.endDate ? `&end=${getDate(current.endDate)}` : ""}`,
   );
 
   const saveButtonPress = async (onClose) => {
@@ -166,11 +167,11 @@ export default function App({ id_instansi }) {
               // 'Content-Type': 'application/x-www-form-urlencoded',
             },
             body: JSON.stringify({ ...v, id_second: v.id }),
-          })
-        )
+          }),
+        ),
       );
       const dataArray = await Promise.all(
-        responses.map((response) => response.json())
+        responses.map((response) => response.json()),
       );
       setReportList(dataArray.map((v, i) => `${i + 1}. ${v.message}`));
     } catch (e) {
@@ -190,7 +191,7 @@ export default function App({ id_instansi }) {
     XLSX.writeFile(
       workbook,
       `proyek_${getDateF(filter.startDate)}_${getDateF(filter.endDate)}.xlsx`,
-      { compression: true }
+      { compression: true },
     );
   };
   const handleExportButtonPress = (proyek) => {
@@ -208,7 +209,7 @@ export default function App({ id_instansi }) {
   const exportPenawaran = () => {
     if (selectedKeys.size == 0) return alert("Proyek belum dipilih");
     const data = penawaran.data.filter((v) =>
-      selectedKeys.has(String(v.id_proyek))
+      selectedKeys.has(String(v.id_proyek)),
     );
     const worksheet = XLSX.utils.json_to_sheet(data);
     const workbook = XLSX.utils.book_new();
@@ -256,7 +257,7 @@ export default function App({ id_instansi }) {
             <LinkOpenNewTab
               content="Detail"
               link={`/proyek?id_karyawan=${data.id}&start=${getDate(
-                data.startDate
+                data.startDate,
               )}&end=${getDate(data.endDate)}`}
               icon={<NoteIcon />}
             />

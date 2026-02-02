@@ -1,7 +1,7 @@
 "use client";
 import React, { useCallback, useState } from "react";
 import * as XLSX from "xlsx";
-import { useClientFetch, getApiPath } from "@/app/utils/apiconfig";
+import { getApiPath } from "@/app/utils/apiconfig";
 import {
   Table,
   TableHeader,
@@ -55,6 +55,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useSession } from "next-auth/react";
 import { highRoleCheck, renderQueryStates } from "@/app/utils/tools";
+import { useClientFetch } from "@/hooks/useClientFetch";
 
 const apiPath = getApiPath();
 

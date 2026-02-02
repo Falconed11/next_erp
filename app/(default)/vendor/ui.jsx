@@ -1,11 +1,7 @@
 "use client";
 import React, { useState, useMemo } from "react";
 import * as XLSX from "xlsx";
-import {
-  useClientFetch,
-  getApiPath,
-  useClientFetchPagination,
-} from "@/app/utils/apiconfig";
+import { getApiPath } from "@/app/utils/apiconfig";
 import {
   Table,
   TableHeader,
@@ -55,6 +51,7 @@ import { FileUploader } from "@/components/input";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import ModalTransferData from "@/components/modaltransferdata";
+import { useClientFetch } from "@/hooks/useClientFetch";
 
 const apiPath = getApiPath();
 
@@ -163,11 +160,11 @@ export default function App() {
               // 'Content-Type': 'application/x-www-form-urlencoded',
             },
             body: JSON.stringify({ ...v, id_second: v.id }),
-          })
-        )
+          }),
+        ),
       );
       const dataArray = await Promise.all(
-        responses.map((response) => response.json())
+        responses.map((response) => response.json()),
       );
       setReportList(dataArray.map((v, i) => `${i + 1}. ${v.message}`));
     } catch (e) {
@@ -187,7 +184,7 @@ export default function App() {
     XLSX.writeFile(
       workbook,
       `proyek_${getDateF(filter.startDate)}_${getDateF(filter.endDate)}.xlsx`,
-      { compression: true }
+      { compression: true },
     );
   };
 
@@ -254,7 +251,7 @@ export default function App() {
   const report = useDisclosure();
 
   const data = vendor.data?.filter((row) =>
-    row.nama.toLowerCase().includes(value.toLowerCase())
+    row.nama.toLowerCase().includes(value.toLowerCase()),
   );
 
   const pages = useMemo(() => {

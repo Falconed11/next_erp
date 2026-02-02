@@ -31,11 +31,7 @@ import {
   ModalFooter,
   useDisclosure,
 } from "@heroui/react";
-import {
-  getApiPath,
-  useClientFetch,
-  useClientFetchNoInterval,
-} from "@/app/utils/apiconfig";
+import { getApiPath } from "@/app/utils/apiconfig";
 import {
   getDate,
   getDateF,
@@ -55,6 +51,7 @@ import { useRouter } from "next/navigation";
 import { FilterProduk } from "@/components/filter";
 import { RangeDate } from "@/components/input";
 import { capitalizeEachWord } from "@/app/utils/tools";
+import { useClientFetch } from "@/hooks/useClientFetch";
 
 const api_path = getApiPath();
 const [startDate, endDate] = getCurFirstLastDay();
@@ -81,16 +78,16 @@ export default function App({ id }) {
 
   const pengeluaranproyek = useClientFetch(
     `pengeluaranproyek?id_vendor=${id}&start=${getDate(
-      current.startDate
+      current.startDate,
     )}&end=${getDate(current.endDate)}&id_kategori=${
       selectKategori.values().next().value ?? ""
-    }`
+    }`,
   );
   console.log(id);
   const vendor = useClientFetch(
     `vendor?id=${id}&starta=${getDate(current.startDate)}&enda=${getDate(
-      current.endDate
-    )}`
+      current.endDate,
+    )}`,
   );
   const kategori = useClientFetch("kategoriproduk");
 
@@ -106,7 +103,7 @@ export default function App({ id }) {
         row.nmerek?.toLowerCase().includes(nama.toLowerCase()) ||
         row.tipe?.toLowerCase().includes(nama.toLowerCase()) ||
         row.vendor?.toLowerCase().includes(nama.toLowerCase())) &&
-      row.id_kustom.toLowerCase().includes(idF.toLocaleLowerCase())
+      row.id_kustom.toLowerCase().includes(idF.toLocaleLowerCase()),
   );
 
   const pages = useMemo(() => {

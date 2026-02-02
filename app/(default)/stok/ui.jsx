@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { useClientFetch, getApiPath } from "../../utils/apiconfig";
+import { getApiPath } from "../../utils/apiconfig";
 import {
   Table,
   TableHeader,
@@ -35,6 +35,7 @@ import {
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { getDate, getDateF } from "../../utils/date";
+import { useClientFetch } from "@/hooks/useClientFetch";
 
 const apiPath = getApiPath();
 

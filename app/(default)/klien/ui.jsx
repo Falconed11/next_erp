@@ -29,9 +29,10 @@ import {
   useDisclosure,
 } from "@heroui/react";
 import "react-datepicker/dist/react-datepicker.css";
-import { getApiPath, useClientFetch } from "../../utils/apiconfig";
+import { getApiPath } from "../../utils/apiconfig";
 import { Button } from "@heroui/react";
 import { Input } from "@heroui/react";
+import { useClientFetch } from "@/hooks/useClientFetch";
 
 const api_path = getApiPath();
 

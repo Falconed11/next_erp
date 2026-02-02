@@ -14,7 +14,7 @@ import {
 import { useRef, useState } from "react";
 import { useReactToPrint } from "react-to-print";
 import { nominalToText } from "@/app/utils/number";
-import { useClientFetch } from "@/app/utils/apiconfig";
+import { useClientFetch } from "@/hooks/useClientFetch";
 
 export default function Kwitansi({ proyek, nilaiProyek }) {
   const componentRef = useRef(null);
@@ -25,7 +25,7 @@ export default function Kwitansi({ proyek, nilaiProyek }) {
   const [versi, setVersi] = useState(0);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const pembayaranProyek = useClientFetch(
-    `pembayaranProyek?id_proyek=${proyek.id}&asc=1`
+    `pembayaranProyek?id_proyek=${proyek.id}&asc=1`,
   );
   if (pembayaranProyek.error) return <div>failed to load keranjang proyek</div>;
   if (pembayaranProyek.isLoading) return <div>loading...</div>;

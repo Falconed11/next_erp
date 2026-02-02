@@ -1,6 +1,6 @@
-import { useClientFetch } from "@/app/utils/apiconfig";
 import { useMemo } from "react";
 import { TRANSFER_BANK_ENDPOINT } from "../services/transfer-bank.service";
+import { useClientFetch } from "./useClientFetch";
 
 export function useTransferBankFetch({ limit, offset }) {
   return useClientFetch(

@@ -30,10 +30,11 @@ import {
   useDisclosure,
 } from "@heroui/react";
 import "react-datepicker/dist/react-datepicker.css";
-import { getApiPath, useClientFetch } from "../../utils/apiconfig";
+import { getApiPath } from "../../utils/apiconfig";
 import { Button } from "@heroui/react";
 import { Input, Select, SelectItem } from "@heroui/react";
 import { key2set, rolesCheck, set2key } from "@/app/utils/tools";
+import { useClientFetch } from "@/hooks/useClientFetch";
 
 const api_path = getApiPath();
 
@@ -43,13 +44,13 @@ export default function App() {
   const user = useClientFetch(
     sessionuser
       ? `user?id=${sessionuser.id}&peran=${sessionuser.peran}&rank=${sessionuser.rank}`
-      : null
+      : null,
   );
   const karyawan = useClientFetch(`karyawan?id_statuskaryawan=1`);
   const peran = useClientFetch(
     sessionuser
       ? `peran?peran=${sessionuser.peran}&rank=${sessionuser.rank}`
-      : null
+      : null,
   );
   const [form, setForm] = useState({});
   const [method, setMethod] = useState();
@@ -260,7 +261,7 @@ export default function App() {
                     placeholder="Pilih karyawan!"
                     selectedKeys={
                       new Set(
-                        form.id_karyawan ? [String(form.id_karyawan)] : []
+                        form.id_karyawan ? [String(form.id_karyawan)] : [],
                       )
                     }
                     className="max-w-xs"

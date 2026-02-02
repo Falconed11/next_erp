@@ -1,4 +1,3 @@
-import { API_PATH, useClientFetch } from "@/app/utils/apiconfig";
 import { renderQueryStates } from "@/app/utils/tools";
 import { Autocomplete, AutocompleteItem } from "@heroui/react";
 import { useFilter } from "@react-aria/i18n";
@@ -15,6 +14,7 @@ import { getDateFId } from "@/app/utils/date";
 import { JENIS_PROYEK_ENDPOINT } from "@/services/jenis-proyek.service";
 import { JENIS_INSTANSI_ENDPOINT } from "@/services/jenis-instansi.service";
 import { GOLONGAN_INSTANSI_ENDPOINT } from "@/services/golongan-instansi.service";
+import { useClientFetch } from "@/hooks/useClientFetch";
 
 // ✅ Reusable Hook
 export const useAutocompleteField = ({

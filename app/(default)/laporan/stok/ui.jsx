@@ -41,11 +41,12 @@ import Harga from "@/components/harga";
 import { FileUploader } from "@/components/input";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { getApiPath, useClientFetch } from "@/app/utils/apiconfig";
+import { getApiPath } from "@/app/utils/apiconfig";
 import { Button } from "@heroui/react";
 import { Input, Textarea } from "@heroui/react";
 import { getDate, getDateFId, getTime } from "@/app/utils/date";
 import { export2excel } from "@/app/utils/export";
+import { useClientFetch } from "@/hooks/useClientFetch";
 
 const apiPath = getApiPath();
 
@@ -62,7 +63,7 @@ export default function App({ id_produk }) {
   const [nama, setNama] = useState("");
   const [id, setId] = useState("");
   const produkmasuk = useClientFetch(
-    `produkmasuk?${id_produk ? `id_produk=${id_produk}` : ""}&laporan=true`
+    `produkmasuk?${id_produk ? `id_produk=${id_produk}` : ""}&laporan=true`,
   );
   const produk = useClientFetch(`produk?id=${id_produk}`);
   const vendor = useClientFetch(`vendor?columnName=nama`);
@@ -102,7 +103,7 @@ export default function App({ id_produk }) {
     //   return alert("Nama, dan Kategori wajib diisi!");
     if (form.jumlah < form.keluar)
       return alert(
-        `Jumlah tidak boleh kurang dari produk keluar. (Min ${form.keluar})`
+        `Jumlah tidak boleh kurang dari produk keluar. (Min ${form.keluar})`,
       );
     const res = await fetch(`${apiPath}produkmasuk`, {
       method: form.method,
@@ -200,11 +201,11 @@ export default function App({ id_produk }) {
               // 'Content-Type': 'application/x-www-form-urlencoded',
             },
             body: JSON.stringify(v),
-          })
-        )
+          }),
+        ),
       );
       const dataArray = await Promise.all(
-        responses.map((response) => response.json())
+        responses.map((response) => response.json()),
       );
       setReportList(dataArray.map((v, i) => `${i}. ${v.message}`));
     } catch (e) {
@@ -460,7 +461,7 @@ export default function App({ id_produk }) {
         acc[kategoriproduk].totalsisamodal += sisamodal;
         acc[kategoriproduk].totalhutang += hutang;
         return acc;
-      }, {})
+      }, {}),
   )
     // Flatten the grouped structure and add total objects
     .flatMap(({ items, totalsisamodal, totalhutang }) => [
@@ -483,7 +484,7 @@ export default function App({ id_produk }) {
     {
       modal: 0,
       hutang: 0,
-    }
+    },
   );
 
   const exportButtonPress = () => {
@@ -543,7 +544,7 @@ export default function App({ id_produk }) {
             const data = [{ TOTAL_MODAL: { f: "SUM(T:T)" } }, ...format];
             return export2excel(
               data,
-              `Laporan Stok_${getDate(date)}_${getTime(date)}_${user.peran}`
+              `Laporan Stok_${getDate(date)}_${getTime(date)}_${user.peran}`,
             );
           }}
           color="primary"

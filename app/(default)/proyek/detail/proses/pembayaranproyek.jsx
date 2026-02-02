@@ -8,9 +8,10 @@ import {
 } from "@heroui/react";
 import { getDate } from "@/app/utils/date";
 import Harga from "@/components/harga";
-import { getApiPath, useClientFetch } from "@/app/utils/apiconfig";
+import { getApiPath } from "@/app/utils/apiconfig";
 import { key2set, set2key } from "@/app/utils/tools";
 import SelectMetodePembayaran from "@/components/metode-pembayaran/SelectMetodePembayaran";
+import { useClientFetch } from "@/hooks/useClientFetch";
 const apiPath = getApiPath();
 
 export default function PembayaranProyek({

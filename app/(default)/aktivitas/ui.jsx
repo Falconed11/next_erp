@@ -34,7 +34,7 @@ import {
   useDisclosure,
 } from "@heroui/react";
 import { useReactToPrint } from "react-to-print";
-import { getApiPath, useClientFetch } from "@/app/utils/apiconfig";
+import { getApiPath } from "@/app/utils/apiconfig";
 import { getDateF, getDateFId, getDate, getTime } from "@/app/utils/date";
 import Harga from "@/components/harga";
 import DetailProyek from "@/components/detailproyek";
@@ -56,6 +56,7 @@ import { useSession } from "next-auth/react";
 import { AutocompleteCustomer } from "@/components/myautocomplete";
 import { RangeDate } from "@/components/input";
 import { LIST_SWASTA_NEGRI } from "@/app/utils/const";
+import { useClientFetch } from "@/hooks/useClientFetch";
 
 const api_path = getApiPath();
 
@@ -79,7 +80,7 @@ export default function App({ id, curDate }) {
       id ? `id_proyek=${id}` : "groupbyproyek=true"
     }&page=${page}&rowsPerPage=${rowsPerPage}&id_karyawan=${
       set2key(selectKaryawan) || ""
-    }&start=${getDate(current.startDate)}&end=${getDate(current.endDate)}`
+    }&start=${getDate(current.startDate)}&end=${getDate(current.endDate)}`,
   );
   const karyawan = useClientFetch(`karyawan`);
   const proyek = useClientFetch(id ? `proyek?id=${id}` : "");
@@ -277,7 +278,7 @@ export default function App({ id, curDate }) {
             return cellValue;
         }
       },
-      [sessUser?.rank]
+      [sessUser?.rank],
     ),
   };
   const modal = {

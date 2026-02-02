@@ -17,7 +17,7 @@ import {
   getCurFirstLastDay,
   excelToJSDate,
 } from "@/app/utils/date";
-import { useClientFetch, getApiPath } from "../../utils/apiconfig";
+import { getApiPath } from "../../utils/apiconfig";
 import { useSession } from "next-auth/react";
 
 const apiPath = getApiPath();

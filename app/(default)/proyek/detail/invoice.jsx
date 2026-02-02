@@ -25,11 +25,7 @@ import {
   ModalFooter,
   useDisclosure,
 } from "@heroui/react";
-import {
-  getApiPath,
-  useClientFetch,
-  useClientFetchNoInterval,
-} from "@/app/utils/apiconfig";
+import { getApiPath } from "@/app/utils/apiconfig";
 import { invoice } from "@/app/utils/formatid";
 import { getDateFId } from "@/app/utils/date";
 import { nominalToText } from "@/app/utils/number";
@@ -43,6 +39,7 @@ import { EditIcon, DeleteIcon } from "@/components/icon";
 import Harga from "@/components/harga";
 import Image from "next/image";
 import { RecapTable } from "./rekap";
+import { useClientFetch } from "@/hooks/useClientFetch";
 
 const api_path = getApiPath();
 
@@ -56,7 +53,7 @@ export default function Invoice({
   compRekapTotal,
 }) {
   const pembayaranProyek = useClientFetch(
-    `pembayaranProyek?id_proyek=${proyek.id}&asc=1`
+    `pembayaranProyek?id_proyek=${proyek.id}&asc=1`,
   );
   const componentRef = useRef(null);
   const handlePrintInvoice = useReactToPrint({
@@ -91,7 +88,7 @@ export default function Invoice({
   const lengthPembayaranVersi = dataPembayaranVersi.length;
   const totalPembayaran = dataPembayaran.reduce(
     (acc, v, i) => acc + v.nominal,
-    0
+    0,
   );
   return (
     <>
@@ -193,13 +190,13 @@ export default function Invoice({
                             No. Invoice :{" "}
                             {invoice(
                               proyek.id_second.split(".")[2],
-                              new Date(proyek.tanggal)
+                              new Date(proyek.tanggal),
                             )}
                           </div>
                           <div>
                             Tanggal :{" "}
                             {getDateFId(
-                              new Date(dataPembayaran[versi]?.tanggal)
+                              new Date(dataPembayaran[versi]?.tanggal),
                             )}
                           </div>
                           <div>No. PO : {proyek.id_po}</div>
@@ -273,7 +270,7 @@ export default function Invoice({
                             <div className="font-bold border-b border-black">
                               ***{" "}
                               {nominalToText(
-                                dataPembayaranVersi.at(-1)?.nominal
+                                dataPembayaranVersi.at(-1)?.nominal,
                               )}{" "}
                               ***
                             </div>

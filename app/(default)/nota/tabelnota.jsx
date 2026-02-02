@@ -49,7 +49,7 @@ export default function App() {
     endDate,
   });
   const nota = useClientFetch(
-    `nota?start=${getDate(current.startDate)}&end=${getDate(current.endDate)}`
+    `nota?start=${getDate(current.startDate)}&end=${getDate(current.endDate)}`,
   );
   const karyawan = useClientFetch("karyawan");
   const { isOpen, onOpen, onOpenChange } = useDisclosure();

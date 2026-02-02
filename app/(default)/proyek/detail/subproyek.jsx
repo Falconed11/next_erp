@@ -17,11 +17,8 @@ import {
   ModalFooter,
   useDisclosure,
 } from "@heroui/react";
-import {
-  getApiPath,
-  useClientFetch,
-  useClientFetchNoInterval,
-} from "@/app/utils/apiconfig";
+import { getApiPath } from "@/app/utils/apiconfig";
+import { useClientFetch } from "@/hooks/useClientFetch";
 
 const api_path = getApiPath();
 
@@ -83,7 +80,7 @@ export default function SubProyek({ id, selectedProyek, isAuthorized }) {
       if (res.status == 400)
         return alert(
           `Gagal menghapus. Sub proyek masih terikat pada tabel produk atau instalasi. ` +
-            json.message
+            json.message,
         );
       return;
       // return alert(json.message);

@@ -58,7 +58,7 @@ export default function App({ id }) {
   const kategori = useClientFetch(`kategoriproduk`);
   const [selectKategori, setSelectKategori] = useState(new Set([]));
   const produk = useClientFetch(
-    `produk?kategori=${selectKategori.values().next().value}`
+    `produk?kategori=${selectKategori.values().next().value}`,
   );
   const [selectProduk, setSelectProduk] = useState(new Set([]));
   const [form, setForm] = useState({});
@@ -316,7 +316,7 @@ export default function App({ id }) {
             : currentValue.hargajual)
       );
     },
-    0
+    0,
   );
   return (
     <div className="flex flex-col w-full">
@@ -494,13 +494,13 @@ export default function App({ id }) {
                           <div className="basis-3/4 top-neg-1">
                             {`${myDate.getDateFId(
                               new Date(selectedNota.tanggal),
-                              "dd-month"
+                              "dd-month",
                             )} `}
                           </div>
                           <div className="basis-1/4">
                             {`${myDate.getDateFId(
                               new Date(selectedNota.tanggal),
-                              "yy"
+                              "yy",
                             )}`}
                           </div>
                         </div>
@@ -541,7 +541,7 @@ export default function App({ id }) {
                                 <TableCell className="px-1 py-0 leading-65">
                                   {renderCell.keranjangnotaprint(
                                     item,
-                                    columnKey
+                                    columnKey,
                                   )}
                                 </TableCell>
                               )}

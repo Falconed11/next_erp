@@ -30,13 +30,14 @@ import {
   ModalFooter,
   useDisclosure,
 } from "@heroui/react";
-import { getApiPath, useClientFetch } from "../../utils/apiconfig";
+import { getApiPath } from "../../utils/apiconfig";
 import { FileUploader } from "@/components/input";
 import { Button, Select, SelectItem } from "@heroui/react";
 import { Input } from "@heroui/react";
 import Link from "next/link";
 import ModalTransferData from "@/components/modaltransferdata";
 import Harga from "@/components/harga";
+import { useClientFetch } from "@/hooks/useClientFetch";
 
 const apiPath = getApiPath();
 
@@ -138,11 +139,11 @@ export default function App() {
               // 'Content-Type': 'application/x-www-form-urlencoded',
             },
             body: JSON.stringify(v),
-          })
-        )
+          }),
+        ),
       );
       const dataArray = await Promise.all(
-        responses.map((response) => response.json())
+        responses.map((response) => response.json()),
       );
       setReportList(dataArray.map((v, i) => `${i + 1}. ${v.message}`));
     } catch (e) {
@@ -346,7 +347,7 @@ export default function App() {
                     new Set(
                       form.id_statuskaryawan
                         ? [String(form.id_statuskaryawan)]
-                        : []
+                        : [],
                     )
                   }
                   className="max-w-xs"

@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import * as XLSX from "xlsx";
-import { useClientFetch, getApiPath } from "@/app/utils/apiconfig";
+import { getApiPath } from "@/app/utils/apiconfig";
 import { penawaran } from "@/app/utils/formatid";
 import {
   Table,
@@ -48,6 +48,7 @@ import {
 import { FileUploader, RangeDate } from "@/components/input";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { useClientFetch } from "@/hooks/useClientFetch";
 
 const apiPath = getApiPath();
 const [startDate, endDate] = getCurFirstLastDay();
@@ -59,7 +60,7 @@ export default function App() {
     selectKategori: new Set([]),
   });
   const omset = useClientFetch(
-    `omset?start=${getDate(current.startDate)}&end=${getDate(current.endDate)}`
+    `omset?start=${getDate(current.startDate)}&end=${getDate(current.endDate)}`,
   );
   const karyawan = useClientFetch("karyawan");
   const statusproyek = useClientFetch("statusproyek");
@@ -159,11 +160,11 @@ export default function App() {
               // 'Content-Type': 'application/x-www-form-urlencoded',
             },
             body: JSON.stringify({ ...v, id_second: v.id }),
-          })
-        )
+          }),
+        ),
       );
       const dataArray = await Promise.all(
-        responses.map((response) => response.json())
+        responses.map((response) => response.json()),
       );
       setReportList(dataArray.map((v, i) => `${i + 1}. ${v.message}`));
     } catch (e) {
@@ -182,7 +183,7 @@ export default function App() {
     XLSX.writeFile(
       workbook,
       `proyek_${getDateF(filter.startDate)}_${getDateF(filter.endDate)}.xlsx`,
-      { compression: true }
+      { compression: true },
     );
   };
 
@@ -199,8 +200,8 @@ export default function App() {
         return data.versi == -1
           ? "reject"
           : data.versi == 0
-          ? "penawaran"
-          : "deal";
+            ? "penawaran"
+            : "deal";
       case "tanggal":
         return getDateF(new Date(data.tanggal));
       case "totalharga":
@@ -239,7 +240,7 @@ export default function App() {
                     window.open(
                       `/proyek/detail?id=${data.id}&versi=${
                         data.versi <= 0 ? "1" : data.versi
-                      }`
+                      }`,
                     );
                   }}
                   // onClick={() => detailButtonPress(data)}
@@ -350,12 +351,12 @@ export default function App() {
 
   const biayaProduksi = omset.data.reduce(
     (acc, cur) => acc + +cur.biayaproduksi,
-    0
+    0,
   );
   const sOmset = omset.data.reduce((acc, cur) => acc + +cur.omset, 0);
   const provit = omset.data.reduce(
     (acc, cur) => acc + (cur.omset - cur.biayaproduksi),
-    0
+    0,
   );
 
   return (

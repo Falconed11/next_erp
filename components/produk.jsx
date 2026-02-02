@@ -1,8 +1,8 @@
+import { highRoleCheck, renderQueryStates } from "@/app/utils/tools";
 import {
   countPercentProvit,
   countPriceByPercentProfit,
 } from "@/app/utils/formula";
-import { highRoleCheck, renderQueryStates } from "@/app/utils/tools";
 import {
   AutocompleteKategoriProduk,
   AutocompleteMerek,
@@ -154,14 +154,14 @@ const FormProduct = ({ form, setForm }) => {
         placeholder="Masukkan persen provit!"
         value={
           Math.round(
-            countPercentProvit(form.hargamodal, form.hargajual) * 100
+            countPercentProvit(form.hargamodal, form.hargajual) * 100,
           ) / 100
         }
         onValueChange={(v) =>
           setForm({
             ...form,
             hargajual: Math.round(
-              countPriceByPercentProfit(form.hargamodal, v)
+              countPriceByPercentProfit(form.hargamodal, v),
             ),
           })
         }

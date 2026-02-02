@@ -1,4 +1,5 @@
-import { useClientFetch } from "@/app/utils/apiconfig";
+import { useClientFetch } from "@/hooks/useClientFetch";
+
 export default function DetailProyek({ id_proyek }) {
   const proyek = useClientFetch(`proyek?id=${id_proyek}`);
   const queries = {

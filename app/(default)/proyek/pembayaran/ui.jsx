@@ -34,7 +34,7 @@ import {
   getDateFId,
   getDate,
 } from "@/app/utils/date";
-import { getApiPath, useClientFetch } from "@/app/utils/apiconfig";
+import { getApiPath } from "@/app/utils/apiconfig";
 import Harga from "@/components/harga";
 import { FileUploader, RangeDate } from "@/components/input";
 import {
@@ -48,6 +48,7 @@ import {
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { LinkOpenNewTab } from "@/components/mycomponent";
+import { useClientFetch } from "@/hooks/useClientFetch";
 
 const api_path = getApiPath();
 const [startDate, endDate] = getCurFirstLastDay();
@@ -60,8 +61,8 @@ export default function UI() {
   });
   const pembayaran = useClientFetch(
     `pembayaranproyek?start=${getDate(filter.startDate)}&end=${getDate(
-      filter.endDate
-    )}`
+      filter.endDate,
+    )}`,
   );
   const metodepembayaran = useClientFetch(`metodepembayaran`);
   const [form, setForm] = useState({});
@@ -148,11 +149,11 @@ export default function UI() {
               // 'Content-Type': 'application/x-www-form-urlencoded',
             },
             body: JSON.stringify(v),
-          })
-        )
+          }),
+        ),
       );
       const dataArray = await Promise.all(
-        responses.map((response) => response.json())
+        responses.map((response) => response.json()),
       );
       setReportList(dataArray.map((v, i) => `${i + 1}. ${v.message}`));
     } catch (e) {
@@ -172,9 +173,9 @@ export default function UI() {
     XLSX.writeFile(
       workbook,
       `pembayaranproyek_${getDateF(filter.startDate)}_${getDateF(
-        filter.endDate
+        filter.endDate,
       )}.xlsx`,
-      { compression: true }
+      { compression: true },
     );
   };
 

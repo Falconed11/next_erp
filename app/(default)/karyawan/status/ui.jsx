@@ -101,11 +101,11 @@ export default function App() {
               // 'Content-Type': 'application/x-www-form-urlencoded',
             },
             body: JSON.stringify(v),
-          })
-        )
+          }),
+        ),
       );
       const dataArray = await Promise.all(
-        responses.map((response) => response.json())
+        responses.map((response) => response.json()),
       );
       setReportList(dataArray.map((v, i) => `${i + 1}. ${v.message}`));
     } catch (e) {

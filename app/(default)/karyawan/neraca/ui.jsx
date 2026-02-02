@@ -241,12 +241,12 @@ export default function App() {
                           compressedFile = await imageCompression(i, options);
                           console.log(
                             "compressedFile instanceof Blob",
-                            compressedFile instanceof Blob
+                            compressedFile instanceof Blob,
                           ); // true
                           console.log(
                             `compressedFile size ${
                               compressedFile.size / 1024 / 1024
-                            } MB`
+                            } MB`,
                           ); // smaller than maxSizeMB
 
                           // await uploadToServer(compressedFile); // write your own logic

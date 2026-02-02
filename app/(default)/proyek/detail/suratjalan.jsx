@@ -30,12 +30,13 @@ import Harga from "@/components/harga";
 import { useRef, useState, useCallback, useMemo } from "react";
 import { useReactToPrint } from "react-to-print";
 import { nominalToText } from "@/app/utils/number";
-import { useClientFetch, getApiPath } from "@/app/utils/apiconfig";
+import { getApiPath } from "@/app/utils/apiconfig";
 const apiPath = getApiPath();
 import { getDateFId, getDate } from "@/app/utils/date";
 import { invoice } from "@/app/utils/formatid";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { useClientFetch } from "@/hooks/useClientFetch";
 
 export default function SuratJalan({ id_proyek, versi, isAuthorized }) {
   const componentRef = useRef(null);
@@ -59,7 +60,7 @@ export default function SuratJalan({ id_proyek, versi, isAuthorized }) {
   });
   const [form, setForm] = useState({});
   const keranjangPeralatan = useClientFetch(
-    `keranjangproyek?id_proyek=${id_proyek}&instalasi=0&versi=${versi}`
+    `keranjangproyek?id_proyek=${id_proyek}&instalasi=0&versi=${versi}`,
   );
   const proyek = useClientFetch(`proyek?id=${id_proyek}`);
   const queries = { keranjangPeralatan, proyek };
@@ -242,13 +243,13 @@ export default function SuratJalan({ id_proyek, versi, isAuthorized }) {
                               No. Invoice :{" "}
                               {invoice(
                                 selectedProyek.id_penawaran,
-                                new Date(selectedProyek.tanggal)
+                                new Date(selectedProyek.tanggal),
                               )}
                             </div>
                             <div>
                               Tanggal :{" "}
                               {getDateFId(
-                                new Date(selectedProyek.tanggalsuratjalan)
+                                new Date(selectedProyek.tanggalsuratjalan),
                               )}
                             </div>
                             <div>No. PO : {selectedProyek.id_po}</div>

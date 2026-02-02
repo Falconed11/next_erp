@@ -67,8 +67,8 @@ export default function App() {
 
   const kwitansi = useClientFetch(
     `kwitansi?start=${getDate(current.startDate)}&end=${getDate(
-      current.endDate
-    )}`
+      current.endDate,
+    )}`,
   );
   const karyawan = useClientFetch("karyawan");
   const [selected, setSelected] = React.useState("normal");

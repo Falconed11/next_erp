@@ -58,7 +58,7 @@ export default function Rekapitulasi({
     diskoninstalasi,
     pajak,
     rekapitulasi,
-    onClose
+    onClose,
   ) => {
     const isPresent = rekapitulasi.id;
     const method = isPresent ? "PUT" : "POST";
@@ -98,7 +98,7 @@ export default function Rekapitulasi({
   const hargaDiskon = jual - diskon;
   const pajak = Math.ceil(
     ((formPeralatan.jual - formPeralatan.diskon) * formPeralatan.pajakpersen) /
-      100
+      100,
   );
   const hargaPajak = hargaDiskon + pajak;
   const provit = hargaDiskon - modal;
@@ -188,7 +188,7 @@ export default function Rekapitulasi({
                       formInstalasi.diskon,
                       formPeralatan.pajakpersen,
                       rekapitulasi,
-                      onClose
+                      onClose,
                     )
                   }
                 >

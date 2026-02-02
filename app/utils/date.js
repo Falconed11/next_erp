@@ -13,7 +13,7 @@ const monthNamesIndonesian = [
   "Desember",
 ];
 
-const getDate = (date) => {
+export const getDate = (date) => {
   if (date === "0000-00-00" || !date) return "";
   const year = date.getFullYear();
   const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Note that months are zero-based
@@ -21,7 +21,7 @@ const getDate = (date) => {
   return `${year}-${month}-${day}`;
 };
 
-const getTime = (date, separator) => {
+export const getTime = (date, separator) => {
   if (!date) return "";
   date = new Date(date);
   const pad = (n) => n.toString().padStart(2, "0");
@@ -30,7 +30,7 @@ const getTime = (date, separator) => {
   return `${hours}${separator || "-"}${minutes}`;
 };
 
-const getDateF = (date) => {
+export const getDateF = (date) => {
   date = new Date(date);
   const year = date.getFullYear();
   const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Note that months are zero-based
@@ -38,7 +38,7 @@ const getDateF = (date) => {
   return `${day}-${month}-${year}`;
 };
 
-const getDateFId = (date, format) => {
+export const getDateFId = (date, format) => {
   if (!date) return "";
   date = new Date(date);
   const year = date.getFullYear();
@@ -50,13 +50,13 @@ const getDateFId = (date, format) => {
   return `${day} ${monthNameIndonesian} ${year}`;
 };
 
-const getMonthYear = (date) => {
+export const getMonthYear = (date) => {
   let month = (date.getMonth() + 1).toString().padStart(2, "0");
   let year = date.getFullYear();
   return `${month}-${year}`;
 };
 
-const getMonthYearFId = (monthyear) => {
+export const getMonthYearFId = (monthyear) => {
   // Split the input string into parts
   const [month, year] = monthyear.split("-");
 
@@ -71,7 +71,7 @@ const getMonthYearFId = (monthyear) => {
   return outputString;
 };
 
-const getCurFirstLastDay = () => {
+export const getCurFirstLastDay = () => {
   const currentDate = new Date();
   const currentMonth = currentDate.getMonth();
   const nextMonthFirstDay = new Date(
@@ -89,17 +89,25 @@ const getCurFirstLastDay = () => {
   return [firstDayOfCurrentMonth, lastDayOfCurrentMonth];
 };
 
-const excelToJSDate = (excelDate) => {
+export const excelToJSDate = (excelDate) => {
   return excelDate ? new Date((excelDate - 25569) * 86400 * 1000) : new Date();
 };
 
-module.exports = {
-  excelToJSDate,
-  getDate,
-  getTime,
-  getDateF,
-  getDateFId,
-  getMonthYear,
-  getMonthYearFId,
-  getCurFirstLastDay,
-};
+export function getMonthsInRange(start, end) {
+  const months = [];
+
+  const current = new Date(start);
+  current.setDate(1); // normalize
+  current.setHours(0, 0, 0, 0);
+
+  const endDate = new Date(end);
+  endDate.setHours(0, 0, 0, 0);
+
+  while (current <= endDate) {
+    months.push(new Date(current)); // clone!
+
+    current.setMonth(current.getMonth() + 1);
+  }
+
+  return months;
+}

@@ -1,4 +1,4 @@
-import { API_PATH, useClientFetch } from "@/app/utils/apiconfig";
+import { API_PATH } from "@/app/utils/apiconfig";
 import { key2set, renderQueryStates, set2key } from "@/app/utils/tools";
 import {
   Button,
@@ -29,6 +29,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { getDate, getDateFId } from "@/app/utils/date";
 import Harga from "./harga";
 import { TITLE_STYLE } from "@/app/utils/const";
+import { useClientFetch } from "@/hooks/useClientFetch";
 
 export const MyChip = ({ text, theme }) => {
   console.log(text, theme);

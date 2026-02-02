@@ -22,6 +22,7 @@ export default function App(sess) {
           Signout
         </Link>
       }
+      placement="bottom-end"
     >
       <div className="inline-flex flex-row">
         <div>

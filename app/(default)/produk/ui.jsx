@@ -1,4 +1,5 @@
 "use client";
+import { useSession } from "next-auth/react";
 import React, {
   useCallback,
   useState,
@@ -6,7 +7,6 @@ import React, {
   useRef,
   useEffect,
 } from "react";
-import { useSession } from "next-auth/react";
 import { v4 as uuidv4 } from "uuid";
 import * as XLSX from "xlsx";
 import Link from "next/link";
@@ -56,7 +56,7 @@ import { TemplateImport } from "@/components/input";
 import { FilterProduk } from "@/components/filter";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { getApiPath, useClientFetch } from "@/app/utils/apiconfig";
+import { getApiPath } from "@/app/utils/apiconfig";
 import { Button } from "@heroui/react";
 import { Input, Textarea } from "@heroui/react";
 import { getDate, getDateF, getDateFId } from "@/app/utils/date";
@@ -70,18 +70,13 @@ import {
   AutocompleteWithCustomValue,
 } from "@/components/myautocomplete";
 import {
-  countPercentProvit,
-  countPriceByPercentProfit,
-  countPriceByProvitMarginPercent,
-  countProvitMarginPercent,
-} from "@/app/utils/formula";
-import {
   highRoleCheck,
   renderQueryStates,
   useDebounce,
 } from "@/app/utils/tools";
 import { useFilter } from "@react-aria/i18n";
 import ModalTransferData from "@/components/modaltransferdata";
+import { useClientFetch } from "@/hooks/useClientFetch";
 
 const apiPath = getApiPath();
 
@@ -93,7 +88,9 @@ export default function App({ id_produk }) {
   const [inputs, setInputs] = useState([{ id: uuidv4(), value: "" }]);
   const handleChange = (id, value) => {
     setInputs((prevInputs) =>
-      prevInputs.map((input) => (input.id === id ? { ...input, value } : input))
+      prevInputs.map((input) =>
+        input.id === id ? { ...input, value } : input,
+      ),
     );
   };
   const addInput = () => {
@@ -116,7 +113,7 @@ export default function App({ id_produk }) {
   const produk = useClientFetch(
     `produk?kategori=${selectKategori.values().next().value ?? ""}${
       isReadyStock ? `&isReadyStock=${isReadyStock}` : ""
-    }${id_produk ? `&id=${id_produk}` : ""}`
+    }${id_produk ? `&id=${id_produk}` : ""}`,
   );
   const merek = useClientFetch("merek");
   const vendor = useClientFetch("vendor?columnName=nama");
@@ -277,11 +274,11 @@ export default function App({ id_produk }) {
               // 'Content-Type': 'application/x-www-form-urlencoded',
             },
             body: JSON.stringify(v),
-          })
-        )
+          }),
+        ),
       );
       const dataArray = await Promise.all(
-        responses.map((response) => response.json())
+        responses.map((response) => response.json()),
       );
       setReportList(dataArray.map((v, i) => `${i}. ${v.message}`));
     } catch (e) {
@@ -509,7 +506,7 @@ export default function App({ id_produk }) {
         (row.nama + row.nmerek + row.tipe + row.keterangan)
           .toLowerCase()
           .includes(debounceSearchByName.toLowerCase()) &&
-        row.id_kustom.toLowerCase().includes(debounceSearchById.toLowerCase())
+        row.id_kustom.toLowerCase().includes(debounceSearchById.toLowerCase()),
     );
   }, [produk?.data, debounceSearchByName, debounceSearchById]);
   const pages = useMemo(() => {
@@ -525,7 +522,7 @@ export default function App({ id_produk }) {
       metodepengeluaran,
       kategori,
     },
-    session
+    session,
   );
   if (queryStates) return queryStates;
   const isHighRole = highRoleCheck(sessUser.rank);
@@ -615,15 +612,15 @@ export default function App({ id_produk }) {
 
   const totalModal = produk.data.reduce(
     (acc, cur) => acc + cur.stok * cur.hargamodal,
-    0
+    0,
   );
   const totalJual = produk.data.reduce(
     (acc, cur) => acc + cur.stok * cur.hargajual,
-    0
+    0,
   );
   const result = produk.data.reduce((acc, item) => {
     const existing = acc.find(
-      (entry) => entry.kategori === item.kategoriproduk
+      (entry) => entry.kategori === item.kategoriproduk,
     );
     if (existing) {
       existing.totalModal += item.stok * item.hargamodal;

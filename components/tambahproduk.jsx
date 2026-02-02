@@ -1,15 +1,8 @@
 "use client";
-import React, { useMemo, useState } from "react";
-import { Autocomplete, AutocompleteItem } from "@heroui/react";
+import { useState } from "react";
 import { Input, NumberInput } from "@heroui/react";
-import { Select, SelectItem } from "@heroui/react";
 import { Checkbox } from "@heroui/react";
-import { getApiPath, useClientFetch } from "@/app/utils/apiconfig";
-import {
-  countPercentProvit,
-  countProvitMarginPercent,
-} from "@/app/utils/formula";
-import { getDateF, getDateFId } from "@/app/utils/date";
+import { getApiPath } from "@/app/utils/apiconfig";
 import Harga from "@/components/harga";
 import { useSession } from "next-auth/react";
 import { highRoleCheck, renderQueryStates } from "@/app/utils/tools";
@@ -18,9 +11,8 @@ import {
   AutocompleteMerek,
   AutocompleteProduk,
   AutocompleteVendor,
-  MyAutocomplete,
-  MyAutocompleteItem,
 } from "./myautocomplete";
+import { useClientFetch } from "@/hooks/useClientFetch";
 
 const api_path = getApiPath();
 
@@ -44,7 +36,7 @@ export default function TambahProduk({
   const [idProduk, setIdProduk] = useState(null);
   const kategori = useClientFetch(`kategoriproduk`);
   const produk = useClientFetch(
-    `produk?${idKategori ? `kategori=${idKategori}` : ""}`
+    `produk?${idKategori ? `kategori=${idKategori}` : ""}`,
   );
   const vendor = useClientFetch("vendor");
   // const pilihProduk = useClientFetch(`produk`)
@@ -68,7 +60,7 @@ export default function TambahProduk({
 
   let fvendor = vendor.data;
   fvendor = fvendor.filter((row) =>
-    row.nama.toLowerCase().includes(sVendor.toLowerCase())
+    row.nama.toLowerCase().includes(sVendor.toLowerCase()),
   );
   fvendor = fvendor.slice(0, 100);
   const selectProduk = produk.data.filter((v) => v.id == form.id_produk)[0];
@@ -217,8 +209,8 @@ export default function TambahProduk({
               ...form,
               isSelected: v,
               harga: refHargaModal
-                ? selectProduk?.hargamodal ?? 0
-                : selectProduk?.hargajual ?? 0,
+                ? (selectProduk?.hargamodal ?? 0)
+                : (selectProduk?.hargajual ?? 0),
             });
           }}
         >
@@ -326,8 +318,8 @@ export default function TambahProduk({
               <Harga
                 harga={
                   refHargaModal
-                    ? selectProduk?.hargamodal ?? 0
-                    : selectProduk?.hargajual ?? 0
+                    ? (selectProduk?.hargamodal ?? 0)
+                    : (selectProduk?.hargajual ?? 0)
                 }
               />
             }

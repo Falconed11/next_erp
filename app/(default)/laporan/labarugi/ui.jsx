@@ -1,29 +1,49 @@
 "use client";
-import { useClientFetchNoInterval } from "@/app/utils/apiconfig";
+import { useClientFetch } from "@/hooks/useClientFetch";
 import Harga from "@/components/harga";
-import { getMonthYearFId } from "@/app/utils/date";
-import { DatePicker } from "@heroui/react";
+import {
+  getDateFId,
+  getMonthsInRange,
+  getMonthYearFId,
+} from "@/app/utils/date";
 import { useState } from "react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { Button } from "@heroui/react";
 
 export default function App() {
-  const kategori = useClientFetchNoInterval("kategorioperasionalkantor");
+  const kategori = useClientFetch("kategorioperasionalkantor");
+  const [startDate, setStartDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(new Date());
   if (kategori.error) return <div>failed to load</div>;
   if (kategori.isLoading) return <div>loading...</div>;
+  const months = getMonthsInRange(startDate, endDate);
   return (
-    <>
+    <div className="flex flex-col gap-2">
+      <div className="flex">
+        Selected months : {months.map((month) => getDateFId(month)).join(", ")}
+      </div>
+      <div>
+        <div className="flex">
+          <RangeMonthPicker
+            currentStartDate={startDate}
+            setCurrentStartDate={setStartDate}
+            currentEndDate={endDate}
+            setCurrentEndDate={setEndDate}
+          />
+        </div>
+      </div>
       <LaporanLR kategori={kategori.data} monthyear={"01-2024"} />
-    </>
+    </div>
   );
 }
 
 const LaporanLR = ({ kategori, monthyear }) => {
-  const operasional = useClientFetchNoInterval(
-    `totalOperasional?monthyear=${monthyear}`,
-  );
-  const pendapatan = useClientFetchNoInterval(
+  const operasional = useClientFetch(`totalOperasional?monthyear=${monthyear}`);
+  const pendapatan = useClientFetch(
     `totalpembayaranproyek?monthyear=${monthyear}`,
   );
-  const biayaProduksi = useClientFetchNoInterval(
+  const biayaProduksi = useClientFetch(
     `pengeluaranproyek?monthyear=${monthyear}`,
   );
   if (operasional.error) return <div>failed to load</div>;
@@ -41,10 +61,7 @@ const LaporanLR = ({ kategori, monthyear }) => {
   const totalBiaya = totalBiayaProduksi + totalOperasional;
   const labaRugiSebelumPajak = pendapatan.data[0].total - totalBiaya;
   return (
-    <div>
-      <div>
-        <RangeMonthPicker />
-      </div>
+    <div className="flex flex-col gap-2">
       <div className="flex flex-col bg-white rounded-lg p-3">
         <div className="">Periode {getMonthYearFId(monthyear)}</div>
         <div className="flex flex-row gap-3">
@@ -89,14 +106,29 @@ const LaporanLR = ({ kategori, monthyear }) => {
   );
 };
 
-const RangeMonthPicker = () => {
-  const [startDate, setStartDate] = useState(new Date("2014/02/08"));
-  const [endDate, setEndDate] = useState(new Date("2014/04/08"));
+const RangeMonthPicker = ({
+  currentStartDate = new Date(),
+  currentEndDate = new Date(),
+  setCurrentStartDate,
+  setCurrentEndDate,
+}) => {
+  const [startDate, setStartDate] = useState(new Date(currentStartDate));
+  const [endDate, setEndDate] = useState(new Date(currentEndDate));
+  const sDatePicker = "px-1 rounded-lg shadow-md border-gray-200 border";
+  console.log({ startDate, currentStartDate, endDate, currentEndDate });
   return (
-    <>
+    <div className="flex flex-col gap-2 bg-white p-2 rounded-lg">
+      <div className="font-bold">Pilih Periode Bulan!</div>
+      {/* <div>{new Date(currentStartDate)?.toString()}</div>
+      <div>{new Date(currentEndDate)?.toString()}</div> */}
       <DatePicker
+        className={sDatePicker}
         selected={startDate}
         onChange={setStartDate}
+        onSelect={(val) => {
+          setStartDate(val);
+          setCurrentStartDate(val);
+        }}
         selectsStart
         startDate={startDate}
         endDate={endDate}
@@ -104,14 +136,34 @@ const RangeMonthPicker = () => {
         showMonthYearPicker
       />
       <DatePicker
+        className={sDatePicker}
         selected={endDate}
         onChange={setEndDate}
+        onSelect={(val) => {
+          setEndDate(val);
+          setCurrentEndDate(val);
+        }}
         selectsEnd
         startDate={startDate}
         endDate={endDate}
         dateFormat="MM/yyyy"
         showMonthYearPicker
       />
-    </>
+      <div className="text-end">
+        <Button
+          color="primary"
+          isDisabled={
+            startDate.getTime() === currentStartDate?.getTime() &&
+            endDate.getTime() === currentEndDate?.getTime()
+          }
+          onPress={() => {
+            setCurrentStartDate(startDate);
+            setCurrentEndDate(endDate);
+          }}
+        >
+          Cari
+        </Button>
+      </div>
+    </div>
   );
 };
