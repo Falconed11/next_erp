@@ -106,7 +106,9 @@ const ProgressNoOfferNotification = ({ link, number }) => {
   if (link.name !== "Proyek" || number <= 0) return null;
 
   return (
-    <div className="bg-warning text-black rounded-full px-2">{number}</div>
+    <div className="bg-warning text-black rounded-full px-3 py-1 text-sm">
+      {number}
+    </div>
   );
 };
 
