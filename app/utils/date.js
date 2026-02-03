@@ -51,9 +51,17 @@ export const getDateFId = (date, format) => {
 };
 
 export const getMonthYear = (date) => {
+  date = new Date(date);
   let month = (date.getMonth() + 1).toString().padStart(2, "0");
   let year = date.getFullYear();
   return `${month}-${year}`;
+};
+
+export const getYearMonth = (date) => {
+  date = new Date(date);
+  let month = (date.getMonth() + 1).toString().padStart(2, "0");
+  let year = date.getFullYear();
+  return `${year}-${month}`;
 };
 
 export const getMonthYearFId = (monthyear) => {
