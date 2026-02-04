@@ -7,13 +7,14 @@ import {
   getMonthYear,
   getMonthYearFId,
   getYearMonth,
+  monthNamesIndonesian,
 } from "@/app/utils/date";
 import { useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { Button } from "@heroui/react";
 import { useSumOperasionalKantor } from "@/hooks/operasional-kantor-hooks";
-import { renderQueryStates } from "@/app/utils/tools";
+import { capitalizeEachWord, renderQueryStates } from "@/app/utils/tools";
 
 export default function App() {
   const kategori = useClientFetch("kategorioperasionalkantor");
@@ -24,9 +25,6 @@ export default function App() {
   const months = getMonthsInRange(startDate, endDate);
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex">
-        Selected months : {months.map((month) => getDateFId(month)).join(", ")}
-      </div>
       <div>
         <div className="flex">
           <RangeMonthPicker
@@ -48,24 +46,42 @@ export default function App() {
 
 const LaporanLR = ({ periode }) => {
   const yearMonth = getYearMonth(periode);
-  const sumOperasionalKantor = useSumOperasionalKantor(yearMonth);
+  const sumOperasionalKantorByKategori = useSumOperasionalKantor(yearMonth);
+  const sumOperasionalKantor = useSumOperasionalKantor(yearMonth, "sum");
 
-  const QueryState = renderQueryStates({ sumOperasionalKantor });
+  const QueryState = renderQueryStates({
+    sumOperasionalKantorByKategori,
+    sumOperasionalKantor,
+  });
   if (QueryState) return QueryState;
-  const { data } = sumOperasionalKantor.data;
+  const { data: dataSumByKategori } = sumOperasionalKantorByKategori.data;
+  const { data: dataSum } = sumOperasionalKantor.data;
   const CustomTd = ({ className, children }) => (
     <td className={className}>{children}</td>
   );
+  const [year, month] = yearMonth.split("-");
   return (
     <div className="bg-white rounded-lg shadow-lg p-2 ">
-      <div className="font-bold">{yearMonth}</div>
+      <div className="font-bold">{`${monthNamesIndonesian[+month]} ${year}`}</div>
       <table className="table-auto">
-        <thead></thead>
+        <thead>
+          <tr>
+            <th className="text-left">Operasional Kantor</th>
+            <th>
+              <Harga harga={dataSum.total} />
+            </th>
+            <th>
+              <Harga harga={dataSum.pengeluaran} />
+            </th>
+          </tr>
+        </thead>
         <tbody>
-          {data.map((kategori, i) => (
-            <tr key={i}>
-              <CustomTd>{kategori.nama}</CustomTd>
-              <CustomTd className="px-2 text-right">
+          {dataSumByKategori.map((kategori, i) => (
+            <tr key={i} className={i % 2 == 0 ? "bg-gray-200" : ""}>
+              <CustomTd className="text-nowrap">
+                {capitalizeEachWord(kategori.nama)}
+              </CustomTd>
+              <CustomTd className="px-4 text-right">
                 <Harga harga={kategori.total} />{" "}
               </CustomTd>
               <CustomTd className="text-right">

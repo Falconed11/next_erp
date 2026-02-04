@@ -1,4 +1,4 @@
-const monthNamesIndonesian = [
+export const monthNamesIndonesian = [
   "Januari",
   "Februari",
   "Maret",

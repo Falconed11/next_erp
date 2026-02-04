@@ -1,9 +1,11 @@
 import { useMemo } from "react";
-import { useClientFetch } from "./useClientFetch";
+import { useClientFetch, useClientFetchNoInterval } from "./useClientFetch";
 import { OPERASIONAL_KANTOR_ENDPOINT } from "@/services/operasional-kantor.service";
 
-export function useSumOperasionalKantor(periode) {
-  return useClientFetch(`${OPERASIONAL_KANTOR_ENDPOINT}?periode=${periode}`);
+export function useSumOperasionalKantor(periode, aggregate) {
+  return useClientFetchNoInterval(
+    `${OPERASIONAL_KANTOR_ENDPOINT}?periode=${periode}${aggregate ? `&aggregate=${aggregate}` : ""}`,
+  );
 }
 
 export function useTransferBankColumns(isAuthorized) {
