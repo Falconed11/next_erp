@@ -14,6 +14,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { Button } from "@heroui/react";
 import { useSumOperasionalKantor } from "@/hooks/operasional-kantor-hooks";
+import { useSumPembayaranProyek } from "@/hooks/pembayaran-proyek-hooks";
 import { capitalizeEachWord, renderQueryStates } from "@/app/utils/tools";
 
 export default function App() {
@@ -46,30 +47,39 @@ export default function App() {
 
 const LaporanLR = ({ periode }) => {
   const yearMonth = getYearMonth(periode);
+  console.log({ yearMonth });
   const sumOperasionalKantorByKategori = useSumOperasionalKantor(yearMonth);
   const sumOperasionalKantor = useSumOperasionalKantor(yearMonth, "sum");
+  const sumPembayaranProyek = useSumPembayaranProyek(yearMonth, "sum");
 
   const QueryState = renderQueryStates({
     sumOperasionalKantorByKategori,
     sumOperasionalKantor,
+    sumPembayaranProyek,
   });
   if (QueryState) return QueryState;
   const { data: dataSumByKategori } = sumOperasionalKantorByKategori.data;
   const { data: dataSum } = sumOperasionalKantor.data;
+  const { data: dataSumPembayaranProyek } = sumPembayaranProyek.data;
   const CustomTd = ({ className, children }) => (
     <td className={className}>{children}</td>
   );
   const [year, month] = yearMonth.split("-");
   return (
     <div className="bg-white rounded-lg shadow-lg p-2 ">
-      <div className="font-bold">{`${monthNamesIndonesian[+month]} ${year}`}</div>
+      <div className="font-bold">{`${monthNamesIndonesian[+month - 1]} ${year}`}</div>
+      <div>
+        Pendapatan
+        {/* <Harga harga={dataSumPembayaranProyek.total} /> */}
+        <Harga harga={dataSumPembayaranProyek.pendapatan} />
+      </div>
       <table className="table-auto">
         <thead>
           <tr>
             <th className="text-left">Operasional Kantor</th>
-            <th>
+            {/* <th>
               <Harga harga={dataSum.total} />
-            </th>
+            </th> */}
             <th>
               <Harga harga={dataSum.pengeluaran} />
             </th>
@@ -81,9 +91,9 @@ const LaporanLR = ({ periode }) => {
               <CustomTd className="text-nowrap">
                 {capitalizeEachWord(kategori.nama)}
               </CustomTd>
-              <CustomTd className="px-4 text-right">
+              {/* <CustomTd className="px-4 text-right">
                 <Harga harga={kategori.total} />{" "}
-              </CustomTd>
+              </CustomTd> */}
               <CustomTd className="text-right">
                 <Harga harga={kategori.pengeluaran} />{" "}
               </CustomTd>

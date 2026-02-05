@@ -1,9 +1,15 @@
 import { useMemo } from "react";
-import { useClientFetch } from "./useClientFetch";
+import { useClientFetch, useClientFetchNoInterval } from "./useClientFetch";
 
 export function useDefaultFetch({ endPoint, limit, offset }) {
   return useClientFetch(
     `${endPoint}?${limit != null && offset != null ? `limit=${limit}&offset=${offset}` : ""}`,
+  );
+}
+
+export function useDefaultSumFetch(endPoint, periode, aggregate) {
+  return useClientFetchNoInterval(
+    `${endPoint}?periode=${periode}${aggregate ? `&aggregate=${aggregate}` : ""}`,
   );
 }
 

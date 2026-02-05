@@ -1,12 +1,12 @@
 import { useMemo } from "react";
-import { OPERASIONAL_KANTOR_ENDPOINT } from "@/services/operasional-kantor.service";
+import { PEMBAYARAN_PROYEK_ENDPOINT } from "@/services/pembayaran-proyek.service";
 import { useDefaultSumFetch } from "./useDefault";
 
-export function useSumOperasionalKantor(periode, aggregate) {
-  return useDefaultSumFetch(OPERASIONAL_KANTOR_ENDPOINT, periode, aggregate);
+export function useSumPembayaranProyek(periode, aggregate) {
+  return useDefaultSumFetch(PEMBAYARAN_PROYEK_ENDPOINT, periode, aggregate);
 }
 
-export function useOperasionalKantorColumns(isAuthorized) {
+export function usePembayaranProyekColumns(isAuthorized) {
   return useMemo(
     () => [
       ...(isAuthorized ? [{ key: "aksi", label: "Aksi" }] : []),
