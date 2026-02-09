@@ -15,6 +15,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { Button } from "@heroui/react";
 import { useSumOperasionalKantor } from "@/hooks/operasional-kantor-hooks";
 import { useSumPembayaranProyek } from "@/hooks/pembayaran-proyek-hooks";
+import { useSumPengeluaranProyek } from "@/hooks/pengeluaran-proyek-hooks";
 import { capitalizeEachWord, renderQueryStates } from "@/app/utils/tools";
 
 export default function App() {
@@ -47,45 +48,56 @@ export default function App() {
 
 const LaporanLR = ({ periode }) => {
   const yearMonth = getYearMonth(periode);
-  console.log({ yearMonth });
   const sumOperasionalKantorByKategori = useSumOperasionalKantor(yearMonth);
   const sumOperasionalKantor = useSumOperasionalKantor(yearMonth, "sum");
   const sumPembayaranProyek = useSumPembayaranProyek(yearMonth, "sum");
+  const sumPengeluaranProyek = useSumPengeluaranProyek(yearMonth, "sum");
 
   const QueryState = renderQueryStates({
     sumOperasionalKantorByKategori,
     sumOperasionalKantor,
     sumPembayaranProyek,
+    sumPengeluaranProyek,
   });
   if (QueryState) return QueryState;
   const { data: dataSumByKategori } = sumOperasionalKantorByKategori.data;
   const { data: dataSum } = sumOperasionalKantor.data;
   const { data: dataSumPembayaranProyek } = sumPembayaranProyek.data;
+  const { data: dataSumPengeluaranProyek } = sumPengeluaranProyek.data;
   const CustomTd = ({ className, children }) => (
     <td className={className}>{children}</td>
   );
   const [year, month] = yearMonth.split("-");
+
+  const totalOperasionalKantor = +dataSum.pengeluaran;
+  const totalPembayaran = +dataSumPembayaranProyek.totalValue;
+  const totalPengeluaran = +dataSumPengeluaranProyek.totalValue;
+  const labaRugi =
+    totalPembayaran - (totalPengeluaran + totalOperasionalKantor);
   return (
     <div className="bg-white rounded-lg shadow-lg p-2 ">
       <div className="font-bold">{`${monthNamesIndonesian[+month - 1]} ${year}`}</div>
-      <div>
-        Pendapatan
-        {/* <Harga harga={dataSumPembayaranProyek.total} /> */}
-        <Harga harga={dataSumPembayaranProyek.pendapatan} />
-      </div>
       <table className="table-auto">
-        <thead>
-          <tr>
-            <th className="text-left">Operasional Kantor</th>
-            {/* <th>
-              <Harga harga={dataSum.total} />
-            </th> */}
-            <th>
-              <Harga harga={dataSum.pengeluaran} />
-            </th>
-          </tr>
-        </thead>
+        <thead></thead>
         <tbody>
+          {[
+            {
+              label: "Laba/Rugi sebelum pajak",
+              value: labaRugi,
+              valueStyle: "font-bold",
+            },
+            { label: "Pendapatan", value: totalPembayaran },
+            { label: "Biaya Produksi", value: totalPengeluaran },
+            { label: "Operasional Kantor", value: totalOperasionalKantor },
+          ].map(({ label, value, valueStyle }, i) => (
+            <tr key={i} className="text-nowrap">
+              <CustomTDLabelValue
+                label={label}
+                value={value}
+                valueStyle={valueStyle}
+              />
+            </tr>
+          ))}
           {dataSumByKategori.map((kategori, i) => (
             <tr key={i} className={i % 2 == 0 ? "bg-gray-200" : ""}>
               <CustomTd className="text-nowrap">
@@ -102,6 +114,17 @@ const LaporanLR = ({ periode }) => {
         </tbody>
       </table>
     </div>
+  );
+};
+
+const CustomTDLabelValue = ({ label = "Label", value, valueStyle = "" }) => {
+  return (
+    <>
+      <td className="font-bold">{label}</td>
+      <td className="text-right pl-2">
+        <Harga className={`text-blue-600 ${valueStyle}`} harga={value} />
+      </td>
+    </>
   );
 };
 

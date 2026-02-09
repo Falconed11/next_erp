@@ -185,9 +185,7 @@ export const ToDoList = () => {
   const session = useSession();
   const sessUser = session.data?.user;
   const userId = sessUser?.id;
-  const todolist = useClientFetch(
-    userId ? `todolist?id_user=${sessUser?.id}` : null,
-  );
+  const todolist = useClientFetch(userId ? `todolist?id_user=${userId}` : null);
   const status = useClientFetch("statustodolist");
   const [form, setForm] = useState({});
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -340,7 +338,7 @@ export const ToDoList = () => {
             </TableColumn>
           )}
         </TableHeader>
-        <TableBody items={todolist.data}>
+        <TableBody items={todolist?.data || []}>
           {(item) => (
             <TableRow key={item.id}>
               {(columnKey) => (

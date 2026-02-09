@@ -12,18 +12,18 @@ export default function App() {
   const sessionuser = session?.data?.user;
   const queryStates = renderQueryStates({}, session);
   if (queryStates) return queryStates;
-  const isHighRole = highRoleCheck(sessionuser.rank);
+  const isHighRole = highRoleCheck(sessionuser?.rank);
   const currentDate = new Date();
   const currentMonth = currentDate.getMonth();
   const nextMonthFirstDay = new Date(
     currentDate.getFullYear(),
     currentMonth + 1,
-    1
+    1,
   );
   const currentMonthFirstDay = new Date(
     currentDate.getFullYear(),
     currentMonth,
-    1
+    1,
   );
   const lastDayOfCurrentMonth = new Date(nextMonthFirstDay - 1);
   const firstDayOfCurrentMonth = new Date(currentMonthFirstDay);
