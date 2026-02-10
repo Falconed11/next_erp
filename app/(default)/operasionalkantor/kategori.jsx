@@ -1,10 +1,6 @@
 "use client";
 import { useCallback, useState } from "react";
-import {
-  useClientFetch,
-  getApiPath,
-  useClientFetchPagination,
-} from "@/app/utils/apiconfig";
+import { getApiPath } from "@/app/utils/apiconfig";
 import {
   Table,
   TableHeader,
@@ -12,14 +8,7 @@ import {
   TableBody,
   TableRow,
   TableCell,
-  User,
-  Chip,
   Tooltip,
-  Pagination,
-  ChipProps,
-  getKeyValue,
-  Autocomplete,
-  AutocompleteItem,
 } from "@heroui/react";
 import {
   Modal,
@@ -31,27 +20,14 @@ import {
   useDisclosure,
 } from "@heroui/react";
 import { Input } from "@heroui/react";
-import {
-  AddIcon,
-  EditIcon,
-  DeleteIcon,
-  EyeIcon,
-  UserIcon,
-  NoteIcon,
-  ReportMoneyIcon,
-  TransferIcon,
-} from "@/components/icon";
-import {
-  getCurFirstLastDay,
-  excelToJSDate,
-  getDate,
-  getDateF,
-} from "@/app/utils/date";
+import { EditIcon, DeleteIcon, TransferIcon } from "@/components/icon";
+import { getDateF } from "@/app/utils/date";
 import Harga from "@/components/harga";
 import ModalTransferData from "@/components/modaltransferdata";
 import "react-datepicker/dist/react-datepicker.css";
 import { capitalizeEachWord, highRoleCheck } from "@/app/utils/tools";
 import { TableHeaderWithAddButton } from "@/components/mycomponent";
+import { useClientFetch } from "@/hooks/useClientFetch";
 
 const apiPath = getApiPath();
 

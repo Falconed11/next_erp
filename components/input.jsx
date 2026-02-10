@@ -19,7 +19,7 @@ import { getApiPath } from "@/app/utils/apiconfig";
 
 const apiPath = getApiPath();
 
-const FileUploader = ({ onFileUpload }) => {
+export const FileUploader = ({ onFileUpload }) => {
   const [file, setFile] = useState(null);
 
   const onDrop = (acceptedFiles) => {
@@ -89,7 +89,7 @@ const FileUploaderV2 = ({ file, setFile, onFileUpload }) => {
   );
 };
 
-const RangeDate = ({
+export const RangeDate = ({
   current,
   setCurrent,
   setPage = () => {
@@ -172,7 +172,66 @@ const RangeDate = ({
   );
 };
 
-function TemplateImport({
+export const RangeMonthPicker = ({
+  currentStartDate = new Date(),
+  currentEndDate = new Date(),
+  setCurrentStartDate,
+  setCurrentEndDate,
+}) => {
+  const [startDate, setStartDate] = useState(new Date(currentStartDate));
+  const [endDate, setEndDate] = useState(new Date(currentEndDate));
+  const sDatePicker = "px-1 rounded-lg shadow-md border-gray-200 border";
+  return (
+    <div className="flex flex-col gap-2 bg-white p-2 rounded-lg">
+      <div className="font-bold">Pilih Periode Bulan!</div>
+      <DatePicker
+        className={sDatePicker}
+        selected={startDate}
+        onChange={setStartDate}
+        onSelect={(val) => {
+          setStartDate(val);
+          setCurrentStartDate(val);
+        }}
+        selectsStart
+        startDate={startDate}
+        endDate={endDate}
+        dateFormat="MM/yyyy"
+        showMonthYearPicker
+      />
+      <DatePicker
+        className={sDatePicker}
+        selected={endDate}
+        onChange={setEndDate}
+        onSelect={(val) => {
+          setEndDate(val);
+          setCurrentEndDate(val);
+        }}
+        selectsEnd
+        startDate={startDate}
+        endDate={endDate}
+        dateFormat="MM/yyyy"
+        showMonthYearPicker
+      />
+      <div className="text-end">
+        <Button
+          color="primary"
+          isDisabled={
+            startDate.getTime() === currentStartDate?.getTime() &&
+            endDate.getTime() === currentEndDate?.getTime()
+          }
+          onPress={() => {
+            setCurrentStartDate(startDate);
+            setCurrentEndDate(endDate);
+          }}
+        >
+          Cari
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+export function TemplateImport({
   setReportList,
   report,
   name,
@@ -246,7 +305,7 @@ function TemplateImport({
     </div>
   );
 }
-function TemplateImportV2({
+export function TemplateImportV2({
   children,
   json,
   setJson,
@@ -364,5 +423,3 @@ function TemplateImportV2({
     </div>
   );
 }
-
-export { FileUploader, RangeDate, TemplateImport, TemplateImportV2 };

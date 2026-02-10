@@ -185,6 +185,10 @@ export default function RootLayout({
             name: "Laba Rugi",
           },
           {
+            key: "operasional-kantor",
+            name: "Operasional Kantor",
+          },
+          {
             key: "proyekbulanan",
             name: "Proyek Bulanan",
           },
