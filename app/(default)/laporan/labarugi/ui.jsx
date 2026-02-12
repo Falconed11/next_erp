@@ -22,8 +22,14 @@ export default function App() {
 }
 
 const LaporanLR = ({ yearMonth }) => {
-  const sumOperasionalKantorByKategori = useSumOperasionalKantor(yearMonth);
-  const sumOperasionalKantor = useSumOperasionalKantor(yearMonth, "sum");
+  const sumOperasionalKantorByKategori = useSumOperasionalKantor({
+    periode: yearMonth,
+    groupBy: "kategorioperasionalkantor",
+  });
+  const sumOperasionalKantor = useSumOperasionalKantor({
+    periode: yearMonth,
+    aggregate: "sum",
+  });
   const sumPembayaranProyek = useSumPembayaranProyek(yearMonth, "sum");
   const sumPengeluaranProyek = useSumPengeluaranProyek(yearMonth, "sum");
 

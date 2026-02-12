@@ -1,9 +1,19 @@
 import { useMemo } from "react";
 import { OPERASIONAL_KANTOR_ENDPOINT } from "@/services/operasional-kantor.service";
 import { useDefaultSumFetch } from "./useDefault";
+import { useClientFetchNoInterval } from "./useClientFetch";
 
-export function useSumOperasionalKantor(periode, aggregate) {
-  return useDefaultSumFetch(OPERASIONAL_KANTOR_ENDPOINT, periode, aggregate);
+export function useSumOperasionalKantor({
+  periode,
+  aggregate = null,
+  groupBy = null,
+}) {
+  return useDefaultSumFetch(
+    OPERASIONAL_KANTOR_ENDPOINT,
+    periode,
+    aggregate,
+    groupBy,
+  );
 }
 
 export function useOperasionalKantorColumns(isAuthorized) {
@@ -22,3 +32,9 @@ export function useOperasionalKantorColumns(isAuthorized) {
     [isAuthorized],
   );
 }
+
+export const useOperasionalKantor = (periode) => {
+  return useClientFetchNoInterval(
+    `${OPERASIONAL_KANTOR_ENDPOINT}?${periode ? `periode=${periode}` : ""}`,
+  );
+};

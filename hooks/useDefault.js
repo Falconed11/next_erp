@@ -7,9 +7,9 @@ export function useDefaultFetch({ endPoint, limit, offset }) {
   );
 }
 
-export function useDefaultSumFetch(endPoint, periode, aggregate) {
+export function useDefaultSumFetch(endPoint, periode, aggregate, groupBy) {
   return useClientFetchNoInterval(
-    `${endPoint}?periode=${periode}${aggregate ? `&aggregate=${aggregate}` : ""}`,
+    `${endPoint}?periode=${periode}${aggregate ? `&aggregate=${aggregate}` : ""}${groupBy ? `&groupBy=${groupBy}` : ""}`,
   );
 }
 

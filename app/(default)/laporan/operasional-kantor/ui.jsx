@@ -1,13 +1,17 @@
 "use client";
 import Harga from "@/components/harga";
 import "react-datepicker/dist/react-datepicker.css";
-import { useSumOperasionalKantor } from "@/hooks/operasional-kantor-hooks";
+import {
+  useOperasionalKantor,
+  useSumOperasionalKantor,
+} from "@/hooks/operasional-kantor-hooks";
 import { capitalizeEachWord, renderQueryStates } from "@/app/utils/tools";
 import {
   MonthlyReport,
   ReportTable,
   ReportTableBody,
 } from "@/components/default/DefaultReportTable";
+import { getDateFId } from "@/app/utils/date";
 
 export default function App() {
   return (
@@ -20,39 +24,74 @@ export default function App() {
 }
 
 const LaporanOperasionalKantor = ({ yearMonth }) => {
-  const sumOperasionalKantorByKategori = useSumOperasionalKantor(yearMonth);
-  const sumOperasionalKantor = useSumOperasionalKantor(yearMonth, "sum");
+  const operasionalKantor = useOperasionalKantor(yearMonth);
+  const sumOperasionalKantor = useSumOperasionalKantor({
+    periode: yearMonth,
+    aggregate: "sum",
+  });
 
   const QueryState = renderQueryStates({
-    sumOperasionalKantorByKategori,
+    operasionalKantor,
     sumOperasionalKantor,
   });
   if (QueryState) return QueryState;
-  const { data: dataSumByKategori } = sumOperasionalKantorByKategori.data;
+  const { data: dataOperasionalKantor } = operasionalKantor.data;
   const { data: dataSum } = sumOperasionalKantor.data;
 
   const totalOperasionalKantor = +dataSum.pengeluaran;
+  const sHeader = "font-bold";
   return (
     <ReportTable yearMonth={yearMonth}>
       <ReportTableBody
-        calculationRows={[
-          {
-            label: "Total",
-            value: totalOperasionalKantor,
-            valueStyle: "font-bold",
-          },
-        ]}
         cells={[
           {
             style: "text-nowrap",
-            renderCell: (data) => capitalizeEachWord(data.nama),
+            renderCell: (data) => getDateFId(data.tanggal),
+          },
+          {
+            style: "text-nowrap px-2",
+            renderCell: (data) =>
+              capitalizeEachWord(data.kategorioperasionalkantor),
+          },
+          {
+            style: "text-nowrap px-2",
+            renderCell: (data) => data.keterangan,
           },
           {
             style: "text-right",
-            renderCell: (data) => <Harga harga={data.pengeluaran} />,
+            renderCell: (data) => <Harga harga={data.biaya} />,
           },
         ]}
-        rows={dataSumByKategori}
+        topRows={[
+          [
+            { style: "font-bold", cell: "Total" },
+            {},
+            {},
+            {
+              style: "text-right font-bold text-blue-600",
+              cell: <Harga harga={totalOperasionalKantor} />,
+            },
+          ],
+          [
+            {
+              style: sHeader,
+              cell: "Tanggal",
+            },
+            {
+              style: sHeader,
+              cell: "Kategori",
+            },
+            {
+              style: sHeader,
+              cell: "Keterangan",
+            },
+            {
+              style: sHeader,
+              cell: "Biaya",
+            },
+          ],
+        ]}
+        rows={dataOperasionalKantor}
       />
     </ReportTable>
   );

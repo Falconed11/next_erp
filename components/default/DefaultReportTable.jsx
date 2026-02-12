@@ -17,13 +17,22 @@ const CustomTDLabelValue = ({ label = "Label", value, valueStyle = "" }) => {
   );
 };
 
-export const ReportTableBody = ({ rows, cells, calculationRows }) => {
+export const ReportTableBody = ({ rows, cells, calculationRows, topRows }) => {
   const CustomTd = ({ className, children }) => (
     <td className={className}>{children}</td>
   );
   return (
     <>
-      {calculationRows.map(({ label, value, valueStyle }, i) => (
+      {topRows?.map((row, i) => (
+        <tr key={i}>
+          {row.map(({ style, cell }, i) => (
+            <CustomTd className={style} key={i}>
+              {cell}
+            </CustomTd>
+          ))}
+        </tr>
+      ))}
+      {calculationRows?.map(({ label, value, valueStyle }, i) => (
         <tr key={i} className="text-nowrap">
           <CustomTDLabelValue
             label={label}
@@ -62,7 +71,9 @@ export const MonthlyReport = ({ renderReport }) => {
         </div>
       </div>
       <div className="flex gap-2">
-        {months.map((month) => renderReport(getYearMonth(month)))}
+        {months.map((month) => (
+          <div key={month}>{renderReport(getYearMonth(month))}</div>
+        ))}
       </div>
     </div>
   );
