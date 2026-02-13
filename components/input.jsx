@@ -182,7 +182,7 @@ export const RangeMonthPicker = ({
   const [endDate, setEndDate] = useState(new Date(currentEndDate));
   const sDatePicker = "px-1 rounded-lg shadow-md border-gray-200 border";
   return (
-    <div className="flex flex-col gap-2 bg-white p-2 rounded-lg">
+    <div className="flex flex-col gap-2 bg-white p-2 rounded-lg border border-gray-200">
       <div className="font-bold">Pilih Periode Bulan!</div>
       <DatePicker
         className={sDatePicker}

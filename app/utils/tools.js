@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { getApiPath } from "./apiconfig";
 const api_path = getApiPath();
-const getNextDomain = () => {
+export const getNextDomain = () => {
   return process.env.NEXT_PUBLIC_MAIN_URL;
 };
-const rolesCheck = (roles, peran) => {
+export const rolesCheck = (roles, peran) => {
   return roles.includes(peran);
 };
-const updateSwitch = async (
+export const updateSwitch = async (
   switchValue,
   currentValue,
   apiEndPoint,
@@ -29,17 +29,17 @@ const updateSwitch = async (
   //return alert(json.message);
   referenceData.forEach((data) => data.mutate());
 };
-const highRoleCheck = (rank) => rank <= 20;
-const key2set = (key) => new Set(key != null ? [String(key)] : []);
-const set2key = (set) => new Set(set).values().next().value || null;
-const capitalizeEachWord = (str = "") => {
+export const highRoleCheck = (rank) => rank <= 20;
+export const key2set = (key) => new Set(key != null ? [String(key)] : []);
+export const set2key = (set) => new Set(set).values().next().value || null;
+export const capitalizeEachWord = (str = "") => {
   if (!str) return;
   return str.replace(
     /\b\w+/g,
     (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(),
   );
 };
-const renderQueryStates = (queries, session) => {
+export const renderQueryStates = (queries, session) => {
   for (const [name, data] of Object.entries(queries ?? {})) {
     const error = data.error;
     if (error)
@@ -52,7 +52,7 @@ const renderQueryStates = (queries, session) => {
   }
   if (session?.status === "loading") return <div>Session Loading...</div>;
 };
-const useDebounce = (value, delay = 1000) => {
+export const useDebounce = (value, delay = 1000) => {
   const [debounced, setDebounced] = useState(value);
   useEffect(() => {
     const timer = setTimeout(() => setDebounced(value), delay);
@@ -60,14 +60,16 @@ const useDebounce = (value, delay = 1000) => {
   }, [value, delay]);
   return debounced;
 };
-export {
-  capitalizeEachWord,
-  rolesCheck,
-  updateSwitch,
-  highRoleCheck,
-  key2set,
-  set2key,
-  getNextDomain,
-  renderQueryStates,
-  useDebounce,
-};
+export const conditionalURLParamBuilder = (key, val) =>
+  val ? `${key}=${val}` : "";
+export const paramBuilder = (params = []) =>
+  params.length
+    ? "?" +
+      params
+        .flatMap(({ key, val }) =>
+          val ? [conditionalURLParamBuilder(key, val)] : [],
+        )
+        .join("&")
+    : "";
+export const urlBuilder = (endPoint = "", params = []) =>
+  `${endPoint}${paramBuilder(params)}`;

@@ -9,11 +9,6 @@ import {
   TableRow,
   TableCell,
   Pagination,
-  User,
-  Chip,
-  Tooltip,
-  ChipProps,
-  getKeyValue,
 } from "@heroui/react";
 import {
   Modal,
@@ -23,30 +18,23 @@ import {
   ModalFooter,
   useDisclosure,
 } from "@heroui/react";
-import Link from "next/link";
 import { Input } from "@heroui/react";
 import { Button } from "@heroui/react";
 import {
   getCurFirstLastDay,
   excelToJSDate,
   getDateF,
-  getDateFId,
   getDate,
 } from "@/app/utils/date";
-import { getApiPath, useClientFetch } from "@/app/utils/apiconfig";
+import { getApiPath } from "@/app/utils/apiconfig";
 import Harga from "@/components/harga";
-import { FileUploader, RangeDate } from "@/components/input";
-import {
-  AddIcon,
-  EditIcon,
-  DeleteIcon,
-  EyeIcon,
-  UserIcon,
-} from "@/components/icon";
+import { RangeDate } from "@/components/input";
+import { EyeIcon } from "@/components/icon";
 import { LinkOpenNewTab, MyChip } from "@/components/mycomponent";
 
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { useClientFetch } from "@/hooks/useClientFetch";
 
 const api_path = getApiPath();
 

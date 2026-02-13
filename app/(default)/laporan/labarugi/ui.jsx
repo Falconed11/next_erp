@@ -1,9 +1,9 @@
 "use client";
 import Harga from "@/components/harga";
 import "react-datepicker/dist/react-datepicker.css";
-import { useSumOperasionalKantor } from "@/hooks/operasional-kantor-hooks";
-import { useSumPembayaranProyek } from "@/hooks/pembayaran-proyek-hooks";
-import { useSumPengeluaranProyek } from "@/hooks/pengeluaran-proyek-hooks";
+import { useSumOperasionalKantor } from "@/hooks/operasional-kantor.hooks";
+import { useSumPembayaranProyek } from "@/hooks/pembayaran-proyek.hooks";
+import { useSumPengeluaranProyek } from "@/hooks/pengeluaran-proyek.hooks";
 import { capitalizeEachWord, renderQueryStates } from "@/app/utils/tools";
 import {
   MonthlyReport,
@@ -14,24 +14,38 @@ import {
 export default function App() {
   return (
     <MonthlyReport
-      renderReport={(yearMonth) => (
-        <LaporanLR key={yearMonth} yearMonth={yearMonth} />
+      renderReport={(yearMonth, form) => (
+        <LaporanLR
+          key={yearMonth}
+          yearMonth={yearMonth}
+          id_perusahaan={form.id_perusahaan}
+        />
       )}
     />
   );
 }
 
-const LaporanLR = ({ yearMonth }) => {
+const LaporanLR = ({ yearMonth, id_perusahaan }) => {
   const sumOperasionalKantorByKategori = useSumOperasionalKantor({
     periode: yearMonth,
     groupBy: "kategorioperasionalkantor",
+    id_perusahaan,
   });
   const sumOperasionalKantor = useSumOperasionalKantor({
     periode: yearMonth,
     aggregate: "sum",
+    id_perusahaan,
   });
-  const sumPembayaranProyek = useSumPembayaranProyek(yearMonth, "sum");
-  const sumPengeluaranProyek = useSumPengeluaranProyek(yearMonth, "sum");
+  const sumPembayaranProyek = useSumPembayaranProyek(
+    yearMonth,
+    "sum",
+    id_perusahaan,
+  );
+  const sumPengeluaranProyek = useSumPengeluaranProyek(
+    yearMonth,
+    "sum",
+    id_perusahaan,
+  );
 
   const QueryState = renderQueryStates({
     sumOperasionalKantorByKategori,
@@ -44,12 +58,12 @@ const LaporanLR = ({ yearMonth }) => {
   const { data: dataSum } = sumOperasionalKantor.data;
   const { data: dataSumPembayaranProyek } = sumPembayaranProyek.data;
   const { data: dataSumPengeluaranProyek } = sumPengeluaranProyek.data;
-
   const totalOperasionalKantor = +dataSum.pengeluaran;
   const totalPembayaran = +dataSumPembayaranProyek.totalValue;
   const totalPengeluaran = +dataSumPengeluaranProyek.totalValue;
   const labaRugi =
     totalPembayaran - (totalPengeluaran + totalOperasionalKantor);
+
   return (
     <ReportTable yearMonth={yearMonth}>
       <ReportTableBody

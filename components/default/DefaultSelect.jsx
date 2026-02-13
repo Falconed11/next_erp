@@ -11,16 +11,18 @@ export default function DefaultSelect({
   fieldName,
   buildTextValue = (data) => data.nama,
   buildText = (data) => data.nama,
+  className,
 }) {
-  const fetchData = useDefaultFetch({ endPoint });
+  const fetchData = useDefaultFetch({ endPoint, noInterval: true });
   const QueryState = renderQueryStates({ fetchData });
   if (QueryState) return QueryState;
-  const data = fetchData.data;
+  const data = fetchData.data.data ?? fetchData.data;
   return (
     <Select
+      variant="bordered"
       label={label}
       placeholder={placeholder}
-      className=""
+      className={className}
       selectedKeys={key2set(form[fieldName])}
       onSelectionChange={(v) => {
         setForm({

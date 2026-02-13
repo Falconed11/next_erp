@@ -1,15 +1,31 @@
 import { useMemo } from "react";
 import { useClientFetch, useClientFetchNoInterval } from "./useClientFetch";
+import { urlBuilder } from "@/app/utils/tools";
 
-export function useDefaultFetch({ endPoint, limit, offset }) {
+export function useDefaultFetch({ endPoint, limit, offset, noInterval }) {
+  if (noInterval)
+    return useClientFetchNoInterval(
+      `${endPoint}?${limit != null && offset != null ? `limit=${limit}&offset=${offset}` : ""}`,
+    );
   return useClientFetch(
     `${endPoint}?${limit != null && offset != null ? `limit=${limit}&offset=${offset}` : ""}`,
   );
 }
 
-export function useDefaultSumFetch(endPoint, periode, aggregate, groupBy) {
+export function useDefaultSumFetch({
+  endPoint,
+  periode,
+  aggregate,
+  groupBy,
+  id_perusahaan,
+}) {
   return useClientFetchNoInterval(
-    `${endPoint}?periode=${periode}${aggregate ? `&aggregate=${aggregate}` : ""}${groupBy ? `&groupBy=${groupBy}` : ""}`,
+    urlBuilder(endPoint, [
+      { key: "periode", val: periode },
+      { key: "aggregate", val: aggregate },
+      { key: "groupBy", val: groupBy },
+      { key: "idPerusahaan", val: id_perusahaan },
+    ]),
   );
 }
 

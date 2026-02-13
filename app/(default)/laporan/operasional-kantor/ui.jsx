@@ -4,7 +4,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import {
   useOperasionalKantor,
   useSumOperasionalKantor,
-} from "@/hooks/operasional-kantor-hooks";
+} from "@/hooks/operasional-kantor.hooks";
 import { capitalizeEachWord, renderQueryStates } from "@/app/utils/tools";
 import {
   MonthlyReport,
@@ -16,18 +16,23 @@ import { getDateFId } from "@/app/utils/date";
 export default function App() {
   return (
     <MonthlyReport
-      renderReport={(yearMonth) => (
-        <LaporanOperasionalKantor key={yearMonth} yearMonth={yearMonth} />
+      renderReport={(yearMonth, form) => (
+        <LaporanOperasionalKantor
+          key={yearMonth}
+          yearMonth={yearMonth}
+          id_perusahaan={form.id_perusahaan}
+        />
       )}
     />
   );
 }
 
-const LaporanOperasionalKantor = ({ yearMonth }) => {
-  const operasionalKantor = useOperasionalKantor(yearMonth);
+const LaporanOperasionalKantor = ({ yearMonth, id_perusahaan }) => {
+  const operasionalKantor = useOperasionalKantor(yearMonth, id_perusahaan);
   const sumOperasionalKantor = useSumOperasionalKantor({
     periode: yearMonth,
     aggregate: "sum",
+    id_perusahaan,
   });
 
   const QueryState = renderQueryStates({

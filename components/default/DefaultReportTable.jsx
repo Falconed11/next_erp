@@ -6,6 +6,7 @@ import {
 } from "@/app/utils/date";
 import { useState } from "react";
 import { RangeMonthPicker } from "../input";
+import { SelectPerusahaan } from "../perusahaan/perusahaan";
 const CustomTDLabelValue = ({ label = "Label", value, valueStyle = "" }) => {
   return (
     <>
@@ -55,13 +56,15 @@ export const ReportTableBody = ({ rows, cells, calculationRows, topRows }) => {
 };
 
 export const MonthlyReport = ({ renderReport }) => {
+  const [form, setForm] = useState({});
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   const months = getMonthsInRange(startDate, endDate);
   return (
     <div className="flex flex-col gap-2">
-      <div>
-        <div className="flex">
+      <div className="flex">
+        <div className="flex flex-col gap-2 bg-white p-2 rounded-lg">
+          <SelectPerusahaan form={form} setForm={setForm} />
           <RangeMonthPicker
             currentStartDate={startDate}
             setCurrentStartDate={setStartDate}
@@ -72,18 +75,20 @@ export const MonthlyReport = ({ renderReport }) => {
       </div>
       <div className="flex gap-2">
         {months.map((month) => (
-          <div key={month}>{renderReport(getYearMonth(month))}</div>
+          <div key={month}>{renderReport(getYearMonth(month), form)}</div>
         ))}
       </div>
     </div>
   );
 };
 
-export const ReportTable = ({ yearMonth, children }) => {
-  const [year, month] = yearMonth.split("-");
+export const ReportTable = ({ yearMonth, children, topContent }) => {
+  const [year, month] = yearMonth?.split("-") || [null, null];
   return (
     <div className="bg-white rounded-lg shadow-lg p-2 ">
-      <div className="font-bold">{`${monthNamesIndonesian[+month - 1]} ${year}`}</div>
+      {topContent || (
+        <div className="font-bold">{`${monthNamesIndonesian[+month - 1]} ${year}`}</div>
+      )}
       <table className="table-auto">
         <thead></thead>
         <tbody>{children}</tbody>
