@@ -77,13 +77,13 @@ const ProjectExpensesTable = ({ TopContent, id_proyek }) => {
   const QueryStates = renderQueryStates({ pengeluaranProyek, offeringSummary });
   if (QueryStates) return QueryStates;
   const { data } = pengeluaranProyek.data;
-  const { nilai_proyek } = offeringSummary.data;
+  const { nilai_proyek } = offeringSummary.data.data || {};
   const style = "pl-2";
   return (
     <ReportTable
       topContent={
         <TopContent>
-          <div className="text-right">
+          <div>
             <Harga harga={nilai_proyek} />
           </div>
         </TopContent>

@@ -640,7 +640,6 @@ export default function App({ id_produk }) {
   //     if (item.id_kategoriproduk == form.id_kategori) return item;
   //   });
   // }
-  console.log(form);
   return (
     <div className="">
       <div className="flex flex-col gap-2">

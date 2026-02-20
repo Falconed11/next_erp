@@ -670,6 +670,7 @@ export default function App({
   );
   const selectedProduct = produk.data?.[0];
   const selectedCustomer = customer.data.find((item) => item.id == id_instansi);
+  console.log(form);
   return (
     <div className="flex flex-col gap-2 w-7/8- h-3/4">
       {/* <div>
@@ -1047,10 +1048,10 @@ export default function App({
                   }
                   className="max-w-xs"
                   onSelectionChange={(val) => {
-                    setForm({
-                      ...form,
-                      id_statusproyek: new Set(val).values().next().value,
-                    });
+                    setForm((prev) => ({
+                      ...prev,
+                      id_statusproyek: key2set(val),
+                    }));
                   }}
                 >
                   {statusproyek.data.map((item) => (
@@ -1067,11 +1068,11 @@ export default function App({
                     selectedKeys={form.selectperusahaan}
                     className="max-w-xs"
                     onSelectionChange={(val) => {
-                      setForm({
-                        ...form,
+                      setForm((prev) => ({
+                        ...prev,
                         selectperusahaan: val,
-                        id_perusahaan: new Set(val).values().next().value,
-                      });
+                        id_perusahaan: set2key(val),
+                      }));
                     }}
                   >
                     {perusahaan.data.map((item) => (
@@ -1087,7 +1088,9 @@ export default function App({
                   label="Nama Proyek"
                   placeholder="Masukkan nama proyek!"
                   value={form.nama}
-                  onValueChange={(val) => setForm({ ...form, nama: val })}
+                  onValueChange={(val) =>
+                    setForm((prev) => ({ ...prev, nama: val }))
+                  }
                 />
                 <AutocompleteJenisProyek form={form} setForm={setForm} />
                 <AutocompleteCustomer form={form} setForm={setForm} />
@@ -1105,10 +1108,10 @@ export default function App({
                   }
                   className="max-w-xs"
                   onSelectionChange={(v) => {
-                    setForm({
-                      ...form,
+                    setForm((prev) => ({
+                      ...prev,
                       swasta: set2key(v),
-                    });
+                    }));
                   }}
                 >
                   {LIST_SWASTA_NEGRI.map((item) => (
@@ -1124,7 +1127,9 @@ export default function App({
                   label="Kota"
                   placeholder="Masukkan kota!"
                   value={form.kota || ""}
-                  onValueChange={(v) => setForm({ ...form, kota: v })}
+                  onValueChange={(v) =>
+                    setForm((prev) => ({ ...prev, kota: v }))
+                  }
                 />
                 <Textarea
                   type="text"
@@ -1133,7 +1138,9 @@ export default function App({
                   isDisabled={isCustomerSelected}
                   placeholder="Masukkan alamat!"
                   value={form.alamat}
-                  onValueChange={(v) => setForm({ ...form, alamat: v })}
+                  onValueChange={(v) =>
+                    setForm((prev) => ({ ...prev, alamat: v }))
+                  }
                 />
                 <Input
                   variant="bordered"
@@ -1141,7 +1148,9 @@ export default function App({
                   label="Klien"
                   placeholder="Masukkan klien! Contoh : Bapak Adi"
                   value={form.klien}
-                  onValueChange={(val) => setForm({ ...form, klien: val })}
+                  onValueChange={(val) =>
+                    setForm((prev) => ({ ...prev, klien: val }))
+                  }
                 />
                 {form.id_statusproyek == 1 && (
                   <Input
@@ -1150,7 +1159,9 @@ export default function App({
                     label="No PO"
                     placeholder="Masukkan no. PO!"
                     value={form.id_po}
-                    onValueChange={(val) => setForm({ ...form, id_po: val })}
+                    onValueChange={(val) =>
+                      setForm((prev) => ({ ...prev, id_po: val }))
+                    }
                   />
                 )}
                 <Select
@@ -1161,11 +1172,11 @@ export default function App({
                   selectedKeys={form.selectkaryawan}
                   className="max-w-xs"
                   onSelectionChange={(val) => {
-                    setForm({
-                      ...form,
+                    setForm((prev) => ({
+                      ...prev,
                       selectkaryawan: val,
                       id_karyawan: set2key(val),
-                    });
+                    }));
                   }}
                 >
                   {karyawan.data.map(
@@ -1190,21 +1201,21 @@ export default function App({
                       dateFormat="dd/MM/yyyy"
                       selected={form.startdate}
                       onChange={(v) =>
-                        setForm({
-                          ...form,
+                        setForm((prev) => ({
+                          ...prev,
                           startdate: v,
                           tanggal_penawaran: getDate(v),
-                        })
+                        }))
                       }
                     />
                     <Button
                       onPress={() => {
                         const now = new Date();
-                        setForm({
-                          ...form,
+                        setForm((prev) => ({
+                          ...prev,
                           startdate: now,
                           tanggal_penawaran: getDate(now),
-                        });
+                        }));
                       }}
                       className="ml-2"
                       size="sm"
@@ -1220,7 +1231,9 @@ export default function App({
                   labelPlacement="inside"
                   placeholder="Masukkan keterangan! (Opsional)"
                   value={form.keterangan}
-                  onValueChange={(val) => setForm({ ...form, keterangan: val })}
+                  onValueChange={(val) =>
+                    setForm((prev) => ({ ...prev, keterangan: val }))
+                  }
                 />
               </ModalBody>
               <ModalFooter>
