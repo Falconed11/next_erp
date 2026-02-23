@@ -27,7 +27,7 @@ export const ReportTableBody = ({ rows, cells, calculationRows, topRows }) => {
       {topRows?.map((row, i) => (
         <tr key={i}>
           {row.map(({ style, cell }, i) => (
-            <CustomTd className={style} key={i}>
+            <CustomTd className={`pl-2 ${style}`} key={i}>
               {cell}
             </CustomTd>
           ))}
@@ -45,7 +45,7 @@ export const ReportTableBody = ({ rows, cells, calculationRows, topRows }) => {
       {rows.map((row, i) => (
         <tr key={i} className={i % 2 == 0 ? "bg-gray-200" : ""}>
           {cells.map(({ style, renderCell }, i) => (
-            <CustomTd className={style} key={i}>
+            <CustomTd className={`pl-2 ${style}`} key={i}>
               {renderCell(row)}
             </CustomTd>
           ))}

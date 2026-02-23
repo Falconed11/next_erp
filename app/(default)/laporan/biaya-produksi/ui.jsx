@@ -5,7 +5,11 @@ import {
   useOperasionalKantor,
   useSumOperasionalKantor,
 } from "@/hooks/operasional-kantor.hooks";
-import { useGetProyek } from "@/hooks/proyek.hooks";
+import {
+  useCalculatePembayaranProyekByid,
+  useCalculatePengeluaranProyekByid,
+  useGetProyek,
+} from "@/hooks/proyek.hooks";
 import { capitalizeEachWord, renderQueryStates } from "@/app/utils/tools";
 import {
   MonthlyReport,
@@ -16,6 +20,7 @@ import { getDateFId } from "@/app/utils/date";
 import { useFindPengeluaranProyek } from "@/hooks/pengeluaran-proyek.hooks";
 import { useGetOfferingSummary } from "@/hooks/keranjang-proyek.hooks";
 import { LIST_SWASTA_NEGRI } from "@/app/utils/const";
+import { useGetPembayaranProyek } from "@/hooks/pembayaran-proyek.hooks";
 
 export default function App() {
   return (
@@ -74,22 +79,93 @@ const LaporanBiayaProduksi = ({ yearMonth, id_perusahaan }) => {
 const ProjectExpensesTable = ({ TopContent, id_proyek }) => {
   const pengeluaranProyek = useFindPengeluaranProyek({ id_proyek });
   const offeringSummary = useGetOfferingSummary(id_proyek);
-  const QueryStates = renderQueryStates({ pengeluaranProyek, offeringSummary });
+  const sumPembayaranProyek = useCalculatePembayaranProyekByid({
+    id: id_proyek,
+    aggregate: "sum",
+  });
+  const sumPengeluaranProyek = useCalculatePengeluaranProyekByid({
+    id: id_proyek,
+    aggregate: "sum",
+    lunas: null,
+  });
+  const pembayaranProyek = useGetPembayaranProyek({ proyek: id_proyek });
+  const QueryStates = renderQueryStates({
+    pengeluaranProyek,
+    offeringSummary,
+    sumPembayaranProyek,
+    sumPengeluaranProyek,
+    pembayaranProyek,
+  });
   if (QueryStates) return QueryStates;
   const { data } = pengeluaranProyek.data;
   const { nilai_proyek } = offeringSummary.data.data || {};
-  const style = "pl-2";
+  const { totalpembayaran } = sumPembayaranProyek.data.data || {};
+  const { totalpengeluaran } = sumPengeluaranProyek.data.data || {};
+  const { data: dataPembayaran } = pembayaranProyek.data;
+  const labaRugi = totalpembayaran - totalpengeluaran;
+  const style = "";
   return (
     <ReportTable
       topContent={
-        <TopContent>
-          <div>
-            <Harga harga={nilai_proyek} />
-          </div>
-        </TopContent>
+        <div className="flex gap-2">
+          <TopContent></TopContent>
+          <ReportTable
+            topContent={<div className="font-bold">Pembayaran Proyek</div>}
+          >
+            <ReportTableBody
+              cells={[
+                {
+                  style: "text-nowrap",
+                  renderCell: (data) => getDateFId(data.tanggal),
+                },
+                {
+                  style: "text-nowrap",
+                  renderCell: (data) => data.metodepembayaran,
+                },
+                {
+                  style: "text-nowrap text-right",
+                  renderCell: (data) => <Harga harga={data.nominal} />,
+                },
+              ]}
+              rows={dataPembayaran}
+            />
+          </ReportTable>
+          <ReportTable topContent={<div className="font-bold">Ringkasan</div>}>
+            <ReportTableBody
+              cells={[
+                {
+                  style: "text-nowrap",
+                  renderCell: ({ label }) => label,
+                },
+                {
+                  style: "text-nowrap",
+                  renderCell: ({ val }) => <Harga harga={val} />,
+                },
+              ]}
+              rows={[
+                { label: "Nilai Proyek", val: nilai_proyek },
+                { label: "Total Pembayaran", val: totalpembayaran },
+                { label: "Biaya Produksi", val: totalpengeluaran },
+                { label: "Laba Rugi", val: labaRugi },
+              ]}
+            />
+          </ReportTable>
+        </div>
       }
     >
       <ReportTableBody
+        topRows={[
+          [
+            { style: "font-bold", cell: "Tanggal" },
+            { style: "font-bold", cell: "Nama" },
+            { style: "font-bold", cell: "Tipe" },
+            { style: "font-bold", cell: "Merek" },
+            { style: "font-bold", cell: "Jumlah" },
+            { style: "font-bold", cell: "Satuan" },
+            { style: "font-bold", cell: "Harga Satuan" },
+            { style: "font-bold", cell: "Total Harga" },
+          ],
+        ]}
         cells={[
           {
             style: "text-nowrap",
@@ -117,11 +193,17 @@ const ProjectExpensesTable = ({ TopContent, id_proyek }) => {
           },
           {
             style: `text-right ${style}`,
-            renderCell: (data) => <Harga harga={data.harga} />,
+            renderCell: (data) => (
+              <Harga harga={data.hargaprodukmasuk || data.harga} />
+            ),
           },
           {
             style: `text-right ${style}`,
-            renderCell: (data) => <Harga harga={data.jumlah * data.harga} />,
+            renderCell: (data) => (
+              <Harga
+                harga={data.jumlah * data.hargaprodukmasuk || data.harga}
+              />
+            ),
           },
         ]}
         rows={data}
