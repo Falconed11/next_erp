@@ -55,6 +55,11 @@ import {
   ShowHideComponent2,
 } from "@/components/componentmanipulation";
 import { useClientFetch } from "@/hooks/useClientFetch";
+import {
+  useCalculatePembayaranProyekByid,
+  useCalculatePengeluaranProyekByid,
+} from "@/hooks/proyek.hooks";
+import { useGetOfferingSummary } from "@/hooks/keranjang-proyek.hooks";
 
 const api_path = getApiPath();
 
@@ -101,7 +106,7 @@ export default function App({ id }) {
     },
     { omset: 0, totalPenagihan: 0 },
   );
-  const { omset, totalPenagihan } = sums;
+  const { totalPenagihan } = sums;
   const keranjangPeralatan = useClientFetch(
     `keranjangproyek?id_proyek=${id}&instalasi=0&versi=${selectedVersion}`,
   );
@@ -111,6 +116,15 @@ export default function App({ id }) {
   const rekapitulasiProyek = useClientFetch(
     `rekapitulasiproyek?id_proyek=${id}&versi=${selectedVersion}`,
   );
+  const dataBiayaProduksi = useCalculatePengeluaranProyekByid({
+    id,
+    aggregate: "sum",
+  });
+  const pembayaranProyek = useCalculatePembayaranProyekByid({
+    id,
+    aggregate: "sum",
+  });
+  const proyekSummary = useGetOfferingSummary(id);
 
   const editButtonPress = (data) => {
     const startdate = new Date(data.tanggalpengeluaran);
@@ -130,8 +144,8 @@ export default function App({ id }) {
     modal.pengeluaranproyek.onOpen();
   };
   const deleteButtonPress = async (data) => {
-    if (confirm("Hapus produk?")) {
-      if (data.id_produkkeluar == "") {
+    if (confirm(`Hapus pengeluaran proyek: ${data.nama}?`)) {
+      if (data.id_produkkeluar == null) {
         const res = await fetch(`${api_path}pengeluaranproyek`, {
           method: "DELETE",
           headers: {
@@ -254,6 +268,7 @@ export default function App({ id }) {
     const json = await res.json();
     if (res.status == 400) return alert(json.message);
     pengeluaranproyek.mutate();
+    dataBiayaProduksi.mutate();
     onClose();
     // console.log(json.message);
   };
@@ -283,6 +298,7 @@ export default function App({ id }) {
       const json = await res.json();
       // return alert(json.message);
       pembayaranproyek.mutate();
+      pembayaranProyek.mutate();
     }
   };
   const tambahButtonPressPembayaran = async (form) => {
@@ -305,6 +321,7 @@ export default function App({ id }) {
       nominal: 0,
     });
     pembayaranproyek.mutate();
+    pembayaranProyek.mutate();
   };
   const simpanButtonPressPembayaran = async (data, onClose) => {
     const res = await fetch(`${api_path}pembayaranproyek`, {
@@ -324,6 +341,7 @@ export default function App({ id }) {
       startdate,
     });
     pembayaranproyek.mutate();
+    pembayaranProyek.mutate();
     onClose();
     // return alert(json.message);
   };
@@ -573,8 +591,11 @@ export default function App({ id }) {
   };
   const queryStates = renderQueryStates(
     {
+      dataBiayaProduksi,
       proyek,
+      proyekSummary,
       pengeluaranproyek,
+      pembayaranProyek,
       pembayaranproyek,
       karyawan,
       kategori,
@@ -586,18 +607,16 @@ export default function App({ id }) {
   );
   if (queryStates) return queryStates;
   if (!selectedProyek) return <>Proyek tidak ditemukan</>;
+  console.log(proyekSummary);
+  const { totalpengeluaran: biayaProduksi } = dataBiayaProduksi.data.data || {};
+  const { totalpembayaran: omset } = pembayaranProyek.data.data || {};
+  const { nilai_proyek } = proyekSummary.data.data || {};
   const { rekapitulasiPeralatan, rekapitulasiInstalasi, rekapitulasiTotal } =
     countRecapitulation(
       keranjangPeralatan.data,
       keranjangInstalasi.data,
       rekapitulasiProyek.data[0] ?? {},
     );
-  const biayaProduksi = pengeluaranproyek.data.reduce((total, v) => {
-    return (
-      total +
-      v.jumlah * (v.hargapengeluaran ? v.hargapengeluaran : v.hargamodal)
-    );
-  }, 0);
   const provit = omset - biayaProduksi;
   const variant = "bordered";
   return (
@@ -632,12 +651,12 @@ export default function App({ id }) {
               comp: <Harga harga={biayaProduksi} />,
             },
             {
-              key: "Omset",
+              key: "Total Pembayaran",
               comp: <Harga harga={omset} />,
             },
             {
               key: "Nilai Proyek",
-              comp: <Harga harga={rekapitulasiTotal.hargaPajak} />,
+              comp: <Harga harga={nilai_proyek} />,
             },
             ...(isHighRole
               ? [
@@ -704,6 +723,7 @@ export default function App({ id }) {
                     />
                     <div>
                       <Button
+                        isDisabled={omset >= +nilai_proyek}
                         onPress={() => {
                           tambahButtonPressPembayaran(formPembayaran);
                         }}

@@ -1,5 +1,6 @@
 import DatePicker from "react-datepicker";
 import {
+  Button,
   Input,
   NumberInput,
   Select,
@@ -54,6 +55,16 @@ export default function PembayaranProyek({
         formatOptions={{
           useGrouping: false,
         }}
+        endContent={
+          <Button
+            isDisabled={!piutang}
+            color="primary"
+            size="sm"
+            onPress={() => setForm((prev) => ({ ...prev, nominal: piutang }))}
+          >
+            Terapkan
+          </Button>
+        }
         label={
           <>
             Nominal (Piutang : <Harga harga={piutang} /> )

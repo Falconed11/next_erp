@@ -154,9 +154,11 @@ const ProjectExpensesTable = ({ TopContent, id_proyek }) => {
       }
     >
       <ReportTableBody
+        rows={data}
         topRows={[
           [
             { style: "font-bold", cell: "Tanggal" },
+            { style: "font-bold", cell: "Karyawan" },
             { style: "font-bold", cell: "Nama" },
             { style: "font-bold", cell: "Tipe" },
             { style: "font-bold", cell: "Merek" },
@@ -164,12 +166,17 @@ const ProjectExpensesTable = ({ TopContent, id_proyek }) => {
             { style: "font-bold", cell: "Satuan" },
             { style: "font-bold", cell: "Harga Satuan" },
             { style: "font-bold", cell: "Total Harga" },
+            { style: "font-bold", cell: "Lunas" },
           ],
         ]}
         cells={[
           {
             style: "text-nowrap",
             renderCell: (data) => getDateFId(data.tanggal),
+          },
+          {
+            style: "text-nowrap",
+            renderCell: (data) => data.karyawan,
           },
           {
             style: `text-nowrap ${style}`,
@@ -205,8 +212,11 @@ const ProjectExpensesTable = ({ TopContent, id_proyek }) => {
               />
             ),
           },
+          {
+            style: `${style}`,
+            renderCell: (data) => data.lunas,
+          },
         ]}
-        rows={data}
       />
     </ReportTable>
   );
