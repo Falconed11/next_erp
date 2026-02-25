@@ -607,7 +607,6 @@ export default function App({ id }) {
   );
   if (queryStates) return queryStates;
   if (!selectedProyek) return <>Proyek tidak ditemukan</>;
-  console.log(proyekSummary);
   const { totalpengeluaran: biayaProduksi } = dataBiayaProduksi.data.data || {};
   const { totalpembayaran: omset } = pembayaranProyek.data.data || {};
   const { nilai_proyek } = proyekSummary.data.data || {};
@@ -723,7 +722,7 @@ export default function App({ id }) {
                     />
                     <div>
                       <Button
-                        isDisabled={omset >= +nilai_proyek}
+                        // isDisabled={omset >= +nilai_proyek}
                         onPress={() => {
                           tambahButtonPressPembayaran(formPembayaran);
                         }}
