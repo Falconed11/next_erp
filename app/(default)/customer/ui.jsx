@@ -1,5 +1,5 @@
 "use client";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import * as XLSX from "xlsx";
 import { getApiPath } from "@/app/utils/apiconfig";
@@ -195,7 +195,7 @@ export default function App() {
     );
   };
 
-  const renderCell = React.useCallback(
+  const renderCell = useCallback(
     (data, columnKey) => {
       console.log(sessionuser);
       const cellValue = data[columnKey];

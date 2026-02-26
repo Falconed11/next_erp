@@ -16,6 +16,7 @@ import Link from "next/link";
 import { Input, Textarea } from "@heroui/react";
 import { getDate, excelToJSDate, getDateF } from "@/app/utils/date";
 import { getApiPath } from "@/app/utils/apiconfig";
+import { SelectPerusahaan } from "./perusahaan/perusahaan";
 
 const apiPath = getApiPath();
 
@@ -172,14 +173,9 @@ export const RangeDate = ({
   );
 };
 
-export const RangeMonthPicker = ({
-  currentStartDate = new Date(),
-  currentEndDate = new Date(),
-  setCurrentStartDate,
-  setCurrentEndDate,
-}) => {
-  const [startDate, setStartDate] = useState(new Date(currentStartDate));
-  const [endDate, setEndDate] = useState(new Date(currentEndDate));
+export const RangeMonthPicker = ({ form, setForm }) => {
+  const [startDate, setStartDate] = useState(new Date(form.startDate));
+  const [endDate, setEndDate] = useState(new Date(form.endDate));
   const sDatePicker = "px-1 rounded-lg shadow-md border-gray-200 border";
   return (
     <div className="flex flex-col gap-2 bg-white p-2 rounded-lg border border-gray-200">
@@ -190,7 +186,7 @@ export const RangeMonthPicker = ({
         onChange={setStartDate}
         onSelect={(val) => {
           setStartDate(val);
-          setCurrentStartDate(val);
+          setForm((prev) => ({ ...prev, startDate: val }));
         }}
         selectsStart
         startDate={startDate}
@@ -204,7 +200,7 @@ export const RangeMonthPicker = ({
         onChange={setEndDate}
         onSelect={(val) => {
           setEndDate(val);
-          setCurrentEndDate(val);
+          setForm((prev) => ({ ...prev, endDate: val }));
         }}
         selectsEnd
         startDate={startDate}
@@ -216,17 +212,28 @@ export const RangeMonthPicker = ({
         <Button
           color="primary"
           isDisabled={
-            startDate.getTime() === currentStartDate?.getTime() &&
-            endDate.getTime() === currentEndDate?.getTime()
+            startDate.getTime() === form.startDate?.getTime() &&
+            endDate.getTime() === form.endDate?.getTime()
           }
-          onPress={() => {
-            setCurrentStartDate(startDate);
-            setCurrentEndDate(endDate);
-          }}
+          onPress={() =>
+            setForm((prev) => ({
+              ...prev,
+              startDate: startDate,
+              endDate: endDate,
+            }))
+          }
         >
           Cari
         </Button>
       </div>
+    </div>
+  );
+};
+export const CompanyPeriodeReportPicker = ({ form, setForm }) => {
+  return (
+    <div className="flex flex-col gap-2 bg-white p-2 rounded-lg">
+      <SelectPerusahaan form={form} setForm={setForm} />
+      <RangeMonthPicker form={form} setForm={setForm} />
     </div>
   );
 };

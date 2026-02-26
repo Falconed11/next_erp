@@ -101,7 +101,7 @@ export const excelToJSDate = (excelDate) => {
   return excelDate ? new Date((excelDate - 25569) * 86400 * 1000) : new Date();
 };
 
-export function getMonthsInRange(start, end) {
+export const getMonthsInRange = (start, end) => {
   const months = [];
 
   const current = new Date(start);
@@ -118,4 +118,10 @@ export function getMonthsInRange(start, end) {
   }
 
   return months;
-}
+};
+
+export const getFirstDayOfMonth = (date = new Date()) =>
+  new Date(date.getFullYear(), date.getMonth(), 1);
+
+export const getFirstDayOfNextMonth = (date = new Date()) =>
+  new Date(date.getFullYear(), date.getMonth() + 1, 1);

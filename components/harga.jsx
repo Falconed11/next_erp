@@ -15,5 +15,12 @@ const Harga = ({ className, harga, label, endContent }) => {
   //   0
   // );
 };
+export const NumberComp = ({ value }) => {
+  return (
+    <div className="text-right">
+      <Harga harga={value} />
+    </div>
+  );
+};
 
 export default Harga;

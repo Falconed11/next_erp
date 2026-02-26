@@ -5,7 +5,7 @@ import {
   monthNamesIndonesian,
 } from "@/app/utils/date";
 import { useState } from "react";
-import { RangeMonthPicker } from "../input";
+import { CompanyPeriodeReportPicker, RangeMonthPicker } from "../input";
 import { SelectPerusahaan } from "../perusahaan/perusahaan";
 const CustomTDLabelValue = ({ label = "Label", value, valueStyle = "" }) => {
   return (
@@ -56,22 +56,15 @@ export const ReportTableBody = ({ rows, cells, calculationRows, topRows }) => {
 };
 
 export const MonthlyReport = ({ renderReport }) => {
-  const [form, setForm] = useState({});
-  const [startDate, setStartDate] = useState(new Date());
-  const [endDate, setEndDate] = useState(new Date());
-  const months = getMonthsInRange(startDate, endDate);
+  const [form, setForm] = useState({
+    startDate: new Date(),
+    endDate: new Date(),
+  });
+  const months = getMonthsInRange(form.startDate, form.endDate);
   return (
     <div className="flex flex-col gap-2">
       <div className="flex">
-        <div className="flex flex-col gap-2 bg-white p-2 rounded-lg">
-          <SelectPerusahaan form={form} setForm={setForm} />
-          <RangeMonthPicker
-            currentStartDate={startDate}
-            setCurrentStartDate={setStartDate}
-            currentEndDate={endDate}
-            setCurrentEndDate={setEndDate}
-          />
-        </div>
+        <CompanyPeriodeReportPicker form={form} setForm={setForm} />
       </div>
       <div className="flex gap-2">
         {months.map((month) => (

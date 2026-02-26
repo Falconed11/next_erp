@@ -4,6 +4,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import {
   useCalculatePembayaranProyekByid,
   useCalculatePengeluaranProyekByid,
+  useGetMonthlyReportByPeriode,
   useGetProyek,
 } from "@/hooks/proyek.hooks";
 import { capitalizeEachWord, renderQueryStates } from "@/app/utils/tools";
@@ -12,34 +13,48 @@ import {
   ReportTable,
   ReportTableBody,
 } from "@/components/default/DefaultReportTable";
-import { getDateFId } from "@/app/utils/date";
+import {
+  getCurFirstLastDay,
+  getDateFId,
+  getFirstDayOfMonth,
+  getFirstDayOfNextMonth,
+} from "@/app/utils/date";
 import { useFindPengeluaranProyek } from "@/hooks/pengeluaran-proyek.hooks";
 import { useGetOfferingSummary } from "@/hooks/keranjang-proyek.hooks";
 import { LIST_SWASTA_NEGRI } from "@/app/utils/const";
 import { useGetPembayaranProyek } from "@/hooks/pembayaran-proyek.hooks";
+import { CompanyPeriodeReportPicker } from "@/components/input";
+import { useState } from "react";
+import { TableProyek } from "@/components/proyek/proyek";
 
 export default function App() {
+  const [form, setForm] = useState({
+    startDate: new Date(),
+    endDate: new Date(),
+  });
+  const from = getFirstDayOfMonth(form.startDate);
+  const to = getFirstDayOfNextMonth(form.endDate);
   return (
-    <MonthlyReport
-      renderReport={(yearMonth, form) => (
-        <LaporanBiayaProduksi
-          key={yearMonth}
-          yearMonth={yearMonth}
-          id_perusahaan={form.id_perusahaan}
-        />
-      )}
-    />
+    <div className="flex flex-col gap-2">
+      <div className="flex">
+        <CompanyPeriodeReportPicker form={form} setForm={setForm} />
+      </div>
+      <TableProyek from={from} to={to} />
+    </div>
   );
 }
 
 const LaporanBiayaProduksi = ({ yearMonth, id_perusahaan }) => {
   const proyekByPeriode = useGetProyek(yearMonth, id_perusahaan);
+  const monthlyReports = useGetMonthlyReportByPeriode(yearMonth);
 
   const QueryState = renderQueryStates({
     proyekByPeriode,
+    monthlyReports,
   });
   if (QueryState) return QueryState;
   const { data: dataProyekByperiode } = proyekByPeriode.data;
+  const { data: dataMonthlyReports } = monthlyReports.data;
 
   const sHeader = "font-bold";
   return (
