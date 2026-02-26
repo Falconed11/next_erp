@@ -130,15 +130,19 @@ export const TableProyek = ({ from, to }) => {
         aria-label="Example table with custom cells"
         sortDescriptor={sortDescriptor}
         onSortChange={setSortDescriptor}
-        topContent={[
-          { label: "Omset", val: totalPembayaran },
-          { label: "Biaya Produksi", val: totalPengeluaran },
-          { label: "Provit", val: profit },
-        ].map(({ label, val }) => (
-          <div key={label}>
-            {label} : <NumberComp value={val} />
+        topContent={
+          <div>
+            {[
+              { label: "Omset", val: totalPembayaran },
+              { label: "Biaya Produksi", val: totalPengeluaran },
+              { label: "Provit", val: profit },
+            ].map(({ label, val }) => (
+              <div key={label}>
+                {label} : <NumberComp value={val} />
+              </div>
+            ))}
           </div>
-        ))}
+        }
       >
         <TableHeader columns={columns}>
           {(column) => (
