@@ -1,4 +1,4 @@
-import { EditIcon, DeleteIcon } from "@/components/icon";
+import { getDateFId } from "@/app/utils/date";
 import {
   Pagination,
   Table,
@@ -15,7 +15,6 @@ import {
   highRoleCheck,
   renderQueryStates,
 } from "@/app/utils/tools";
-import { getDateFId, getTime } from "@/app/utils/date";
 import { useSession } from "next-auth/react";
 import { NumberComp } from "../harga";
 import { LIST_SWASTA_NEGRI } from "@/app/utils/const";
@@ -25,7 +24,6 @@ import {
 } from "@/hooks/proyek.hooks";
 import { tableClassName, tableClassNames } from "@/app/utils/style";
 import { useMemo, useState } from "react";
-import { label } from "framer-motion/client";
 
 export const renderTableCellProyek = ({ data, columnKey }) => {
   const cellValue = data[columnKey];
@@ -65,11 +63,25 @@ export const renderTableCellProyek = ({ data, columnKey }) => {
       return cellValue;
   }
 };
-export const TableProyek = ({ from, to }) => {
+export const TableProyek = ({
+  from,
+  to,
+  jenisproyek,
+  jenisinstansi,
+  golonganinstansi,
+  perusahaan,
+}) => {
   const session = useSession();
   const sessUser = session?.data?.user;
 
-  const proyekReports = useGetMonthlyReportByPeriode({ from, to });
+  const proyekReports = useGetMonthlyReportByPeriode({
+    from,
+    to,
+    jenisproyek,
+    jenisinstansi,
+    golonganinstansi,
+    perusahaan,
+  });
 
   const [sortDescriptor, setSortDescriptor] = useState({
     column: "id_second",
@@ -102,7 +114,7 @@ export const TableProyek = ({ from, to }) => {
         return {
           totalPembayaran: totalPembayaran + val.totalpembayaran,
           totalPengeluaran: totalPengeluaran + val.totalpengeluaran,
-          provit: profit + val.profit,
+          profit: profit + val.profit,
         };
       },
       {
@@ -119,6 +131,7 @@ export const TableProyek = ({ from, to }) => {
   const QueryState = renderQueryStates({ proyekReports }, session);
   if (QueryState) return QueryState;
   const { data: items } = proyekReports.data;
+  // console.log(items);
 
   const id_karyawan = sessUser.id_karyawan;
   return (
@@ -131,16 +144,32 @@ export const TableProyek = ({ from, to }) => {
         sortDescriptor={sortDescriptor}
         onSortChange={setSortDescriptor}
         topContent={
-          <div>
-            {[
-              { label: "Omset", val: totalPembayaran },
-              { label: "Biaya Produksi", val: totalPengeluaran },
-              { label: "Provit", val: profit },
-            ].map(({ label, val }) => (
-              <div key={label}>
-                {label} : <NumberComp value={val} />
+          <div className="flex gap-2">
+            <div className="table">
+              <div className="table-row-group">
+                {[
+                  ["Omset", ":", <NumberComp value={totalPembayaran} />],
+                  [
+                    "Biaya Produksi",
+                    ":",
+                    <NumberComp value={totalPengeluaran} />,
+                  ],
+                  ["Profit", ":", <NumberComp value={profit} />],
+                ].map((cells, i) => (
+                  <div key={i} className="table-row">
+                    {cells.map((cell, i) => (
+                      <div
+                        key={i}
+                        className={`table-cell ${i != 0 ? "pl-2" : ""}`}
+                      >
+                        <div>{cell}</div>
+                      </div>
+                    ))}
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
+            <div>aaa</div>
           </div>
         }
       >

@@ -197,6 +197,10 @@ export default function RootLayout({
             name: "Proyek Bulanan",
           },
           {
+            key: "perubahan-modal",
+            name: "Perubahan Modal",
+          },
+          {
             key: "omset",
             name: "Omset",
           },

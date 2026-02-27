@@ -31,11 +31,22 @@ export const useGetProyek = (periode, id_perusahaan) =>
       { key: "idPerusahaan", val: id_perusahaan },
     ]),
   );
-export const useGetMonthlyReportByPeriode = ({ from, to }) =>
+export const useGetMonthlyReportByPeriode = ({
+  from,
+  to,
+  jenisproyek,
+  jenisinstansi,
+  golonganinstansi,
+  perusahaan,
+}) =>
   useClientFetchNoInterval(
     urlBuilder(`${PROYEK_ENDPOINT}/reports/monthly`, [
       { key: "from", val: from },
       { key: "to", val: to },
+      { key: "jenisproyek", val: jenisproyek },
+      { key: "jenisinstansi", val: jenisinstansi },
+      { key: "golonganinstansi", val: golonganinstansi },
+      { key: "perusahaan", val: perusahaan },
     ]),
   );
 export const useCalculatePengeluaranProyekByid = ({ id, aggregate, lunas }) =>
