@@ -55,10 +55,11 @@ export const ReportTableBody = ({ rows, cells, calculationRows, topRows }) => {
   );
 };
 
-export const MonthlyReport = ({ renderReport }) => {
+export const MonthlyReport = ({ renderReport, id_perusahaan }) => {
   const [form, setForm] = useState({
     startDate: new Date(),
     endDate: new Date(),
+    ...(id_perusahaan ? { id_perusahaan } : {}),
   });
   const months = getMonthsInRange(form.startDate, form.endDate);
   return (

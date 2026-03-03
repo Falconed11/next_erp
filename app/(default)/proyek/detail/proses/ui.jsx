@@ -244,7 +244,7 @@ export default function App({ id }) {
           id: data.id_produkkeluar,
           metodepengeluaran: "proyek",
           id_produk: data.id,
-          keterangan: data.keteranganpenawaran,
+          keterangan: data.keteranganpengeluaranproyek,
           id_proyek: id,
           // id_produk: form.selectProduk,
           // id_karyawan: selectKaryawan ?? 0,
