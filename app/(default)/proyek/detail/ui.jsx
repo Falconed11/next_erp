@@ -1,5 +1,11 @@
 "use client";
-import React, { useState, useRef, useEffect, useMemo } from "react";
+import React, {
+  useState,
+  useRef,
+  useEffect,
+  useMemo,
+  useCallback,
+} from "react";
 import { useSession } from "next-auth/react";
 import {
   Table,
@@ -105,6 +111,7 @@ export default function App({ id, versi }) {
   });
 
   const [selectVersi, setSelectVersi] = useState(new Set(versi ? [versi] : []));
+  const selectedVersion = useMemo(() => set2key(selectVersi), [selectVersi]);
   const [selectInstalasi, setSelectInstalasi] = useState(new Set([]));
   const [selected, setSelected] = React.useState(["audio", "multimedia"]);
   const proyek = useClientFetch(`proyek?id=${id}`);
@@ -112,19 +119,13 @@ export default function App({ id, versi }) {
   const [isLoading, setIsLoading] = useState(0);
 
   const keranjangProyek = useClientFetch(
-    `keranjangproyek?id_proyek=${id}&instalasi=0&versi=${
-      selectVersi.values().next().value
-    }`,
+    `keranjangproyek?id_proyek=${id}&instalasi=0&versi=${selectedVersion}`,
   );
   const keranjangProyekInstalasi = useClientFetch(
-    `keranjangproyek?id_proyek=${id}&instalasi=1&versi=${
-      selectVersi.values().next().value
-    }`,
+    `keranjangproyek?id_proyek=${id}&instalasi=1&versi=${selectedVersion}`,
   );
   const rekapitulasiProyek = useClientFetch(
-    `rekapitulasiproyek?id_proyek=${id}&versi=${
-      selectVersi.values().next().value
-    }`,
+    `rekapitulasiproyek?id_proyek=${id}&versi=${selectedVersion}`,
   );
   const keteranganPenawaran = useClientFetch(
     `keteranganpenawaran?idProyek=${id}`,
@@ -134,16 +135,6 @@ export default function App({ id, versi }) {
   );
   const statusProyek = useClientFetch(`statusproyek?ids=1&ids=3`);
   const subProyek = useClientFetch(`subproyek?id_proyek=${id}`);
-  const queries = {
-    proyek,
-    keranjangProyek,
-    keranjangProyekInstalasi,
-    rekapitulasiProyek,
-    keteranganPenawaran,
-    versiKeranjangProyek,
-    statusProyek,
-    subProyek,
-  };
   const [form, setForm] = useState({});
   const [formInstalasi, setFormInstalasi] = useState({});
   const PERSEN_PROVIT = 30;
@@ -224,7 +215,7 @@ export default function App({ id, versi }) {
       },
       body: JSON.stringify({
         id_proyek: id,
-        versi: selectVersi.values().next().value,
+        versi: selectedVersion,
         // harga: data.hargajual,
       }),
     });
@@ -237,7 +228,7 @@ export default function App({ id, versi }) {
       },
       body: JSON.stringify({
         id_proyek: id,
-        versi: selectVersi.values().next().value,
+        versi: selectedVersion,
         // harga: data.hargajual,
       }),
     });
@@ -386,7 +377,7 @@ export default function App({ id, versi }) {
   const isAuthorized =
     isRoleAuthorized && selectedProgress >= 10 && selectedProgress < 100;
   const renderCell = {
-    keranjangproyek: React.useCallback(
+    keranjangproyek: useCallback(
       (data, columnKey) => {
         const cellValue = data[columnKey];
         const isChecked = (v) => {
@@ -641,17 +632,38 @@ export default function App({ id, versi }) {
     }
     resultInstalasi.push(item);
   });
-  const queryStates = renderQueryStates(queries, session);
+  const rekapitulasi = useMemo(() => {
+    if (rekapitulasiProyek.data?.[0]) {
+      return rekapitulasiProyek.data[0];
+    }
+    return {
+      id_proyek: id,
+      versi,
+      diskon: 0,
+      diskoninstalasi: 0,
+      pajak: 0,
+    };
+  }, [rekapitulasiProyek.data, id, versi]);
+  const selectedRekapitulasiProyek = useMemo(
+    () => rekapitulasiProyek.data?.[0],
+    rekapitulasiProyek.data,
+  );
+  const queryStates = renderQueryStates(
+    {
+      proyek,
+      keranjangProyek,
+      keranjangProyekInstalasi,
+      rekapitulasiProyek,
+      keteranganPenawaran,
+      versiKeranjangProyek,
+      statusProyek,
+      subProyek,
+    },
+    session,
+  );
   if (queryStates) return queryStates;
-  const keranjangProduk = keranjangProyek.data;
-  const keranjangInstalasi = keranjangProyekInstalasi.data;
-  const rekapitulasi = rekapitulasiProyek.data[0] || {
-    id_proyek: id,
-    versi,
-    diskon: 0,
-    diskoninstalasi: 0,
-    pajak: 0,
-  };
+  const keranjangProduk = [...keranjangProyek.data];
+  const keranjangInstalasi = [...keranjangProyekInstalasi.data];
   if (!selectedProyek) return <>Proyek tidak ditemukan</>;
   const col = {
     keranjangproyek: [
@@ -901,14 +913,7 @@ export default function App({ id, versi }) {
       },
     ],
   };
-  const selectedRekapitulasiProyek = rekapitulasiProyek.data[0];
-  const kategoriProyek = [];
-  if (selectedRekapitulasiProyek) {
-    if (selectedRekapitulasiProyek.audio) kategoriProyek.push("audio");
-    if (selectedRekapitulasiProyek.cctv) kategoriProyek.push("cctv");
-    if (selectedRekapitulasiProyek.multimedia)
-      kategoriProyek.push("multimedia");
-  }
+
   const rekapPajak = selectedRekapitulasiProyek?.pajak || 0;
   const keteranganPajak = rekapPajak ? "sudah" : "tidak";
   const subTotalHargaJual = keranjangProyek.data.reduce(
@@ -923,7 +928,6 @@ export default function App({ id, versi }) {
     },
     0,
   );
-  const selectedVersion = selectVersi.values().next().value;
   const formatTable = {
     wrapper: "py-0 px-1",
     td: "text-xs py-0 align-top", // Reduce font size and vertical padding
@@ -1222,7 +1226,7 @@ export default function App({ id, versi }) {
               <div>
                 <SuratJalan
                   id_proyek={id}
-                  versi={selectVersi.values().next().value}
+                  versi={selectedVersion}
                   isAuthorized={isRoleAuthorized}
                 />
               </div>

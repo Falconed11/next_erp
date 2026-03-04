@@ -33,6 +33,7 @@ export const useAutocompleteField = ({
   getCustomLabel,
   getCustomValue,
   getFormUpdateOnSelectionChange,
+  key,
 }) => {
   const query = useClientFetch(endpoint);
   const queryStates = renderQueryStates({ [endpoint]: query });
@@ -55,6 +56,7 @@ export const useAutocompleteField = ({
       getCustomLabel={getCustomLabel}
       getCustomValue={getCustomValue}
       getFormUpdateOnSelectionChange={getFormUpdateOnSelectionChange}
+      key={key}
     />
   );
   return { component };
@@ -127,7 +129,6 @@ export const AutocompleteWithCustomValue = ({
     });
   };
   const isInvalid = form[field] && form[id] == null;
-  // console.log({ items });
   return (
     <Autocomplete
       popoverProps={{ shouldCloseOnScroll: false }}
@@ -281,6 +282,7 @@ export const AutocompleteProduk = ({
       merek: item?.nmerek,
     }),
     disableCustomValue,
+    key: id_kategori,
     ...props,
   });
   return component;

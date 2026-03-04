@@ -126,6 +126,11 @@ export default function App({ id }) {
   });
   const proyekSummary = useGetOfferingSummary(id);
 
+  const updateDataPengeluaran = () => {
+    pengeluaranproyek.mutate();
+    dataBiayaProduksi.mutate();
+  };
+
   const editButtonPress = (data) => {
     const startdate = new Date(data.tanggalpengeluaran);
     setForm({
@@ -215,18 +220,14 @@ export default function App({ id }) {
     }
     const json = await res.json();
     if (res.status == 400) return alert(json.message);
-    setForm({
-      ...form,
-      vendor: "",
-      stok: 0,
-      satuan: "",
-      jumlah: 0,
-      selectKategori: new Set([]),
-      selectProduk: new Set([]),
-    });
-    pengeluaranproyek.mutate();
+    setForm((prev) => ({
+      id_karyawan: prev.id_karyawan,
+      startdate: prev.startdate,
+    }));
+    updateDataPengeluaran();
     // return alert(json.message);
   };
+  console.log(form);
   const simpanButtonPress = async (data, onClose) => {
     // return console.log({ form, id });
     let res;
@@ -244,7 +245,6 @@ export default function App({ id }) {
           id: data.id_produkkeluar,
           metodepengeluaran: "proyek",
           id_produk: data.id,
-          keterangan: data.keteranganpengeluaranproyek,
           id_proyek: id,
           // id_produk: form.selectProduk,
           // id_karyawan: selectKaryawan ?? 0,
@@ -267,8 +267,8 @@ export default function App({ id }) {
       });
     const json = await res.json();
     if (res.status == 400) return alert(json.message);
-    pengeluaranproyek.mutate();
-    dataBiayaProduksi.mutate();
+    updateDataPengeluaran();
+    setForm({});
     onClose();
     // console.log(json.message);
   };

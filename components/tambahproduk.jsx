@@ -130,7 +130,7 @@ export default function TambahProduk({
       </Autocomplete> */}
       <AutocompleteProduk
         disableCustomValue={disableCustomValue}
-        id_kategori={form.id_kategori}
+        id_kategori={idKategori}
         form={form}
         setForm={setForm}
         className="w-8/12"
