@@ -29,8 +29,8 @@ import {
   useDisclosure,
 } from "@heroui/react";
 import { useReactToPrint } from "react-to-print";
-import { getApiPath, useClientFetch } from "../../../utils/apiconfig";
-import myDate, { getDateFId } from "@/app/utils/date";
+import { useClientFetch } from "@/hooks/useClientFetch";
+import { getDateFId } from "@/app/utils/date";
 import { penawaran } from "@/app/utils/formatid";
 import Harga from "../../../../components/harga";
 import { Button } from "@heroui/react";
@@ -492,13 +492,13 @@ export default function App({ id }) {
                       <div className="">
                         <div className="flex flex-row">
                           <div className="basis-3/4 top-neg-1">
-                            {`${myDate.getDateFId(
+                            {`${getDateFId(
                               new Date(selectedNota.tanggal),
                               "dd-month",
                             )} `}
                           </div>
                           <div className="basis-1/4">
-                            {`${myDate.getDateFId(
+                            {`${getDateFId(
                               new Date(selectedNota.tanggal),
                               "yy",
                             )}`}

@@ -17,6 +17,7 @@ import { Input, Textarea } from "@heroui/react";
 import { getDate, excelToJSDate, getDateF } from "@/app/utils/date";
 import { getApiPath } from "@/app/utils/apiconfig";
 import { SelectPerusahaan } from "./perusahaan/perusahaan";
+import { useSession } from "next-auth/react";
 
 const apiPath = getApiPath();
 
@@ -430,95 +431,3 @@ export function TemplateImportV2({
     </div>
   );
 }
-
-export const TambahPeralatan = ({ tambahWidth, rank }) => {
-  const [form, setForm] = useState({});
-  return (
-    <>
-      <div className={`flex gap-2 ${tambahWidth}`}>
-        <TambahProduk
-          form={form}
-          setForm={setForm}
-          disableStok
-          disableVendor
-          rank={rank}
-          customInput={
-            <>
-              <NumberInput
-                hideStepper
-                isWheelDisabled
-                formatOptions={{
-                  useGrouping: false,
-                }}
-                className={`${defStyleFormWidth} ${hideComponent}`}
-                value={form.harga - form.hargamodal || ""}
-                label={"Provit"}
-                placeholder="Masukkan provit!"
-                onValueChange={(v) => {
-                  setForm({
-                    ...form,
-                    harga: form.hargamodal + v || "",
-                  });
-                }}
-              />
-              <NumberInput
-                hideStepper
-                isWheelDisabled
-                formatOptions={{
-                  useGrouping: false,
-                }}
-                className={`${defStyleFormWidth} ${hideComponent}`}
-                value={
-                  Math.round(
-                    countPercentProvit(form.hargamodal, form.harga) * 100,
-                  ) / 100 || ""
-                }
-                label={"Provit (%)"}
-                placeholder="Masukkan provit %!"
-                onValueChange={(v) => {
-                  setForm({
-                    ...form,
-                    harga:
-                      Math.round(
-                        countPriceByPercentProfit(form.hargamodal, v),
-                      ) || "",
-                  });
-                }}
-              />
-              <Input
-                type="text"
-                value={form.namakustom}
-                label="Nama Kustom"
-                placeholder="Masukkan nama kustom! (Opsional)"
-                // placeholder="Masukkan jumlah!"
-                className={`${defStyleFormWidth}`}
-                onValueChange={(v) =>
-                  setForm({
-                    ...form,
-                    namakustom: v,
-                  })
-                }
-              />
-              <SelectSubProyek
-                classNames={defStyleFormWidth}
-                data={dataSubProyek}
-                form={form}
-                setForm={setForm}
-              />
-            </>
-          }
-        />
-      </div>
-      <div>
-        <Button
-          onPress={() => {
-            tambahButtonPress(form, setForm);
-          }}
-          color="primary"
-        >
-          Tambah
-        </Button>
-      </div>
-    </>
-  );
-};

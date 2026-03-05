@@ -41,7 +41,7 @@ import {
   PrinterIcon,
   NoteIcon,
 } from "@/components/icon";
-import { useClientFetch, getApiPath } from "@/app/utils/apiconfig";
+import { useClientFetch } from "@/hooks/useClientFetch";
 import date, {
   getDateF,
   getDate,

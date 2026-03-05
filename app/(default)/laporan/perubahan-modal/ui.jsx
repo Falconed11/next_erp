@@ -38,6 +38,9 @@ const LaporanPerubahanModal = ({ yearMonth, id_perusahaan }) => {
         <div>Awal</div>
         <div>Penambahan</div>
         <div>
+          Modal Awal: <Harga harga={dataMontlyReport.awallabarugi} />
+        </div>
+        <div>
           Laba/Rugi: <Harga harga={dataMontlyReport.labarugi} />
         </div>
         <div>Total</div>

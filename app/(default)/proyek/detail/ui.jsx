@@ -1,4 +1,5 @@
 "use client";
+import { useSession } from "next-auth/react";
 import React, {
   useState,
   useRef,
@@ -6,7 +7,6 @@ import React, {
   useMemo,
   useCallback,
 } from "react";
-import { useSession } from "next-auth/react";
 import {
   Table,
   TableHeader,
@@ -95,6 +95,10 @@ import { NEXT_DOMAIN } from "@/app/utils/const";
 import { TemplateImportV2 } from "@/components/input";
 import { BadgeStatusProyek } from "@/components/badgestatusproyek";
 import { useClientFetch } from "@/hooks/useClientFetch";
+import {
+  SelectSubProyek,
+  TambahProdukPenawaran,
+} from "@/components/penawaran/penawaran";
 
 const api_path = getApiPath();
 
@@ -110,10 +114,11 @@ export default function App({ id, versi }) {
     pageStyle: "p-10 block",
   });
 
-  const [selectVersi, setSelectVersi] = useState(new Set(versi ? [versi] : []));
-  const selectedVersion = useMemo(() => set2key(selectVersi), [selectVersi]);
+  // const [selectVersi, setSelectVersi] = useState(new Set(versi ? [versi] : []));
+  // const selectedVersion = set2key(selectVersi);
+  const selectedVersion = versi;
+
   const [selectInstalasi, setSelectInstalasi] = useState(new Set([]));
-  const [selected, setSelected] = React.useState(["audio", "multimedia"]);
   const proyek = useClientFetch(`proyek?id=${id}`);
   const [json, setJson] = useState();
   const [isLoading, setIsLoading] = useState(0);
@@ -136,7 +141,6 @@ export default function App({ id, versi }) {
   const statusProyek = useClientFetch(`statusproyek?ids=1&ids=3`);
   const subProyek = useClientFetch(`subproyek?id_proyek=${id}`);
   const [form, setForm] = useState({});
-  const [formInstalasi, setFormInstalasi] = useState({});
   const PERSEN_PROVIT = 30;
   const [inputPersenProvit, setInputPersenProvit] = useState(PERSEN_PROVIT);
 
@@ -144,36 +148,7 @@ export default function App({ id, versi }) {
     keranjangProyek.mutate();
     keranjangProyekInstalasi.mutate();
   };
-  const tambahButtonPress = async (form, setForm) => {
-    const jumlah = form.jumlah;
-    if (!form.selectProduk && !form.produk)
-      return alert("Silahkan pilih produk");
-    if (!jumlah) return alert("Jumlah belum diisi");
-    const res = await fetch(`${api_path}keranjangproyek`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify({
-        ...form,
-        id_proyek: id,
-        versi,
-        tanggal: null,
-        stok: 0, //
-      }),
-    });
-    const json = await res.json();
-    if (res.status == 400) return alert(json.message);
-    const newForm = { namakustom: "" };
-    if (form.instalasi) setFormInstalasi(newForm);
-    else setForm(newForm);
-    mutateKeranjang();
-    // console.log(json.message);
-    // return alert(json.message);
-  };
   const editButtonPress = (data) => {
-    console.log({ data });
     setForm({
       ...data,
       namakustom: data.keterangan,
@@ -285,10 +260,6 @@ export default function App({ id, versi }) {
     // alert(json);
     // console.log(json);
     return alert(json.message);
-  };
-  const handleButtonEditJenisProyek = () => {
-    setSelected(kategoriProyek);
-    modal.jenisproyek.onOpen();
   };
   const handleButtonSimpanJenisProyek = async (data, onClose) => {
     const method = rekapitulasiProyek.data.length == 0 ? "POST" : "PUT";
@@ -592,62 +563,89 @@ export default function App({ id, versi }) {
     invoice: useDisclosure(),
     jenisproyek: useDisclosure(),
   };
-  const dataPenawaran = useMemo(() => {
-    if (!keranjangProyek?.data) return [];
-    return [...keranjangProyek.data]
-      .sort((a, b) => a.subproyek?.localeCompare(b?.subproyek))
-      .map((produk, i) => ({
-        ...produk,
-        no: i + 1,
-      }));
-  }, [keranjangProyek?.data]);
 
   // Step 2: Insert rows before each group
-  const result = [];
-  let currentGroup = null;
-  dataPenawaran?.forEach((item) => {
-    if (item.subproyek !== currentGroup) {
-      currentGroup = item.subproyek;
-      result.push({ no: uuidv4(), nama: item.subproyek });
-    }
-    result.push(item);
-  });
-  const dataInstalasi = useMemo(() => {
-    if (!keranjangProyekInstalasi?.data) return [];
-    return [...keranjangProyekInstalasi.data]
-      .sort((a, b) => a.subproyek?.localeCompare(b?.subproyek))
-      .map((produk, i) => ({
-        ...produk,
-        no: i + 1,
-      }));
-  }, [keranjangProyekInstalasi?.data]);
+  const groupBySubproyek = (data = []) => {
+    const result = [];
+    let currentGroup = null;
 
-  const resultInstalasi = [];
-  let currentGroupInstalasi = null;
+    data.forEach((item) => {
+      if (item.subproyek !== currentGroup) {
+        currentGroup = item.subproyek;
 
-  dataInstalasi?.forEach((item) => {
-    if (item.subproyek !== currentGroupInstalasi) {
-      currentGroupInstalasi = item.subproyek;
-      resultInstalasi.push({ no: uuidv4(), nama: item.subproyek });
-    }
-    resultInstalasi.push(item);
-  });
-  const rekapitulasi = useMemo(() => {
-    if (rekapitulasiProyek.data?.[0]) {
-      return rekapitulasiProyek.data[0];
-    }
-    return {
-      id_proyek: id,
-      versi,
-      diskon: 0,
-      diskoninstalasi: 0,
-      pajak: 0,
-    };
-  }, [rekapitulasiProyek.data, id, versi]);
-  const selectedRekapitulasiProyek = useMemo(
-    () => rekapitulasiProyek.data?.[0],
-    rekapitulasiProyek.data,
+        result.push({
+          type: "group",
+          id: uuidv4(),
+          nama: item.subproyek,
+        });
+      }
+
+      result.push(item);
+    });
+
+    return result;
+  };
+  const dataPenawaran = useMemo(
+    () =>
+      [...(keranjangProyek?.data || [])]
+        .slice()
+        .sort((a, b) => (a.subproyek || "").localeCompare(b.subproyek || ""))
+        .map((produk, i) => ({
+          ...produk,
+          no: i + 1,
+        })),
+    [keranjangProyek?.data],
   );
+  const dataInstalasi = useMemo(
+    () =>
+      [...(keranjangProyekInstalasi?.data || [])]
+        .slice()
+        .sort((a, b) => (a.subproyek || "").localeCompare(b.subproyek || ""))
+        .map((produk, i) => ({
+          ...produk,
+          no: i + 1,
+        })),
+    [keranjangProyekInstalasi?.data],
+  );
+  const result = useMemo(
+    () => groupBySubproyek(dataPenawaran),
+    [dataPenawaran],
+  );
+  const resultInstalasi = useMemo(
+    () => groupBySubproyek(dataInstalasi),
+    [dataInstalasi],
+  );
+
+  const rekapitulasi = rekapitulasiProyek.data?.[0] || {
+    id_proyek: id,
+    versi,
+    diskon: 0,
+    diskoninstalasi: 0,
+    pajak: 0,
+  };
+  const selectedRekapitulasiProyek = rekapitulasiProyek.data?.[0];
+  const keranjangProduk = keranjangProyek?.data || [];
+  const keranjangInstalasi = keranjangProyekInstalasi?.data || [];
+  const subTotalHargaJual = useMemo(
+    () =>
+      keranjangProduk?.reduce((total, currentValue) => {
+        return total + currentValue.jumlah * currentValue.harga;
+      }, 0),
+    [keranjangProduk],
+  );
+  const subTotalHargaInstalasi = useMemo(
+    () =>
+      keranjangInstalasi?.reduce((total, currentValue) => {
+        return total + currentValue.jumlah * currentValue.harga;
+      }, 0),
+    [keranjangInstalasi],
+  );
+  const { rekapitulasiPeralatan, rekapitulasiInstalasi, rekapitulasiTotal } =
+    useMemo(
+      () =>
+        countRecapitulation(keranjangProduk, keranjangInstalasi, rekapitulasi),
+      [keranjangProduk, keranjangInstalasi, rekapitulasi],
+    );
   const queryStates = renderQueryStates(
     {
       proyek,
@@ -662,8 +660,6 @@ export default function App({ id, versi }) {
     session,
   );
   if (queryStates) return queryStates;
-  const keranjangProduk = [...keranjangProyek.data];
-  const keranjangInstalasi = [...keranjangProyekInstalasi.data];
   if (!selectedProyek) return <>Proyek tidak ditemukan</>;
   const col = {
     keranjangproyek: [
@@ -916,24 +912,10 @@ export default function App({ id, versi }) {
 
   const rekapPajak = selectedRekapitulasiProyek?.pajak || 0;
   const keteranganPajak = rekapPajak ? "sudah" : "tidak";
-  const subTotalHargaJual = keranjangProyek.data.reduce(
-    (total, currentValue) => {
-      return total + currentValue.jumlah * currentValue.harga;
-    },
-    0,
-  );
-  const subTotalHargaInstalasi = keranjangProyekInstalasi.data.reduce(
-    (total, currentValue) => {
-      return total + currentValue.jumlah * currentValue.harga;
-    },
-    0,
-  );
   const formatTable = {
     wrapper: "py-0 px-1",
     td: "text-xs py-0 align-top", // Reduce font size and vertical padding
   };
-  const { rekapitulasiPeralatan, rekapitulasiInstalasi, rekapitulasiTotal } =
-    countRecapitulation(keranjangProduk, keranjangInstalasi, rekapitulasi);
   const dataTabelPeralatan = (isPenawaran) =>
     createRecapTable(
       rekapitulasiPeralatan,
@@ -966,9 +948,7 @@ export default function App({ id, versi }) {
   );
   const dataSubProyek = subProyek.data;
   const hideComponent = isHighRole ? "" : "hidden";
-  const defStyleFormWidth = "w-2/12";
   const fullPath = `${NEXT_DOMAIN}/proyek/detail?id=${id}&versi=${versi}`;
-  const tambahWidth = "w-9/12-";
   console.log(form);
   return (
     <div className="flex gap-2 flex-col item-start">
@@ -1135,574 +1115,331 @@ export default function App({ id, versi }) {
           />
         </div>
       </div>
-      <ConditionalComponent
-        condition={selectVersi.size}
-        component={
-          <>
-            {/* tombol fungsional */}
-            <div className="flex flex-row gap-2">
-              {/* <div>
-                <Button
-                  onClick={handleButtonVersi}
-                  color="primary"
-                  className="mt-3"
-                >
-                  Buat Versi Baru
-                </Button>
-              </div> */}
-              {["admin", "super"].includes(sessUser?.peran) ? (
-                selectedProyek?.statusproyek.toLowerCase() != "deal" ? (
-                  <div>
-                    <Button
-                      onPress={handleButtonSetAsDealClick}
-                      color="primary"
-                      className=""
-                    >
-                      Set as Deal
-                    </Button>
-                  </div>
-                ) : (
-                  <div>
-                    <Button
-                      onPress={handleButtonCancelDealRejectClick}
-                      color="primary"
-                      className=""
-                    >
-                      Cancel Deal
-                    </Button>
-                  </div>
-                )
-              ) : (
-                <></>
-              )}
-              {["admin", "super"].includes(sessUser?.peran) ? (
-                selectedProyek?.statusproyek.toLowerCase() != "reject" ? (
-                  <div>
-                    <Button
-                      onPress={handleButtonSetAsRejectClick}
-                      color="primary"
-                      className=""
-                    >
-                      Set as Reject
-                    </Button>
-                  </div>
-                ) : (
-                  <div>
-                    <Button
-                      onPress={handleButtonCancelDealRejectClick}
-                      color="primary"
-                      className=""
-                    >
-                      Cancel Reject
-                    </Button>
-                  </div>
-                )
-              ) : (
-                <></>
-              )}
-              <div>
-                <Button
-                  onPress={modal.penawaran.onOpen}
-                  color="primary"
-                  className=""
-                >
-                  Penawaran
-                </Button>
-              </div>
-              {/* Invoice */}
-              <div>
-                <Invoice
-                  proyek={selectedProyek}
-                  className={formatTable}
-                  peralatan={keranjangProduk}
-                  instalasi={keranjangInstalasi}
-                  rekapTotal={rekapitulasiTotal}
-                  compRekapPeralatan={compRekapPeralatan}
-                  compRekapInstalasi={compRekapInstalasi}
-                  compRekapTotal={compRekapTotal}
-                />
-              </div>
-              {/* Surat Jalan */}
-              <div>
-                <SuratJalan
-                  id_proyek={id}
-                  versi={selectedVersion}
-                  isAuthorized={isRoleAuthorized}
-                />
-              </div>
-              {/* Kwitansi */}
-              <div>
-                <Kwitansi
-                  proyek={selectedProyek}
-                  nilaiProyek={rekapitulasiTotal.hargaPajak}
-                />
-              </div>
-              <NavLinkNewTab
-                href={`/proyek/detail/proses?id=${selectedProyek?.id}`}
+      {/* tombol fungsional */}
+      <div className="flex flex-row gap-2">
+        {/* <div>
+          <Button onClick={handleButtonVersi} color="primary" className="mt-3">
+            Buat Versi Baru
+          </Button>
+        </div> */}
+        {["admin", "super"].includes(sessUser?.peran) ? (
+          selectedProyek?.statusproyek.toLowerCase() != "deal" ? (
+            <div>
+              <Button
+                onPress={handleButtonSetAsDealClick}
+                color="primary"
+                className=""
               >
-                {"Pengeluaran & Pembayaran ==>>"}
-              </NavLinkNewTab>
+                Set as Deal
+              </Button>
             </div>
-            {id && versi && isAuthorized && (
-              <div>
-                <TemplateImportV2
-                  json={json}
-                  setJson={setJson}
-                  name={"Import Produk"}
-                  apiendpoint={"importproduk"}
-                  isLoading={isLoading}
-                  isDisabled={
-                    selectInstalasi.size && json?.length ? undefined : true
-                  }
-                  setIsLoading={setIsLoading}
-                  formatLink={"/produk.xlsx"}
-                  editRow={(row) => ({
-                    ...row,
-                    id_proyek: id,
-                    instalasi: set2key(selectInstalasi),
-                    versi,
-                  })}
-                >
-                  <div className="w-1/12">
-                    <Select
-                      label="Peralatan / Instalasi"
-                      placeholder="Pilih opsi"
-                      selectedKeys={selectInstalasi}
-                      onSelectionChange={setSelectInstalasi}
-                    >
-                      {[
-                        { key: 0, label: "Peralatan" },
-                        { key: 1, label: "Instalasi" },
-                      ].map((data) => (
-                        <SelectItem key={data.key}>{data.label}</SelectItem>
-                      ))}
-                    </Select>
-                  </div>
-                </TemplateImportV2>
-              </div>
-            )}
-            <div className="w-9/12-">
-              {/* sub proyek */}
-              <SubProyek
-                id={id}
-                selectedProyek={selectedProyek}
-                isAuthorized={isAuthorized}
-              />
-              {/* tabel peralatan */}
-              <Table
-                key={selectedProgress}
-                isStriped
-                isCompact
-                className="pt-3"
-                topContent={
-                  <>
-                    <div>Peralatan</div>
-                    <ConditionalComponent
-                      condition={isAuthorized}
-                      component={
-                        <>
-                          <div className={`flex gap-2 ${tambahWidth}`}>
-                            <TambahProduk
-                              form={form}
-                              setForm={setForm}
-                              disableStok
-                              disableVendor
-                              rank={sessUser.rank}
-                              customInput={
-                                <>
-                                  <NumberInput
-                                    hideStepper
-                                    isWheelDisabled
-                                    formatOptions={{
-                                      useGrouping: false,
-                                    }}
-                                    className={`${defStyleFormWidth} ${hideComponent}`}
-                                    value={form.harga - form.hargamodal || ""}
-                                    label={"Provit"}
-                                    placeholder="Masukkan provit!"
-                                    onValueChange={(v) => {
-                                      setForm({
-                                        ...form,
-                                        harga: form.hargamodal + v || "",
-                                      });
-                                    }}
-                                  />
-                                  <NumberInput
-                                    hideStepper
-                                    isWheelDisabled
-                                    formatOptions={{
-                                      useGrouping: false,
-                                    }}
-                                    className={`${defStyleFormWidth} ${hideComponent}`}
-                                    value={
-                                      Math.round(
-                                        countPercentProvit(
-                                          form.hargamodal,
-                                          form.harga,
-                                        ) * 100,
-                                      ) / 100 || ""
-                                    }
-                                    label={"Provit (%)"}
-                                    placeholder="Masukkan provit %!"
-                                    onValueChange={(v) => {
-                                      setForm({
-                                        ...form,
-                                        harga:
-                                          Math.round(
-                                            countPriceByPercentProfit(
-                                              form.hargamodal,
-                                              v,
-                                            ),
-                                          ) || "",
-                                      });
-                                    }}
-                                  />
-                                  <Input
-                                    type="text"
-                                    value={form.namakustom}
-                                    label="Nama Kustom"
-                                    placeholder="Masukkan nama kustom! (Opsional)"
-                                    // placeholder="Masukkan jumlah!"
-                                    className={`${defStyleFormWidth}`}
-                                    onValueChange={(v) =>
-                                      setForm({
-                                        ...form,
-                                        namakustom: v,
-                                      })
-                                    }
-                                  />
-                                  <SelectSubProyek
-                                    classNames={defStyleFormWidth}
-                                    data={dataSubProyek}
-                                    form={form}
-                                    setForm={setForm}
-                                  />
-                                </>
-                              }
-                            />
-                          </div>
-                          <div>
-                            <Button
-                              onPress={() => {
-                                tambahButtonPress(form, setForm);
-                              }}
-                              color="primary"
-                            >
-                              Tambah
-                            </Button>
-                          </div>
-                        </>
-                      }
-                    />
-                  </>
-                }
-                bottomContent={
-                  <>
-                    <div className="text-right">
-                      <div>
-                        <Harga
-                          label="Sub Total Harga Jual :"
-                          harga={subTotalHargaJual}
-                        />
-                      </div>
-                      {isHighRole && (
-                        <>
-                          <div>
-                            <Harga
-                              harga={keranjangProyek.data.reduce(
-                                (total, currentValue) => {
-                                  return (
-                                    total +
-                                    currentValue.jumlah *
-                                      currentValue.temphargamodal
-                                  );
-                                },
-                                0,
-                              )}
-                              label="Sub Total Harga Modal :"
-                            />
-                          </div>
-                          <div>
-                            <Harga
-                              label={"Sub Total Provit :"}
-                              harga={keranjangProyek.data.reduce(
-                                (total, currentValue) => {
-                                  return (
-                                    total +
-                                    currentValue.jumlah *
-                                      (currentValue.harga -
-                                        currentValue.temphargamodal)
-                                  );
-                                },
-                                0,
-                              )}
-                            />
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  </>
-                }
-                aria-label="Example table with custom cells"
+          ) : (
+            <div>
+              <Button
+                onPress={handleButtonCancelDealRejectClick}
+                color="primary"
+                className=""
               >
-                <TableHeader columns={col.keranjangproyek}>
-                  {(column) => (
-                    <TableColumn
-                      key={column.key}
-                      align={column.key === "aksi" ? "center" : "start"}
-                    >
-                      {column.label}
-                    </TableColumn>
-                  )}
-                </TableHeader>
-                <TableBody items={keranjangProduk} emptyContent={"Kosong"}>
-                  {(item) => (
-                    <TableRow key={item.id_keranjangproyek}>
-                      {(columnKey) => (
-                        <TableCell>
-                          {renderCell.keranjangproyek(item, columnKey)}
-                        </TableCell>
-                      )}
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-              {/* tabel instalasi */}
-              <Table
-                key={`${selectedProgress}-instalasi`}
-                isStriped
-                isCompact
-                topContent={
-                  <>
-                    <div>Instalasi</div>
-                    <ConditionalComponent
-                      condition={isAuthorized}
-                      component={
-                        <>
-                          <div className={`flex gap-2 ${tambahWidth}`}>
-                            <TambahProduk
-                              form={formInstalasi}
-                              setForm={setFormInstalasi}
-                              disableStok
-                              disableVendor
-                              rank={sessUser.rank}
-                              customInput={
-                                <>
-                                  <NumberInput
-                                    hideStepper
-                                    isWheelDisabled
-                                    formatOptions={{
-                                      useGrouping: false,
-                                    }}
-                                    className={`${defStyleFormWidth} ${hideComponent}`}
-                                    value={
-                                      formInstalasi.harga -
-                                        formInstalasi.hargamodal || ""
-                                    }
-                                    label={"Provit"}
-                                    placeholder="Masukkan provit!"
-                                    onValueChange={(v) => {
-                                      setFormInstalasi({
-                                        ...formInstalasi,
-                                        harga:
-                                          formInstalasi.hargamodal + v || "",
-                                      });
-                                    }}
-                                  />
-                                  <NumberInput
-                                    hideStepper
-                                    isWheelDisabled
-                                    formatOptions={{
-                                      useGrouping: false,
-                                    }}
-                                    className={`${defStyleFormWidth} ${hideComponent}`}
-                                    value={
-                                      Math.round(
-                                        countPercentProvit(
-                                          formInstalasi.hargamodal,
-                                          formInstalasi.harga,
-                                        ) * 100,
-                                      ) / 100 || ""
-                                    }
-                                    label={"Provit (%)"}
-                                    placeholder="Masukkan provit %!"
-                                    onValueChange={(v) => {
-                                      setFormInstalasi({
-                                        ...formInstalasi,
-                                        harga:
-                                          Math.round(
-                                            countPriceByPercentProfit(
-                                              formInstalasi.hargamodal,
-                                              v,
-                                            ),
-                                          ) || "",
-                                      });
-                                    }}
-                                  />
-                                  <Input
-                                    type="text"
-                                    value={formInstalasi.namakustom}
-                                    label="Nama Kustom"
-                                    placeholder="Masukkan nama kustom! (Opsional)"
-                                    // placeholder="Masukkan jumlah!"
-                                    className={`${defStyleFormWidth}`}
-                                    onValueChange={(v) =>
-                                      setFormInstalasi({
-                                        ...formInstalasi,
-                                        namakustom: v,
-                                      })
-                                    }
-                                  />
-                                  <SelectSubProyek
-                                    classNames={defStyleFormWidth}
-                                    data={dataSubProyek}
-                                    form={formInstalasi}
-                                    setForm={setFormInstalasi}
-                                  />
-                                </>
-                              }
-                            />
-                          </div>
-                          <div>
-                            <Button
-                              onPress={() => {
-                                tambahButtonPress(
-                                  {
-                                    ...formInstalasi,
-                                    instalasi: 1,
-                                  },
-                                  setFormInstalasi,
-                                );
-                              }}
-                              color="primary"
-                            >
-                              Tambah
-                            </Button>
-                          </div>
-                        </>
-                      }
-                    />
-                  </>
-                }
-                bottomContent={
-                  <>
-                    <div className="text-right">
-                      <div>
-                        <Harga
-                          label="Sub Total Harga Instalasi :"
-                          harga={subTotalHargaInstalasi}
-                        />
-                      </div>
-                      {isHighRole && (
-                        <>
-                          <div>
-                            <Harga
-                              harga={keranjangProyekInstalasi.data.reduce(
-                                (total, currentValue) => {
-                                  return (
-                                    total +
-                                    currentValue.jumlah *
-                                      currentValue.temphargamodal
-                                  );
-                                },
-                                0,
-                              )}
-                              label="Sub Total Harga Modal :"
-                            />
-                          </div>
-                          <div>
-                            <Harga
-                              label={"Sub Total Provit :"}
-                              harga={keranjangProyekInstalasi.data.reduce(
-                                (total, currentValue) => {
-                                  return (
-                                    total +
-                                    currentValue.jumlah *
-                                      (currentValue.harga -
-                                        currentValue.temphargamodal)
-                                  );
-                                },
-                                0,
-                              )}
-                            />
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  </>
-                }
-                className="pt-3"
-                aria-label="Example table with custom cells"
-              >
-                <TableHeader columns={col.instalasi}>
-                  {(column) => (
-                    <TableColumn
-                      key={column.key}
-                      align={column.key === "aksi" ? "center" : "start"}
-                    >
-                      {column.label}
-                    </TableColumn>
-                  )}
-                </TableHeader>
-                <TableBody items={keranjangInstalasi} emptyContent={"Kosong"}>
-                  {(item) => (
-                    <TableRow key={item.id_keranjangproyek}>
-                      {(columnKey) => (
-                        <TableCell>
-                          {renderCell.keranjangproyek(item, columnKey)}
-                        </TableCell>
-                      )}
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
+                Cancel Deal
+              </Button>
             </div>
-          </>
-        }
-      />
-      {/* edit jenis proyek */}
-      <Modal
-        scrollBehavior="inside"
-        isOpen={modal.jenisproyek.isOpen}
-        onOpenChange={modal.jenisproyek.onOpenChange}
-      >
-        <ModalContent>
-          {(onClose) => (
+          )
+        ) : (
+          <></>
+        )}
+        {["admin", "super"].includes(sessUser?.peran) ? (
+          selectedProyek?.statusproyek.toLowerCase() != "reject" ? (
+            <div>
+              <Button
+                onPress={handleButtonSetAsRejectClick}
+                color="primary"
+                className=""
+              >
+                Set as Reject
+              </Button>
+            </div>
+          ) : (
+            <div>
+              <Button
+                onPress={handleButtonCancelDealRejectClick}
+                color="primary"
+                className=""
+              >
+                Cancel Reject
+              </Button>
+            </div>
+          )
+        ) : (
+          <></>
+        )}
+        <div>
+          <Button onPress={modal.penawaran.onOpen} color="primary" className="">
+            Penawaran
+          </Button>
+        </div>
+        {/* Invoice */}
+        <div>
+          <Invoice
+            proyek={selectedProyek}
+            className={formatTable}
+            peralatan={keranjangProduk}
+            instalasi={keranjangInstalasi}
+            rekapTotal={rekapitulasiTotal}
+            compRekapPeralatan={compRekapPeralatan}
+            compRekapInstalasi={compRekapInstalasi}
+            compRekapTotal={compRekapTotal}
+          />
+        </div>
+        {/* Surat Jalan */}
+        <div>
+          <SuratJalan
+            id_proyek={id}
+            versi={selectedVersion}
+            isAuthorized={isRoleAuthorized}
+          />
+        </div>
+        {/* Kwitansi */}
+        <div>
+          <Kwitansi
+            proyek={selectedProyek}
+            nilaiProyek={rekapitulasiTotal.hargaPajak}
+          />
+        </div>
+        <NavLinkNewTab href={`/proyek/detail/proses?id=${selectedProyek?.id}`}>
+          {"Pengeluaran & Pembayaran ==>>"}
+        </NavLinkNewTab>
+      </div>
+      {id && versi && isAuthorized && (
+        <div>
+          <TemplateImportV2
+            json={json}
+            setJson={setJson}
+            name={"Import Produk"}
+            apiendpoint={"importproduk"}
+            isLoading={isLoading}
+            isDisabled={selectInstalasi.size && json?.length ? undefined : true}
+            setIsLoading={setIsLoading}
+            formatLink={"/produk.xlsx"}
+            editRow={(row) => ({
+              ...row,
+              id_proyek: id,
+              instalasi: set2key(selectInstalasi),
+              versi,
+            })}
+          >
+            <div className="w-1/12">
+              <Select
+                label="Peralatan / Instalasi"
+                placeholder="Pilih opsi"
+                selectedKeys={selectInstalasi}
+                onSelectionChange={setSelectInstalasi}
+              >
+                {[
+                  { key: 0, label: "Peralatan" },
+                  { key: 1, label: "Instalasi" },
+                ].map((data) => (
+                  <SelectItem key={data.key}>{data.label}</SelectItem>
+                ))}
+              </Select>
+            </div>
+          </TemplateImportV2>
+        </div>
+      )}
+      <div className="w-9/12-">
+        {/* sub proyek */}
+        <SubProyek
+          id={id}
+          selectedProyek={selectedProyek}
+          isAuthorized={isAuthorized}
+        />
+        {/* tabel peralatan */}
+        <Table
+          key={selectedProgress}
+          isStriped
+          isCompact
+          className="pt-3"
+          topContent={
             <>
-              <ModalHeader className="flex flex-col gap-1">
-                Edit Jenis Proyek
-              </ModalHeader>
-              <ModalBody>
-                <div className="flex flex-col gap-3">
-                  <CheckboxGroup
-                    label="Pilih jenis proyek"
-                    color="warning"
-                    value={selected}
-                    onValueChange={setSelected}
-                  >
-                    <Checkbox value="audio">Audio</Checkbox>
-                    <Checkbox value="cctv">CCTV</Checkbox>
-                    <Checkbox value="multimedia">Multimedia</Checkbox>
-                  </CheckboxGroup>
-                </div>
-              </ModalBody>
-              <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
-                  Batal
-                </Button>
-                <Button
-                  color="primary"
-                  onPress={() =>
-                    handleButtonSimpanJenisProyek(selected, onClose)
-                  }
-                >
-                  Simpan
-                </Button>
-              </ModalFooter>
+              <div>Peralatan</div>
+              <ConditionalComponent
+                condition={isAuthorized}
+                component={
+                  <TambahProdukPenawaran
+                    isHighRole={isHighRole}
+                    idProyek={id}
+                    instalasi={0}
+                    mutateKeranjang={mutateKeranjang}
+                    versi={versi}
+                  />
+                }
+              />
             </>
-          )}
-        </ModalContent>
-      </Modal>
+          }
+          bottomContent={
+            <>
+              <div className="text-right">
+                <div>
+                  <Harga
+                    label="Sub Total Harga Jual :"
+                    harga={subTotalHargaJual}
+                  />
+                </div>
+                {isHighRole && (
+                  <>
+                    <div>
+                      <Harga
+                        harga={keranjangProyek.data.reduce(
+                          (total, currentValue) => {
+                            return (
+                              total +
+                              currentValue.jumlah * currentValue.temphargamodal
+                            );
+                          },
+                          0,
+                        )}
+                        label="Sub Total Harga Modal :"
+                      />
+                    </div>
+                    <div>
+                      <Harga
+                        label={"Sub Total Provit :"}
+                        harga={keranjangProyek.data.reduce(
+                          (total, currentValue) => {
+                            return (
+                              total +
+                              currentValue.jumlah *
+                                (currentValue.harga -
+                                  currentValue.temphargamodal)
+                            );
+                          },
+                          0,
+                        )}
+                      />
+                    </div>
+                  </>
+                )}
+              </div>
+            </>
+          }
+          aria-label="Example table with custom cells"
+        >
+          <TableHeader columns={col.keranjangproyek}>
+            {(column) => (
+              <TableColumn
+                key={column.key}
+                align={column.key === "aksi" ? "center" : "start"}
+              >
+                {column.label}
+              </TableColumn>
+            )}
+          </TableHeader>
+          <TableBody items={keranjangProduk} emptyContent={"Kosong"}>
+            {(item) => (
+              <TableRow key={item.id_keranjangproyek}>
+                {(columnKey) => (
+                  <TableCell>
+                    {renderCell.keranjangproyek(item, columnKey)}
+                  </TableCell>
+                )}
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+        {/* tabel instalasi */}
+        <Table
+          key={`${selectedProgress}-instalasi`}
+          isStriped
+          isCompact
+          topContent={
+            <>
+              <div>Instalasi</div>
+              <ConditionalComponent
+                condition={isAuthorized}
+                component={
+                  <TambahProdukPenawaran
+                    isHighRole={isHighRole}
+                    idProyek={id}
+                    instalasi={1}
+                    mutateKeranjang={mutateKeranjang}
+                    versi={versi}
+                  />
+                }
+              />
+            </>
+          }
+          bottomContent={
+            <>
+              <div className="text-right">
+                <div>
+                  <Harga
+                    label="Sub Total Harga Instalasi :"
+                    harga={subTotalHargaInstalasi}
+                  />
+                </div>
+                {isHighRole && (
+                  <>
+                    <div>
+                      <Harga
+                        harga={keranjangProyekInstalasi.data.reduce(
+                          (total, currentValue) => {
+                            return (
+                              total +
+                              currentValue.jumlah * currentValue.temphargamodal
+                            );
+                          },
+                          0,
+                        )}
+                        label="Sub Total Harga Modal :"
+                      />
+                    </div>
+                    <div>
+                      <Harga
+                        label={"Sub Total Provit :"}
+                        harga={keranjangProyekInstalasi.data.reduce(
+                          (total, currentValue) => {
+                            return (
+                              total +
+                              currentValue.jumlah *
+                                (currentValue.harga -
+                                  currentValue.temphargamodal)
+                            );
+                          },
+                          0,
+                        )}
+                      />
+                    </div>
+                  </>
+                )}
+              </div>
+            </>
+          }
+          className="pt-3"
+          aria-label="Example table with custom cells"
+        >
+          <TableHeader columns={col.instalasi}>
+            {(column) => (
+              <TableColumn
+                key={column.key}
+                align={column.key === "aksi" ? "center" : "start"}
+              >
+                {column.label}
+              </TableColumn>
+            )}
+          </TableHeader>
+          <TableBody items={keranjangInstalasi} emptyContent={"Kosong"}>
+            {(item) => (
+              <TableRow key={item.id_keranjangproyek}>
+                {(columnKey) => (
+                  <TableCell>
+                    {renderCell.keranjangproyek(item, columnKey)}
+                  </TableCell>
+                )}
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+
       {/* edit produk */}
       <Modal
         scrollBehavior="inside"
@@ -2147,26 +1884,3 @@ const TableBottom = ({ title = "", tableData }) => (
     </div>
   </div>
 );
-
-const SelectSubProyek = ({ classNames = "", data = [], form, setForm }) => {
-  return (
-    <Select
-      className={classNames}
-      label="Sub Proyek"
-      placeholder="Pilih subproyek! (Opsional)"
-      selectedKeys={key2set(form.id_subproyek)}
-      onSelectionChange={(v) => {
-        setForm({
-          ...form,
-          id_subproyek: set2key(v),
-        });
-      }}
-    >
-      {data.map((item) => (
-        <SelectItem key={item.id} value={item.id}>
-          {item.nama}
-        </SelectItem>
-      ))}
-    </Select>
-  );
-};

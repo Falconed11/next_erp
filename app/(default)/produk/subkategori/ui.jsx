@@ -30,7 +30,7 @@ import {
 } from "@heroui/react";
 import { Select, SelectItem } from "@heroui/react";
 import "react-datepicker/dist/react-datepicker.css";
-import { getApiPath, useClientFetch } from "../../../utils/apiconfig";
+import { useClientFetch } from "@/hooks/useClientFetch";
 import { Button } from "@heroui/react";
 import { Input } from "@heroui/react";
 

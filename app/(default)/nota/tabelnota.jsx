@@ -35,7 +35,7 @@ import {
   EyeIcon,
   UserIcon,
 } from "../../../components/icon";
-import { useClientFetch, getApiPath } from "@/app/utils/apiconfig";
+import { useClientFetch } from "@/hooks/useClientFetch";
 import { getDateF, getDate, getCurFirstLastDay } from "@/app/utils/date";
 import { RangeDate } from "@/components/input";
 import { LinkOpenNewTab } from "@/components/mycomponent";

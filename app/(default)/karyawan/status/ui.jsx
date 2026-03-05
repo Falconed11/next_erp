@@ -29,7 +29,7 @@ import {
   ModalFooter,
   useDisclosure,
 } from "@heroui/react";
-import { getApiPath, useClientFetch } from "@/app/utils/apiconfig";
+import { useClientFetch } from "@/hooks/useClientFetch";
 import { FileUploader } from "@/components/input";
 import { Button } from "@heroui/react";
 import { Input } from "@heroui/react";

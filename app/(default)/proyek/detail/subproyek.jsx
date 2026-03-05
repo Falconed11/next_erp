@@ -43,9 +43,8 @@ export default function SubProyek({ id, selectedProyek, isAuthorized }) {
     });
     const json = await res.json();
     if (res.status == 400) return alert(json.message);
-    setForm({ ...form, namaSubProyek: "" });
-    // console.log(json.message);
-    // return alert(json.message);
+    subProyek.mutate();
+    setForm({ namaSubProyek: "" });
   };
   const editButtonPress = (data, onOpen) => {
     setForm(data);
@@ -62,9 +61,8 @@ export default function SubProyek({ id, selectedProyek, isAuthorized }) {
     });
     const json = await res.json();
     if (res.status == 400) return alert(json.message);
+    subProyek.mutate();
     onClose();
-    // console.log(json.message);
-    //return alert(json.message);
   };
   const deleteButtonPress = async (data) => {
     if (confirm(`Hapus sub proyek ${data.nama}?`)) {
@@ -82,8 +80,7 @@ export default function SubProyek({ id, selectedProyek, isAuthorized }) {
           `Gagal menghapus. Sub proyek masih terikat pada tabel produk atau instalasi. ` +
             json.message,
         );
-      return;
-      // return alert(json.message);
+      subProyek.mutate();
     }
   };
 

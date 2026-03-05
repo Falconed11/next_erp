@@ -23,7 +23,7 @@ import { useSession } from "next-auth/react";
 import {
   useTransferBankColumns,
   useTransferBankFetch,
-} from "@/hooks/transfer-bank-hooks";
+} from "@/hooks/transfer-bank.hooks";
 
 export const renderTransferBankTableCell = ({
   data,

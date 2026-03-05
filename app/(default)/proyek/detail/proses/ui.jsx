@@ -227,7 +227,6 @@ export default function App({ id }) {
     updateDataPengeluaran();
     // return alert(json.message);
   };
-  console.log(form);
   const simpanButtonPress = async (data, onClose) => {
     // return console.log({ form, id });
     let res;
@@ -618,6 +617,7 @@ export default function App({ id }) {
     );
   const provit = omset - biayaProduksi;
   const variant = "bordered";
+  console.log("cek");
   return (
     <div className="flex flex-col gap-2 w-full-">
       <div className="flex gap-2">
