@@ -51,6 +51,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useSession } from "next-auth/react";
 import {
+  capitalizeEachWord,
   highRoleCheck,
   key2set,
   renderQueryStates,
@@ -60,6 +61,7 @@ import SelectMetodePembayaran from "@/components/metode-pembayaran/SelectMetodeP
 import { SelectPerusahaan } from "@/components/perusahaan/perusahaan";
 import useOperasionalKantorColumns from "@/hooks/useOperasionalKantorColumns";
 import { useClientFetch } from "@/hooks/useClientFetch";
+import { buildTableClassNames, tableClassNames } from "@/app/utils/style";
 
 const apiPath = getApiPath();
 const [startDate, endDate] = getCurFirstLastDay();
@@ -219,8 +221,10 @@ export default function App() {
     const cellValue = data[columnKey];
     const date = new Date(data.tanggal);
     switch (columnKey) {
+      case "kategori":
+        return capitalizeEachWord(cellValue);
       case "tanggal":
-        return getDateF(new Date(data.tanggal));
+        return <div className="text-nowrap">{getDateF(date)}</div>;
       case "biaya":
         return (
           <div className="text-right">
@@ -330,6 +334,7 @@ export default function App() {
           <Table
             isStriped
             className="h-full w-full"
+            classNames={buildTableClassNames({ customTd: "py-1" })}
             aria-label="Example table with custom cells"
             topContent={
               <>
@@ -403,7 +408,9 @@ export default function App() {
               {(item) => (
                 <TableRow key={item.id}>
                   {(columnKey) => (
-                    <TableCell>{renderCell(item, columnKey)}</TableCell>
+                    <TableCell className="text-nowrap">
+                      {renderCell(item, columnKey)}
+                    </TableCell>
                   )}
                 </TableRow>
               )}

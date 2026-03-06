@@ -1,6 +1,4 @@
-import { withAuth as proxy } from "next-auth/middleware";
-
-export default proxy;
+export { default } from "next-auth/middleware";
 
 // export const config = {
 //   matcher: ["/((?!api/auth|_next/static|_next/image|favicon.ico).*)"],

@@ -25,8 +25,9 @@ const LaporanPerubahanModal = ({ yearMonth, id_perusahaan }) => {
   const QueryState = renderQueryStates({ monthlyReport });
   if (QueryState) return QueryState;
   const { data: dataMontlyReport } = monthlyReport.data;
-  console.log(monthlyReport.data.data);
   const sHeader = "font-bold";
+  const { awallabarugi, labarugi } = dataMontlyReport;
+  const saldoAkhir = awallabarugi + labarugi;
   return (
     <div className="flex flex-col gap-2">
       <div className="flex">
@@ -35,18 +36,21 @@ const LaporanPerubahanModal = ({ yearMonth, id_perusahaan }) => {
         </div>
       </div>
       <div className="bg-white p-2 rounded-lg flex flex-col gap-2">
-        <div>Awal</div>
-        <div>Penambahan</div>
         <div>
-          Modal Awal: <Harga harga={dataMontlyReport.awallabarugi} />
+          Saldo Awal <Harga harga={awallabarugi} />
+        </div>
+        <div className="font-bold">Penambahan</div>
+        <div>
+          Laba/Rugi: <Harga harga={labarugi} />
         </div>
         <div>
-          Laba/Rugi: <Harga harga={dataMontlyReport.labarugi} />
+          Total <Harga harga={labarugi} />
         </div>
+        <div className="font-bold">Pengurangan</div>
         <div>Total</div>
-        <div>Pengurangan</div>
-        <div>Total</div>
-        <div>Akhir</div>
+        <div>
+          Saldo Akhir <Harga harga={saldoAkhir} />{" "}
+        </div>
       </div>
     </div>
   );

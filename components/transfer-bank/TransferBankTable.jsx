@@ -24,6 +24,7 @@ import {
   useTransferBankColumns,
   useTransferBankFetch,
 } from "@/hooks/transfer-bank.hooks";
+import { tableClassNames } from "@/app/utils/style";
 
 export const renderTransferBankTableCell = ({
   data,
@@ -110,6 +111,7 @@ export const TransferBankTable = ({ rowsPerPage, onDelete, onSave }) => {
   return (
     <>
       <Table
+        classNames={tableClassNames}
         isStriped
         className="min-h-[40px]"
         aria-label="Example table with custom cells"
