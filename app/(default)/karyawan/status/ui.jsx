@@ -30,12 +30,9 @@ import {
   useDisclosure,
 } from "@heroui/react";
 import { useClientFetch } from "@/hooks/useClientFetch";
-import { FileUploader } from "@/components/input";
 import { Button } from "@heroui/react";
 import { Input } from "@heroui/react";
-import Link from "next/link";
-
-const apiPath = getApiPath();
+import { API_PATH } from "@/app/utils/apiconfig";
 
 export default function App() {
   const statuskaryawan = useClientFetch(`statuskaryawan`);
@@ -54,7 +51,7 @@ export default function App() {
   };
   const deleteButtonPress = async (id) => {
     if (confirm("Hapus statuskaryawan?")) {
-      const res = await fetch(`${apiPath}statuskaryawan`, {
+      const res = await fetch(`${API_PATH}statuskaryawan`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -67,7 +64,7 @@ export default function App() {
     }
   };
   const simpanButtonPress = async (data, onClose) => {
-    const res = await fetch(`${apiPath}statuskaryawan`, {
+    const res = await fetch(`${API_PATH}statuskaryawan`, {
       method,
       headers: {
         "Content-Type": "application/json",
@@ -94,7 +91,7 @@ export default function App() {
     try {
       const responses = await Promise.all(
         json.map((v) =>
-          fetch(`${apiPath}statuskaryawan`, {
+          fetch(`${API_PATH}statuskaryawan`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",

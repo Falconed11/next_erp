@@ -1,5 +1,5 @@
 "use client";
-import React, { useCallback, useState } from "react";
+import { useCallback, useState } from "react";
 import * as XLSX from "xlsx";
 import { getApiPath } from "@/app/utils/apiconfig";
 import {
@@ -14,6 +14,7 @@ import {
   Tooltip,
   ChipProps,
   getKeyValue,
+  Checkbox,
 } from "@heroui/react";
 import {
   Modal,
@@ -56,6 +57,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { useSession } from "next-auth/react";
 import { highRoleCheck, renderQueryStates } from "@/app/utils/tools";
 import { useClientFetch } from "@/hooks/useClientFetch";
+import { SelectPerusahaan } from "@/components/perusahaan/perusahaan";
 
 const apiPath = getApiPath();
 
@@ -63,7 +65,10 @@ export default function App() {
   const session = useSession();
   const sessUser = session?.data?.user;
   const bank = useClientFetch("bank");
-  const metodepembayaran = useClientFetch("metodepembayaran");
+  const [isShowHidden, setIsShowHidden] = useState(false);
+  const metodepembayaran = useClientFetch(
+    `metodepembayaran?${isShowHidden ? "" : "hide=0"}`,
+  );
   const [form, setForm] = useState({});
   const [isLoading, setIsLoading] = useState(false);
 
@@ -79,7 +84,22 @@ export default function App() {
     });
     const json = await res.json();
     if (res.status == 400) return alert(json.message);
+    metodepembayaran.mutate();
     onClose();
+    //return alert(json.message);
+  };
+  const showHidePress = async (data) => {
+    const res = await fetch(`${apiPath}metodepembayaran`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        // 'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: JSON.stringify({ id: data.id, hide: data.hide ? 0 : 1 }),
+    });
+    const json = await res.json();
+    if (res.status == 400) return alert(json.message);
+    metodepembayaran.mutate();
     //return alert(json.message);
   };
   const saveTransferButtonPress = async (onClose) => {
@@ -195,72 +215,90 @@ export default function App() {
     );
   };
 
-  const renderCell = React.useCallback((data, columnKey) => {
-    const cellValue = data[columnKey];
-    const date = new Date(data.tanggal);
-    switch (columnKey) {
-      case "tanggal":
-        return getDateF(new Date(data.tanggal));
-      case "totalharga":
-        return data.jumlah * data.harga;
-      case "total":
-        return (
-          <div className="text-right">
-            <Harga harga={+data.total} />
-          </div>
-        );
-      case "aksi":
-        return (
-          <div className="relative flex items-center gap-2">
-            <LinkOpenNewTab
-              content="Detail"
-              link={`/bank/detail?id=${data.id}`}
-              icon={<EyeIcon />}
-            />
-            <Tooltip content="Transfer">
-              <span
-                onClick={() => transferButtonPress(data)}
-                className="text-lg text-default-400 cursor-pointer active:opacity-50"
-              >
-                <TransferIcon />
-              </span>
-            </Tooltip>
-            {data.versi > 0 ? (
-              <Tooltip content="Pengeluaran Proyek">
-                <Link href={`/proyek/detail/proses?id=${data.id}`}>
-                  <span
-                    // onClick={() => detailButtonPress(data)}
-                    className="text-lg text-default-400 cursor-pointer active:opacity-50"
-                  >
-                    <ReportMoneyIcon />
-                  </span>
-                </Link>
+  const isHighRole = highRoleCheck(sessUser?.rank);
+  const renderCell = useCallback(
+    (data, columnKey) => {
+      const cellValue = data[columnKey];
+      const date = new Date(data.tanggal);
+      const { hide } = data;
+      switch (columnKey) {
+        case "tanggal":
+          return getDateF(new Date(data.tanggal));
+        case "perusahaan":
+          return <div className="text-nowrap">{cellValue}</div>;
+        case "atasnama":
+          return <div className="text-nowrap">{cellValue}</div>;
+        case "total":
+          return (
+            <div className="text-right">
+              <Harga harga={+data.total} />
+            </div>
+          );
+        case "aksi":
+          return (
+            <div className="relative flex items-center gap-2">
+              <LinkOpenNewTab
+                content="Detail"
+                link={`/bank/detail?id=${data.id}`}
+                icon={<EyeIcon />}
+              />
+              <Tooltip content="Transfer">
+                <span
+                  onClick={() => transferButtonPress(data)}
+                  className="text-lg text-default-400 cursor-pointer active:opacity-50"
+                >
+                  <TransferIcon />
+                </span>
               </Tooltip>
-            ) : (
-              <></>
-            )}
-            <Tooltip content="Edit">
-              <span
-                onClick={() => editButtonPress(data)}
-                className="text-lg text-default-400 cursor-pointer active:opacity-50"
+              {data.versi > 0 ? (
+                <Tooltip content="Pengeluaran Proyek">
+                  <Link href={`/proyek/detail/proses?id=${data.id}`}>
+                    <span
+                      // onClick={() => detailButtonPress(data)}
+                      className="text-lg text-default-400 cursor-pointer active:opacity-50"
+                    >
+                      <ReportMoneyIcon />
+                    </span>
+                  </Link>
+                </Tooltip>
+              ) : (
+                <></>
+              )}
+              <Tooltip content="Edit">
+                <span
+                  onClick={() => editButtonPress(data)}
+                  className="text-lg text-default-400 cursor-pointer active:opacity-50"
+                >
+                  <EditIcon />
+                </span>
+              </Tooltip>
+
+              <Tooltip
+                content={`Klik untuk ${hide ? "menampilkan!" : "Menyembunyikan"}`}
               >
-                <EditIcon />
-              </span>
-            </Tooltip>
-            <Tooltip color="danger" content="Delete">
-              <span
-                onClick={() => deleteButtonPress(data.id)}
-                className="text-lg text-danger cursor-pointer active:opacity-50"
-              >
-                <DeleteIcon />
-              </span>
-            </Tooltip>
-          </div>
-        );
-      default:
-        return cellValue;
-    }
-  }, []);
+                <span
+                  onClick={() => showHidePress(data)}
+                  className="text-lg text-primary underline text-sm cursor-pointer active:opacity-50"
+                >
+                  {hide ? "Show" : "Hide"}
+                </span>
+              </Tooltip>
+              <Tooltip color="danger" content="Delete">
+                <span
+                  onClick={() => deleteButtonPress(data.id)}
+                  className="text-lg text-danger cursor-pointer active:opacity-50"
+                >
+                  <DeleteIcon />
+                </span>
+              </Tooltip>
+            </div>
+          );
+        default:
+          return cellValue;
+      }
+    },
+    [isHighRole],
+  );
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const transfer = useDisclosure();
   const report = useDisclosure();
@@ -269,11 +307,18 @@ export default function App() {
   // if (bank.error) return <div>failed to load</div>;
   // if (bank.isLoading) return <div>loading...</div>;
 
-  const isHighRole = highRoleCheck(sessUser?.rank);
   if (isLoading) return <div>loading...</div>;
   const QueryState = renderQueryStates({ bank, metodepembayaran }, session);
   if (QueryState) return QueryState;
   const columns = [
+    ...(isHighRole
+      ? [
+          {
+            key: "aksi",
+            label: "Aksi",
+          },
+        ]
+      : []),
     {
       key: "id",
       label: "Id",
@@ -291,17 +336,21 @@ export default function App() {
       label: "Atas Nama",
     },
     {
+      key: "perusahaan",
+      label: "Perusahaan",
+    },
+    {
       key: "nama",
       label: "Keterangan",
     },
-    {
-      key: "total",
-      label: "Total",
-    },
-    {
-      key: "aksi",
-      label: "Aksi",
-    },
+    ...(isHighRole
+      ? [
+          {
+            key: "total",
+            label: "Total",
+          },
+        ]
+      : []),
   ];
   return (
     <div className="flex gap-2">
@@ -326,11 +375,21 @@ export default function App() {
           className=""
           aria-label="Example table with custom cells"
           topContent={
-            <TableHeaderWithAddButton
-              isHighRole={isHighRole}
-              onPress={tambahButtonPress}
-              title="Metode Pembayaran"
-            />
+            <>
+              <TableHeaderWithAddButton
+                isHighRole={isHighRole}
+                onPress={tambahButtonPress}
+                title="Metode Pembayaran"
+              />
+              {isHighRole && (
+                <Checkbox
+                  isSelected={isShowHidden}
+                  onValueChange={setIsShowHidden}
+                >
+                  Show Hidden
+                </Checkbox>
+              )}
+            </>
           }
         >
           <TableHeader columns={columns}>
@@ -345,7 +404,10 @@ export default function App() {
           </TableHeader>
           <TableBody items={metodepembayaran.data}>
             {(item) => (
-              <TableRow key={item.id}>
+              <TableRow
+                className={`${item.hide == 1 ? "text-red-500" : ""}`}
+                key={item.id}
+              >
                 {(columnKey) => (
                   <TableCell>{renderCell(item, columnKey)}</TableCell>
                 )}
@@ -366,6 +428,7 @@ export default function App() {
                 {form.title} Bank
               </ModalHeader>
               <ModalBody>
+                <SelectPerusahaan form={form} setForm={setForm} />
                 <Select
                   label="Bank"
                   variant="bordered"
@@ -547,7 +610,7 @@ export default function App() {
 
 const Bank = ({ bank }) => {
   const session = useSession();
-  const sessUser = session?.data.user;
+  const sessUser = session?.data?.user;
   const [form, setForm] = useState();
 
   const onSubmit = async (e, onClose) => {
@@ -636,6 +699,14 @@ const Bank = ({ bank }) => {
   if (QueryState) return QueryState;
 
   const columns = [
+    ...(isHighRole
+      ? [
+          {
+            key: "aksi",
+            label: "Aksi",
+          },
+        ]
+      : []),
     {
       key: "id",
       label: "Id",
@@ -643,10 +714,6 @@ const Bank = ({ bank }) => {
     {
       key: "nama",
       label: "Nama",
-    },
-    {
-      key: "aksi",
-      label: "Aksi",
     },
   ];
   return (

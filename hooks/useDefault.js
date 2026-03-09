@@ -3,12 +3,13 @@ import { useClientFetch, useClientFetchNoInterval } from "./useClientFetch";
 import { urlBuilder } from "@/app/utils/tools";
 
 export function useDefaultFetch({ endPoint, limit, offset, noInterval }) {
+  const qPagination = `limit=${limit}&offset=${offset}`;
   if (noInterval)
     return useClientFetchNoInterval(
-      `${endPoint}?${limit != null && offset != null ? `limit=${limit}&offset=${offset}` : ""}`,
+      `${endPoint}?${limit != null && offset != null ? qPagination : ""}`,
     );
   return useClientFetch(
-    `${endPoint}?${limit != null && offset != null ? `limit=${limit}&offset=${offset}` : ""}`,
+    `${endPoint}?${limit != null && offset != null ? qPagination : ""}`,
   );
 }
 

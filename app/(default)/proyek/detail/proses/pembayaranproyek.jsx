@@ -16,6 +16,7 @@ import { useClientFetch } from "@/hooks/useClientFetch";
 const apiPath = getApiPath();
 
 export default function PembayaranProyek({
+  id_perusahaan,
   isCreate,
   form,
   setForm,
@@ -80,7 +81,12 @@ export default function PembayaranProyek({
           })
         }
       />
-      <SelectMetodePembayaran form={form} setForm={setForm} />
+      <SelectMetodePembayaran
+        form={form}
+        setForm={setForm}
+        hide={0}
+        id_perusahaan={id_perusahaan}
+      />
       <Select
         label="Invoice"
         placeholder="Pilih karyawan!"

@@ -15,6 +15,7 @@ const nextConfig = {
         protocol: "http", // use https if your Express is behind SSL
         hostname: process.env.MAIN_DOMAIN,
         port: process.env.EXPRESS_PORT,
+        pathname: "/logo/**",
       },
     ],
   },

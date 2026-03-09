@@ -1661,6 +1661,7 @@ export default function App({ id, versi }) {
                         alt="Company Logo"
                         width={40}
                         height={40}
+                        unoptimized
                       />
                       <div className="flex flex-col pl-2 text-xs">
                         <CompanyHeader

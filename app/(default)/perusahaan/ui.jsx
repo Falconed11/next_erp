@@ -95,7 +95,13 @@ export default function App() {
       switch (columnKey) {
         case "logo":
           return (
-            <Image src={data.logo} alt="Company Logo" width={40} height={40} />
+            <Image
+              src={data.logo}
+              alt="Company Logo"
+              width={40}
+              height={40}
+              unoptimized
+            />
           );
         case "aksi":
           return (
@@ -212,6 +218,7 @@ export default function App() {
                   alt="Preview Logo"
                   width={40}
                   height={40}
+                  unoptimized
                 />
                 <Input
                   type="file"

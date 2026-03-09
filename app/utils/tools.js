@@ -61,13 +61,13 @@ export const useDebounce = (value, delay = 1000) => {
   return debounced;
 };
 export const conditionalURLParamBuilder = (key, val) =>
-  val ? `${key}=${val}` : "";
+  val != null ? `${key}=${val}` : "";
 export const paramBuilder = (params = []) =>
   params.length
     ? "?" +
       params
         .flatMap(({ key, val }) =>
-          val ? [conditionalURLParamBuilder(key, val)] : [],
+          val != null ? [conditionalURLParamBuilder(key, val)] : [],
         )
         .join("&")
     : "";

@@ -1,17 +1,29 @@
 import { Select, SelectItem } from "@heroui/react";
-import { set2key, key2set, renderQueryStates } from "@/app/utils/tools";
+import {
+  set2key,
+  key2set,
+  renderQueryStates,
+  urlBuilder,
+} from "@/app/utils/tools";
 import { useDefaultFetch } from "@/hooks/useDefault";
 import { METODE_PEMBAYARAN_ENDPOINT } from "@/services/metode-pembayaran.service";
+import { useClientFetch } from "@/hooks/useClientFetch";
 
 export default function SelectMetodePembayaran({
+  id_perusahaan,
+  hide,
   form,
   setForm,
   label = "Metode Pembayaran",
   fieldName = "id_metodepembayaran",
 }) {
-  const metodePembayaran = useDefaultFetch({
-    endPoint: METODE_PEMBAYARAN_ENDPOINT,
-  });
+  console.log({ id_perusahaan, hide });
+  const metodePembayaran = useClientFetch(
+    urlBuilder(METODE_PEMBAYARAN_ENDPOINT, [
+      { key: "id_perusahaan", val: id_perusahaan },
+      { key: "hide", val: hide },
+    ]),
+  );
   const QueryState = renderQueryStates({ metodePembayaran });
   if (QueryState) return QueryState;
   const data = metodePembayaran.data;

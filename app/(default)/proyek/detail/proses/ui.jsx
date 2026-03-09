@@ -714,6 +714,7 @@ export default function App({ id }) {
                 <div className="flex-col gap-2">
                   <div className="grid grid-cols-6 gap-2 mt-3">
                     <PembayaranProyek
+                      id_perusahaan={selectedProyek.id_perusahaan}
                       isCreate
                       form={formPembayaran}
                       setForm={setFormPembayaran}
@@ -1066,6 +1067,7 @@ export default function App({ id }) {
               </ModalHeader>
               <ModalBody>
                 <PembayaranProyek
+                  id_perusahaan={selectedProyek.id_perusahaan}
                   form={formPembayaran}
                   setForm={setFormPembayaran}
                   rekap={rekapitulasiTotal}
