@@ -22,7 +22,7 @@ const TransferBankModal = ({
   form,
   setForm,
   onSave,
-  data,
+  mutate,
 }) => {
   const session = useSession();
   const sessUser = session?.data?.user;
@@ -30,7 +30,7 @@ const TransferBankModal = ({
     const res = await onSave(form, sessUser?.id_karyawan);
     const json = await res.json();
     if (!res.ok) return alert(json.message);
-    data.mutate();
+    mutate();
     onClose();
   };
   const QueryState = renderQueryStates({}, session);

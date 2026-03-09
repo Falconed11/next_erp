@@ -7,8 +7,9 @@ import {
 import { TransferBankTable } from "@/components/transfer-bank/TransferBankTable";
 
 export default function App() {
-  const queryStates = renderQueryStates({});
-  if (queryStates) return queryStates;
+  // const queryStates = renderQueryStates({});
+  // if (queryStates) return queryStates;
+  console.log("parent");
   return (
     <div className="flex flex-col gap-2">
       <TransferBankTable

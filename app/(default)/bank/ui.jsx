@@ -270,7 +270,6 @@ export default function App() {
   // if (bank.isLoading) return <div>loading...</div>;
 
   const isHighRole = highRoleCheck(sessUser?.rank);
-
   if (isLoading) return <div>loading...</div>;
   const QueryState = renderQueryStates({ bank, metodepembayaran }, session);
   if (QueryState) return QueryState;

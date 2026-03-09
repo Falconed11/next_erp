@@ -1109,7 +1109,8 @@ export default function App({ id, versi }) {
         {/* tabel keterangan penawaran */}
         <div>
           <KeteranganPenawaran
-            keteranganPenawaran={keteranganPenawaran}
+            data={keteranganPenawaran.data}
+            mutate={keteranganPenawaran.mutate}
             idProyek={selectedProyek?.id}
             isAuthorized={isAuthorized}
           />

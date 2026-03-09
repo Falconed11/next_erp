@@ -20,12 +20,12 @@ import {
 import { API_PATH } from "@/app/utils/apiconfig";
 
 export default function KeteranganPenawaran({
-  keteranganPenawaran,
+  data,
+  mutate,
   idProyek,
   isAuthorized,
 }) {
   const [form, setForm] = useState();
-  const data = keteranganPenawaran.data;
 
   const simpanButtonPress = async (data, onClose) => {
     // if (data.jumlah <= 0) return alert("Jumlah belum diisi");
@@ -42,7 +42,7 @@ export default function KeteranganPenawaran({
     });
     const json = await res.json();
     if (res.status == 400) return alert(json.message);
-    keteranganPenawaran.mutate();
+    mutate();
     onClose();
     // console.log(json.message);
     //return alert(json.message);
@@ -79,7 +79,7 @@ export default function KeteranganPenawaran({
                 // if (res.status == 400) return alert(json.message);
                 // console.log(json.message);
                 //return alert(json.message);
-                keteranganPenawaran.mutate();
+                mutate();
               }}
             ></Checkbox>
           );
@@ -120,7 +120,7 @@ export default function KeteranganPenawaran({
                       );
                       const json = await res.json();
                       if (res.status == 400) return alert(json.message);
-                      keteranganPenawaran.mutate();
+                      mutate();
                       return;
                       // return alert(json.message);
                     }

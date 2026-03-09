@@ -25,6 +25,7 @@ import {
   useTransferBankFetch,
 } from "@/hooks/transfer-bank.hooks";
 import { tableClassNames } from "@/app/utils/style";
+import { NumberComp } from "../harga";
 
 export const renderTransferBankTableCell = ({
   data,
@@ -38,6 +39,8 @@ export const renderTransferBankTableCell = ({
       return `${getDateFId(cellValue)} ${getTime(cellValue)}`;
     case "created_at":
       return `${getDateFId(cellValue)}`;
+    case "nominal":
+      return <NumberComp value={cellValue} />;
     case "aksi":
       return (
         <div className="flex items-center gap-2 text-lg">
@@ -108,6 +111,7 @@ export const TransferBankTable = ({ rowsPerPage, onDelete, onSave }) => {
   if (QueryState) return QueryState;
 
   const pages = Math.ceil(items[0]?.total / rowsPerPage);
+  console.log("tes");
   return (
     <>
       <Table
@@ -174,7 +178,7 @@ export const TransferBankTable = ({ rowsPerPage, onDelete, onSave }) => {
         </TableBody>
       </Table>
       <TransferBankModal
-        data={data}
+        mutate={data.mutate}
         form={form}
         setForm={setForm}
         isOpen={isOpen}
