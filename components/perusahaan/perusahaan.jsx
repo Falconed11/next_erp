@@ -1,7 +1,12 @@
 import { PERUSAHAAN_ENDPOINT } from "../../services/perusahaan.service";
 import DefaultSelect from "../default/DefaultSelect";
 
-export const SelectPerusahaan = ({ form, setForm, className }) => {
+export const SelectPerusahaan = ({
+  form,
+  setForm,
+  className,
+  disallowEmptySelection,
+}) => {
   return (
     <DefaultSelect
       label="Perusahaan"
@@ -11,6 +16,7 @@ export const SelectPerusahaan = ({ form, setForm, className }) => {
       form={form}
       setForm={setForm}
       className={className}
+      disallowEmptySelection={disallowEmptySelection}
     />
   );
 };

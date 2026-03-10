@@ -99,12 +99,14 @@ const TransferBankForm = ({ form, setForm }) => {
         setForm={setForm}
         fieldName="id_metode_pembayaran_asal"
         label="Asal"
+        hide={0}
       />
       <SelectMetodePembayaran
         form={form}
         setForm={setForm}
         fieldName="id_metode_pembayaran_tujuan"
         label="Tujuan"
+        hide={0}
       />
       <NumberInput
         hideStepper

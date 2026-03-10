@@ -12,6 +12,7 @@ export default function DefaultSelect({
   buildTextValue = (data) => data.nama,
   buildText = (data) => data.nama,
   className,
+  disallowEmptySelection,
 }) {
   const fetchData = useDefaultFetch({ endPoint, noInterval: true });
   const QueryState = renderQueryStates({ fetchData });
@@ -19,6 +20,7 @@ export default function DefaultSelect({
   const data = fetchData.data.data ?? fetchData.data;
   return (
     <Select
+      disallowEmptySelection={disallowEmptySelection}
       variant="bordered"
       label={label}
       placeholder={placeholder}

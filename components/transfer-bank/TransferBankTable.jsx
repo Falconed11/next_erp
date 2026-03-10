@@ -39,6 +39,8 @@ export const renderTransferBankTableCell = ({
       return `${getDateFId(cellValue)} ${getTime(cellValue)}`;
     case "created_at":
       return `${getDateFId(cellValue)}`;
+    case "tanggal":
+      return `${getDateFId(cellValue)}`;
     case "nominal":
       return <NumberComp value={cellValue} />;
     case "aksi":
@@ -111,7 +113,6 @@ export const TransferBankTable = ({ rowsPerPage, onDelete, onSave }) => {
   if (QueryState) return QueryState;
 
   const pages = Math.ceil(items[0]?.total / rowsPerPage);
-  console.log("tes");
   return (
     <>
       <Table

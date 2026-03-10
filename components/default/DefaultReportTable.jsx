@@ -55,7 +55,11 @@ export const ReportTableBody = ({ rows, cells, calculationRows, topRows }) => {
   );
 };
 
-export const MonthlyReport = ({ renderReport, id_perusahaan }) => {
+export const MonthlyReport = ({
+  renderReport,
+  id_perusahaan,
+  disallowEmptySelection,
+}) => {
   const [form, setForm] = useState({
     startDate: new Date(),
     endDate: new Date(),
@@ -65,7 +69,11 @@ export const MonthlyReport = ({ renderReport, id_perusahaan }) => {
   return (
     <div className="flex flex-col gap-2">
       <div className="flex">
-        <CompanyPeriodeReportPicker form={form} setForm={setForm} />
+        <CompanyPeriodeReportPicker
+          form={form}
+          setForm={setForm}
+          disallowEmptySelection={disallowEmptySelection}
+        />
       </div>
       <div className="flex gap-2">
         {months.map((month) => (

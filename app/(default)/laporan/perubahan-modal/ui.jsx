@@ -8,6 +8,7 @@ import { useGetPerusahaanMonthlyReport } from "@/hooks/perusahaan.hooks";
 export default function App() {
   return (
     <MonthlyReport
+      disallowEmptySelection
       id_perusahaan={1}
       renderReport={(yearMonth, form) => (
         <LaporanPerubahanModal
@@ -26,8 +27,17 @@ const LaporanPerubahanModal = ({ yearMonth, id_perusahaan }) => {
   if (QueryState) return QueryState;
   const { data: dataMontlyReport } = monthlyReport.data;
   const sHeader = "font-bold";
-  const { awallabarugi, labarugi } = dataMontlyReport;
-  const saldoAkhir = awallabarugi + labarugi;
+  const {
+    saldoAwal,
+    modalAwal,
+    labaRugi,
+    penambahanModal,
+    totalPenambahan,
+    prive,
+    totalPengurangan,
+    totalPerubahan,
+    saldoAkhir,
+  } = dataMontlyReport;
   return (
     <div className="flex flex-col gap-2">
       <div className="flex">
@@ -37,17 +47,29 @@ const LaporanPerubahanModal = ({ yearMonth, id_perusahaan }) => {
       </div>
       <div className="bg-white p-2 rounded-lg flex flex-col gap-2">
         <div>
-          Saldo Awal <Harga harga={awallabarugi} />
+          Saldo Awal <Harga harga={saldoAwal} />
         </div>
-        <div className="font-bold">Penambahan</div>
+        {/* <div>
+          Modal Awal <Harga harga={modalAwal} />
+        </div> */}
+        <div className="font-bold">
+          Penambahan: <Harga harga={totalPenambahan} />
+        </div>
         <div>
-          Laba/Rugi: <Harga harga={labarugi} />
+          Modal: <Harga harga={penambahanModal} />
         </div>
         <div>
-          Total <Harga harga={labarugi} />
+          Laba/Rugi: <Harga harga={labaRugi} />
         </div>
-        <div className="font-bold">Pengurangan</div>
-        <div>Total</div>
+        <div className="font-bold">
+          Pengurangan: <Harga harga={totalPengurangan} />
+        </div>
+        <div>
+          Prive <Harga harga={prive} />
+        </div>
+        <div className="font-bold">
+          Total: <Harga harga={totalPerubahan} />
+        </div>
         <div>
           Saldo Akhir <Harga harga={saldoAkhir} />{" "}
         </div>

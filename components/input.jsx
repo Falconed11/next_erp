@@ -230,10 +230,18 @@ export const RangeMonthPicker = ({ form, setForm }) => {
     </div>
   );
 };
-export const CompanyPeriodeReportPicker = ({ form, setForm }) => {
+export const CompanyPeriodeReportPicker = ({
+  form,
+  setForm,
+  disallowEmptySelection,
+}) => {
   return (
     <div className="flex flex-col gap-2 bg-white p-2 rounded-lg">
-      <SelectPerusahaan form={form} setForm={setForm} />
+      <SelectPerusahaan
+        form={form}
+        setForm={setForm}
+        disallowEmptySelection={disallowEmptySelection}
+      />
       <RangeMonthPicker form={form} setForm={setForm} />
     </div>
   );

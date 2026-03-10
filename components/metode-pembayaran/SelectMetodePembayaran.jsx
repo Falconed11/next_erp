@@ -17,7 +17,6 @@ export default function SelectMetodePembayaran({
   label = "Metode Pembayaran",
   fieldName = "id_metodepembayaran",
 }) {
-  console.log({ id_perusahaan, hide });
   const metodePembayaran = useClientFetch(
     urlBuilder(METODE_PEMBAYARAN_ENDPOINT, [
       { key: "id_perusahaan", val: id_perusahaan },
@@ -44,9 +43,10 @@ export default function SelectMetodePembayaran({
         <SelectItem
           key={item.id}
           value={item.id}
-          textValue={`${item.nama} ${item.namabank} ${item.norekening} ${item.atasnama}`}
+          textValue={`${item.nama} ${item.namabank} ${item.norekening} ${item.atasnama} ${item.perusahaan}`}
         >
-          {item.nama} {item.namabank} {item.norekening} {item.atasnama}
+          {item.nama} {item.namabank} {item.norekening} {item.atasnama}{" "}
+          {item.perusahaan}
         </SelectItem>
       ))}
     </Select>

@@ -12,6 +12,7 @@ export function useTransferBankColumns(isAuthorized) {
   return useMemo(
     () => [
       ...(isAuthorized ? [{ key: "aksi", label: "Aksi" }] : []),
+      { key: "tanggal", label: "Tanggal Transaksi" },
       { key: "metodepembayaranasal", label: "Asal" },
       { key: "metodepembayarantujuan", label: "Tujuan" },
       { key: "nominal", label: "Nominal" },
