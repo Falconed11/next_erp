@@ -123,29 +123,29 @@ export default function PembayaranProyek({
           </SelectItem>
         ))}
       </Select>
-      {isCreate ? (
+      {/* {isCreate ? (
         <></>
       ) : (
-        <Select
-          label="Status Pembayaran"
-          placeholder="Pilih status pembayaran!"
-          className=""
-          selectedKeys={new Set([String(form.status)])}
-          onSelectionChange={(v) => {
-            setForm({
-              ...form,
-              status: v.values().next().value,
-            });
-          }}
-        >
-          {[
-            { key: 0, label: "Menunggu" },
-            { key: 1, label: "Lunas" },
-          ].map((item) => (
-            <SelectItem key={item.key}>{item.label}</SelectItem>
-          ))}
-        </Select>
-      )}
+      )} */}
+      <Select
+        label="Status Pembayaran"
+        placeholder="Pilih status pembayaran!"
+        className=""
+        selectedKeys={key2set(form.status)}
+        onSelectionChange={(v) => {
+          setForm({
+            ...form,
+            status: set2key(v),
+          });
+        }}
+      >
+        {[
+          { key: 0, label: "Menunggu" },
+          { key: 1, label: "Lunas" },
+        ].map((item) => (
+          <SelectItem key={item.key}>{item.label}</SelectItem>
+        ))}
+      </Select>
       <Input
         type="text"
         label="Telah terima dari"

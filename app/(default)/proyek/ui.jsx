@@ -88,6 +88,7 @@ import { useReactToPrint } from "react-to-print";
 import { useClientFetch } from "@/hooks/useClientFetch";
 
 export default function App({
+  idProyek,
   id_instansi,
   id_karyawan,
   startDate,
@@ -104,7 +105,7 @@ export default function App({
     endDate: endDate ? new Date(endDate) : null,
   });
   const [selectkaryawan, setSelectKaryawan] = useState(
-    new Set([id_karyawan ? id_karyawan : ""]),
+    new Set(id_karyawan ? [id_karyawan] : null),
     // new Set([])
   );
   const [stat, setStat] = useState(1);
@@ -123,15 +124,17 @@ export default function App({
   const produk = useClientFetch(id_produk ? `produk?id=${id_produk}` : null);
   const customer = useClientFetch(`customer`);
   const proyek = useClientFetch(
-    `proyek?${id_instansi ? `id_instansi=${id_instansi}` : ""}${
-      selectkaryawan.size > 0
-        ? `id_karyawan=${selectkaryawan.values().next().value}`
-        : ""
-    }${current.startDate ? `&start=${getDate(current.startDate)}` : ""}${
-      current.endDate ? `&end=${getDate(current.endDate)}` : ""
-    }${
-      selectStatusProyek ? `&id_statusproyek=${selectStatusProyek}` : ""
-    }&sort=${sort}&id_produk=${id_produk || ""}`,
+    `proyek?${[
+      ...(idProyek ? [`id=${idProyek}`] : []),
+      ...(id_instansi ? [`id_instansi=${id_instansi}`] : []),
+      ...(selectkaryawan.size > 0
+        ? [`id_karyawan=${set2key(selectkaryawan)}`]
+        : []),
+      ...(current.startDate ? [`start=${getDate(current.startDate)}`] : []),
+      ...(current.endDate ? [`start=${getDate(current.endDate)}`] : []),
+      ...(selectStatusProyek ? [`id_statusproyek=${selectStatusProyek}`] : []),
+      ...(current.endDate ? [`start=${getDate(current.endDate)}`] : []),
+    ].join("&")}&sort=${sort}&id_produk=${id_produk || ""}`,
   );
   const penawaran = useClientFetch(
     `exportpenawaran?start=${getDate(current.startDate)}&end=${getDate(
@@ -670,7 +673,7 @@ export default function App({
   );
   const selectedProduct = produk.data?.[0];
   const selectedCustomer = customer.data.find((item) => item.id == id_instansi);
-  console.log(form);
+  // console.log(selectkaryawan);
   return (
     <div className="flex flex-col gap-2 w-7/8- h-3/4">
       {/* <div>

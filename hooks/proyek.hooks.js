@@ -19,8 +19,8 @@ export const useProyekReportsColumns = (isHighRole) =>
       { key: "totalpembayaran", label: "Omset" },
       { key: "profit", label: "Profit" },
       { key: "karyawan", label: "Sales" },
-      { key: "bank", label: "Bank" },
-      { key: "metodepembayaran", label: "Metode Pembayaran" },
+      // { key: "bank", label: "Bank" },
+      { key: "riwayatpembayaran", label: "Riwayat Pembayaran" },
     ];
   }, [isHighRole]);
 

@@ -16,7 +16,7 @@ import {
   renderQueryStates,
 } from "@/app/utils/tools";
 import { useSession } from "next-auth/react";
-import { NumberComp } from "../harga";
+import Harga, { NumberComp } from "../harga";
 import { LIST_SWASTA_NEGRI } from "@/app/utils/const";
 import {
   useGetMonthlyReportByPeriode,
@@ -24,10 +24,18 @@ import {
 } from "@/hooks/proyek.hooks";
 import { tableClassName, tableClassNames } from "@/app/utils/style";
 import { useMemo, useState } from "react";
+import { OpenBlueLinkInNewTab } from "../mycomponent";
+import { number2Nominal } from "@/app/utils/number";
 
 export const renderTableCellProyek = ({ data, columnKey }) => {
   const cellValue = data[columnKey];
   switch (columnKey) {
+    case "nama":
+      return (
+        <OpenBlueLinkInNewTabProyek idProyek={data.id}>
+          {cellValue || "noname"}
+        </OpenBlueLinkInNewTabProyek>
+      );
     case "totalpengeluaran":
       return <NumberComp value={cellValue} />;
     case "totalpembayaran":
@@ -37,7 +45,18 @@ export const renderTableCellProyek = ({ data, columnKey }) => {
     case "swasta":
       return cellValue != null && LIST_SWASTA_NEGRI[cellValue].nama;
     case "tanggal":
-      return `${getDateFId(cellValue)}`;
+      return <div className="text-nowrap">{getDateFId(cellValue)}</div>;
+    case "riwayatpembayaran":
+      return (
+        <div className="text-nowrap">
+          {data.pembayaran
+            .map(
+              (o, i) =>
+                `${getDateFId(o.tanggal)} ${o.metodepembayaran} ${number2Nominal(o.nominal)}`,
+            )
+            .join(", ")}
+        </div>
+      );
     // case "aksi":
     //   return (
     //     <div className="flex items-center gap-2 text-lg">
@@ -131,7 +150,7 @@ export const TableProyek = ({
   const QueryState = renderQueryStates({ proyekReports }, session);
   if (QueryState) return QueryState;
   const { data: items } = proyekReports.data;
-  // console.log(items);
+  console.log(items);
 
   const id_karyawan = sessUser.id_karyawan;
   return (
@@ -169,7 +188,6 @@ export const TableProyek = ({
                 ))}
               </div>
             </div>
-            <div>aaa</div>
           </div>
         }
       >
@@ -192,13 +210,15 @@ export const TableProyek = ({
         >
           {(item) => {
             return (
-              <TableRow key={item.id}>
+              <TableRow className="" key={item.id}>
                 {(columnKey) => (
-                  <TableCell>
-                    {renderTableCellProyek({
-                      data: item,
-                      columnKey,
-                    })}
+                  <TableCell className="">
+                    <div className="text-nowrap">
+                      {renderTableCellProyek({
+                        data: item,
+                        columnKey,
+                      })}
+                    </div>
                   </TableCell>
                 )}
               </TableRow>
@@ -207,5 +227,12 @@ export const TableProyek = ({
         </TableBody>
       </Table>
     </>
+  );
+};
+export const OpenBlueLinkInNewTabProyek = ({ children, idProyek }) => {
+  return (
+    <OpenBlueLinkInNewTab link={`/proyek?id_proyek=${idProyek}`}>
+      {children}
+    </OpenBlueLinkInNewTab>
   );
 };

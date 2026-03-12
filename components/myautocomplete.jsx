@@ -38,7 +38,7 @@ export const useAutocompleteField = ({
   const query = useClientFetch(endpoint);
   const queryStates = renderQueryStates({ [endpoint]: query });
   if (queryStates) return { component: queryStates };
-  const data = query.data.data ?? query.data;
+  const data = [...(query.data.data ?? query.data)].slice(0, 50);
   const component = (
     <AutocompleteWithCustomValue
       isDisabled={isDisabled}
@@ -131,8 +131,12 @@ export const AutocompleteWithCustomValue = ({
   const isInvalid = form[field] && form[id] == null;
   return (
     <Autocomplete
+      isVirtualized={false}
       popoverProps={{ shouldCloseOnScroll: false }}
       className={className}
+      classNames={{
+        popoverContent: "w-auto text-nowrap",
+      }}
       isDisabled={isDisabled}
       variant="bordered"
       allowsCustomValue={disableCustomValue ? undefined : true}

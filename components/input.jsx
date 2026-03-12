@@ -9,6 +9,7 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
+  Tooltip,
 } from "@heroui/react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -439,3 +440,23 @@ export function TemplateImportV2({
     </div>
   );
 }
+
+export const UpdateShowHide = ({ data, onFetch, mutate }) => {
+  const { hide } = data;
+  const onPress = async (data) => {
+    const res = await onFetch({ ...data, hide: hide ? 0 : 1, method: "PATCH" });
+    const json = await res.json();
+    if (res.status == 400) return alert(json.message);
+    mutate();
+  };
+  return (
+    <Tooltip content={`Klik untuk ${hide ? "menampilkan!" : "Menyembunyikan"}`}>
+      <span
+        onClick={() => onPress(data)}
+        className="text-lg text-primary underline text-sm cursor-pointer active:opacity-50"
+      >
+        {hide ? "Show" : "Hide"}
+      </span>
+    </Tooltip>
+  );
+};

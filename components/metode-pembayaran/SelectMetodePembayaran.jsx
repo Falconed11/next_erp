@@ -31,6 +31,9 @@ export default function SelectMetodePembayaran({
       label={label}
       placeholder="Pilih metode pembayaran!"
       className=""
+      classNames={{
+        popoverContent: "w-auto text-nowrap",
+      }}
       selectedKeys={key2set(form[fieldName])}
       onSelectionChange={(v) => {
         setForm({

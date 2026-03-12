@@ -239,7 +239,7 @@ export default function App() {
                 <>
                   <LinkOpenNewTab
                     content="Detail"
-                    link={`/proyek?id_instansi=${data.id}`}
+                    link={`/proyek?id=${data.id}`}
                     icon={<EyeIcon />}
                   />
                   <Tooltip content="Transfer">

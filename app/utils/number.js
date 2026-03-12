@@ -49,7 +49,7 @@
 //   return result.trim();
 // };
 
-const nominalToText = (number) => {
+export const nominalToText = (number) => {
   if (number === 0) return "Nol";
 
   const nominal = [
@@ -118,4 +118,5 @@ const nominalToText = (number) => {
   return result.trim();
 };
 
-module.exports = { nominalToText };
+export const number2Nominal = (harga) =>
+  harga ? (+harga).toLocaleString("id-ID") : 0;

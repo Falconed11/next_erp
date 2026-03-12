@@ -702,138 +702,133 @@ export default function App({ id }) {
         openContent="Tutup Pembayaran Proyek"
         closeContent="Buka Pembayaran Proyek"
       >
-        <Table
-          isStriped
-          isCompact
-          className="pt-2"
-          aria-label="Example table with custom cells"
-          topContent={
-            <>
-              <div>Pembayaran Proyek</div>
-              {isAuthorized && (
-                <div className="flex-col gap-2">
-                  <div className="grid grid-cols-6 gap-2 mt-3">
-                    <PembayaranProyek
-                      id_perusahaan={selectedProyek.id_perusahaan}
-                      isCreate
-                      form={formPembayaran}
-                      setForm={setFormPembayaran}
-                      rekap={rekapitulasiTotal}
-                      totalPenagihan={totalPenagihan}
-                    />
-                    <div>
-                      <Button
-                        // isDisabled={omset >= +nilai_proyek}
-                        onPress={() => {
-                          tambahButtonPressPembayaran(formPembayaran);
-                        }}
-                        color="primary"
-                        className="ml-2"
-                      >
-                        Tambah
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </>
-          }
-        >
-          <TableHeader columns={col.pembayaranproyek}>
-            {(column) => (
-              <TableColumn
-                key={column.key}
-                align={column.key === "aksi" ? "center" : "start"}
-              >
-                <div
-                // className={
-                //   {
-                //     untukpembayaran: "w-48",
-                //   }[column.key]
-                // }
-                >
-                  {column.label}
-                </div>
-              </TableColumn>
-            )}
-          </TableHeader>
-          <TableBody emptyContent={"Kosong"} items={pembayaranproyek.data}>
-            {(item) => (
-              <TableRow key={item.id}>
-                {(columnKey) => (
-                  <TableCell>
-                    {renderCell.pembayaranproyek(item, columnKey)}
-                  </TableCell>
-                )}
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </ShowHideComponent2>
-      {/* tabel pengeluaran proyek */}
-      <Table
-        className="z-10 w-fit"
-        aria-label="Example table with custom cells"
-        topContent={
-          <>
-            <div>Pengeluaran Proyek</div>
-            <ProdukMenunggu
-              id_proyek={id}
-              form={form}
-              setForm={setForm}
-              onScroll={scroll2AddProduct}
-              isAuthorized={isAuthorized}
-            />
+        <div className="bg-white p-3 rounded-lg mt-2">
+          <div>Pembayaran Proyek</div>
+          <div className="flex gap-2">
             {isAuthorized && (
-              <div className="flex-col gap-2">
-                <div ref={addProductRef} className="flex flex-row gap-2">
-                  <TambahProduk
-                    disableCustomValue
-                    form={form}
-                    setForm={setForm}
-                    disableHargaKustom
-                    refHargaModal
-                  />
-                </div>
-                <div className="flex flex-row gap-2 mt-3">
-                  <div className="bg-gray-100 p-3 rounded-lg z-50">
-                    <div>Tanggal</div>
-                    <DatePicker
-                      placeholderText="Pilih tanggal"
-                      dateFormat="dd/MM/yyyy"
-                      selected={form.startdate}
-                      onChange={(v) => setForm({ ...form, startdate: v })}
-                    />
-                  </div>
-                  <Select
-                    label="Karyawan"
-                    placeholder="Pilih karyawan!"
-                    className="w-2/12"
-                    selectedKeys={key2set(form.id_karyawan)}
-                    onSelectionChange={(val) =>
-                      setForm({ ...form, id_karyawan: set2key(val) })
-                    }
+              <div className="flex flex-col gap-2 ">
+                <PembayaranProyek
+                  id_perusahaan={selectedProyek.id_perusahaan}
+                  isCreate
+                  form={formPembayaran}
+                  setForm={setFormPembayaran}
+                  rekap={rekapitulasiTotal}
+                  totalPenagihan={totalPenagihan}
+                />
+                <div className="text-right">
+                  <Button
+                    // isDisabled={omset >= +nilai_proyek}
+                    onPress={() => {
+                      tambahButtonPressPembayaran(formPembayaran);
+                    }}
+                    color="primary"
+                    className="ml-2"
                   >
-                    {karyawan.data.map((item) => (
-                      <SelectItem key={item.id} value={item.id}>
-                        {item.nama}
-                      </SelectItem>
-                    ))}
-                  </Select>
-                  <Input
-                    type="text"
-                    value={form.keteranganpengeluaranproyek}
-                    label="Keterangan"
-                    placeholder="Masukkan keterangan!"
-                    className="w-2/12 pl-2"
-                    onValueChange={(v) =>
-                      setForm({
-                        ...form,
-                        keteranganpengeluaranproyek: v,
-                      })
-                    }
-                  />
-                  {/* <Input
+                    Tambah
+                  </Button>
+                </div>
+              </div>
+            )}
+            <Table
+              isStriped
+              isCompact
+              className=""
+              aria-label="Example table with custom cells"
+              topContent={<></>}
+            >
+              <TableHeader columns={col.pembayaranproyek}>
+                {(column) => (
+                  <TableColumn
+                    key={column.key}
+                    align={column.key === "aksi" ? "center" : "start"}
+                  >
+                    <div
+                    // className={
+                    //   {
+                    //     untukpembayaran: "w-48",
+                    //   }[column.key]
+                    // }
+                    >
+                      {column.label}
+                    </div>
+                  </TableColumn>
+                )}
+              </TableHeader>
+              <TableBody emptyContent={"Kosong"} items={pembayaranproyek.data}>
+                {(item) => (
+                  <TableRow key={item.id}>
+                    {(columnKey) => (
+                      <TableCell>
+                        {renderCell.pembayaranproyek(item, columnKey)}
+                      </TableCell>
+                    )}
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        </div>
+      </ShowHideComponent2>
+      <ProdukMenunggu
+        id_proyek={id}
+        form={form}
+        setForm={setForm}
+        onScroll={scroll2AddProduct}
+        isAuthorized={isAuthorized}
+      />
+      {/* tabel pengeluaran proyek */}
+      <div className="bg-white p-3 rounded-lg flex flex-col gap-2">
+        <div>Pengeluaran Proyek</div>
+        <div className="flex gap-2">
+          {isAuthorized && (
+            <div className="flex flex-col gap-2">
+              <div ref={addProductRef}>
+                <TambahProduk
+                  disableCustomValue
+                  form={form}
+                  setForm={setForm}
+                  disableHargaKustom
+                  refHargaModal
+                />
+              </div>
+              <div className="bg-gray-100 p-3 rounded-lg z-50">
+                <div>Tanggal</div>
+                <DatePicker
+                  placeholderText="Pilih tanggal"
+                  dateFormat="dd/MM/yyyy"
+                  selected={form.startdate}
+                  onChange={(v) => setForm({ ...form, startdate: v })}
+                />
+              </div>
+              <Select
+                label="Karyawan"
+                placeholder="Pilih karyawan!"
+                className=""
+                selectedKeys={key2set(form.id_karyawan)}
+                onSelectionChange={(val) =>
+                  setForm({ ...form, id_karyawan: set2key(val) })
+                }
+              >
+                {karyawan.data.map((item) => (
+                  <SelectItem key={item.id} value={item.id}>
+                    {item.nama}
+                  </SelectItem>
+                ))}
+              </Select>
+              <Input
+                type="text"
+                value={form.keteranganpengeluaranproyek}
+                label="Keterangan"
+                placeholder="Masukkan keterangan!"
+                className=""
+                onValueChange={(v) =>
+                  setForm({
+                    ...form,
+                    keteranganpengeluaranproyek: v,
+                  })
+                }
+              />
+              {/* <Input
                   type="text"
                   value={form.status}
                   label="Status"
@@ -846,74 +841,79 @@ export default function App({ id }) {
                     })
                   }
                 /> */}
-                  {!form.isSelected ? (
-                    <Select
-                      label="Status"
-                      placeholder="Pilih status!"
-                      className="w-2/12"
-                      selectedKeys={form.selectStatus}
-                      onSelectionChange={(v) =>
-                        setForm({
-                          ...form,
-                          selectStatus: v,
-                          status: v.values().next().value,
-                        })
-                      }
-                    >
-                      {[
-                        { id: 0, nama: "Belum Lunas" },
-                        { id: 1, nama: "Lunas" },
-                      ].map((item) => (
-                        <SelectItem key={item.id} value={item.id}>
-                          {item.nama}
-                        </SelectItem>
-                      ))}
-                    </Select>
-                  ) : (
-                    <></>
-                  )}
-                  <Button
-                    isDisabled={!form.id_produk}
-                    onPress={() => {
-                      tambahButtonPress({
-                        selectProduk,
-                        selectKaryawan,
-                        form,
-                      });
-                    }}
-                    color="primary"
-                    className="ml-2"
-                  >
-                    Tambah
-                  </Button>
-                </div>
-              </div>
-            )}
-          </>
-        }
-      >
-        <TableHeader columns={col.pengeluaranproyek}>
-          {(column) => (
-            <TableColumn
-              key={column.key}
-              align={column.key === "aksi" ? "center" : "start"}
-            >
-              {column.label}
-            </TableColumn>
-          )}
-        </TableHeader>
-        <TableBody items={pengeluaranproyek.data} emptyContent={"Kosong"}>
-          {(item) => (
-            <TableRow key={item.id_pengeluaranproyek}>
-              {(columnKey) => (
-                <TableCell>
-                  {renderCell.pengeluaranproyek(item, columnKey)}
-                </TableCell>
+              {!form.isSelected ? (
+                <Select
+                  label="Status"
+                  placeholder="Pilih status!"
+                  className=""
+                  selectedKeys={form.selectStatus}
+                  onSelectionChange={(v) =>
+                    setForm({
+                      ...form,
+                      selectStatus: v,
+                      status: v.values().next().value,
+                    })
+                  }
+                >
+                  {[
+                    { id: 0, nama: "Belum Lunas" },
+                    { id: 1, nama: "Lunas" },
+                  ].map((item) => (
+                    <SelectItem key={item.id} value={item.id}>
+                      {item.nama}
+                    </SelectItem>
+                  ))}
+                </Select>
+              ) : (
+                <></>
               )}
-            </TableRow>
+              <div className="text-right">
+                <Button
+                  isDisabled={!form.id_produk}
+                  onPress={() => {
+                    tambahButtonPress({
+                      selectProduk,
+                      selectKaryawan,
+                      form,
+                    });
+                  }}
+                  color="primary"
+                  className="ml-2"
+                >
+                  Tambah
+                </Button>
+              </div>
+            </div>
           )}
-        </TableBody>
-      </Table>
+          <Table
+            className="z-10 w-fit"
+            aria-label="Example table with custom cells"
+            topContent={<></>}
+          >
+            <TableHeader columns={col.pengeluaranproyek}>
+              {(column) => (
+                <TableColumn
+                  key={column.key}
+                  align={column.key === "aksi" ? "center" : "start"}
+                >
+                  {column.label}
+                </TableColumn>
+              )}
+            </TableHeader>
+            <TableBody items={pengeluaranproyek.data} emptyContent={"Kosong"}>
+              {(item) => (
+                <TableRow key={item.id_pengeluaranproyek}>
+                  {(columnKey) => (
+                    <TableCell>
+                      {renderCell.pengeluaranproyek(item, columnKey)}
+                    </TableCell>
+                  )}
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      </div>
       {/* edit pengeluaranproyek */}
       <Modal
         scrollBehavior="inside"

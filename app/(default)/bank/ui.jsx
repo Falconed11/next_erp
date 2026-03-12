@@ -51,13 +51,17 @@ import {
   LinkOpenNewTab,
   TableHeaderWithAddButton,
 } from "@/components/mycomponent";
-import { FileUploader } from "@/components/input";
+import { FileUploader, UpdateShowHide } from "@/components/input";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useSession } from "next-auth/react";
 import { highRoleCheck, renderQueryStates } from "@/app/utils/tools";
 import { useClientFetch } from "@/hooks/useClientFetch";
 import { SelectPerusahaan } from "@/components/perusahaan/perusahaan";
+import {
+  METODE_PEMBAYARAN_ENDPOINT,
+  saveMetodePembayaran,
+} from "@/services/metode-pembayaran.service";
 
 const apiPath = getApiPath();
 
@@ -272,8 +276,7 @@ export default function App() {
                   <EditIcon />
                 </span>
               </Tooltip>
-
-              <Tooltip
+              {/* <Tooltip
                 content={`Klik untuk ${hide ? "menampilkan!" : "Menyembunyikan"}`}
               >
                 <span
@@ -282,7 +285,12 @@ export default function App() {
                 >
                   {hide ? "Show" : "Hide"}
                 </span>
-              </Tooltip>
+              </Tooltip> */}
+              <UpdateShowHide
+                data={data}
+                mutate={metodepembayaran.mutate}
+                onFetch={saveMetodePembayaran}
+              />
               <Tooltip color="danger" content="Delete">
                 <span
                   onClick={() => deleteButtonPress(data.id)}

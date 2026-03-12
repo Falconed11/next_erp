@@ -1,20 +1,15 @@
 // import { UserIcon, DeleteIcon } from "./icon";
 
+import { number2Nominal } from "@/app/utils/number";
+
 const Harga = ({ className, harga, label, endContent }) => {
   return (
     <span className={`text-right ${className}`}>
-      {label} {harga ? (+harga).toLocaleString("id-ID") : 0} {endContent}
+      {label} {number2Nominal(harga)} {endContent}
     </span>
   );
-
-  // harga ? (
-  //   <div className="inline-block text-right">
-  //     {label} {harga.toLocaleString("id-ID")} {endContent}
-  //   </div>
-  // ) : (
-  //   0
-  // );
 };
+
 export const NumberComp = ({ value, label }) => {
   return (
     <div className="text-right">

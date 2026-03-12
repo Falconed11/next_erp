@@ -2,9 +2,9 @@ import { defaultDelete, defaultSave } from "./default.service";
 
 export const METODE_PEMBAYARAN_ENDPOINT = "metodepembayaran";
 
-export const saveJenisInstansi = (form) => {
+export const saveMetodePembayaran = (form) => {
   return defaultSave(METODE_PEMBAYARAN_ENDPOINT, form);
 };
-export const deleteJenisInstansi = (id) => {
+export const deleteMetodePembayaran = (id) => {
   return defaultDelete(METODE_PEMBAYARAN_ENDPOINT, id);
 };
