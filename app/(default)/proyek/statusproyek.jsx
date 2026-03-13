@@ -37,17 +37,17 @@ import { StatusProyekModal } from "@/components/status-proyek/StatusProyekModal"
 import { useStatusProyekColumns } from "@/hooks/useStatusProyekColumns";
 import { isValidProgress } from "@/app/utils/validation";
 import { useClientFetch } from "@/hooks/useClientFetch";
+import { countOffset, countPages } from "@/app/utils/formula";
 
 const StatusProyek = () => {
   const { data: session } = useSession();
   const sessUser = session?.user;
   const [page, setPage] = useState(1);
   const rowsPerPage = 5;
-  const offset = (page - 1) * rowsPerPage;
+  const offset = countOffset(page, rowsPerPage);
   const statusproyek = useClientFetch(
     `statusproyek?limit=${rowsPerPage}&offset=${offset}`,
   );
-  const pages = Math.ceil(statusproyek?.data?.[0]?.nstatusproyek / rowsPerPage);
   const [form, setForm] = useState({});
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const tambahPress = () => {
@@ -82,6 +82,9 @@ const StatusProyek = () => {
   const queryStates = renderQueryStates({ statusproyek }, session);
   if (queryStates) return queryStates;
   const loadingState = statusproyek.isLoading ? "loading" : "idle";
+
+  const totalRows = statusproyek.data[0].nstatusproyek;
+  const pages = countPages(totalRows, rowsPerPage);
   return (
     <>
       <Table

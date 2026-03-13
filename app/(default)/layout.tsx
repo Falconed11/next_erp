@@ -227,9 +227,9 @@ export default function RootLayout({
   return (
     <section className="inline-flex- flex flex-col gap-3">
       <div></div>
-      <div className="bg-black- w-screen">
+      <div className="bg-black- w-screen sticky left-0">
         <div className="bg-red-500- mx-3">
-          <div className="grid grid-cols-2 py-2 mr-3 rounded-lg bg-background">
+          <div className="grid grid-cols-2 py-2 mr-3 rounded-lg bg-background ">
             <div className="basis-3/4-">
               <div className="p-3">ERP{pathname != "/" && pathname}</div>
             </div>
@@ -244,8 +244,8 @@ export default function RootLayout({
       </div>
       <div className="flex flex-row gap-3">
         <div></div>
-        <div className="w-1/9-">
-          <Nav navLinks={links} className={""} />
+        <div className={"sticky top-3"}>
+          <Nav navLinks={links} className="" />
         </div>
         <div className="w-8/9- shrink-0-">
           {session.status == "loading" ? (

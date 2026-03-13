@@ -61,6 +61,7 @@ import { SelectPerusahaan } from "@/components/perusahaan/perusahaan";
 import {
   METODE_PEMBAYARAN_ENDPOINT,
   saveMetodePembayaran,
+  saveMetodePembayaranV2,
 } from "@/services/metode-pembayaran.service";
 
 const apiPath = getApiPath();
@@ -90,20 +91,6 @@ export default function App() {
     if (res.status == 400) return alert(json.message);
     metodepembayaran.mutate();
     onClose();
-    //return alert(json.message);
-  };
-  const showHidePress = async (data) => {
-    const res = await fetch(`${apiPath}metodepembayaran`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify({ id: data.id, hide: data.hide ? 0 : 1 }),
-    });
-    const json = await res.json();
-    if (res.status == 400) return alert(json.message);
-    metodepembayaran.mutate();
     //return alert(json.message);
   };
   const saveTransferButtonPress = async (onClose) => {
@@ -289,7 +276,7 @@ export default function App() {
               <UpdateShowHide
                 data={data}
                 mutate={metodepembayaran.mutate}
-                onFetch={saveMetodePembayaran}
+                onFetch={saveMetodePembayaranV2}
               />
               <Tooltip color="danger" content="Delete">
                 <span

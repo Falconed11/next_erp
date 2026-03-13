@@ -50,11 +50,12 @@ export const TambahProdukPenawaran = ({
   // const QueryState = renderQueryStates({}, session);
   // if (QueryState) return QueryState;
   const hideComponent = isHighRole ? "" : "hidden";
-  const defStyleFormWidth = "w-2/12";
+  const defStyleFormWidth = "w-2/12-";
   return (
     <>
-      <div className={`flex gap-2`}>
+      <div className={`flex flex-col gap-2 w-60`}>
         <TambahProduk
+          className={``}
           form={form}
           setForm={setForm}
           disableStok
@@ -126,16 +127,16 @@ export const TambahProdukPenawaran = ({
             </>
           }
         />
-      </div>
-      <div>
-        <Button
-          onPress={() => {
-            tambahButtonPress(form, setForm);
-          }}
-          color="primary"
-        >
-          Tambah
-        </Button>
+        <div className="text-right">
+          <Button
+            onPress={() => {
+              tambahButtonPress(form, setForm);
+            }}
+            color="primary"
+          >
+            Tambah
+          </Button>
+        </div>
       </div>
     </>
   );

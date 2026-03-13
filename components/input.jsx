@@ -442,9 +442,9 @@ export function TemplateImportV2({
 }
 
 export const UpdateShowHide = ({ data, onFetch, mutate }) => {
-  const { hide } = data;
-  const onPress = async (data) => {
-    const res = await onFetch({ ...data, hide: hide ? 0 : 1, method: "PATCH" });
+  const { id, hide } = data;
+  const onPress = async () => {
+    const res = await onFetch({ id, hide: hide ? 0 : 1, method: "PATCH" });
     const json = await res.json();
     if (res.status == 400) return alert(json.message);
     mutate();
@@ -452,7 +452,7 @@ export const UpdateShowHide = ({ data, onFetch, mutate }) => {
   return (
     <Tooltip content={`Klik untuk ${hide ? "menampilkan!" : "Menyembunyikan"}`}>
       <span
-        onClick={() => onPress(data)}
+        onClick={() => onPress()}
         className="text-lg text-primary underline text-sm cursor-pointer active:opacity-50"
       >
         {hide ? "Show" : "Hide"}

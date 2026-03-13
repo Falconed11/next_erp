@@ -35,9 +35,9 @@ export default function Navigation({ navLinks, className }) {
 
   return (
     <nav
-      className={`mx-3- flex flex-col rounded-lg bg-background ${className}`}
+      className={`mx-3- flex flex-col rounded-lg bg-background text-nowrap sticky top-3`}
     >
-      <ul>
+      <ul className="max-w-10 hover:max-w-xs transition-all duration-300 overflow-hidden">
         {navLinks.map((link) => {
           const active = isActivePath(link.href);
           const baseClass = "p-2 cursor-pointer";

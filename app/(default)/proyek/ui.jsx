@@ -1,5 +1,11 @@
 "use client";
-import React, { useState, useMemo, useEffect, useRef } from "react";
+import React, {
+  useState,
+  useMemo,
+  useEffect,
+  useRef,
+  useCallback,
+} from "react";
 import { useSession } from "next-auth/react";
 import * as XLSX from "xlsx";
 import { RadioGroup, Radio, Badge } from "@heroui/react";
@@ -68,7 +74,7 @@ import {
   rolesCheck,
   set2key,
 } from "@/app/utils/tools";
-import { FileUploader } from "@/components/input";
+import { FileUploader, UpdateShowHide } from "@/components/input";
 import { RangeDate } from "@/components/input";
 import { LinkOpenNewTab } from "@/components/mycomponent";
 import Harga from "@/components/harga";
@@ -86,6 +92,9 @@ import {
 import { BadgeStatusProyek } from "@/components/badgestatusproyek";
 import { useReactToPrint } from "react-to-print";
 import { useClientFetch } from "@/hooks/useClientFetch";
+import { saveProyek } from "@/services/proyek.service";
+import { FilterHidden } from "@/components/filter";
+import { countOffset, countPages } from "@/app/utils/formula";
 
 export default function App({
   idProyek,
@@ -98,7 +107,9 @@ export default function App({
   const [sort, setSort] = useState("tanggal_penawaran");
   const session = useSession();
   const sessUser = session.data?.user;
-
+  const { peran } = sessUser;
+  // filter
+  const [isShowHidden, setIsShowHidden] = useState(false);
   const [selectedKeys, setSelectedKeys] = useState(new Set([]));
   const [current, setCurrent] = useState({
     startDate: startDate ? new Date(startDate) : null,
@@ -109,10 +120,6 @@ export default function App({
     // new Set([])
   );
   const [stat, setStat] = useState(1);
-  const [page, setPage] = useState(1);
-  const rowsPerPage = 10;
-  const offset = (page - 1) * rowsPerPage;
-  const [filteredData, setFilteredData] = useState([]);
   const [selectStatusProyek, setSelectStatusProyek] = useState();
   const printProyekRef = useRef(null);
   const handlePrintProyek = useReactToPrint({
@@ -121,10 +128,12 @@ export default function App({
     pageStyle: "bg-white block",
     documentTitle: "Daftar Proyek",
   });
-  const produk = useClientFetch(id_produk ? `produk?id=${id_produk}` : null);
-  const customer = useClientFetch(`customer`);
+  const [page, setPage] = useState(1);
+  const rowsPerPage = 10;
+  const offset = countOffset(page, rowsPerPage);
   const proyek = useClientFetch(
     `proyek?${[
+      ...(isShowHidden ? [] : ["hide=0"]),
       ...(idProyek ? [`id=${idProyek}`] : []),
       ...(id_instansi ? [`id_instansi=${id_instansi}`] : []),
       ...(selectkaryawan.size > 0
@@ -134,8 +143,14 @@ export default function App({
       ...(current.endDate ? [`start=${getDate(current.endDate)}`] : []),
       ...(selectStatusProyek ? [`id_statusproyek=${selectStatusProyek}`] : []),
       ...(current.endDate ? [`start=${getDate(current.endDate)}`] : []),
-    ].join("&")}&sort=${sort}&id_produk=${id_produk || ""}`,
+      ...(id_produk ? [`id_produk=${id_produk}`] : []),
+      `sort=${sort}`,
+      `limit=${rowsPerPage}`,
+      `offset=${offset}`,
+    ].join("&")}`,
   );
+  const produk = useClientFetch(id_produk ? `produk?id=${id_produk}` : null);
+  const customer = useClientFetch(`customer`);
   const penawaran = useClientFetch(
     `exportpenawaran?start=${getDate(current.startDate)}&end=${getDate(
       current.endDate,
@@ -159,18 +174,6 @@ export default function App({
   const [form, setForm] = useState({});
   const [method, setMethod] = useState("POST");
   const [json, setJson] = useState([]);
-  // filteredData = proyek?.data;
-  // filteredData.forEach((data) => [(data.peran = sessUser?.peran)]);
-  useEffect(() => {
-    const updated = proyek?.data?.map((d) => ({
-      ...d,
-      peran: sessUser?.peran,
-    }));
-    setFilteredData(updated);
-  }, [proyek?.data, sessUser?.peran]);
-  const pages = useMemo(() => {
-    return filteredData ? Math.ceil(filteredData?.length / rowsPerPage) : 0;
-  }, [filteredData?.length, rowsPerPage]);
   const loadingState = proyek.isLoading ? "loading" : "idle";
   const saveButtonPress = async (onClose) => {
     // if (form.isSwasta.size == 0) return alert("Swasta/Negri belum diisi");
@@ -324,12 +327,11 @@ export default function App({
   };
 
   const isHighRole = highRoleCheck(sessUser?.rank);
-  const renderCell = React.useCallback(
+  const renderCell = useCallback(
     (data, columnKey) => {
       const cellValue = data[columnKey];
       const date = new Date(data.tanggal);
       const versi = data.versi;
-      const peran = data.peran;
       const idStatusProyek = data.id_statusproyek;
       const tanggalReject = data.tanggal_reject;
       const sTanggal = "text-white font-bold p-1 rounded";
@@ -408,12 +410,12 @@ export default function App({
           return (
             <div className="relative flex items-center gap-2">
               {/* <LinkOpenNewTab
-              content="Aktivitas Sales"
-              link={`/proyek/aktivitassales?id=${data.id}&versi=${
-                data.versi <= 0 ? "1" : data.versi
-              }`}
-              icon={<BusinessProgressBarIcon />}
-            /> */}
+                content="Aktivitas Sales"
+                link={`/proyek/aktivitassales?id=${data.id}&versi=${
+                  data.versi <= 0 ? "1" : data.versi
+                }`}
+                icon={<BusinessProgressBarIcon />}
+              /> */}
               <LinkOpenNewTab
                 content="Detail (Penawaran, Invoice, Surat Jalan, & Kwitansi)"
                 link={`/proyek/detail?id=${data.id}&versi=${
@@ -421,7 +423,7 @@ export default function App({
                 }`}
                 icon={<NoteIcon />}
               />
-              {rolesCheck(["super", "admin", "sales"], peran) ? (
+              {rolesCheck(["super", "admin", "sales"], peran) && (
                 <Tooltip content="Proses (Pengeluaran & Pembayaran)">
                   <Link href={`/proyek/detail/proses?id=${data.id}`}>
                     <span
@@ -437,52 +439,57 @@ export default function App({
                     </span>
                   </Link>
                 </Tooltip>
-              ) : (
-                <></>
               )}
               {/* {versi > 0 ? (
-              peran == "admin" || peran == "super" ? (
-                <Tooltip content="Pengeluaran Proyek">
-                  <Link href={`/proyek/detail/proses?id=${data.id}`}>
-                    <span
-                      // onClick={() => detailButtonPress(data)}
-                      role="link"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        window.open(`/proyek/detail/proses?id=${data.id}`);
-                      }}
-                      className="text-lg text-default-400 cursor-pointer active:opacity-50"
-                    >
-                      <ReportMoneyIcon />
-                    </span>
-                  </Link>
-                </Tooltip>
+                peran == "admin" || peran == "super" ? (
+                  <Tooltip content="Pengeluaran Proyek">
+                    <Link href={`/proyek/detail/proses?id=${data.id}`}>
+                      <span
+                        // onClick={() => detailButtonPress(data)}
+                        role="link"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          window.open(`/proyek/detail/proses?id=${data.id}`);
+                        }}
+                        className="text-lg text-default-400 cursor-pointer active:opacity-50"
+                      >
+                        <ReportMoneyIcon />
+                      </span>
+                    </Link>
+                  </Tooltip>
+                ) : (
+                  <></>
+                )
               ) : (
                 <></>
-              )
-            ) : (
-              <></>
-            )} */}
+              )} */}
               {(!data.id_karyawan ||
                 isHighRole ||
                 sessUser.id_karyawan == data.id_karyawan) && (
-                <Tooltip content="Edit">
-                  <span
-                    onClick={() => editButtonPress(data)}
-                    className="text-lg text-default-400 cursor-pointer active:opacity-50"
-                  >
-                    <EditIcon />
-                  </span>
-                </Tooltip>
+                <>
+                  <Tooltip content="Edit">
+                    <span
+                      onClick={() => editButtonPress(data)}
+                      className="text-lg text-default-400 cursor-pointer active:opacity-50"
+                    >
+                      <EditIcon />
+                    </span>
+                  </Tooltip>
+                  <UpdateShowHide
+                    data={data}
+                    mutate={proyek.mutate}
+                    onFetch={saveProyek}
+                  />
+                </>
               )}
               {/* <Tooltip content="Export">
-              <span
-                onClick={() => handleExportButtonPress(data)}
-                className="text-lg text-default-400 cursor-pointer active:opacity-50"
-              >
-                <FileExportIcon />
-              </span>
-            </Tooltip> */}
+                <span
+                  onClick={() => handleExportButtonPress(data)}
+                  className="text-lg text-default-400 cursor-pointer active:opacity-50"
+                >
+                  <FileExportIcon />
+                </span>
+              </Tooltip> */}
               {["super", "admin"].includes(peran) ? (
                 <Tooltip color="danger" content="Delete">
                   <span
@@ -508,6 +515,11 @@ export default function App({
   const report = useDisclosure();
   const queryStates = renderQueryStates(queries, session);
   if (queryStates) return queryStates;
+
+  const selectedProyek = proyek.data[0];
+  const totalRows = selectedProyek?.totalrows;
+  const pages = countPages(totalRows, rowsPerPage);
+
   const columns = [
     {
       key: "aksi",
@@ -704,6 +716,7 @@ export default function App({
         </div>
       </div> */}
       <Table
+        key={peran}
         isStriped
         className=""
         aria-label="Example table with custom cells"
@@ -767,6 +780,10 @@ export default function App({
                           setSelect={setSelectStatusProyek}
                           setPage={setPage}
                         />
+                        <FilterHidden
+                          isShowHidden={isShowHidden}
+                          setIsShowHidden={setIsShowHidden}
+                        />
                       </div>
                       {selectedProduct && (
                         <div>
@@ -799,6 +816,17 @@ export default function App({
                                 label: "Alamat",
                                 value: selectedCustomer.alamat,
                               },
+                            ]}
+                          />
+                        </div>
+                      )}
+                      {idProyek && (
+                        <div>
+                          <FilterCard
+                            title={"Proyek"}
+                            arrayContent={[
+                              { label: "Id", value: idProyek },
+                              { label: "Nama", value: selectedProyek?.nama },
                             ]}
                           />
                         </div>
@@ -1009,9 +1037,7 @@ export default function App({
           )}
         </TableHeader>
         <TableBody
-          items={
-            filteredData ? filteredData.slice(offset, offset + rowsPerPage) : []
-          }
+          items={proyek.data}
           loadingContent={"Loading..."}
           emptyContent={"Kosong"}
           loadingState={loadingState}
@@ -1019,7 +1045,9 @@ export default function App({
           {(item) => (
             <TableRow key={item.id}>
               {(columnKey) => (
-                <TableCell>{renderCell(item, columnKey)}</TableCell>
+                <TableCell className={item.hide ? "bg-red-200" : ""}>
+                  {renderCell(item, columnKey)}
+                </TableCell>
               )}
             </TableRow>
           )}

@@ -68,13 +68,13 @@ export default function TambahProduk({
   // console.log(form.selectProduk);
   // console.log({ nama });
   const dataProduk = produk.data;
-  const defStyleFormWidth = "w-2/12-";
+  const defStyleFormWidth = "group";
   const variant = "bordered";
   const isProdukSelected = !!form.id_produk;
   return (
     <div
       // className={`flex flex-wrap gap-3 ${className}`}
-      className="flex flex-col gap-2"
+      className={`flex flex-col gap-2 ${className}`}
     >
       <AutocompleteKategoriProduk
         disableCustomValue={disableCustomValue}
@@ -87,7 +87,7 @@ export default function TambahProduk({
         id_kategori={idKategori}
         form={form}
         setForm={setForm}
-        className=""
+        className={defStyleFormWidth}
       />
       <AutocompleteMerek
         disableCustomValue={disableCustomValue}

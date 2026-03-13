@@ -2,7 +2,7 @@ import { Select, SelectItem } from "@heroui/react";
 import { Checkbox } from "@heroui/react";
 import { Input } from "@heroui/react";
 
-const FilterProduk = ({
+export const FilterProduk = ({
   id,
   setId,
   nama,
@@ -79,4 +79,8 @@ const FilterProduk = ({
   );
 };
 
-export { FilterProduk };
+export const FilterHidden = ({ isShowHidden, setIsShowHidden }) => (
+  <Checkbox isSelected={isShowHidden} onValueChange={setIsShowHidden}>
+    Show Hidden
+  </Checkbox>
+);

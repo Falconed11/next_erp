@@ -949,7 +949,8 @@ export default function App({ id, versi }) {
   const dataSubProyek = subProyek.data;
   const hideComponent = isHighRole ? "" : "hidden";
   const fullPath = `${NEXT_DOMAIN}/proyek/detail?id=${id}&versi=${versi}`;
-  console.log(form);
+  const selectedStatusProyek = selectedProyek.statusproyek.toLowerCase();
+  // console.log(form);
   return (
     <div className="flex gap-2 flex-col item-start">
       <div className="flex gap-2">
@@ -1123,55 +1124,51 @@ export default function App({ id, versi }) {
             Buat Versi Baru
           </Button>
         </div> */}
-        {["admin", "super"].includes(sessUser?.peran) ? (
-          selectedProyek?.statusproyek.toLowerCase() != "deal" ? (
-            <div>
-              <Button
-                onPress={handleButtonSetAsDealClick}
-                color="primary"
-                className=""
-              >
-                Set as Deal
-              </Button>
-            </div>
-          ) : (
-            <div>
-              <Button
-                onPress={handleButtonCancelDealRejectClick}
-                color="primary"
-                className=""
-              >
-                Cancel Deal
-              </Button>
-            </div>
-          )
-        ) : (
-          <></>
-        )}
-        {["admin", "super"].includes(sessUser?.peran) ? (
-          selectedProyek?.statusproyek.toLowerCase() != "reject" ? (
-            <div>
-              <Button
-                onPress={handleButtonSetAsRejectClick}
-                color="primary"
-                className=""
-              >
-                Set as Reject
-              </Button>
-            </div>
-          ) : (
-            <div>
-              <Button
-                onPress={handleButtonCancelDealRejectClick}
-                color="primary"
-                className=""
-              >
-                Cancel Reject
-              </Button>
-            </div>
-          )
-        ) : (
-          <></>
+        {isRoleAuthorized && (
+          <>
+            {selectedStatusProyek != "deal" ? (
+              <div>
+                <Button
+                  onPress={handleButtonSetAsDealClick}
+                  color="primary"
+                  className=""
+                >
+                  Set as Deal
+                </Button>
+              </div>
+            ) : (
+              <div>
+                <Button
+                  onPress={handleButtonCancelDealRejectClick}
+                  color="primary"
+                  className=""
+                >
+                  Cancel Deal
+                </Button>
+              </div>
+            )}
+            {selectedStatusProyek != "reject" ? (
+              <div>
+                <Button
+                  onPress={handleButtonSetAsRejectClick}
+                  color="primary"
+                  className=""
+                >
+                  Set as Reject
+                </Button>
+              </div>
+            ) : (
+              <div>
+                <Button
+                  onPress={handleButtonCancelDealRejectClick}
+                  color="primary"
+                  className=""
+                >
+                  Cancel Reject
+                </Button>
+              </div>
+            )}
+          </>
         )}
         <div>
           <Button onPress={modal.penawaran.onOpen} color="primary" className="">
@@ -1246,7 +1243,7 @@ export default function App({ id, versi }) {
           </TemplateImportV2>
         </div>
       )}
-      <div className="w-9/12-">
+      <div className="w-9/12- flex flex-col gap-2">
         {/* sub proyek */}
         <SubProyek
           id={id}
@@ -1254,191 +1251,195 @@ export default function App({ id, versi }) {
           isAuthorized={isAuthorized}
         />
         {/* tabel peralatan */}
-        <Table
-          key={selectedProgress}
-          isStriped
-          isCompact
-          className="pt-3"
-          topContent={
-            <>
-              <div>Peralatan</div>
-              <ConditionalComponent
-                condition={isAuthorized}
-                component={
-                  <TambahProdukPenawaran
-                    isHighRole={isHighRole}
-                    idProyek={id}
-                    instalasi={0}
-                    mutateKeranjang={mutateKeranjang}
-                    versi={versi}
-                  />
-                }
-              />
-            </>
-          }
-          bottomContent={
-            <>
-              <div className="text-right">
-                <div>
-                  <Harga
-                    label="Sub Total Harga Jual :"
-                    harga={subTotalHargaJual}
-                  />
+        <div className="bg-white p-3 rounded-lg">
+          <div>Peralatan</div>
+          <div className="flex gap-2">
+            <ConditionalComponent
+              condition={isAuthorized}
+              component={
+                <TambahProdukPenawaran
+                  isHighRole={isHighRole}
+                  idProyek={id}
+                  instalasi={0}
+                  mutateKeranjang={mutateKeranjang}
+                  versi={versi}
+                />
+              }
+            />
+            <Table
+              key={selectedProgress}
+              isStriped
+              isCompact
+              className="overflow-x-auto"
+              topContent={<></>}
+              bottomContent={
+                <div className="flex justify-end relative">
+                  <div className="text-right sticky right-3">
+                    <div>
+                      <Harga
+                        label="Sub Total Harga Jual :"
+                        harga={subTotalHargaJual}
+                      />
+                    </div>
+                    {isHighRole && (
+                      <>
+                        <div>
+                          <Harga
+                            harga={keranjangProyek.data.reduce(
+                              (total, currentValue) => {
+                                return (
+                                  total +
+                                  currentValue.jumlah *
+                                    currentValue.temphargamodal
+                                );
+                              },
+                              0,
+                            )}
+                            label="Sub Total Harga Modal :"
+                          />
+                        </div>
+                        <div>
+                          <Harga
+                            label={"Sub Total Provit :"}
+                            harga={keranjangProyek.data.reduce(
+                              (total, currentValue) => {
+                                return (
+                                  total +
+                                  currentValue.jumlah *
+                                    (currentValue.harga -
+                                      currentValue.temphargamodal)
+                                );
+                              },
+                              0,
+                            )}
+                          />
+                        </div>
+                      </>
+                    )}
+                  </div>
                 </div>
-                {isHighRole && (
-                  <>
-                    <div>
-                      <Harga
-                        harga={keranjangProyek.data.reduce(
-                          (total, currentValue) => {
-                            return (
-                              total +
-                              currentValue.jumlah * currentValue.temphargamodal
-                            );
-                          },
-                          0,
-                        )}
-                        label="Sub Total Harga Modal :"
-                      />
-                    </div>
-                    <div>
-                      <Harga
-                        label={"Sub Total Provit :"}
-                        harga={keranjangProyek.data.reduce(
-                          (total, currentValue) => {
-                            return (
-                              total +
-                              currentValue.jumlah *
-                                (currentValue.harga -
-                                  currentValue.temphargamodal)
-                            );
-                          },
-                          0,
-                        )}
-                      />
-                    </div>
-                  </>
+              }
+              aria-label="Example table with custom cells"
+            >
+              <TableHeader columns={col.keranjangproyek}>
+                {(column) => (
+                  <TableColumn
+                    key={column.key}
+                    align={column.key === "aksi" ? "center" : "start"}
+                  >
+                    {column.label}
+                  </TableColumn>
                 )}
-              </div>
-            </>
-          }
-          aria-label="Example table with custom cells"
-        >
-          <TableHeader columns={col.keranjangproyek}>
-            {(column) => (
-              <TableColumn
-                key={column.key}
-                align={column.key === "aksi" ? "center" : "start"}
-              >
-                {column.label}
-              </TableColumn>
-            )}
-          </TableHeader>
-          <TableBody items={keranjangProduk} emptyContent={"Kosong"}>
-            {(item) => (
-              <TableRow key={item.id_keranjangproyek}>
-                {(columnKey) => (
-                  <TableCell>
-                    {renderCell.keranjangproyek(item, columnKey)}
-                  </TableCell>
+              </TableHeader>
+              <TableBody items={keranjangProduk} emptyContent={"Kosong"}>
+                {(item) => (
+                  <TableRow key={item.id_keranjangproyek}>
+                    {(columnKey) => (
+                      <TableCell>
+                        {renderCell.keranjangproyek(item, columnKey)}
+                      </TableCell>
+                    )}
+                  </TableRow>
                 )}
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+              </TableBody>
+            </Table>
+          </div>
+        </div>
         {/* tabel instalasi */}
-        <Table
-          key={`${selectedProgress}-instalasi`}
-          isStriped
-          isCompact
-          topContent={
-            <>
-              <div>Instalasi</div>
-              <ConditionalComponent
-                condition={isAuthorized}
-                component={
-                  <TambahProdukPenawaran
-                    isHighRole={isHighRole}
-                    idProyek={id}
-                    instalasi={1}
-                    mutateKeranjang={mutateKeranjang}
-                    versi={versi}
-                  />
-                }
-              />
-            </>
-          }
-          bottomContent={
-            <>
-              <div className="text-right">
-                <div>
-                  <Harga
-                    label="Sub Total Harga Instalasi :"
-                    harga={subTotalHargaInstalasi}
-                  />
-                </div>
-                {isHighRole && (
-                  <>
+        <div className="bg-white p-3 rounded-lg">
+          <div>Instalasi</div>
+          <div className="flex gap-2">
+            <ConditionalComponent
+              condition={isAuthorized}
+              component={
+                <TambahProdukPenawaran
+                  isHighRole={isHighRole}
+                  idProyek={id}
+                  instalasi={1}
+                  mutateKeranjang={mutateKeranjang}
+                  versi={versi}
+                />
+              }
+            />
+            <Table
+              key={`${selectedProgress}-instalasi`}
+              isStriped
+              isCompact
+              topContent={<></>}
+              bottomContent={
+                <>
+                  <div className="text-right">
                     <div>
                       <Harga
-                        harga={keranjangProyekInstalasi.data.reduce(
-                          (total, currentValue) => {
-                            return (
-                              total +
-                              currentValue.jumlah * currentValue.temphargamodal
-                            );
-                          },
-                          0,
-                        )}
-                        label="Sub Total Harga Modal :"
+                        label="Sub Total Harga Instalasi :"
+                        harga={subTotalHargaInstalasi}
                       />
                     </div>
-                    <div>
-                      <Harga
-                        label={"Sub Total Provit :"}
-                        harga={keranjangProyekInstalasi.data.reduce(
-                          (total, currentValue) => {
-                            return (
-                              total +
-                              currentValue.jumlah *
-                                (currentValue.harga -
-                                  currentValue.temphargamodal)
-                            );
-                          },
-                          0,
-                        )}
-                      />
-                    </div>
-                  </>
+                    {isHighRole && (
+                      <>
+                        <div>
+                          <Harga
+                            harga={keranjangProyekInstalasi.data.reduce(
+                              (total, currentValue) => {
+                                return (
+                                  total +
+                                  currentValue.jumlah *
+                                    currentValue.temphargamodal
+                                );
+                              },
+                              0,
+                            )}
+                            label="Sub Total Harga Modal :"
+                          />
+                        </div>
+                        <div>
+                          <Harga
+                            label={"Sub Total Provit :"}
+                            harga={keranjangProyekInstalasi.data.reduce(
+                              (total, currentValue) => {
+                                return (
+                                  total +
+                                  currentValue.jumlah *
+                                    (currentValue.harga -
+                                      currentValue.temphargamodal)
+                                );
+                              },
+                              0,
+                            )}
+                          />
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </>
+              }
+              className=""
+              aria-label="Example table with custom cells"
+            >
+              <TableHeader columns={col.instalasi}>
+                {(column) => (
+                  <TableColumn
+                    key={column.key}
+                    align={column.key === "aksi" ? "center" : "start"}
+                  >
+                    {column.label}
+                  </TableColumn>
                 )}
-              </div>
-            </>
-          }
-          className="pt-3"
-          aria-label="Example table with custom cells"
-        >
-          <TableHeader columns={col.instalasi}>
-            {(column) => (
-              <TableColumn
-                key={column.key}
-                align={column.key === "aksi" ? "center" : "start"}
-              >
-                {column.label}
-              </TableColumn>
-            )}
-          </TableHeader>
-          <TableBody items={keranjangInstalasi} emptyContent={"Kosong"}>
-            {(item) => (
-              <TableRow key={item.id_keranjangproyek}>
-                {(columnKey) => (
-                  <TableCell>
-                    {renderCell.keranjangproyek(item, columnKey)}
-                  </TableCell>
+              </TableHeader>
+              <TableBody items={keranjangInstalasi} emptyContent={"Kosong"}>
+                {(item) => (
+                  <TableRow key={item.id_keranjangproyek}>
+                    {(columnKey) => (
+                      <TableCell>
+                        {renderCell.keranjangproyek(item, columnKey)}
+                      </TableCell>
+                    )}
+                  </TableRow>
                 )}
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+              </TableBody>
+            </Table>
+          </div>
+        </div>
       </div>
 
       {/* edit produk */}

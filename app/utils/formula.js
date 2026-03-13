@@ -1,20 +1,23 @@
-const countProvitMarginPercent = (hargamodal, hargajual) => {
+export const countProvitMarginPercent = (hargamodal, hargajual) => {
   return ((hargajual - hargamodal) / hargajual) * 100;
   return Math.round(((hargajual - hargamodal) / hargajual) * 100 * 100) / 100;
 };
-const countPriceByProvitMarginPercent = (hargaModal, provitMarginPercent) => {
+export const countPriceByProvitMarginPercent = (
+  hargaModal,
+  provitMarginPercent,
+) => {
   return Math.ceil(hargaModal / (1 - provitMarginPercent / 100));
 };
-const countPercentProvit = (hargaModal, hargaJual) => {
+export const countPercentProvit = (hargaModal, hargaJual) => {
   return ((hargaJual - hargaModal) / hargaModal) * 100;
 };
-const countPriceByPercentProfit = (hargaModal, provitPercent) => {
+export const countPriceByPercentProfit = (hargaModal, provitPercent) => {
   return hargaModal * (1 + provitPercent / 100);
 };
-const countRecapitulation = (
+export const countRecapitulation = (
   peralatan,
   instalasi,
-  { diskon = 0, diskoninstalasi = 0, pajak = 0 }
+  { diskon = 0, diskoninstalasi = 0, pajak = 0 },
 ) => {
   const countModalJual = (data) =>
     data.reduce(
@@ -23,7 +26,7 @@ const countRecapitulation = (
         acc.jual += v.harga * v.jumlah;
         return acc;
       },
-      { modal: 0, jual: 0 }
+      { modal: 0, jual: 0 },
     );
   const countRekap = ({ modal, jual }, diskon, pajakPersen) => {
     const hargaDiskon = jual - diskon;
@@ -53,7 +56,7 @@ const countRecapitulation = (
     Object.entries(rekapPeralatan).map(([key, val]) => [
       key,
       val + (rekapInstalasi[key] || 0),
-    ])
+    ]),
   );
   rekapTotal.diskonPersen = (
     ((diskon + diskoninstalasi) / total.jual) *
@@ -61,7 +64,7 @@ const countRecapitulation = (
   ).toFixed(2);
   rekapTotal.provitPersen = countPercentProvit(
     total.modal,
-    rekapTotal.hargaDiskon
+    rekapTotal.hargaDiskon,
   ).toFixed(2);
   return {
     rekapitulasiPeralatan: {
@@ -80,11 +83,10 @@ const countRecapitulation = (
     },
   };
 };
-
-export {
-  countProvitMarginPercent,
-  countPriceByProvitMarginPercent,
-  countPercentProvit,
-  countPriceByPercentProfit,
-  countRecapitulation,
-};
+export const countOffset = (page, rowsPerPage) => (page - 1) * rowsPerPage;
+export const countPages = (totalRows, rowsPerPage) =>
+  Math.ceil(totalRows / rowsPerPage);
+export const getPaginationInfo = (page, rowsPerPage, totalRows) => ({
+  offset: countOffset(page, rowsPerPage),
+  pages: countPages(totalRows, rowsPerPage),
+});
