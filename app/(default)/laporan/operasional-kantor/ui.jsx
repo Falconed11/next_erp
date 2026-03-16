@@ -54,6 +54,10 @@ const LaporanOperasionalKantor = ({ yearMonth, id_perusahaan }) => {
             renderCell: (data) => getDateFId(data.tanggal),
           },
           {
+            style: "text-nowrap",
+            renderCell: (data) => data.perusahaan,
+          },
+          {
             style: "text-nowrap px-2",
             renderCell: (data) =>
               capitalizeEachWord(data.kategorioperasionalkantor),
@@ -72,6 +76,7 @@ const LaporanOperasionalKantor = ({ yearMonth, id_perusahaan }) => {
             { style: "font-bold", cell: "Total" },
             {},
             {},
+            {},
             {
               style: "text-right font-bold text-blue-600",
               cell: <Harga harga={totalOperasionalKantor} />,
@@ -81,6 +86,10 @@ const LaporanOperasionalKantor = ({ yearMonth, id_perusahaan }) => {
             {
               style: sHeader,
               cell: "Tanggal",
+            },
+            {
+              style: sHeader,
+              cell: "Perusahaan",
             },
             {
               style: sHeader,

@@ -78,7 +78,10 @@ import { FileUploader, UpdateShowHide } from "@/components/input";
 import { RangeDate } from "@/components/input";
 import { LinkOpenNewTab } from "@/components/mycomponent";
 import Harga from "@/components/harga";
-import { ShowHideComponent } from "@/components/componentmanipulation";
+import {
+  ShowHideComponent,
+  ShowHideComponent2,
+} from "@/components/componentmanipulation";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import SelectStatusProyek from "@/components/selectstatusproyek";
@@ -727,13 +730,10 @@ export default function App({
           <div className="flex gap-2">
             {/* Filter & Report */}
             <div className="flex gap-2 flex-col">
-              <ShowHideComponent
-                stat={stat}
-                setStat={setStat}
-                openContent={"Buka Filter"}
-                btnClassName="mb-2"
-                variant="shadow"
-                btnSize="sm"
+              <ShowHideComponent2
+                initialState
+                closeContent="Buka Filter"
+                openContent="Tutup Filter"
               >
                 <div className="flex gap-2">
                   {/* Filter */}
@@ -985,7 +985,7 @@ export default function App({
                     <StatusProyek />
                   </div>
                 </div>
-              </ShowHideComponent>
+              </ShowHideComponent2>
               <div className="flex gap-2">
                 <Button
                   variant="shadow"

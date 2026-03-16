@@ -17,3 +17,5 @@ export const buildTableClassNames = ({ customTd }) => ({
   tr: "",
   base: "",
 });
+export const styleActionButton =
+  "text-lg text-default-400 cursor-pointer active:opacity-50";

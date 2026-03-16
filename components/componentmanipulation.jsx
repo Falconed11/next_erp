@@ -1,5 +1,6 @@
 import { Button } from "@heroui/react";
 import { useState } from "react";
+import { RiArrowDropDownLine, RiArrowDropRightLine } from "react-icons/ri";
 
 const ConditionalComponent = ({ condition, component }) => {
   return condition ? component : <></>;
@@ -34,12 +35,16 @@ const ShowHideComponent = ({
       >
         {stat == 0 ? openContent || "Buka" : closeContent || "Sembunyikan"}
       </Button>
-      <div className={`${stat == 0 ? "hidden" : ""}`}>{children}</div>
+      <div
+        className={`${stat == 0 ? "max-h-0" : "max-h-1000"} overflow-hidden transition-all duration-500`}
+      >
+        {children}
+      </div>
     </div>
   );
 };
 const ShowHideComponent2 = ({
-  initialState = false,
+  initialState,
   children,
   openContent,
   closeContent,
@@ -47,16 +52,32 @@ const ShowHideComponent2 = ({
   // stat and setStat must be `const [stat, setStat] = useState(0)`;
   const [isOpen, setIsOpen] = useState(initialState);
   return (
-    <div>
-      <Button
-        color="primary"
-        onPress={() => {
-          setIsOpen(!isOpen);
-        }}
+    <div className="flex flex-col gap-2">
+      <div>
+        <Button
+          color="primary"
+          onPress={() => {
+            setIsOpen(!isOpen);
+          }}
+        >
+          {isOpen ? (
+            <>
+              {openContent || "Sembunyikan"}
+              <RiArrowDropDownLine className="text-4xl" />
+            </>
+          ) : (
+            <>
+              {closeContent || "Buka"}
+              <RiArrowDropRightLine className="text-4xl" />
+            </>
+          )}
+        </Button>
+      </div>
+      <div
+        className={`${isOpen ? "max-h-1000" : "max-h-0"} overflow-hidden transition-all duration-500`}
       >
-        {isOpen ? openContent || "Sembunyikan" : closeContent || "Buka"}
-      </Button>
-      <div className={`${isOpen ? "" : "hidden"}`}>{children}</div>
+        {children}
+      </div>
     </div>
   );
 };

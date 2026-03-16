@@ -1,8 +1,6 @@
+import { API_PATH } from "@/app/utils/apiconfig";
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { getApiPath } from "@/app/utils/apiconfig";
-
-const api_path = getApiPath();
 
 export const options: NextAuthOptions = {
   providers: [
@@ -21,7 +19,7 @@ export const options: NextAuthOptions = {
         },
       },
       async authorize(credentials) {
-        const res = await fetch(`${api_path}login`, {
+        const res = await fetch(`${API_PATH}login`, {
           method: "POST",
           body: JSON.stringify(credentials),
           headers: { "Content-Type": "application/json" },

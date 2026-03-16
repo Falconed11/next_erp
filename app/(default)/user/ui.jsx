@@ -33,24 +33,29 @@ import "react-datepicker/dist/react-datepicker.css";
 import { getApiPath } from "../../utils/apiconfig";
 import { Button } from "@heroui/react";
 import { Input, Select, SelectItem } from "@heroui/react";
-import { key2set, rolesCheck, set2key } from "@/app/utils/tools";
+import {
+  highRoleCheck,
+  key2set,
+  renderQueryStates,
+  rolesCheck,
+  set2key,
+} from "@/app/utils/tools";
 import { useClientFetch } from "@/hooks/useClientFetch";
+import { TableHeaderWithAddButton } from "@/components/mycomponent";
 
 const api_path = getApiPath();
 
 export default function App() {
   const session = useSession();
-  const sessionuser = session?.data?.user;
+  const sessUser = session?.data?.user;
   const user = useClientFetch(
-    sessionuser
-      ? `user?id=${sessionuser.id}&peran=${sessionuser.peran}&rank=${sessionuser.rank}`
+    sessUser
+      ? `user?id=${sessUser.id}&peran=${sessUser.peran}&rank=${sessUser.rank}`
       : null,
   );
   const karyawan = useClientFetch(`karyawan?id_statuskaryawan=1`);
   const peran = useClientFetch(
-    sessionuser
-      ? `peran?peran=${sessionuser.peran}&rank=${sessionuser.rank}`
-      : null,
+    sessUser ? `peran?peran=${sessUser.peran}&rank=${sessUser.rank}` : null,
   );
   const [form, setForm] = useState({});
   const [method, setMethod] = useState();
@@ -160,19 +165,25 @@ export default function App() {
     user: useDisclosure(),
   };
 
-  const sources = [karyawan, user, peran];
-  if (sources.some((o) => o.error)) return <div>failed to load</div>;
-  if (sources.some((o) => o.isLoading)) return <div>loading...</div>;
-  if (session.status === "loading") return <>Loading...</>;
+  const QueryStates = renderQueryStates({ karyawan, user, peran }, session);
+  if (QueryStates) return QueryStates;
+  const isHighRole = highRoleCheck(sessUser.rank);
   // if (session.data.user.peran != "super")
   //   return <div>Anda tidak memiliki akses pada laman ini.</div>;
   // console.log(peran);
   return (
     <div>
-      <Button onPress={tambahButtonPress} color="primary">
-        Tambah
-      </Button>
-      <Table className="pt-3" aria-label="Example table with custom cells">
+      <Table
+        className=""
+        aria-label="Example table with custom cells"
+        topContent={
+          <TableHeaderWithAddButton
+            isHighRole={isHighRole}
+            onPress={tambahButtonPress}
+            title="User"
+          />
+        }
+      >
         <TableHeader columns={col.user}>
           {(column) => (
             <TableColumn
@@ -212,7 +223,7 @@ export default function App() {
                   value={form.username}
                   onValueChange={(v) => setForm({ ...form, username: v })}
                 />
-                {sessionuser.rank >= form.tempRank ? (
+                {sessUser.rank >= form.tempRank ? (
                   <Input
                     disabled
                     type="text"
@@ -224,7 +235,7 @@ export default function App() {
                     label="Peran"
                     variant="bordered"
                     disabled={
-                      sessionuser.rank < form.tempRank ||
+                      sessUser.rank < form.tempRank ||
                       form.modalmode == "Tambah"
                         ? undefined
                         : true
@@ -247,7 +258,7 @@ export default function App() {
                     ))}
                   </Select>
                 )}
-                {sessionuser.rank > 10 ? (
+                {sessUser.rank > 10 ? (
                   <Input
                     disabled
                     type="text"

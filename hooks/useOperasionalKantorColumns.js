@@ -17,7 +17,7 @@ export default function useOperasionalKantorColumns(isHighRole) {
       },
       {
         key: "karyawan",
-        label: "Karyawan",
+        label: "Diinput Oleh",
       },
       {
         key: "kategori",

@@ -1,6 +1,7 @@
 // https://reactsvgicons.com/
-// https://react-icons.github.io/
+// https://react-icons.github.io/react-icons/
 import React from "react";
+
 const AddIcon = (props) => {
   return (
     <svg

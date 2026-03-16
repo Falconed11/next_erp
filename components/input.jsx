@@ -19,6 +19,8 @@ import { getDate, excelToJSDate, getDateF } from "@/app/utils/date";
 import { getApiPath } from "@/app/utils/apiconfig";
 import { SelectPerusahaan } from "./perusahaan/perusahaan";
 import { useSession } from "next-auth/react";
+import { GoEye, GoEyeClosed } from "react-icons/go";
+import { styleActionButton } from "@/app/utils/style";
 
 const apiPath = getApiPath();
 
@@ -444,6 +446,7 @@ export function TemplateImportV2({
 export const UpdateShowHide = ({ data, onFetch, mutate }) => {
   const { id, hide } = data;
   const onPress = async () => {
+    if (!hide) if (!confirm("Sembunyikan data?")) return;
     const res = await onFetch({ id, hide: hide ? 0 : 1, method: "PATCH" });
     const json = await res.json();
     if (res.status == 400) return alert(json.message);
@@ -451,11 +454,8 @@ export const UpdateShowHide = ({ data, onFetch, mutate }) => {
   };
   return (
     <Tooltip content={`Klik untuk ${hide ? "menampilkan!" : "Menyembunyikan"}`}>
-      <span
-        onClick={() => onPress()}
-        className="text-lg text-primary underline text-sm cursor-pointer active:opacity-50"
-      >
-        {hide ? "Show" : "Hide"}
+      <span onClick={() => onPress()} className={styleActionButton}>
+        {hide ? <GoEye /> : <GoEyeClosed />}
       </span>
     </Tooltip>
   );

@@ -79,8 +79,12 @@ export const FilterProduk = ({
   );
 };
 
-export const FilterHidden = ({ isShowHidden, setIsShowHidden }) => (
+export const FilterHidden = ({
+  isShowHidden,
+  setIsShowHidden,
+  children = "Tampilkan data tersembunyi",
+}) => (
   <Checkbox isSelected={isShowHidden} onValueChange={setIsShowHidden}>
-    Show Hidden
+    {children}
   </Checkbox>
 );
