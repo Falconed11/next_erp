@@ -6,7 +6,7 @@ export default async function Produk(props: {
   const id = searchParams.id;
   return (
     <>
-      <UI id_produk={id} />
+      <UI id={id} />
     </>
   );
 }

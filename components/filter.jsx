@@ -13,7 +13,7 @@ export const FilterProduk = ({
   setPage,
   isReadyStock,
   setIsReadyStock,
-  kategori,
+  kategori = [],
   hideReadyStock,
 }) => {
   return (
@@ -42,7 +42,7 @@ export const FilterProduk = ({
             setPage(1);
           }}
         >
-          {kategori.data.map((item) => (
+          {kategori.map((item) => (
             <SelectItem key={item.id} value={item.id}>
               {`${item.nama}`}
             </SelectItem>

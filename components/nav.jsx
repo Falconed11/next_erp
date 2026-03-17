@@ -52,7 +52,7 @@ export default function Navigation({ navLinks, className }) {
                       <Button className="p-0 m-0 bg-transparent text-left justify-start text-base h-fit">
                         <div className="flex items-center gap-2">
                           <Icon icon={icon} />
-                          {link.name}
+                          {link.name} {">"}
                           <ProgressNoOfferNotification
                             link={link}
                             number={numberProgressNoOffer}

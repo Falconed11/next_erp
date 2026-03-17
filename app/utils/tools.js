@@ -73,3 +73,5 @@ export const paramBuilder = (params = []) =>
     : "";
 export const urlBuilder = (endPoint = "", params = []) =>
   `${endPoint}${paramBuilder(params)}`;
+export const updateForm = (setForm, data = {}) =>
+  setForm((prev) => ({ ...prev, ...data }));

@@ -1,6 +1,7 @@
 import { API_PATH } from "@/app/utils/apiconfig";
 import { key2set, renderQueryStates, set2key } from "@/app/utils/tools";
 import {
+  Badge,
   Button,
   Input,
   Modal,
@@ -658,3 +659,33 @@ export const TableHeaderWithAddButton = ({ title, onPress, isHighRole }) => (
     )}
   </div>
 );
+
+/**
+ * @typedef {{ label: string, value: string | number }} Item
+ */
+/**
+ * @param {{ arrayContent: Item[],
+ * title: string,
+ * link: string }} props
+ */
+export const FilterCard = ({ title, arrayContent = [], link }) => {
+  return (
+    <Badge
+      color="danger"
+      content={
+        <Link className="px-1 text-white" href={link}>
+          X
+        </Link>
+      }
+    >
+      <div className="flex flex-col gap-2 p-2 border shadow-lg rounded-lg">
+        <div className="font-bold text-lg">{title}</div>
+        {arrayContent.map((o, i) => (
+          <div key={i}>
+            {o.label} : {o.value}
+          </div>
+        ))}
+      </div>
+    </Badge>
+  );
+};

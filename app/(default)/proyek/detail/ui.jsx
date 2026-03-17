@@ -54,6 +54,7 @@ import {
   CompanyHeader,
   LinkOpenNewTab,
   NavLinkNewTab,
+  OpenBlueLinkInNewTab,
   SVTHeader,
 } from "@/components/mycomponent";
 import { Button } from "@heroui/react";
@@ -358,10 +359,11 @@ export default function App({ id, versi }) {
         const showTipe = isChecked(data.showtipe);
         switch (columnKey) {
           case "nama":
-            return `${data.nama}${
-              data.keterangan ? `(${data.keterangan})` : ""
-            }`;
-            data.keterangan ? `${data.nama} (${data.keterangan})` : data.nama;
+            return (
+              <OpenBlueLinkInNewTab link={`/produk?id=${data.id_produk}`}>
+                {cellValue}
+              </OpenBlueLinkInNewTab>
+            );
           case "stok":
             return (
               <div
@@ -686,6 +688,10 @@ export default function App({ id, versi }) {
       {
         key: "nama",
         label: "Nama",
+      },
+      {
+        key: "keterangan",
+        label: "Nama Penawaran",
       },
       {
         key: "nmerek",

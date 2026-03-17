@@ -1,4 +1,8 @@
-import { highRoleCheck, renderQueryStates } from "@/app/utils/tools";
+import {
+  highRoleCheck,
+  renderQueryStates,
+  updateForm,
+} from "@/app/utils/tools";
 import {
   countPercentProvit,
   countPriceByPercentProfit,
@@ -12,9 +16,22 @@ import { Input, NumberInput, Radio, RadioGroup, Textarea } from "@heroui/react";
 import { useSession } from "next-auth/react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { useEffect, useState } from "react";
 
 const FormProduct = ({ form, setForm }) => {
   const session = useSession();
+
+  // const [inputId, setInputId] = useState(form.id_kustom);
+  // useEffect(() => {
+  //   const handler = setTimeout(() => {
+  //     setForm((prev) => ({ ...prev, id_kustom: inputId }));
+  //   }, 1000); // delay (1 second)
+
+  //   return () => {
+  //     clearTimeout(handler); // cancel previous timeout
+  //   };
+  // }, [inputId]);
+
   const queryStates = renderQueryStates(null, session);
   if (queryStates) return queryStates;
   const sessUser = session.data.user;
@@ -29,7 +46,7 @@ const FormProduct = ({ form, setForm }) => {
         label="Id"
         placeholder="Masukkan id!"
         value={form.id_kustom}
-        onValueChange={(val) => setForm({ ...form, id_kustom: val })}
+        onValueChange={(v) => updateForm(setForm, { id_kustom: v })}
       />
       <Input
         variant="bordered"
@@ -37,7 +54,7 @@ const FormProduct = ({ form, setForm }) => {
         label="Nama"
         placeholder="Masukkan nama!"
         value={form.nama}
-        onValueChange={(val) => setForm({ ...form, nama: val })}
+        onValueChange={(val) => updateForm(setForm, { nama: val })}
       />
       <AutocompleteMerek form={form} setForm={setForm} />
       <Input

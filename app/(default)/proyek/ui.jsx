@@ -76,7 +76,7 @@ import {
 } from "@/app/utils/tools";
 import { FileUploader, UpdateShowHide } from "@/components/input";
 import { RangeDate } from "@/components/input";
-import { LinkOpenNewTab } from "@/components/mycomponent";
+import { FilterCard, LinkOpenNewTab } from "@/components/mycomponent";
 import Harga from "@/components/harga";
 import {
   ShowHideComponent,
@@ -817,6 +817,7 @@ export default function App({
                                 value: selectedCustomer.alamat,
                               },
                             ]}
+                            link="proyek"
                           />
                         </div>
                       )}
@@ -828,6 +829,7 @@ export default function App({
                               { label: "Id", value: idProyek },
                               { label: "Nama", value: selectedProyek?.nama },
                             ]}
+                            link="proyek"
                           />
                         </div>
                       )}
@@ -1320,25 +1322,3 @@ export default function App({
     </div>
   );
 }
-
-const FilterCard = ({ title, arrayContent = [], link }) => {
-  return (
-    <Badge
-      color="danger"
-      content={
-        <Link className="px-1" href={`proyek?`}>
-          Hapus
-        </Link>
-      }
-    >
-      <div className="flex flex-col gap-2 p-2 border shadow-lg rounded-lg">
-        <div className="font-bold text-lg">{title}</div>
-        {arrayContent.map((o, i) => (
-          <div key={i}>
-            {o.label} : {o.value}
-          </div>
-        ))}
-      </div>
-    </Badge>
-  );
-};

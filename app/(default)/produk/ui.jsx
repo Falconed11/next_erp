@@ -60,7 +60,11 @@ import { getApiPath } from "@/app/utils/apiconfig";
 import { Button } from "@heroui/react";
 import { Input, Textarea } from "@heroui/react";
 import { getDate, getDateF, getDateFId } from "@/app/utils/date";
-import { LinkOpenNewTab, OpenBlueLinkInNewTab } from "@/components/mycomponent";
+import {
+  FilterCard,
+  LinkOpenNewTab,
+  OpenBlueLinkInNewTab,
+} from "@/components/mycomponent";
 import { FormProduct } from "@/components/produk";
 import { AuthorizationComponent } from "@/components/componentmanipulation";
 import {
@@ -71,7 +75,9 @@ import {
 } from "@/components/myautocomplete";
 import {
   highRoleCheck,
+  key2set,
   renderQueryStates,
+  set2key,
   useDebounce,
 } from "@/app/utils/tools";
 import { useFilter } from "@react-aria/i18n";
@@ -80,11 +86,9 @@ import { useClientFetch } from "@/hooks/useClientFetch";
 
 const apiPath = getApiPath();
 
-export default function App({ id_produk }) {
+export default function App({ id }) {
   const session = useSession();
-  const sessUser = useMemo(() => session.data?.user, [session]);
-  // dynamic input
-  const terapkanButton = useRef();
+  const sessUser = session?.data?.user;
   const [inputs, setInputs] = useState([{ id: uuidv4(), value: "" }]);
   const handleChange = (id, value) => {
     setInputs((prevInputs) =>
@@ -103,17 +107,16 @@ export default function App({ id_produk }) {
   };
 
   const [nama, setNama] = useState("");
-  const [id, setId] = useState("");
+  const [filterId, setFilterId] = useState("");
   const [selectKategori, setSelectKategori] = useState([]);
-  const [page, setPage] = React.useState(1);
+  const [page, setPage] = useState(1);
   const [isReadyStock, setIsReadyStock] = useState(false);
   const rowsPerPage = 10;
-  const { contains } = useFilter({ sensitivity: "base" });
 
   const produk = useClientFetch(
-    `produk?kategori=${selectKategori.values().next().value ?? ""}${
+    `produk?kategori=${set2key(selectKategori) ?? ""}${
       isReadyStock ? `&isReadyStock=${isReadyStock}` : ""
-    }${id_produk ? `&id=${id_produk}` : ""}`,
+    }${id ? `&id=${id}` : ""}`,
   );
   const merek = useClientFetch("merek");
   const vendor = useClientFetch("vendor?columnName=nama");
@@ -147,7 +150,7 @@ export default function App({ id_produk }) {
   const transfer = useDisclosure();
 
   const debounceSearchByName = useDebounce(nama, 300);
-  const debounceSearchById = useDebounce(id, 300);
+  const debounceSearchById = useDebounce(filterId, 300);
 
   const modal = { masuk: useDisclosure(), keluar: useDisclosure() };
   const saveButtonPress = async (onClose) => {
@@ -178,9 +181,9 @@ export default function App({ id_produk }) {
     setForm({
       modalmode: "Tambah",
       id: "",
-      kategori: "",
-      id_kustom: id,
-      nama: "",
+      id_kustom: filterId,
+      id_kategori: set2key(selectKategori),
+      nama,
       merek: "",
       tipe: "",
       vendor: "",
@@ -501,12 +504,13 @@ export default function App({ id_produk }) {
   }, []);
   const filteredData = useMemo(() => {
     if (!produk?.data) return [];
+    const name = debounceSearchByName.toLowerCase();
+    const id = debounceSearchById.toLowerCase();
     return produk.data.filter(
       (row) =>
         (row.nama + row.nmerek + row.tipe + row.keterangan)
           .toLowerCase()
-          .includes(debounceSearchByName.toLowerCase()) &&
-        row.id_kustom.toLowerCase().includes(debounceSearchById.toLowerCase()),
+          .includes(name) && row.id_kustom.toLowerCase().includes(id),
     );
   }, [produk?.data, debounceSearchByName, debounceSearchById]);
   const pages = useMemo(() => {
@@ -606,40 +610,41 @@ export default function App({ id_produk }) {
     },
   ];
 
-  let filteredsubkategori = [
-    { nama: "Silahkan pilih kategori terlebih dahulu" },
-  ];
+  // let filteredsubkategori = [
+  //   { nama: "Silahkan pilih kategori terlebih dahulu" },
+  // ];
 
-  const totalModal = produk.data.reduce(
-    (acc, cur) => acc + cur.stok * cur.hargamodal,
-    0,
-  );
-  const totalJual = produk.data.reduce(
-    (acc, cur) => acc + cur.stok * cur.hargajual,
-    0,
-  );
-  const result = produk.data.reduce((acc, item) => {
-    const existing = acc.find(
-      (entry) => entry.kategori === item.kategoriproduk,
-    );
-    if (existing) {
-      existing.totalModal += item.stok * item.hargamodal;
-      existing.totalJual += item.stok * item.hargajual;
-    } else {
-      acc.push({
-        kategori: item.kategoriproduk,
-        totalModal: item.stok * item.hargamodal,
-        totalJual: item.stok * item.hargajual,
-      });
-    }
-    return acc;
-  }, []);
+  // const totalModal = produk.data.reduce(
+  //   (acc, cur) => acc + cur.stok * cur.hargamodal,
+  //   0,
+  // );
+  // const totalJual = produk.data.reduce(
+  //   (acc, cur) => acc + cur.stok * cur.hargajual,
+  //   0,
+  // );
+  // const result = produk.data.reduce((acc, item) => {
+  //   const existing = acc.find(
+  //     (entry) => entry.kategori === item.kategoriproduk,
+  //   );
+  //   if (existing) {
+  //     existing.totalModal += item.stok * item.hargamodal;
+  //     existing.totalJual += item.stok * item.hargajual;
+  //   } else {
+  //     acc.push({
+  //       kategori: item.kategoriproduk,
+  //       totalModal: item.stok * item.hargamodal,
+  //       totalJual: item.stok * item.hargajual,
+  //     });
+  //   }
+  //   return acc;
+  // }, []);
   const classCompByRole = isHighRole ? "" : "hidden";
   // if (form.id_kategori) {
   //   filteredsubkategori = subkategori.data.filter((item) => {
   //     if (item.id_kategoriproduk == form.id_kategori) return item;
   //   });
   // }
+  console.log(form);
   return (
     <div className="">
       <div className="flex flex-col gap-2">
@@ -682,8 +687,8 @@ export default function App({ id_produk }) {
         topContent={
           <>
             <FilterProduk
-              id={id}
-              setId={setId}
+              id={filterId}
+              setId={setFilterId}
               nama={nama}
               setNama={setNama}
               selectKategori={selectKategori}
@@ -692,13 +697,22 @@ export default function App({ id_produk }) {
               setPage={setPage}
               isReadyStock={isReadyStock}
               setIsReadyStock={setIsReadyStock}
-              kategori={kategori}
+              kategori={kategori.data}
             />
             {/* <div className="flex flex-row gap-2">
               <Button color="primary" onClick={handleButtonExportToExcelPress}>
                 Export to Excel
               </Button>
             </div> */}
+            <div>
+              {id && (
+                <FilterCard
+                  arrayContent={[{ label: "Id", value: id }]}
+                  link="produk"
+                  title="Produk"
+                />
+              )}
+            </div>
           </>
         }
         bottomContent={

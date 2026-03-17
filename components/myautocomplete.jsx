@@ -36,9 +36,12 @@ export const useAutocompleteField = ({
   key,
 }) => {
   const query = useClientFetch(endpoint);
+  const data = useMemo(
+    () => [...((query?.data?.data ?? query?.data) || [])],
+    [query],
+  );
   const queryStates = renderQueryStates({ [endpoint]: query });
   if (queryStates) return { component: queryStates };
-  const data = [...(query.data.data ?? query.data)].slice(0, 50);
   const component = (
     <AutocompleteWithCustomValue
       isDisabled={isDisabled}
@@ -131,11 +134,11 @@ export const AutocompleteWithCustomValue = ({
   const isInvalid = form[field] && form[id] == null;
   return (
     <Autocomplete
-      isVirtualized={false}
+      // isVirtualized={false}
       popoverProps={{ shouldCloseOnScroll: false }}
       className={className}
       classNames={{
-        popoverContent: "w-auto text-nowrap",
+        popoverContent: "text-nowrap w-300",
       }}
       isDisabled={isDisabled}
       variant="bordered"
