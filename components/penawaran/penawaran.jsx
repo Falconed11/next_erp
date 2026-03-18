@@ -11,6 +11,7 @@ import { useClientFetch } from "@/hooks/useClientFetch";
 import { API_PATH } from "@/app/utils/apiconfig";
 
 export const TambahProdukPenawaran = ({
+  title = "",
   idProyek,
   isHighRole,
   instalasi,
@@ -52,8 +53,9 @@ export const TambahProdukPenawaran = ({
   const hideComponent = isHighRole ? "" : "hidden";
   const defStyleFormWidth = "w-2/12-";
   return (
-    <>
-      <div className={`flex flex-col gap-2 w-60`}>
+    <div className="relative">
+      <div>{title}</div>
+      <div className={`flex flex-col gap-2 w-80 overflow-y-scroll h-150`}>
         <TambahProduk
           className={``}
           form={form}
@@ -120,25 +122,26 @@ export const TambahProdukPenawaran = ({
               />
               <SelectSubProyek
                 classNames={defStyleFormWidth}
-                proyek={idProyek}
+                idProyek={idProyek}
                 form={form}
                 setForm={setForm}
               />
             </>
           }
         />
-        <div className="text-right">
-          <Button
-            onPress={() => {
-              tambahButtonPress(form, setForm);
-            }}
-            color="primary"
-          >
-            Tambah
-          </Button>
-        </div>
       </div>
-    </>
+      <div className="text-right sticky absolute top-0 right-0 z-50">
+        <Button
+          className=""
+          onPress={() => {
+            tambahButtonPress(form, setForm);
+          }}
+          color="primary"
+        >
+          Tambah
+        </Button>
+      </div>
+    </div>
   );
 };
 

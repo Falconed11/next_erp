@@ -8,9 +8,9 @@ export const tableClassNames = {
   tr: "",
   base: "",
 };
-export const buildTableClassNames = ({ customTd }) => ({
-  wrapper: "gap-0",
-  table: "m-0 p-0 border-collapse ",
+export const buildTableClassNames = ({ customTd, sWrapper }) => ({
+  wrapper: sWrapper,
+  table: "border-collapse",
   //   thead: " bg-transparent [&>tr:last-child]:hidden",
   th: "",
   td: `py-0 align-top ${customTd}`,

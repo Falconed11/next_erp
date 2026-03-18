@@ -3,7 +3,11 @@ import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Nav from "@/components/nav";
 import User from "@/components/user";
-import { highRoleCheck, rolesCheck } from "@/app/utils/tools";
+import {
+  highRoleCheck,
+  renderQueryStates,
+  rolesCheck,
+} from "@/app/utils/tools";
 import { RiDashboard2Fill, RiDashboard2Line } from "react-icons/ri";
 import { AiOutlineProduct } from "react-icons/ai";
 import { BusinessProgressBarIcon } from "@/components/icon";
@@ -24,7 +28,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   const session = useSession();
-  const user = session.data?.user;
+  const user = session?.data?.user;
   const pathname = usePathname();
   const isHighRole = highRoleCheck(user?.rank);
   const proyek = [
@@ -58,6 +62,9 @@ export default function RootLayout({
     //     href: "/kategori"
     // },
   ];
+
+  const queryState = renderQueryStates({ proyek }, session);
+  if (queryState) return <div className="p-3 w-screen">{queryState}</div>;
   // if (user?.peran == "admin" || user?.peran == "super")
   //   proyek.push(
   //     {

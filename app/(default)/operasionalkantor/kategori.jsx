@@ -192,10 +192,10 @@ export default function App({ sessionuser }) {
       key: "totaltransaksi",
       label: "Jumlah Transaksi",
     },
-    {
-      key: "totalbiaya",
-      label: "Pengeluaran",
-    },
+    // {
+    //   key: "totalbiaya",
+    //   label: "Pengeluaran",
+    // },
   ];
   return (
     <>

@@ -690,7 +690,9 @@ export default function App({
   const selectedCustomer = customer.data.find((item) => item.id == id_instansi);
   // console.log(selectkaryawan);
   return (
-    <div className="flex flex-col gap-2 w-7/8- h-3/4">
+    <div
+    // className="flex flex-col gap-2 w-7/8- h-3/4"
+    >
       {/* <div>
         <div className="bg-white p-2 rounded-lg inline-flex gap-2 items-center">
           <div className="font-bold text-lg">Proyek</div>
@@ -718,236 +720,205 @@ export default function App({
           </Button>
         </div>
       </div> */}
-      <Table
-        key={peran}
-        isStriped
-        className=""
-        aria-label="Example table with custom cells"
-        // selectionMode="multiple"
-        selectedKeys={selectedKeys}
-        onSelectionChange={setSelectedKeys}
-        topContent={
-          <div className="flex gap-2">
-            {/* Filter & Report */}
-            <div className="flex gap-2 flex-col">
-              <ShowHideComponent2
-                initialState
-                closeContent="Buka Filter"
-                openContent="Tutup Filter"
-              >
-                <div className="flex gap-2">
-                  {/* Filter */}
-                  <div className="flex flex-col gap-2 shadow-lg border rounded-lg p-3">
-                    <div className="font-bold text-lg">Filter</div>
-                    <div className="flex gap-2">
-                      <div className="flex flex-col gap-2">
-                        <RadioGroup
-                          orientation="horizontal"
-                          value={sort}
-                          onValueChange={setSort}
-                        >
-                          <Radio value="tanggal_penawaran">Penawaran</Radio>
-                          <Radio value="tanggal">Deal</Radio>
-                        </RadioGroup>
-                        <div className="flex flex-row gap-2">
-                          <div className="flex">
-                            <RangeDate
-                              current={current}
-                              setCurrent={setCurrent}
-                              setPage={setPage}
+      <div className="w-300-">
+        <Table
+          key={peran}
+          isStriped
+          aria-label="Example table with custom cells"
+          // selectionMode="multiple"
+          selectedKeys={selectedKeys}
+          onSelectionChange={setSelectedKeys}
+          topContent={
+            <div className="flex gap-2">
+              {/* Filter & Report */}
+              <div className="flex gap-2 flex-col">
+                <ShowHideComponent2
+                  initialState
+                  closeContent="Buka Filter"
+                  openContent="Tutup Filter"
+                >
+                  <div className="flex gap-2">
+                    {/* Filter */}
+                    <div className="flex flex-col gap-2 shadow-lg border rounded-lg p-3">
+                      <div className="font-bold text-lg">Filter</div>
+                      <div className="flex gap-2">
+                        <div className="flex flex-col gap-2">
+                          <RadioGroup
+                            orientation="horizontal"
+                            value={sort}
+                            onValueChange={setSort}
+                          >
+                            <Radio value="tanggal_penawaran">Penawaran</Radio>
+                            <Radio value="tanggal">Deal</Radio>
+                          </RadioGroup>
+                          <div className="flex flex-row gap-2">
+                            <div className="flex">
+                              <RangeDate
+                                current={current}
+                                setCurrent={setCurrent}
+                                setPage={setPage}
+                              />
+                            </div>
+                          </div>
+                          <Select
+                            className="max-w-xs"
+                            label="Sales"
+                            placeholder="Pilih sales"
+                            selectedKeys={selectkaryawan}
+                            variant="bordered"
+                            onSelectionChange={(v) => {
+                              setSelectKaryawan(v);
+                              setPage(1);
+                            }}
+                          >
+                            {karyawan.data.map((v) => (
+                              <SelectItem key={v.id} textValue={v.nama || "NN"}>
+                                {v.nama || "NN"}
+                              </SelectItem>
+                            ))}
+                          </Select>
+                          <SelectStatusProyek
+                            select={selectStatusProyek}
+                            setSelect={setSelectStatusProyek}
+                            setPage={setPage}
+                          />
+                          <FilterHidden
+                            isShowHidden={isShowHidden}
+                            setIsShowHidden={setIsShowHidden}
+                          />
+                        </div>
+                        {selectedProduct && (
+                          <div>
+                            <div className="font-bold text-lg">Produk</div>
+                            {[
+                              { label: "Id", value: selectedProduct.id },
+                              { label: "Nama", value: selectedProduct.nama },
+                              { label: "Merek", value: selectedProduct.nmerek },
+                              { label: "Tipe", value: selectedProduct.tipe },
+                              {
+                                label: "Satuan",
+                                value: selectedProduct.satuan,
+                              },
+                              {
+                                label: "Keterangan",
+                                value: selectedProduct.keterangan,
+                              },
+                            ].map((o, i) => (
+                              <div key={i}>
+                                {o.label} : {o.value}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        {selectedCustomer && (
+                          <div>
+                            <FilterCard
+                              title={"Customer"}
+                              arrayContent={[
+                                { label: "Id", value: selectedCustomer.id },
+                                { label: "Nama", value: selectedCustomer.nama },
+                                {
+                                  label: "Alamat",
+                                  value: selectedCustomer.alamat,
+                                },
+                              ]}
+                              link="proyek"
                             />
                           </div>
-                        </div>
-                        <Select
-                          className="max-w-xs"
-                          label="Sales"
-                          placeholder="Pilih sales"
-                          selectedKeys={selectkaryawan}
-                          variant="bordered"
-                          onSelectionChange={(v) => {
-                            setSelectKaryawan(v);
-                            setPage(1);
-                          }}
-                        >
-                          {karyawan.data.map((v) => (
-                            <SelectItem key={v.id} textValue={v.nama || "NN"}>
-                              {v.nama || "NN"}
-                            </SelectItem>
-                          ))}
-                        </Select>
-                        <SelectStatusProyek
-                          select={selectStatusProyek}
-                          setSelect={setSelectStatusProyek}
-                          setPage={setPage}
-                        />
-                        <FilterHidden
-                          isShowHidden={isShowHidden}
-                          setIsShowHidden={setIsShowHidden}
-                        />
+                        )}
+                        {idProyek && (
+                          <div>
+                            <FilterCard
+                              title={"Proyek"}
+                              arrayContent={[
+                                { label: "Id", value: idProyek },
+                                { label: "Nama", value: selectedProyek?.nama },
+                              ]}
+                              link="proyek"
+                            />
+                          </div>
+                        )}
                       </div>
-                      {selectedProduct && (
-                        <div>
-                          <div className="font-bold text-lg">Produk</div>
-                          {[
-                            { label: "Id", value: selectedProduct.id },
-                            { label: "Nama", value: selectedProduct.nama },
-                            { label: "Merek", value: selectedProduct.nmerek },
-                            { label: "Tipe", value: selectedProduct.tipe },
-                            { label: "Satuan", value: selectedProduct.satuan },
-                            {
-                              label: "Keterangan",
-                              value: selectedProduct.keterangan,
-                            },
-                          ].map((o, i) => (
-                            <div key={i}>
-                              {o.label} : {o.value}
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                      {selectedCustomer && (
-                        <div>
-                          <FilterCard
-                            title={"Customer"}
-                            arrayContent={[
-                              { label: "Id", value: selectedCustomer.id },
-                              { label: "Nama", value: selectedCustomer.nama },
-                              {
-                                label: "Alamat",
-                                value: selectedCustomer.alamat,
-                              },
-                            ]}
-                            link="proyek"
-                          />
-                        </div>
-                      )}
-                      {idProyek && (
-                        <div>
-                          <FilterCard
-                            title={"Proyek"}
-                            arrayContent={[
-                              { label: "Id", value: idProyek },
-                              { label: "Nama", value: selectedProyek?.nama },
-                            ]}
-                            link="proyek"
-                          />
-                        </div>
-                      )}
                     </div>
-                  </div>
-                  {/* Ringkasan */}
-                  <div>
-                    <div className="text-lg shadow-lg border border-black- p-3 rounded-xl">
-                      <div className="font-bold">Ringkasan</div>
-                      <div className="flex gap-2">
-                        {/* PENAWARAN */}
-                        <Section
-                          title="Penawaran"
-                          items={[
-                            {
-                              label: "Total",
-                              value: nPenawaran,
-                              color: "primary",
-                            },
-                            {
-                              label: "Waiting",
-                              value: summary.nOfferingWaiting,
-                              color: "warning",
-                            },
-                            {
-                              label: "Deal",
-                              value: summary.nOfferingDeal,
-                              color: "success",
-                            },
-                            {
-                              label: "Reject",
-                              value: summary.nOfferingReject,
-                              color: "danger",
-                            },
-                          ]}
-                        />
-                        {/* MODAL */}
-                        {isHighRole && (
+                    {/* Ringkasan */}
+                    <div>
+                      <div className="text-lg shadow-lg border border-black- p-3 rounded-xl">
+                        <div className="font-bold">Ringkasan</div>
+                        <div className="flex gap-2">
+                          {/* PENAWARAN */}
                           <Section
-                            title="Modal"
+                            title="Penawaran"
                             items={[
                               {
                                 label: "Total",
-                                value: <Harga harga={summary.totalModal} />,
+                                value: nPenawaran,
                                 color: "primary",
                               },
                               {
                                 label: "Waiting",
-                                value: (
-                                  <Harga harga={summary.totalModalWaiting} />
-                                ),
+                                value: summary.nOfferingWaiting,
                                 color: "warning",
                               },
                               {
                                 label: "Deal",
-                                value: <Harga harga={summary.totalModalDeal} />,
+                                value: summary.nOfferingDeal,
                                 color: "success",
                               },
                               {
                                 label: "Reject",
-                                value: (
-                                  <Harga harga={summary.totalModalReject} />
-                                ),
+                                value: summary.nOfferingReject,
                                 color: "danger",
                               },
                             ]}
                           />
-                        )}
-                        {/* NILAI PENAWARAN */}
-                        <Section
-                          title="Nilai Penawaran"
-                          items={[
-                            {
-                              label: "Total",
-                              value: <Harga harga={summary.totalPenawaran} />,
-                              color: "primary",
-                            },
-                            {
-                              label: "Waiting",
-                              value: (
-                                <Harga harga={summary.totalPenawaranWaiting} />
-                              ),
-                              color: "warning",
-                            },
-                            {
-                              label: "Deal",
-                              value: (
-                                <Harga harga={summary.totalPenawaranDeal} />
-                              ),
-                              color: "success",
-                            },
-                            {
-                              label: "Reject",
-                              value: (
-                                <Harga harga={summary.totalPenawaranReject} />
-                              ),
-                              color: "danger",
-                            },
-                          ]}
-                        />
-                        {/* PROVIT */}
-                        {isHighRole && (
+                          {/* MODAL */}
+                          {isHighRole && (
+                            <Section
+                              title="Modal"
+                              items={[
+                                {
+                                  label: "Total",
+                                  value: <Harga harga={summary.totalModal} />,
+                                  color: "primary",
+                                },
+                                {
+                                  label: "Waiting",
+                                  value: (
+                                    <Harga harga={summary.totalModalWaiting} />
+                                  ),
+                                  color: "warning",
+                                },
+                                {
+                                  label: "Deal",
+                                  value: (
+                                    <Harga harga={summary.totalModalDeal} />
+                                  ),
+                                  color: "success",
+                                },
+                                {
+                                  label: "Reject",
+                                  value: (
+                                    <Harga harga={summary.totalModalReject} />
+                                  ),
+                                  color: "danger",
+                                },
+                              ]}
+                            />
+                          )}
+                          {/* NILAI PENAWARAN */}
                           <Section
-                            title="Provit"
+                            title="Nilai Penawaran"
                             items={[
                               {
                                 label: "Total",
-                                value: <Harga harga={summary.totalProvit} />,
+                                value: <Harga harga={summary.totalPenawaran} />,
                                 color: "primary",
                               },
                               {
                                 label: "Waiting",
                                 value: (
                                   <Harga
-                                    harga={
-                                      summary.totalPenawaranWaiting -
-                                      summary.totalModalWaiting
-                                    }
+                                    harga={summary.totalPenawaranWaiting}
                                   />
                                 ),
                                 color: "warning",
@@ -955,106 +926,145 @@ export default function App({
                               {
                                 label: "Deal",
                                 value: (
-                                  <Harga
-                                    harga={
-                                      summary.totalPenawaranDeal -
-                                      summary.totalModalDeal
-                                    }
-                                  />
+                                  <Harga harga={summary.totalPenawaranDeal} />
                                 ),
                                 color: "success",
                               },
                               {
                                 label: "Reject",
                                 value: (
-                                  <Harga
-                                    harga={
-                                      summary.totalPenawaranReject -
-                                      summary.totalModalReject
-                                    }
-                                  />
+                                  <Harga harga={summary.totalPenawaranReject} />
                                 ),
                                 color: "danger",
                               },
                             ]}
                           />
-                        )}
+                          {/* PROVIT */}
+                          {isHighRole && (
+                            <Section
+                              title="Provit"
+                              items={[
+                                {
+                                  label: "Total",
+                                  value: <Harga harga={summary.totalProvit} />,
+                                  color: "primary",
+                                },
+                                {
+                                  label: "Waiting",
+                                  value: (
+                                    <Harga
+                                      harga={
+                                        summary.totalPenawaranWaiting -
+                                        summary.totalModalWaiting
+                                      }
+                                    />
+                                  ),
+                                  color: "warning",
+                                },
+                                {
+                                  label: "Deal",
+                                  value: (
+                                    <Harga
+                                      harga={
+                                        summary.totalPenawaranDeal -
+                                        summary.totalModalDeal
+                                      }
+                                    />
+                                  ),
+                                  color: "success",
+                                },
+                                {
+                                  label: "Reject",
+                                  value: (
+                                    <Harga
+                                      harga={
+                                        summary.totalPenawaranReject -
+                                        summary.totalModalReject
+                                      }
+                                    />
+                                  ),
+                                  color: "danger",
+                                },
+                              ]}
+                            />
+                          )}
+                        </div>
                       </div>
                     </div>
+                    {/* Status Proyek */}
+                    <div>
+                      <StatusProyek />
+                    </div>
                   </div>
-                  {/* Status Proyek */}
-                  <div>
-                    <StatusProyek />
-                  </div>
+                </ShowHideComponent2>
+                <div className="flex gap-2">
+                  <Button
+                    variant="shadow"
+                    size="sm"
+                    color="primary"
+                    onPress={tambahButtonPress}
+                  >
+                    <span className="text-xl font-bold">
+                      <AddIcon />
+                    </span>
+                    Tambah
+                  </Button>
+                  <Button
+                    variant="shadow"
+                    size="sm"
+                    color="primary"
+                    onPress={handlePrintProyek}
+                  >
+                    Print
+                  </Button>
                 </div>
-              </ShowHideComponent2>
-              <div className="flex gap-2">
-                <Button
-                  variant="shadow"
-                  size="sm"
-                  color="primary"
-                  onPress={tambahButtonPress}
-                >
-                  <span className="text-xl font-bold">
-                    <AddIcon />
-                  </span>
-                  Tambah
-                </Button>
-                <Button
-                  variant="shadow"
-                  size="sm"
-                  color="primary"
-                  onPress={handlePrintProyek}
-                >
-                  Print
-                </Button>
               </div>
             </div>
-          </div>
-        }
-        bottomContent={
-          pages > 0 ? (
-            <div className="flex w-full justify-center">
-              <Pagination
-                isCompact
-                showControls
-                showShadow
-                color="primary"
-                page={page}
-                total={pages}
-                onChange={(page) => setPage(page)}
-              />
-            </div>
-          ) : null
-        }
-      >
-        <TableHeader columns={columns}>
-          {(column) => (
-            <TableColumn
-              key={column.key}
-              align={column.key === "actions" ? "center" : "start"}
-            >
-              {column.label}
-            </TableColumn>
-          )}
-        </TableHeader>
-        <TableBody
-          items={proyek.data}
-          loadingContent={"Loading..."}
-          emptyContent={"Kosong"}
-          loadingState={loadingState}
+          }
+          bottomContent={
+            pages > 0 ? (
+              <div className="flex w-full justify-center">
+                <Pagination
+                  isCompact
+                  showControls
+                  showShadow
+                  color="primary"
+                  page={page}
+                  total={pages}
+                  onChange={(page) => setPage(page)}
+                />
+              </div>
+            ) : null
+          }
         >
-          {(item) => (
-            <TableRow key={item.id}>
-              {(columnKey) => (
-                <TableCell className={item.hide ? "bg-red-200" : ""}>
-                  {renderCell(item, columnKey)}
-                </TableCell>
-              )}
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+          <TableHeader columns={columns}>
+            {(column) => (
+              <TableColumn
+                key={column.key}
+                align={column.key === "actions" ? "center" : "start"}
+              >
+                {column.label}
+              </TableColumn>
+            )}
+          </TableHeader>
+          <TableBody
+            items={proyek.data}
+            loadingContent={"Loading..."}
+            emptyContent={"Kosong"}
+            loadingState={loadingState}
+          >
+            {(item) => (
+              <TableRow key={item.id}>
+                {(columnKey) => (
+                  <TableCell className={item.hide ? "bg-red-200" : ""}>
+                    {renderCell(item, columnKey)}
+                  </TableCell>
+                )}
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
       <Modal
         isOpen={isOpen}
         onOpenChange={onOpenChange}

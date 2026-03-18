@@ -285,35 +285,74 @@ export default function App() {
     session,
   );
   if (QueryState) return QueryState;
+  if (!isHighRole) return "Anda tidak memiliki izin untuk mengakses laman ini.";
   return (
     <>
       <div className="flex gap-2">
-        <div className="flex flex-col gap-2">
-          <div className="bg-white p-3 rounded-lg">
-            <div>Operasional Kantor</div>
-            <div className="flex flex-col gap-2">
-              <div className="flex flex-col gap-2 w-full">
-                <FormOperasionalKantor
-                  form={form}
-                  setForm={setForm}
-                  kategorioperasionalkantor={kategorioperasionalkantor}
-                  karyawan={karyawan}
-                />
-              </div>
-              <div className="flex flex-row gap-2 justify-end">
-                <Button
-                  onPress={() => {
-                    tambahButtonPress("POST");
-                  }}
-                  color="primary"
-                  className="ml-2"
+        <div>
+          <div className="flex flex-col gap-2 sticky top-2">
+            <div className="bg-background rounded-lg p-3 flex flex-col gap-2">
+              <div>Filter</div>
+              <div className="flex flex-col gap-3">
+                <div className="flex gap-2">
+                  <div className="flex">
+                    <RangeDate
+                      current={current}
+                      setCurrent={setCurrent}
+                      setPage={setPage}
+                    />
+                  </div>
+                </div>
+                {/* kategori */}
+                <Select
+                  label="Kategori"
+                  placeholder="Pilih kategori!"
+                  className=""
+                  selectedKeys={filter.selectKategori}
+                  onSelectionChange={(v) =>
+                    setFilter({ ...filter, selectKategori: v })
+                  }
                 >
-                  Tambah
-                </Button>
+                  {kategorioperasionalkantor.data.map((item) => (
+                    <SelectItem key={item.id} value={item.id}>
+                      {item.nama}
+                    </SelectItem>
+                  ))}
+                </Select>
+              </div>
+              {/* <div>
+              <Button color="primary" onClick={handleButtonExportToExcelPress}>
+                Export to Excel
+              </Button>
+            </div> */}
+            </div>
+            <div className="bg-white p-3 rounded-lg">
+              <div>Operasional Kantor</div>
+              <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-2 w-full">
+                  <FormOperasionalKantor
+                    form={form}
+                    setForm={setForm}
+                    kategorioperasionalkantor={kategorioperasionalkantor}
+                    karyawan={karyawan}
+                  />
+                </div>
+                <div className="flex flex-row gap-2 justify-end">
+                  <Button
+                    onPress={() => {
+                      tambahButtonPress("POST");
+                    }}
+                    color="primary"
+                    className="ml-2"
+                  >
+                    Tambah
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
-          {/* <div className="flex flex-row gap-2">
+        </div>
+        {/* <div className="flex flex-row gap-2">
             <div>
               <Link
                 className="bg-primary text-white p-2 rounded-lg inline-block"
@@ -331,92 +370,54 @@ export default function App() {
               Upload Excel
             </Button>
           </div> */}
-          <Table
-            isStriped
-            className="h-full w-full"
-            classNames={buildTableClassNames({ customTd: "py-1" })}
-            aria-label="Example table with custom cells"
-            topContent={
-              <>
-                <div>Filter</div>
-                <div className="flex flex-row gap-3">
-                  <div className="flex flex-row gap-2">
-                    <div className="flex">
-                      <RangeDate
-                        current={current}
-                        setCurrent={setCurrent}
-                        setPage={setPage}
-                      />
-                    </div>
-                  </div>
-                  {/* kategori */}
-                  <Select
-                    label="Kategori"
-                    placeholder="Pilih kategori!"
-                    className="w-4/12"
-                    selectedKeys={filter.selectKategori}
-                    onSelectionChange={(v) =>
-                      setFilter({ ...filter, selectKategori: v })
-                    }
-                  >
-                    {kategorioperasionalkantor.data.map((item) => (
-                      <SelectItem key={item.id} value={item.id}>
-                        {item.nama}
-                      </SelectItem>
-                    ))}
-                  </Select>
-                </div>
-                {/* <div>
-              <Button color="primary" onClick={handleButtonExportToExcelPress}>
-                Export to Excel
-              </Button>
-            </div> */}
-              </>
-            }
-            bottomContent={
-              pages > 0 ? (
-                <div className="flex w-full justify-center">
-                  <Pagination
-                    isCompact
-                    showControls
-                    showShadow
-                    color="primary"
-                    page={page}
-                    total={pages}
-                    onChange={(page) => setPage(page)}
-                  />
-                </div>
-              ) : null
-            }
+        <Table
+          isStriped
+          className="h-full w-full"
+          classNames={buildTableClassNames({ customTd: "py-1" })}
+          aria-label="Example table with custom cells"
+          bottomContent={
+            pages > 0 ? (
+              <div className="flex w-full justify-center">
+                <Pagination
+                  isCompact
+                  showControls
+                  showShadow
+                  color="primary"
+                  page={page}
+                  total={pages}
+                  onChange={(page) => setPage(page)}
+                />
+              </div>
+            ) : null
+          }
+        >
+          <TableHeader columns={col}>
+            {(column) => (
+              <TableColumn
+                key={column.key}
+                align={column.key === "actions" ? "center" : "start"}
+              >
+                {column.label}
+              </TableColumn>
+            )}
+          </TableHeader>
+          <TableBody
+            items={operasionalkantor.data.slice(offset, offset + rowsPerPage)}
+            loadingContent={"Loading..."}
+            emptyContent={"Kosong"}
+            loadingState={loadingState}
           >
-            <TableHeader columns={col}>
-              {(column) => (
-                <TableColumn
-                  key={column.key}
-                  align={column.key === "actions" ? "center" : "start"}
-                >
-                  {column.label}
-                </TableColumn>
-              )}
-            </TableHeader>
-            <TableBody
-              items={operasionalkantor.data.slice(offset, offset + rowsPerPage)}
-              loadingContent={"Loading..."}
-              emptyContent={"Kosong"}
-              loadingState={loadingState}
-            >
-              {(item) => (
-                <TableRow key={item.id}>
-                  {(columnKey) => (
-                    <TableCell className="text-nowrap">
-                      {renderCell(item, columnKey)}
-                    </TableCell>
-                  )}
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
+            {(item) => (
+              <TableRow key={item.id}>
+                {(columnKey) => (
+                  <TableCell className="text-nowrap">
+                    {renderCell(item, columnKey)}
+                  </TableCell>
+                )}
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
         <div className="flex">
           <Kategori sessionuser={sessUser} />
         </div>

@@ -919,7 +919,7 @@ export default function App({ id, versi }) {
   const rekapPajak = selectedRekapitulasiProyek?.pajak || 0;
   const keteranganPajak = rekapPajak ? "sudah" : "tidak";
   const formatTable = {
-    wrapper: "py-0 px-1",
+    base: "py-0 px-1",
     td: "text-xs py-0 align-top", // Reduce font size and vertical padding
   };
   const dataTabelPeralatan = (isPenawaran) =>
@@ -956,6 +956,8 @@ export default function App({ id, versi }) {
   const hideComponent = isHighRole ? "" : "hidden";
   const fullPath = `${NEXT_DOMAIN}/proyek/detail?id=${id}&versi=${versi}`;
   const selectedStatusProyek = selectedProyek.statusproyek.toLowerCase();
+  // const sTable = "max-w-3/4";
+  const sTable = "";
   // console.log(form);
   return (
     <div className="flex gap-2 flex-col item-start">
@@ -1070,7 +1072,7 @@ export default function App({ id, versi }) {
           </div>
         </div>
         {/* alat */}
-        {isAuthorized ? (
+        {isAuthorized && (
           <div>
             <div className="bg-white rounded-lg p-3 flex flex-col gap-2">
               <div>Alat</div>
@@ -1094,8 +1096,6 @@ export default function App({ id, versi }) {
               </Form>
             </div>
           </div>
-        ) : (
-          <></>
         )}
         {/* rekapitulasi */}
         <div className="shrink-0">
@@ -1124,7 +1124,7 @@ export default function App({ id, versi }) {
         </div>
       </div>
       {/* tombol fungsional */}
-      <div className="flex flex-row gap-2">
+      <div className="flex flex-row gap-2 bg-background p-3 rounded-lg">
         {/* <div>
           <Button onClick={handleButtonVersi} color="primary" className="mt-3">
             Buat Versi Baru
@@ -1276,54 +1276,51 @@ export default function App({ id, versi }) {
               key={selectedProgress}
               isStriped
               isCompact
-              className="overflow-x-auto"
-              topContent={<></>}
+              className={sTable}
               bottomContent={
-                <div className="flex justify-end relative">
-                  <div className="text-right sticky right-3">
-                    <div>
-                      <Harga
-                        label="Sub Total Harga Jual :"
-                        harga={subTotalHargaJual}
-                      />
-                    </div>
-                    {isHighRole && (
-                      <>
-                        <div>
-                          <Harga
-                            harga={keranjangProyek.data.reduce(
-                              (total, currentValue) => {
-                                return (
-                                  total +
-                                  currentValue.jumlah *
-                                    currentValue.temphargamodal
-                                );
-                              },
-                              0,
-                            )}
-                            label="Sub Total Harga Modal :"
-                          />
-                        </div>
-                        <div>
-                          <Harga
-                            label={"Sub Total Provit :"}
-                            harga={keranjangProyek.data.reduce(
-                              (total, currentValue) => {
-                                return (
-                                  total +
-                                  currentValue.jumlah *
-                                    (currentValue.harga -
-                                      currentValue.temphargamodal)
-                                );
-                              },
-                              0,
-                            )}
-                          />
-                        </div>
-                      </>
-                    )}
+                <TableSummary>
+                  <div>
+                    <Harga
+                      label="Sub Total Harga Jual :"
+                      harga={subTotalHargaJual}
+                    />
                   </div>
-                </div>
+                  {isHighRole && (
+                    <>
+                      <div>
+                        <Harga
+                          harga={keranjangProyek.data.reduce(
+                            (total, currentValue) => {
+                              return (
+                                total +
+                                currentValue.jumlah *
+                                  currentValue.temphargamodal
+                              );
+                            },
+                            0,
+                          )}
+                          label="Sub Total Harga Modal :"
+                        />
+                      </div>
+                      <div>
+                        <Harga
+                          label={"Sub Total Provit :"}
+                          harga={keranjangProyek.data.reduce(
+                            (total, currentValue) => {
+                              return (
+                                total +
+                                currentValue.jumlah *
+                                  (currentValue.harga -
+                                    currentValue.temphargamodal)
+                              );
+                            },
+                            0,
+                          )}
+                        />
+                      </div>
+                    </>
+                  )}
+                </TableSummary>
               }
               aria-label="Example table with custom cells"
             >
@@ -1371,55 +1368,53 @@ export default function App({ id, versi }) {
               key={`${selectedProgress}-instalasi`}
               isStriped
               isCompact
+              className={sTable}
               topContent={<></>}
               bottomContent={
-                <>
-                  <div className="text-right">
-                    <div>
-                      <Harga
-                        label="Sub Total Harga Instalasi :"
-                        harga={subTotalHargaInstalasi}
-                      />
-                    </div>
-                    {isHighRole && (
-                      <>
-                        <div>
-                          <Harga
-                            harga={keranjangProyekInstalasi.data.reduce(
-                              (total, currentValue) => {
-                                return (
-                                  total +
-                                  currentValue.jumlah *
-                                    currentValue.temphargamodal
-                                );
-                              },
-                              0,
-                            )}
-                            label="Sub Total Harga Modal :"
-                          />
-                        </div>
-                        <div>
-                          <Harga
-                            label={"Sub Total Provit :"}
-                            harga={keranjangProyekInstalasi.data.reduce(
-                              (total, currentValue) => {
-                                return (
-                                  total +
-                                  currentValue.jumlah *
-                                    (currentValue.harga -
-                                      currentValue.temphargamodal)
-                                );
-                              },
-                              0,
-                            )}
-                          />
-                        </div>
-                      </>
-                    )}
+                <TableSummary>
+                  <div>
+                    <Harga
+                      label="Sub Total Harga Instalasi :"
+                      harga={subTotalHargaInstalasi}
+                    />
                   </div>
-                </>
+                  {isHighRole && (
+                    <>
+                      <div>
+                        <Harga
+                          harga={keranjangProyekInstalasi.data.reduce(
+                            (total, currentValue) => {
+                              return (
+                                total +
+                                currentValue.jumlah *
+                                  currentValue.temphargamodal
+                              );
+                            },
+                            0,
+                          )}
+                          label="Sub Total Harga Modal :"
+                        />
+                      </div>
+                      <div>
+                        <Harga
+                          label={"Sub Total Provit :"}
+                          harga={keranjangProyekInstalasi.data.reduce(
+                            (total, currentValue) => {
+                              return (
+                                total +
+                                currentValue.jumlah *
+                                  (currentValue.harga -
+                                    currentValue.temphargamodal)
+                              );
+                            },
+                            0,
+                          )}
+                        />
+                      </div>
+                    </>
+                  )}
+                </TableSummary>
               }
-              className=""
               aria-label="Example table with custom cells"
             >
               <TableHeader columns={col.instalasi}>
@@ -1891,5 +1886,11 @@ const TableBottom = ({ title = "", tableData }) => (
     <div>
       <RecapTable tableData={tableData} />
     </div>
+  </div>
+);
+
+const TableSummary = ({ children }) => (
+  <div className="flex justify-end">
+    <div className="text-right sticky right-3">{children}</div>
   </div>
 );

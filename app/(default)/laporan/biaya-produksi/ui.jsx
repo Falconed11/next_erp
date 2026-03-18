@@ -138,7 +138,7 @@ const ProjectExpensesTable = ({ TopContent, id_proyek }) => {
                   renderCell: ({ label }) => label,
                 },
                 {
-                  style: "text-nowrap",
+                  style: "text-nowrap text-right",
                   renderCell: ({ val }) => <Harga harga={val} />,
                 },
               ]}
