@@ -39,6 +39,7 @@ export default function Navigation({ navLinks, className }) {
     >
       <ul className="max-w-10 hover:max-w-xs transition-all duration-300 overflow-hidden">
         {navLinks.map((link) => {
+          // console.log(link);
           const active = isActivePath(link.href);
           const baseClass = "p-2 cursor-pointer";
           const activeClass = active ? "bg-slate-300 text-black" : "text-black";
@@ -62,17 +63,27 @@ export default function Navigation({ navLinks, className }) {
                     </DropdownTrigger>
                     <DropdownMenu
                       aria-label="navigation dropdown"
-                      onAction={(key) => {
-                        const path =
-                          key === "data" ? link.href : `${link.href}/${key}`;
-                        router.push(path);
-                      }}
+                      // onAction={(key) => {
+                      //   const path =
+                      //     key === "data" ? link.href : `${link.href}/${key}`;
+                      //   router.push(path);
+                      // }}
                     >
-                      {link.dropdown.map((item) => (
-                        <DropdownItem key={item.key} textValue={item.name}>
-                          {item.name}
-                        </DropdownItem>
-                      ))}
+                      {link.dropdown.map(({ key, name }) => {
+                        return (
+                          <DropdownItem key={key} textValue={name}>
+                            <Link
+                              href={
+                                key === "data"
+                                  ? link.href
+                                  : `${link.href}/${key}`
+                              }
+                            >
+                              {name}
+                            </Link>
+                          </DropdownItem>
+                        );
+                      })}
                     </DropdownMenu>
                   </Dropdown>
                 </div>
