@@ -1,3 +1,4 @@
+import { updateForm } from "@/app/utils/tools";
 import {
   Button,
   Input,
@@ -44,7 +45,17 @@ export default function DefaultModal({
                 label={name}
                 placeholder={`Masukkan nama ${name}!`}
                 value={form.nama}
-                onValueChange={(val) => setForm({ ...form, nama: val })}
+                onValueChange={(val) => updateForm(setForm, { nama: val })}
+              />
+              <Input
+                type="text"
+                variant="bordered"
+                label={"Keterangan"}
+                placeholder={`Masukkan keterangan!`}
+                value={form.keterangan}
+                onValueChange={(val) =>
+                  updateForm(setForm, { keterangan: val })
+                }
               />
             </ModalBody>
             <ModalFooter>

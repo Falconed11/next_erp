@@ -183,6 +183,17 @@ export default function RootLayout({
         ],
       },
       {
+        href: "/coa",
+        name: "COA",
+        icon: <TbDeviceDesktopAnalytics />,
+        dropdown: [
+          {
+            key: "coa-type",
+            name: "COA Type",
+          },
+        ],
+      },
+      {
         href: "/laporan",
         name: "Laporan",
         icon: <TbDeviceDesktopAnalytics />,

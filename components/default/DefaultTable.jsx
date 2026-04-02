@@ -29,13 +29,16 @@ export const renderDefaultTableCell = ({
   onDelete,
 }) => {
   const cellValue = data[columnKey];
+  const updated_at = cellValue || data.updated_at;
+  const created_at = cellValue || data.created_at;
+  const renderDateTimeComp = (date) => `${getDateFId(date)} ${getTime(date)}`;
   switch (columnKey) {
     case "nama":
       return capitalizeEachWord(cellValue);
     case "lastupdate":
-      return `${getDateFId(cellValue)} ${getTime(cellValue)}`;
+      return renderDateTimeComp(updated_at);
     case "creationdate":
-      return `${getDateFId(cellValue)}`;
+      return renderDateTimeComp(created_at);
     case "aksi":
       return (
         <div className="flex items-center gap-2 text-lg">
@@ -96,7 +99,7 @@ export const DefaultTable = ({
     onOpen();
   };
   const deleteButtonPress = async (id) => {
-    if (confirm("Hapus jenis proyek?")) {
+    if (confirm(`Hapus ${name}?`)) {
       const res = await onDelete(id);
       const json = await res.json();
       if (!res.ok) return alert(json.message);
