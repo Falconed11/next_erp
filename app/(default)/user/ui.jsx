@@ -311,15 +311,17 @@ export default function App() {
                   </>
                 ) : (
                   <>
-                    <Input
-                      type="password"
-                      label="Password Lama"
-                      placeholder="Masukkan password"
-                      value={form.passwordlama}
-                      onValueChange={(v) =>
-                        setForm({ ...form, passwordlama: v })
-                      }
-                    />
+                    {!rolesCheck(["super"], sessUser.peran) && (
+                      <Input
+                        type="password"
+                        label="Password Lama"
+                        placeholder="Masukkan password"
+                        value={form.passwordlama}
+                        onValueChange={(v) =>
+                          setForm({ ...form, passwordlama: v })
+                        }
+                      />
+                    )}
                     <Input
                       type="password"
                       label="Password Baru"

@@ -8,6 +8,7 @@ import {
   renderQueryStates,
   rolesCheck,
 } from "@/app/utils/tools";
+import { highRoles } from "@/app/utils/roles";
 import { RiDashboard2Fill, RiDashboard2Line } from "react-icons/ri";
 import { AiOutlineProduct } from "react-icons/ai";
 import { BusinessProgressBarIcon } from "@/components/icon";
@@ -28,56 +29,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   const session = useSession();
-  const user = session?.data?.user;
+  const sessUser = session?.data?.user;
   const pathname = usePathname();
-  const isHighRole = highRoleCheck(user?.rank);
-  const proyek = [
-    {
-      key: "data",
-      name: "Proyek",
-      href: "",
-    },
-    ...(rolesCheck(["admin", "super"], user?.peran)
-      ? [
-          {
-            key: "jenisproyek",
-            name: "Jenis Proyek",
-            href: "/jenisproyek",
-          },
-          {
-            key: "pengeluaran",
-            name: "Pengeluaran",
-            href: "/pengeluaran",
-          },
-          {
-            key: "pembayaran",
-            name: "Pembayaran",
-            href: "/pembayaran",
-          },
-        ]
-      : []),
-    // {
-    //     key: "kategori",
-    //     name: "Kategori",
-    //     href: "/kategori"
-    // },
-  ];
 
-  const queryState = renderQueryStates({ proyek }, session);
+  const queryState = renderQueryStates({}, session);
   if (queryState) return <div className="p-3 w-screen">{queryState}</div>;
-  // if (user?.peran == "admin" || user?.peran == "super")
-  //   proyek.push(
-  //     {
-  //       key: "pengeluaran",
-  //       name: "Pengeluaran",
-  //       href: "/pengeluaran",
-  //     },
-  //     {
-  //       key: "pembayaran",
-  //       name: "Pembayaran",
-  //       href: "/pembayaran",
-  //     }
-  //   );
+  const isHighRole = highRoleCheck(sessUser?.rank);
   const links = [
     { href: "/", name: "Dashboard", icon: <RiDashboard2Line /> },
     {
@@ -104,144 +61,172 @@ export default function RootLayout({
         },
       ],
     },
-  ];
-  // if (rolesCheck(["head-sales", "sales"], user?.peran))
-  //   links.push({ href: "/proyek", name: "Proyek", dropdown: proyek });
-  // if (rolesCheck(["admin", "super"], user?.peran))
-  links.push({
-    href: "/proyek",
-    name: "Proyek",
-    ...(isHighRole ? { dropdown: proyek } : {}),
-    icon: <VscGithubProject />,
-  });
-  if (user?.peran == "admin" || user?.peran == "super")
-    links.push(
-      // { href: "/nota", name: "Nota" },
-      // { href: "/kwitansi", name: "Kwitansi" },
-      {
-        href: "/operasionalkantor",
-        name: "Operasional Kantor",
-        icon: <BsHouseGear />,
-      },
-    );
-  links.push({
-    href: "/customer",
-    name: "Customer",
-    icon: <LuBookUser />,
-    ...(isHighRole
-      ? {
-          dropdown: [
-            {
-              key: "data",
-              name: "Customer",
-            },
-            {
-              key: "jenis-instansi",
-              name: "Jenis Instansi",
-            },
-            {
-              key: "golongan-instansi",
-              name: "Golongan Instansi",
-            },
-          ],
-        }
-      : {}),
-  });
-  if (rolesCheck(["admin", "super"], user?.peran))
-    links.push(
-      {
-        href: "/vendor",
-        name: "Vendor",
-        icon: <MdOutlineFactory />,
-      },
-      {
-        href: "/bank",
-        name: "Bank",
-        icon: <BsBank />,
-        ...(isHighRole
-          ? {
-              dropdown: [
-                { key: "data", name: "Bank" },
-                { key: "transfer-bank", name: "Transfer Bank" },
-              ],
-            }
-          : {}),
-      },
-      {
-        href: "/karyawan",
-        name: "Karyawan",
-        icon: <HiOutlineUserGroup />,
-        dropdown: [
+    {
+      href: "/proyek",
+      name: "Proyek",
+      ...(isHighRole
+        ? {
+            dropdown: [
+              {
+                key: "data",
+                name: "Proyek",
+                href: "",
+              },
+              ...(rolesCheck(["admin", "super"], sessUser?.peran)
+                ? [
+                    {
+                      key: "jenisproyek",
+                      name: "Jenis Proyek",
+                      href: "/jenisproyek",
+                    },
+                    {
+                      key: "pengeluaran",
+                      name: "Pengeluaran",
+                      href: "/pengeluaran",
+                    },
+                    {
+                      key: "pembayaran",
+                      name: "Pembayaran",
+                      href: "/pembayaran",
+                    },
+                  ]
+                : []),
+            ],
+          }
+        : {}),
+      icon: <VscGithubProject />,
+    },
+    ...(rolesCheck(highRoles, sessUser?.peran)
+      ? [
           {
-            key: "data",
-            name: "Data",
-          },
-          {
-            key: "status",
-            name: "Status",
-          },
-        ],
-      },
-      {
-        href: "/coa",
-        name: "COA",
-        icon: <TbDeviceDesktopAnalytics />,
-        dropdown: [
-          {
-            key: "coa-type",
-            name: "COA Type",
-          },
-        ],
-      },
-      {
-        href: "/laporan",
-        name: "Laporan",
-        icon: <TbDeviceDesktopAnalytics />,
-        dropdown: [
-          {
-            key: "biaya-produksi",
-            name: "Biaya Produksi",
-          },
-          {
-            key: "proyek",
-            name: "Proyek",
-          },
-          {
-            key: "operasional-kantor",
+            href: "/operasionalkantor",
             name: "Operasional Kantor",
+            icon: <BsHouseGear />,
+          },
+        ]
+      : []),
+    {
+      href: "/customer",
+      name: "Customer",
+      icon: <LuBookUser />,
+      ...(isHighRole
+        ? {
+            dropdown: [
+              {
+                key: "data",
+                name: "Customer",
+              },
+              {
+                key: "jenis-instansi",
+                name: "Jenis Instansi",
+              },
+              {
+                key: "golongan-instansi",
+                name: "Golongan Instansi",
+              },
+            ],
+          }
+        : {}),
+    },
+    ...(rolesCheck(highRoles, sessUser?.peran)
+      ? [
+          {
+            href: "/vendor",
+            name: "Vendor",
+            icon: <MdOutlineFactory />,
           },
           {
-            key: "labarugi",
-            name: "Laba Rugi",
+            href: "/bank",
+            name: "Bank",
+            icon: <BsBank />,
+            ...(isHighRole
+              ? {
+                  dropdown: [
+                    { key: "data", name: "Bank" },
+                    { key: "transfer-bank", name: "Transfer Bank" },
+                  ],
+                }
+              : {}),
           },
           {
-            key: "perubahan-modal",
-            name: "Perubahan Modal",
+            href: "/karyawan",
+            name: "Karyawan",
+            icon: <HiOutlineUserGroup />,
+            dropdown: [
+              {
+                key: "data",
+                name: "Data",
+              },
+              {
+                key: "status",
+                name: "Status",
+              },
+            ],
           },
           {
-            key: "omset",
-            name: "Omset",
+            href: "/coa",
+            name: "COA",
+            icon: <TbDeviceDesktopAnalytics />,
+            dropdown: [
+              {
+                key: "coa-type",
+                name: "COA Type",
+              },
+            ],
           },
           {
-            key: "stok",
-            name: "Stok",
+            href: "/laporan",
+            name: "Laporan",
+            icon: <TbDeviceDesktopAnalytics />,
+            dropdown: [
+              {
+                key: "biaya-produksi",
+                name: "Biaya Produksi",
+              },
+              {
+                key: "proyek",
+                name: "Proyek",
+              },
+              {
+                key: "operasional-kantor",
+                name: "Operasional Kantor",
+              },
+              {
+                key: "labarugi",
+                name: "Laba Rugi",
+              },
+              {
+                key: "perubahan-modal",
+                name: "Perubahan Modal",
+              },
+              {
+                key: "omset",
+                name: "Omset",
+              },
+              {
+                key: "stok",
+                name: "Stok",
+              },
+              {
+                key: "penawaran",
+                name: "Penawaran",
+              },
+            ],
           },
           {
-            key: "penawaran",
-            name: "Penawaran",
+            href: "/perusahaan",
+            name: "Perusahaan",
+            icon: <HiOutlineOfficeBuilding />,
           },
-        ],
-      },
-      {
-        href: "/perusahaan",
-        name: "Perusahaan",
-        icon: <HiOutlineOfficeBuilding />,
-      },
-    );
-  if (user?.peran == "super" || true)
-    links.push({ href: "/user", name: "User", icon: <FaRegUser /> });
-  if (user?.peran == "super")
-    links.push({ href: "/alat", name: "Alat", icon: <LiaToolsSolid /> });
+        ]
+      : []),
+    ...(rolesCheck(["super"], sessUser?.peran)
+      ? [
+          { href: "/user", name: "User", icon: <FaRegUser /> },
+          { href: "/alat", name: "Alat", icon: <LiaToolsSolid /> },
+        ]
+      : []),
+  ];
   return (
     <section className="inline-flex- flex flex-col gap-3">
       <div></div>

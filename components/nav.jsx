@@ -1,5 +1,4 @@
 "use client";
-
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import {
@@ -10,14 +9,12 @@ import {
   Button,
   Spinner,
 } from "@heroui/react";
-// import { Badge, Avatar } from "@heroui/react";
-import { useRouter } from "next/navigation";
 import { useClientFetch } from "@/hooks/useClientFetch";
-import { useEffect } from "react";
+import { use, useEffect } from "react";
+import { renderQueryStates } from "@/app/utils/tools";
 
 export default function Navigation({ navLinks, className }) {
   const proyek = useClientFetch(`proyek?countProgressNoOffer=true`);
-  const router = useRouter();
   const pathname = usePathname();
 
   const title = pathname.split("/").at(-1);
@@ -25,21 +22,21 @@ export default function Navigation({ navLinks, className }) {
     document.title = title;
   }, [title]);
 
-  if (proyek.error) return <div>failed to load</div>;
-  if (proyek.isLoading) return <Spinner />;
+  const queryStates = renderQueryStates({ proyek });
+  if (queryStates) return queryStates;
 
   const numberProgressNoOffer = proyek.data.length;
 
   const isActivePath = (href) =>
     (pathname === "/" && href === "/") || pathname === href;
 
+  // console.log(navLinks);
   return (
     <nav
       className={`mx-3- flex flex-col rounded-lg bg-background text-nowrap sticky top-3`}
     >
       <ul className="max-w-10 hover:max-w-xs transition-all duration-300 overflow-hidden">
         {navLinks.map((link) => {
-          // console.log(link);
           const active = isActivePath(link.href);
           const baseClass = "p-2 cursor-pointer";
           const activeClass = active ? "bg-slate-300 text-black" : "text-black";
@@ -61,18 +58,19 @@ export default function Navigation({ navLinks, className }) {
                         </div>
                       </Button>
                     </DropdownTrigger>
-                    <DropdownMenu
-                      aria-label="navigation dropdown"
-                      // onAction={(key) => {
-                      //   const path =
-                      //     key === "data" ? link.href : `${link.href}/${key}`;
-                      //   router.push(path);
-                      // }}
-                    >
+                    <DropdownMenu aria-label="navigation dropdown">
                       {link.dropdown.map(({ key, name }) => {
                         return (
-                          <DropdownItem key={key} textValue={name}>
-                            <Link
+                          <DropdownItem
+                            key={key}
+                            textValue={name}
+                            className="bg-blue-200"
+                            href={
+                              key === "data" ? link.href : `${link.href}/${key}`
+                            }
+                          >
+                            {/* <Link
+                              className="bg-red-200 w-full"
                               href={
                                 key === "data"
                                   ? link.href
@@ -80,7 +78,8 @@ export default function Navigation({ navLinks, className }) {
                               }
                             >
                               {name}
-                            </Link>
+                            </Link> */}
+                            {name}
                           </DropdownItem>
                         );
                       })}
