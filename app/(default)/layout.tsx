@@ -128,7 +128,7 @@ export default function RootLayout({
           }
         : {}),
     },
-    ...(rolesCheck(highRoles, sessUser?.peran)
+    ...(rolesCheck([...highRoles, "admin"], sessUser?.peran)
       ? [
           {
             href: "/vendor",
@@ -169,8 +169,16 @@ export default function RootLayout({
             icon: <TbDeviceDesktopAnalytics />,
             dropdown: [
               {
+                key: "data",
+                name: "COA",
+              },
+              {
                 key: "coa-type",
                 name: "COA Type",
+              },
+              {
+                key: "coa-subtype",
+                name: "COA Sub Type",
               },
             ],
           },

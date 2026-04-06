@@ -30,12 +30,13 @@ export function useDefaultSumFetch({
   );
 }
 
-export function useDefaultColumns(isHighRole) {
+export function useDefaultColumns(isHighRole, extraColumns = []) {
   return useMemo(
     () => [
       ...(isHighRole ? [{ key: "aksi", label: "Aksi" }] : []),
       { key: "id", label: "Id" },
       { key: "nama", label: "Nama" },
+      ...extraColumns,
       { key: "keterangan", label: "Keterangan" },
       { key: "creationdate", label: "Tanggal Dibuat" },
       { key: "authorid_karyawan", label: "User Pembuat" },

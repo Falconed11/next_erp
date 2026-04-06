@@ -10,7 +10,7 @@ import {
   Spinner,
 } from "@heroui/react";
 import { useClientFetch } from "@/hooks/useClientFetch";
-import { use, useEffect } from "react";
+import { useEffect } from "react";
 import { renderQueryStates } from "@/app/utils/tools";
 
 export default function Navigation({ navLinks, className }) {
@@ -64,21 +64,10 @@ export default function Navigation({ navLinks, className }) {
                           <DropdownItem
                             key={key}
                             textValue={name}
-                            className="bg-blue-200"
                             href={
                               key === "data" ? link.href : `${link.href}/${key}`
                             }
                           >
-                            {/* <Link
-                              className="bg-red-200 w-full"
-                              href={
-                                key === "data"
-                                  ? link.href
-                                  : `${link.href}/${key}`
-                              }
-                            >
-                              {name}
-                            </Link> */}
                             {name}
                           </DropdownItem>
                         );

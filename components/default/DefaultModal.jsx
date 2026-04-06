@@ -18,6 +18,7 @@ export default function DefaultModal({
   onSave,
   name,
   id_karyawan,
+  extraFields,
 }) {
   const saveButtonPress = async (onClose) => {
     const res = await onSave({
@@ -57,6 +58,7 @@ export default function DefaultModal({
                   updateForm(setForm, { keterangan: val })
                 }
               />
+              {extraFields && extraFields(form, setForm)}
             </ModalBody>
             <ModalFooter>
               <Button color="danger" variant="light" onPress={onClose}>

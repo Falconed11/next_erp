@@ -64,12 +64,15 @@ export const renderDefaultTableCell = ({
       return cellValue;
   }
 };
+
 export const DefaultTable = ({
   endPoint,
   rowsPerPage,
   onDelete,
   onSave,
   name,
+  extraFields,
+  extraColumns,
 }) => {
   const session = useSession();
   const sessUser = session?.data?.user;
@@ -108,7 +111,7 @@ export const DefaultTable = ({
     }
   };
   const isHighRole = highRoleCheck(sessUser?.rank);
-  const columns = useDefaultColumns(isHighRole);
+  const columns = useDefaultColumns(isHighRole, extraColumns);
   const QueryState = renderQueryStates({ data }, session);
   if (QueryState) return QueryState;
 
@@ -188,6 +191,7 @@ export const DefaultTable = ({
         onOpenChange={onOpenChange}
         onSave={onSave}
         setForm={setForm}
+        extraFields={extraFields}
       />
     </>
   );
