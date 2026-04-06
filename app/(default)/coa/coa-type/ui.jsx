@@ -4,7 +4,7 @@ import {
   deleteCoaType,
   COA_TYPE_ENDPOINT,
   patchCoaType,
-} from "@/modules/coa/coa-type.service";
+} from "@/services/coa/coa-type.service";
 import { DefaultTable } from "@/components/default/DefaultTable";
 
 export default function App() {
