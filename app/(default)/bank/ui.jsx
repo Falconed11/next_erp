@@ -63,6 +63,8 @@ import {
   saveMetodePembayaran,
   saveMetodePembayaranV2,
 } from "@/services/metode-pembayaran.service";
+import DefaultSelect from "@/components/default/DefaultSelect";
+import { COA_ENDPOINT } from "@/services/coa/coa.service";
 
 const apiPath = getApiPath();
 
@@ -319,6 +321,10 @@ export default function App() {
       label: "Id",
     },
     {
+      key: "coa",
+      label: "COA",
+    },
+    {
       key: "namabank",
       label: "Bank",
     },
@@ -464,6 +470,16 @@ export default function App() {
                   placeholder="Masukkan keterangan!"
                   value={form.nama}
                   onValueChange={(val) => setForm({ ...form, nama: val })}
+                />
+                <DefaultSelect
+                  disallowEmptySelection
+                  endPoint={COA_ENDPOINT}
+                  filter="coa_subtype[table]=cs&coa_subtype[column]=nama&coa_subtype[values]=bank&coa_subtype[values]=kas"
+                  fieldName={"id_coa"}
+                  label={"COA"}
+                  placeholder={"Pilih coa!"}
+                  form={form}
+                  setForm={setForm}
                 />
                 {/* <div className="bg-gray-100 p-3 rounded-lg">
                   <div>Tanggal</div>

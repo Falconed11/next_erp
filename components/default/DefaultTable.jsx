@@ -21,12 +21,14 @@ import { useDefaultColumns, useDefaultFetch } from "@/hooks/useDefault";
 import { useState } from "react";
 import DefaultModal from "./DefaultModal";
 import { useSession } from "next-auth/react";
+import { FilterActive } from "../filter";
 
 export const renderDefaultTableCell = ({
   data,
   columnKey,
   onEdit,
   onDelete,
+  renderActionButton,
 }) => {
   const cellValue = data[columnKey];
   const updated_at = cellValue || data.updated_at;
@@ -50,6 +52,7 @@ export const renderDefaultTableCell = ({
               <EditIcon />
             </span>
           </Tooltip>
+          {renderActionButton && renderActionButton(data)}
           <Tooltip color="danger" content="Delete">
             <span
               onClick={() => onDelete(data.id)}
@@ -73,17 +76,27 @@ export const DefaultTable = ({
   name,
   extraFields,
   extraColumns,
+  enableActiveStatus,
+  renderActionButton,
+  generateTableCellClassName = () => "",
 }) => {
   const session = useSession();
   const sessUser = session?.data?.user;
 
   const [form, setForm] = useState({});
   const [page, setPage] = useState(1);
+  const [isShowInactive, setIsShowInactive] = useState(false);
   const offset = (page - 1) * rowsPerPage;
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
-  const data = useDefaultFetch({ endPoint, limit: rowsPerPage, offset });
+  const data = useDefaultFetch({
+    endPoint: endPoint,
+    limit: rowsPerPage,
+    offset,
+    filter: `${isShowInactive ? "" : "&aktif=1"}`,
+  });
   const items = data?.data?.data;
+  const mutate = data?.mutate;
 
   const loadingState = data.isLoading ? "loading" : "idle";
   const tambahButtonPress = () => {
@@ -106,7 +119,7 @@ export const DefaultTable = ({
       const res = await onDelete(id);
       const json = await res.json();
       if (!res.ok) return alert(json.message);
-      data.mutate();
+      mutate();
       setPage(1);
     }
   };
@@ -125,11 +138,19 @@ export const DefaultTable = ({
         className="min-h-[40px]"
         aria-label="Example table with custom cells"
         topContent={
-          <TableHeaderWithAddButton
-            title={name}
-            isHighRole={isHighRole}
-            onPress={tambahButtonPress}
-          />
+          <>
+            <TableHeaderWithAddButton
+              title={name}
+              isHighRole={isHighRole}
+              onPress={tambahButtonPress}
+            />
+            {enableActiveStatus && (
+              <FilterActive
+                isShowInactive={isShowInactive}
+                setIsShowInactive={setIsShowInactive}
+              />
+            )}
+          </>
         }
         bottomContent={
           pages > 0 ? (
@@ -168,12 +189,20 @@ export const DefaultTable = ({
             return (
               <TableRow key={item.id}>
                 {(columnKey) => (
-                  <TableCell>
+                  <TableCell
+                    className={`${enableActiveStatus && !item.aktif ? "bg-red-200" : ""} ${generateTableCellClassName(item)}`}
+                  >
                     {renderDefaultTableCell({
                       data: item,
                       columnKey,
                       onEdit: editButtonPress,
                       onDelete: deleteButtonPress,
+                      ...(renderActionButton
+                        ? {
+                            renderActionButton: (data) =>
+                              renderActionButton(data, mutate, onSave),
+                          }
+                        : {}),
                     })}
                   </TableCell>
                 )}
@@ -183,7 +212,7 @@ export const DefaultTable = ({
         </TableBody>
       </Table>
       <DefaultModal
-        data={data}
+        data={{ mutate: data.mutate }}
         form={form}
         id_karyawan={id_karyawan}
         isOpen={isOpen}

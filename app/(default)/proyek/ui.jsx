@@ -1,18 +1,11 @@
 "use client";
-import React, {
-  useState,
-  useMemo,
-  useEffect,
-  useRef,
-  useCallback,
-} from "react";
+import { useState, useRef, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import * as XLSX from "xlsx";
 import { RadioGroup, Radio, Badge } from "@heroui/react";
 import { getApiPath } from "@/app/utils/apiconfig";
 const apiPath = getApiPath();
 import { fIdProyek } from "@/app/utils/formatid";
-import { Autocomplete, AutocompleteItem } from "@heroui/react";
 import {
   Table,
   TableHeader,
@@ -21,11 +14,7 @@ import {
   TableRow,
   TableCell,
   Pagination,
-  User,
-  Chip,
   Tooltip,
-  ChipProps,
-  getKeyValue,
 } from "@heroui/react";
 import {
   Modal,
@@ -39,33 +28,15 @@ import {
 import { Input } from "@heroui/react";
 import { Textarea } from "@heroui/react";
 import { Select, SelectItem } from "@heroui/react";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerBody,
-  DrawerFooter,
-} from "@heroui/drawer";
-import { Accordion, AccordionItem } from "@heroui/react";
 import Link from "next/link";
 import {
   AddIcon,
   EditIcon,
   DeleteIcon,
-  EyeIcon,
-  UserIcon,
   NoteIcon,
   ReportMoneyIcon,
-  FileExportIcon,
-  DangerTriangleBrokenIcon,
-  BusinessProgressBarIcon,
 } from "@/components/icon";
-import {
-  getCurFirstLastDay,
-  excelToJSDate,
-  getDate,
-  getDateF,
-} from "@/app/utils/date";
+import { getDate, getDateF } from "@/app/utils/date";
 import {
   capitalizeEachWord,
   highRoleCheck,
@@ -74,14 +45,11 @@ import {
   rolesCheck,
   set2key,
 } from "@/app/utils/tools";
-import { FileUploader, UpdateShowHide } from "@/components/input";
+import { UpdateShowHide } from "@/components/input";
 import { RangeDate } from "@/components/input";
 import { FilterCard, LinkOpenNewTab } from "@/components/mycomponent";
 import Harga from "@/components/harga";
-import {
-  ShowHideComponent,
-  ShowHideComponent2,
-} from "@/components/componentmanipulation";
+import { ShowHideComponent2 } from "@/components/componentmanipulation";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import SelectStatusProyek from "@/components/selectstatusproyek";
@@ -616,10 +584,6 @@ export default function App({
       key: "keterangan",
       label: "Keterangan",
     },
-  ];
-  const isSwasta = [
-    { id: 0, nama: "negri" },
-    { id: 1, nama: "swasta" },
   ];
   const nPenawaran = proyek.data.length;
   const summary = proyek.data.reduce(

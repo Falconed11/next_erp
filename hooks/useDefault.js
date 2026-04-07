@@ -2,15 +2,18 @@ import { useMemo } from "react";
 import { useClientFetch, useClientFetchNoInterval } from "./useClientFetch";
 import { urlBuilder } from "@/app/utils/tools";
 
-export function useDefaultFetch({ endPoint, limit, offset, noInterval }) {
+export function useDefaultFetch({
+  endPoint,
+  limit,
+  offset,
+  noInterval,
+  filter,
+}) {
+  const isPagination = limit != null && offset != null;
   const qPagination = `limit=${limit}&offset=${offset}`;
-  if (noInterval)
-    return useClientFetchNoInterval(
-      `${endPoint}?${limit != null && offset != null ? qPagination : ""}`,
-    );
-  return useClientFetch(
-    `${endPoint}?${limit != null && offset != null ? qPagination : ""}`,
-  );
+  const finalEndPoint = `${endPoint}?${isPagination ? qPagination : ""}&${filter}`;
+  if (noInterval) return useClientFetchNoInterval(finalEndPoint);
+  return useClientFetch(finalEndPoint);
 }
 
 export function useDefaultSumFetch({

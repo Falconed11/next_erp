@@ -5,14 +5,15 @@ import {
   COA_TYPE_ENDPOINT,
   patchCoaType,
 } from "@/services/coa/coa-type.service";
-import { DefaultTable } from "@/components/default/DefaultTable";
+import { renderFilterActive } from "@/app/utils/render";
+import { CoaTable } from "@/components/coa/coa";
 
 export default function App() {
   const queryStates = renderQueryStates({});
   if (queryStates) return queryStates;
   return (
     <div className="flex flex-col gap-2">
-      <DefaultTable
+      <CoaTable
         endPoint={COA_TYPE_ENDPOINT}
         rowsPerPage={10}
         name={"COA Type"}

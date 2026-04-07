@@ -88,3 +88,13 @@ export const FilterHidden = ({
     {children}
   </Checkbox>
 );
+
+export const FilterActive = ({
+  isShowInactive,
+  setIsShowInactive,
+  children = "Tampilkan data non aktif",
+}) => (
+  <Checkbox isSelected={isShowInactive} onValueChange={setIsShowInactive}>
+    {children}
+  </Checkbox>
+);

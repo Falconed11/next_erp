@@ -6,6 +6,7 @@ export default function DefaultSelect({
   label,
   placeholder,
   endPoint,
+  filter,
   form,
   setForm,
   fieldName,
@@ -14,7 +15,7 @@ export default function DefaultSelect({
   className,
   disallowEmptySelection,
 }) {
-  const fetchData = useDefaultFetch({ endPoint, noInterval: true });
+  const fetchData = useDefaultFetch({ endPoint, noInterval: true, filter });
   const QueryState = renderQueryStates({ fetchData });
   if (QueryState) return QueryState;
   const data = fetchData.data.data ?? fetchData.data;

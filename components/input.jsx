@@ -460,3 +460,23 @@ export const UpdateShowHide = ({ data, onFetch, mutate }) => {
     </Tooltip>
   );
 };
+
+export const UpdateActiveStatus = ({ data, onFetch, mutate }) => {
+  const { id, aktif } = data;
+  const onPress = async () => {
+    if (aktif) if (!confirm("Non aktifkan data?")) return;
+    const res = await onFetch({ id, aktif: aktif ? 0 : 1, method: "PATCH" });
+    const json = await res.json();
+    if (res.status == 400) return alert(json.message);
+    mutate();
+  };
+  return (
+    <Tooltip
+      content={`Klik untuk ${aktif ? "menonaktifkan!" : "mengaktifkan"}`}
+    >
+      <span onClick={() => onPress()} className={styleActionButton}>
+        {aktif ? <GoEyeClosed /> : <GoEye />}
+      </span>
+    </Tooltip>
+  );
+};
