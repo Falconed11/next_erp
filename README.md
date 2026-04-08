@@ -1,36 +1,65 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Next ERP
 
-## Getting Started
+Internal ERP frontend built with Next.js App Router, HeroUI, SWR, and NextAuth credentials authentication. The app organizes business modules like projects, products, customers, vendors, banking, accounting, reports, and employee operations behind a session-aware UI.
 
-First, run the development server:
+## Stack
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Next.js 16 with App Router
+- React 19
+- TypeScript for framework entry files, mixed with existing `.jsx` modules
+- NextAuth v4 using a credentials provider
+- HeroUI component library
+- SWR for client-side data fetching
+- Tailwind CSS v4
+
+## What This App Does
+
+- Renders authenticated ERP screens under `app/(default)`
+- Connects to a separate backend API through `NEXT_PUBLIC_API_PATH`
+- Uses role and rank checks to shape navigation and feature access
+- Provides reusable table, modal, form, and report components for CRUD-style modules
+
+## Project Layout
+
+```text
+app/
+  (default)/              Protected application pages
+  api/auth/[...nextauth]/ NextAuth route handler and options
+  context/                Session provider wrapper
+  login/                  Login screen
+  utils/                  Shared helpers, config, roles, formatting
+components/               Reusable UI and module-specific components
+hooks/                    SWR-based data hooks and table column helpers
+services/                 Backend endpoint wrappers
+public/                   Static assets and spreadsheet templates
+proxy.ts                  NextAuth middleware entry point
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Quick Start
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Install dependencies:
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+   ```bash
+   npm install
+   ```
 
-## Learn More
+2. Create `.env.local` with the required variables listed in `docs/setup.md`.
+3. Make sure the backend API is running and reachable from `NEXT_PUBLIC_API_PATH`.
+4. Start the frontend:
 
-To learn more about Next.js, take a look at the following resources:
+   ```bash
+   npm run dev
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+5. Open `http://localhost:3000`.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+## Documentation
 
-## Deploy on Vercel
+- [Architecture](docs/architecture.md)
+- [Setup](docs/setup.md)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Notes
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+- The middleware entry point exists in [`proxy.ts`](/d:/project/next_erp/proxy.ts), but the route matcher is currently commented out, so protection behavior depends on NextAuth's default middleware coverage.
+- The login UI under [`app/login/ui.jsx`](/d:/project/next_erp/app/login/ui.jsx) appears to be a placeholder screen and is not yet wired to `signIn()` directly.
+- The repo currently has local uncommitted changes in [`app/api/auth/[...nextauth]/options.ts`](/d:/project/next_erp/app/api/auth/[...nextauth]/options.ts) and [`app/utils/apiconfig.js`](/d:/project/next_erp/app/utils/apiconfig.js); this documentation was written around the current working tree and does not modify those files.

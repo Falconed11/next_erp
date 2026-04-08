@@ -1,6 +1,8 @@
-import { API_PATH } from "@/app/utils/apiconfig";
+import { API_PATH, getApiPath } from "@/app/utils/apiconfig";
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+
+console.log(API_PATH);
 
 export const options: NextAuthOptions = {
   providers: [
@@ -19,27 +21,30 @@ export const options: NextAuthOptions = {
         },
       },
       async authorize(credentials) {
-        const res = await fetch(`${API_PATH}login`, {
-          method: "POST",
-          body: JSON.stringify(credentials),
-          headers: { "Content-Type": "application/json" },
-        });
-        const user = await res.json();
-        // const user = { id: "1", nama: "david", password: "1234", peran: "admin", };
-        // if (credentials?.username === user.username && credentials?.password === user.password) {
-        //     return user
-        // }
-        if (user.id)
-          return {
-            id: user.id,
-            username: user.username,
-            nama: user.nama,
-            peran: user.peran,
-            rank: user.rank,
-            id_karyawan: user.id_karyawan,
-            keteranganperan: user.keteranganperan,
-          };
-        return null;
+        try {
+          const url = `${getApiPath()}login`;
+          console.log(url);
+
+          const res = await fetch(url, {
+            method: "POST",
+            body: JSON.stringify(credentials),
+            headers: { "Content-Type": "application/json" },
+          });
+
+          if (!res.ok) {
+            console.error("Status:", res.status);
+            console.error(await res.text());
+            return null;
+          }
+
+          const user = await res.json();
+          if (user?.id) return user;
+
+          return null;
+        } catch (err) {
+          console.error("Authorize error:", err);
+          return null;
+        }
       },
     }),
   ],
