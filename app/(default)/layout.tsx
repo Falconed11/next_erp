@@ -180,6 +180,14 @@ export default function RootLayout({
                 key: "coa-subtype",
                 name: "COA Sub Type",
               },
+              {
+                key: "peristiwa",
+                name: "Peristiwa",
+              },
+              {
+                key: "peristiwa_coa_map",
+                name: "Peristiwa COA Map",
+              },
             ],
           },
           {

@@ -2,10 +2,10 @@
 import { renderQueryStates } from "@/app/utils/tools";
 import { TableWithActiveStatus } from "@/components/default/DefaultTable";
 import {
-  deleteCoaType,
-  COA_TYPE_ENDPOINT,
-  patchCoaType,
-} from "@/services/coa/coa-type.service";
+  deletePeristiwa,
+  PERISTIWA_ENDPOINT,
+  patchPeristiwa,
+} from "@/services/coa/peristiwa.service";
 
 export default function App() {
   const queryStates = renderQueryStates({});
@@ -13,11 +13,11 @@ export default function App() {
   return (
     <div className="flex flex-col gap-2">
       <TableWithActiveStatus
-        endPoint={COA_TYPE_ENDPOINT}
+        endPoint={PERISTIWA_ENDPOINT}
         rowsPerPage={10}
-        name={"COA Type"}
-        onDelete={deleteCoaType}
-        onSave={patchCoaType}
+        name={"Peristiwa"}
+        onDelete={deletePeristiwa}
+        onSave={patchPeristiwa}
       />
     </div>
   );

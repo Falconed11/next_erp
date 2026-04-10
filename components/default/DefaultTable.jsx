@@ -21,6 +21,7 @@ import { useDefaultColumns, useDefaultFetch } from "@/hooks/useDefault";
 import { useState } from "react";
 import DefaultModal from "./DefaultModal";
 import { useSession } from "next-auth/react";
+import { renderFilterActive } from "@/app/utils/render";
 import { FilterActive } from "../filter";
 
 export const renderDefaultTableCell = ({
@@ -28,44 +29,40 @@ export const renderDefaultTableCell = ({
   columnKey,
   onEdit,
   onDelete,
-  renderActionButton,
+  renderActionButton = () => <></>,
+  addExtraColumnHandlers = () => ({}),
 }) => {
-  const cellValue = data[columnKey];
-  const updated_at = cellValue || data.updated_at;
-  const created_at = cellValue || data.created_at;
+  const cellValue = data?.[columnKey];
   const renderDateTimeComp = (date) => `${getDateFId(date)} ${getTime(date)}`;
-  switch (columnKey) {
-    case "nama":
-      return capitalizeEachWord(cellValue);
-    case "lastupdate":
-      return renderDateTimeComp(updated_at);
-    case "creationdate":
-      return renderDateTimeComp(created_at);
-    case "aksi":
-      return (
-        <div className="flex items-center gap-2 text-lg">
-          <Tooltip content="Edit">
-            <span
-              onClick={() => onEdit(data)}
-              className="cursor-pointer text-default-400"
-            >
-              <EditIcon />
-            </span>
-          </Tooltip>
-          {renderActionButton && renderActionButton(data)}
-          <Tooltip color="danger" content="Delete">
-            <span
-              onClick={() => onDelete(data.id)}
-              className="cursor-pointer text-danger"
-            >
-              <DeleteIcon />
-            </span>
-          </Tooltip>
-        </div>
-      );
-    default:
-      return cellValue;
-  }
+  const columnHandlers = {
+    nama: () => capitalizeEachWord(cellValue),
+    lastupdate: () => renderDateTimeComp(cellValue || data.updated_at),
+    creationdate: () => renderDateTimeComp(cellValue || data.created_at),
+    aksi: () => (
+      <div className="flex items-center gap-2 text-lg">
+        <Tooltip content="Edit">
+          <span
+            onClick={() => onEdit(data)}
+            className="cursor-pointer text-default-400"
+          >
+            <EditIcon />
+          </span>
+        </Tooltip>
+        {renderActionButton(data)}
+        <Tooltip color="danger" content="Delete">
+          <span
+            onClick={() => onDelete(data.id)}
+            className="cursor-pointer text-danger"
+          >
+            <DeleteIcon />
+          </span>
+        </Tooltip>
+      </div>
+    ),
+    ...addExtraColumnHandlers(data, cellValue),
+  };
+  const renderFn = columnHandlers[columnKey];
+  return typeof renderFn === "function" ? renderFn() : cellValue;
 };
 
 export const DefaultTable = ({
@@ -79,6 +76,8 @@ export const DefaultTable = ({
   enableActiveStatus,
   renderActionButton,
   generateTableCellClassName = () => "",
+  disableNama = false,
+  addExtraColumnHandlers,
 }) => {
   const session = useSession();
   const sessUser = session?.data?.user;
@@ -124,7 +123,7 @@ export const DefaultTable = ({
     }
   };
   const isHighRole = highRoleCheck(sessUser?.rank);
-  const columns = useDefaultColumns(isHighRole, extraColumns);
+  const columns = useDefaultColumns(isHighRole, extraColumns, disableNama);
   const QueryState = renderQueryStates({ data }, session);
   if (QueryState) return QueryState;
 
@@ -197,12 +196,15 @@ export const DefaultTable = ({
                       columnKey,
                       onEdit: editButtonPress,
                       onDelete: deleteButtonPress,
-                      ...(renderActionButton
-                        ? {
-                            renderActionButton: (data) =>
-                              renderActionButton(data, mutate, onSave),
-                          }
-                        : {}),
+                      renderActionButton: (data) => (
+                        <>
+                          {enableActiveStatus &&
+                            renderFilterActive(data, mutate, onSave)}
+                          {renderActionButton &&
+                            renderActionButton(data, mutate, onSave)}
+                        </>
+                      ),
+                      addExtraColumnHandlers: addExtraColumnHandlers,
                     })}
                   </TableCell>
                 )}
@@ -221,7 +223,35 @@ export const DefaultTable = ({
         onSave={onSave}
         setForm={setForm}
         extraFields={extraFields}
+        disableNama={disableNama}
       />
     </>
   );
 };
+
+export const TableWithActiveStatus = ({
+  endPoint,
+  rowsPerPage,
+  name,
+  onDelete,
+  onSave,
+  renderActionButton,
+  extraFields,
+  extraColumns,
+  disableNama = false,
+  addExtraColumnHandlers,
+}) => (
+  <DefaultTable
+    endPoint={endPoint}
+    rowsPerPage={rowsPerPage}
+    name={name}
+    onDelete={onDelete}
+    onSave={onSave}
+    renderActionButton={renderActionButton}
+    extraFields={extraFields}
+    extraColumns={extraColumns}
+    enableActiveStatus
+    disableNama={disableNama}
+    addExtraColumnHandlers={addExtraColumnHandlers}
+  />
+);

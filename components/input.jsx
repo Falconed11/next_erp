@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import * as XLSX from "xlsx";
 import { useDropzone } from "react-dropzone";
 import {
@@ -462,14 +462,22 @@ export const UpdateShowHide = ({ data, onFetch, mutate }) => {
 };
 
 export const UpdateActiveStatus = ({ data, onFetch, mutate }) => {
+  const session = useSession();
+  const sessUser = session?.data?.user;
+  const { id_karyawan } = sessUser;
   const { id, aktif } = data;
-  const onPress = async () => {
+  const onPress = useCallback(async () => {
     if (aktif) if (!confirm("Non aktifkan data?")) return;
-    const res = await onFetch({ id, aktif: aktif ? 0 : 1, method: "PATCH" });
+    const res = await onFetch({
+      id,
+      updated_by: id_karyawan,
+      aktif: aktif ? 0 : 1,
+      method: "PATCH",
+    });
     const json = await res.json();
     if (res.status == 400) return alert(json.message);
     mutate();
-  };
+  }, [id_karyawan, id, aktif, onFetch, mutate]);
   return (
     <Tooltip
       content={`Klik untuk ${aktif ? "menonaktifkan!" : "mengaktifkan"}`}

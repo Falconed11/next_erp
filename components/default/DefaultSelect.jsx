@@ -14,13 +14,16 @@ export default function DefaultSelect({
   buildText = (data) => data.nama,
   className,
   disallowEmptySelection,
+  options,
 }) {
-  const fetchData = useDefaultFetch({ endPoint, noInterval: true, filter });
+  const fetchData =
+    options || useDefaultFetch({ endPoint, noInterval: true, filter });
   const QueryState = renderQueryStates({ fetchData });
   if (QueryState) return QueryState;
-  const data = fetchData.data.data ?? fetchData.data;
+  const data = options || (fetchData.data.data ?? fetchData.data);
   return (
     <Select
+      isRequired={disallowEmptySelection}
       disallowEmptySelection={disallowEmptySelection}
       variant="bordered"
       label={label}
@@ -38,9 +41,9 @@ export default function DefaultSelect({
         <SelectItem
           key={item.id}
           value={item.id}
-          textValue={buildTextValue(item)}
+          textValue={buildTextValue(item, form)}
         >
-          {buildText(item)}
+          {buildText(item, form)}
         </SelectItem>
       ))}
     </Select>

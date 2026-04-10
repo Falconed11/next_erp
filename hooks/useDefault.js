@@ -33,19 +33,23 @@ export function useDefaultSumFetch({
   );
 }
 
-export function useDefaultColumns(isHighRole, extraColumns = []) {
+export function useDefaultColumns(
+  isHighRole,
+  extraColumns = [],
+  disableNama = false,
+) {
   return useMemo(
     () => [
       ...(isHighRole ? [{ key: "aksi", label: "Aksi" }] : []),
       { key: "id", label: "Id" },
-      { key: "nama", label: "Nama" },
+      ...(!disableNama ? [{ key: "nama", label: "Nama" }] : []),
       ...extraColumns,
       { key: "keterangan", label: "Keterangan" },
       { key: "creationdate", label: "Tanggal Dibuat" },
-      { key: "authorid_karyawan", label: "User Pembuat" },
+      { key: "created_by", label: "Pembuat" },
       { key: "lastupdate", label: "Terakhir Diubah" },
-      { key: "lastid_karyawan", label: "User Terakhir" },
+      { key: "updated_by", label: "Pengubah" },
     ],
-    [isHighRole],
+    [isHighRole, disableNama],
   );
 }

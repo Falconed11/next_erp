@@ -19,12 +19,15 @@ export default function DefaultModal({
   name,
   id_karyawan,
   extraFields,
+  disableNama = false,
 }) {
   const saveButtonPress = async (onClose) => {
     const res = await onSave({
       ...form,
       lastid_karyawan: id_karyawan,
-      ...(form.method == "POST" ? { authorid_karyawan: id_karyawan } : {}),
+      ...(form.method == "POST"
+        ? { authorid_karyawan: id_karyawan, created_by: id_karyawan }
+        : { updated_by: id_karyawan }),
     });
     const json = await res.json();
     if (!res.ok) return alert(json.message);
@@ -40,14 +43,17 @@ export default function DefaultModal({
               {form.title} {name}
             </ModalHeader>
             <ModalBody>
-              <Input
-                type="text"
-                variant="bordered"
-                label={name}
-                placeholder={`Masukkan nama ${name}!`}
-                value={form.nama}
-                onValueChange={(val) => updateForm(setForm, { nama: val })}
-              />
+              {!disableNama && (
+                <Input
+                  isRequired
+                  type="text"
+                  variant="bordered"
+                  label={name}
+                  placeholder={`Masukkan nama ${name}!`}
+                  value={form.nama}
+                  onValueChange={(val) => updateForm(setForm, { nama: val })}
+                />
+              )}
               <Input
                 type="text"
                 variant="bordered"

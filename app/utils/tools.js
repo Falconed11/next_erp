@@ -75,3 +75,10 @@ export const urlBuilder = (endPoint = "", params = []) =>
   `${endPoint}${paramBuilder(params)}`;
 export const updateForm = (setForm, data = {}) =>
   setForm((prev) => ({ ...prev, ...data }));
+export const buildURLPathQuery = (path = "", params = { sample: "test" }) => {
+  const cleanData = Object.fromEntries(
+    Object.entries(params).filter(([_, value]) => value != null),
+  );
+  const query = new URLSearchParams(cleanData).toString();
+  return `${path}?${query}`;
+};
