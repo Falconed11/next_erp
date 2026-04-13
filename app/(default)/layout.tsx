@@ -9,7 +9,7 @@ import {
   rolesCheck,
 } from "@/app/utils/tools";
 import { highRoles } from "@/app/utils/roles";
-import { RiDashboard2Fill, RiDashboard2Line } from "react-icons/ri";
+import { RiDashboard2Line } from "react-icons/ri";
 import { AiOutlineProduct } from "react-icons/ai";
 import { BusinessProgressBarIcon } from "@/components/icon";
 import { VscGithubProject } from "react-icons/vsc";
@@ -20,7 +20,6 @@ import { HiOutlineOfficeBuilding, HiOutlineUserGroup } from "react-icons/hi";
 import { TbDeviceDesktopAnalytics } from "react-icons/tb";
 import { FaRegUser } from "react-icons/fa";
 import { LiaToolsSolid } from "react-icons/lia";
-import { GoSignOut } from "react-icons/go";
 import { Spinner } from "@heroui/react";
 
 export default function RootLayout({
@@ -185,7 +184,7 @@ export default function RootLayout({
                 name: "Peristiwa",
               },
               {
-                key: "peristiwa_coa_map",
+                key: "peristiwa-coa-map",
                 name: "Peristiwa COA Map",
               },
             ],

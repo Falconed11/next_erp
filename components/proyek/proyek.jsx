@@ -10,13 +10,9 @@ import {
   Tooltip,
   useDisclosure,
 } from "@heroui/react";
-import {
-  capitalizeEachWord,
-  highRoleCheck,
-  renderQueryStates,
-} from "@/app/utils/tools";
+import { highRoleCheck, renderQueryStates, sortItems } from "@/app/utils/tools";
 import { useSession } from "next-auth/react";
-import Harga, { NumberComp } from "../harga";
+import { NumberComp } from "../harga";
 import { LIST_SWASTA_NEGRI } from "@/app/utils/const";
 import {
   useGetMonthlyReportByPeriode,
@@ -107,25 +103,10 @@ export const TableProyek = ({
     direction: "ascending",
   });
 
-  const sortedItems = useMemo(() => {
-    const items = [...(proyekReports?.data?.data || [])];
-    items.sort((a, b) => {
-      const col = sortDescriptor.column;
-
-      let first = a[col];
-      let second = b[col];
-
-      const cmp =
-        (first ?? "") < (second ?? "")
-          ? -1
-          : (first ?? "") > (second ?? "")
-            ? 1
-            : 0;
-
-      return sortDescriptor.direction === "descending" ? -cmp : cmp;
-    });
-    return items;
-  }, [proyekReports?.data?.data, sortDescriptor]);
+  const sortedItems = useMemo(
+    () => sortItems(proyekReports?.data?.data || [], sortDescriptor),
+    [proyekReports?.data?.data, sortDescriptor],
+  );
   const { totalPembayaran, totalPengeluaran, profit } = useMemo(() => {
     const items = [...(proyekReports?.data?.data || [])];
     return items.reduce(

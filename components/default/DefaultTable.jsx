@@ -14,11 +14,12 @@ import {
   capitalizeEachWord,
   highRoleCheck,
   renderQueryStates,
+  sortItems,
 } from "@/app/utils/tools";
 import { getDateFId, getTime } from "@/app/utils/date";
 import { TableHeaderWithAddButton } from "../mycomponent";
 import { useDefaultColumns, useDefaultFetch } from "@/hooks/useDefault";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import DefaultModal from "./DefaultModal";
 import { useSession } from "next-auth/react";
 import { renderFilterActive } from "@/app/utils/render";
@@ -78,6 +79,10 @@ export const DefaultTable = ({
   generateTableCellClassName = () => "",
   disableNama = false,
   addExtraColumnHandlers,
+  customSort = {
+    column: "nama",
+    direction: "ascending",
+  },
 }) => {
   const session = useSession();
   const sessUser = session?.data?.user;
@@ -85,6 +90,7 @@ export const DefaultTable = ({
   const [form, setForm] = useState({});
   const [page, setPage] = useState(1);
   const [isShowInactive, setIsShowInactive] = useState(false);
+  const [sortDescriptor, setSortDescriptor] = useState(customSort);
   const offset = (page - 1) * rowsPerPage;
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
@@ -96,6 +102,11 @@ export const DefaultTable = ({
   });
   const items = data?.data?.data;
   const mutate = data?.mutate;
+
+  const sortedItems = useMemo(
+    () => sortItems(items || [], sortDescriptor),
+    [items, sortDescriptor],
+  );
 
   const loadingState = data.isLoading ? "loading" : "idle";
   const tambahButtonPress = () => {
@@ -136,6 +147,8 @@ export const DefaultTable = ({
         isStriped
         className="min-h-[40px]"
         aria-label="Example table with custom cells"
+        sortDescriptor={sortDescriptor}
+        onSortChange={setSortDescriptor}
         topContent={
           <>
             <TableHeaderWithAddButton
@@ -172,13 +185,14 @@ export const DefaultTable = ({
             <TableColumn
               key={column.key}
               align={column.key === "actions" ? "center" : "start"}
+              allowsSorting
             >
               {column.label}
             </TableColumn>
           )}
         </TableHeader>
         <TableBody
-          items={items}
+          items={sortedItems}
           loadingContent={"Loading..."}
           emptyContent={"Kosong"}
           loadingState={loadingState}
@@ -240,6 +254,7 @@ export const TableWithActiveStatus = ({
   extraColumns,
   disableNama = false,
   addExtraColumnHandlers,
+  customSort,
 }) => (
   <DefaultTable
     endPoint={endPoint}
@@ -253,5 +268,6 @@ export const TableWithActiveStatus = ({
     enableActiveStatus
     disableNama={disableNama}
     addExtraColumnHandlers={addExtraColumnHandlers}
+    customSort={customSort}
   />
 );

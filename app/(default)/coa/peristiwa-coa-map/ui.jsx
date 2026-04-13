@@ -60,6 +60,10 @@ export default function App() {
         addExtraColumnHandlers={(data, cellValue) => ({
           entry_tipe: () => (cellValue ? "Debit" : "Kredit"),
         })}
+        customSort={{
+          column: "peristiwa",
+          direction: "ascending",
+        }}
       />
     </div>
   );

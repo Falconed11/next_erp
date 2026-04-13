@@ -15,7 +15,7 @@ export default function App() {
       <TableWithActiveStatus
         endPoint={COA_TYPE_ENDPOINT}
         rowsPerPage={10}
-        name={"COA Type"}
+        name={"Tipe COA"}
         onDelete={deleteCoaType}
         onSave={patchCoaType}
       />

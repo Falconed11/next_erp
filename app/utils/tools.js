@@ -82,3 +82,23 @@ export const buildURLPathQuery = (path = "", params = { sample: "test" }) => {
   const query = new URLSearchParams(cleanData).toString();
   return `${path}?${query}`;
 };
+export const sortItems = (items = [], sortDescriptor = {}) => {
+  const itemsArray = [...items];
+  const { column = "id", direction = "ascending" } = sortDescriptor;
+
+  itemsArray.sort((a, b) => {
+    let first = a[column];
+    let second = b[column];
+
+    const cmp =
+      (first ?? "") < (second ?? "")
+        ? -1
+        : (first ?? "") > (second ?? "")
+          ? 1
+          : 0;
+
+    return direction === "descending" ? -cmp : cmp;
+  });
+
+  return itemsArray;
+};
