@@ -17,7 +17,7 @@ import {
   sortItems,
 } from "@/app/utils/tools";
 import { getDateFId, getTime } from "@/app/utils/date";
-import { TableHeaderWithAddButton } from "../mycomponent";
+import { TableHeaderWithAddButton, TableTitle } from "../mycomponent";
 import { useDefaultColumns, useDefaultFetch } from "@/hooks/useDefault";
 import { useMemo, useState } from "react";
 import DefaultModal from "./DefaultModal";
@@ -83,6 +83,7 @@ export const DefaultTable = ({
     column: "nama",
     direction: "ascending",
   },
+  isRemoveAddButton = false,
 }) => {
   const session = useSession();
   const sessUser = session?.data?.user;
@@ -151,11 +152,15 @@ export const DefaultTable = ({
         onSortChange={setSortDescriptor}
         topContent={
           <>
-            <TableHeaderWithAddButton
-              title={name}
-              isHighRole={isHighRole}
-              onPress={tambahButtonPress}
-            />
+            {isRemoveAddButton ? (
+              <TableTitle>{name}</TableTitle>
+            ) : (
+              <TableHeaderWithAddButton
+                title={name}
+                isHighRole={isHighRole}
+                onPress={tambahButtonPress}
+              />
+            )}
             {enableActiveStatus && (
               <FilterActive
                 isShowInactive={isShowInactive}
@@ -255,6 +260,7 @@ export const TableWithActiveStatus = ({
   disableNama = false,
   addExtraColumnHandlers,
   customSort,
+  isRemoveAddButton = false,
 }) => (
   <DefaultTable
     endPoint={endPoint}
@@ -269,5 +275,6 @@ export const TableWithActiveStatus = ({
     disableNama={disableNama}
     addExtraColumnHandlers={addExtraColumnHandlers}
     customSort={customSort}
+    isRemoveAddButton={isRemoveAddButton}
   />
 );

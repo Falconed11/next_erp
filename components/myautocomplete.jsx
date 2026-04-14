@@ -33,6 +33,7 @@ export const useAutocompleteField = ({
   getCustomLabel,
   getCustomValue,
   getFormUpdateOnSelectionChange,
+  disallowEmptySelection,
   key,
 }) => {
   const query = useClientFetch(endpoint);
@@ -59,6 +60,7 @@ export const useAutocompleteField = ({
       getCustomLabel={getCustomLabel}
       getCustomValue={getCustomValue}
       getFormUpdateOnSelectionChange={getFormUpdateOnSelectionChange}
+      disallowEmptySelection={disallowEmptySelection}
       key={key}
     />
   );
@@ -81,6 +83,7 @@ export const AutocompleteWithCustomValue = ({
   getCustomLabel,
   getCustomValue = (i) => i[labelKey],
   getFormUpdateOnSelectionChange = () => {},
+  disallowEmptySelection,
 }) => {
   const { contains } = useFilter({ sensitivity: "base" });
   const [items, setItems] = useState(data);
@@ -141,6 +144,7 @@ export const AutocompleteWithCustomValue = ({
         popoverContent: "text-nowrap w-300",
       }}
       isDisabled={isDisabled}
+      isRequired={disallowEmptySelection}
       variant="bordered"
       allowsCustomValue={disableCustomValue ? undefined : true}
       label={

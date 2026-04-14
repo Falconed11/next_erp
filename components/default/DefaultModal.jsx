@@ -1,5 +1,6 @@
 import { updateForm } from "@/app/utils/tools";
 import {
+  addToast,
   Button,
   Input,
   Modal,
@@ -10,7 +11,7 @@ import {
 } from "@heroui/react";
 
 export default function DefaultModal({
-  data,
+  data = { mutate: () => {} },
   isOpen,
   onOpenChange,
   form,

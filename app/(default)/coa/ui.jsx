@@ -3,7 +3,10 @@ import { buildURLPathQuery, renderQueryStates } from "@/app/utils/tools";
 import { deleteCoa, COA_ENDPOINT, patchCoa } from "@/services/coa/coa.service";
 import DefaultSelect from "@/components/default/DefaultSelect";
 import { COA_SUBTYPE_ENDPOINT } from "@/services/coa/coa-subtype.service";
-import { SelectCoaType } from "@/components/coa/coa";
+import {
+  AutocompleteCoaType,
+  AutocompleteCoaSubtype,
+} from "@/components/coa/coa";
 import { TableWithActiveStatus } from "@/components/default/DefaultTable";
 
 export default function App() {
@@ -23,24 +26,16 @@ export default function App() {
           const { id_coa_type } = form;
           return (
             <>
-              <SelectCoaType
+              <AutocompleteCoaType
                 extraLabel={" (Filter)"}
                 form={form}
                 setForm={setForm}
               />
-              <DefaultSelect
+              <AutocompleteCoaSubtype
                 disallowEmptySelection
-                endPoint={buildURLPathQuery(COA_SUBTYPE_ENDPOINT, {
-                  id_coa_type,
-                  aktif: 1,
-                })}
-                fieldName={"id_coa_subtype"}
-                label={"Sub Tipe COA"}
-                placeholder={"Pilih sub tipe coa!"}
+                id_coa_type={id_coa_type}
                 form={form}
                 setForm={setForm}
-                buildText={generateCustomSelectCoaSubtypeText}
-                buildTextValue={generateCustomSelectCoaSubtypeText}
               />
             </>
           );

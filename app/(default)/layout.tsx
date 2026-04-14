@@ -176,6 +176,10 @@ export default function RootLayout({
                 name: "COA Type",
               },
               {
+                key: "coa-filter",
+                name: "COA Filter",
+              },
+              {
                 key: "coa-subtype",
                 name: "COA Sub Type",
               },

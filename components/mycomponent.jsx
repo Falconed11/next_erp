@@ -646,9 +646,12 @@ export const MyAddButton = ({ onPress }) => {
     </Button>
   );
 };
+export const TableTitle = ({ children }) => (
+  <div className={TITLE_STYLE}>{children}</div>
+);
 export const TableHeaderWithAddButton = ({ title, onPress, isHighRole }) => (
   <div className="flex justify-between items-center">
-    <div className={TITLE_STYLE}>{title}</div>
+    <TableTitle>{title}</TableTitle>
     {isHighRole && (
       <Button onPress={onPress} variant="shadow" size="sm" color="primary">
         <span className="text-xl font-bold">

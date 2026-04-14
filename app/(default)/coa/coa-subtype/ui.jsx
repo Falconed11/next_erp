@@ -5,7 +5,7 @@ import {
   COA_SUBTYPE_ENDPOINT,
   patchCoaSubType,
 } from "@/services/coa/coa-subtype.service";
-import { SelectCoaType } from "@/components/coa/coa";
+import { AutocompleteCoaType } from "@/components/coa/coa";
 import { TableWithActiveStatus } from "@/components/default/DefaultTable";
 
 export default function App() {
@@ -20,7 +20,11 @@ export default function App() {
         onDelete={deleteCoaSubType}
         onSave={patchCoaSubType}
         extraFields={(form, setForm) => (
-          <SelectCoaType disallowEmptySelection form={form} setForm={setForm} />
+          <AutocompleteCoaType
+            disallowEmptySelection
+            form={form}
+            setForm={setForm}
+          />
         )}
         extraColumns={[{ key: "coa_type", label: "Tipe COA" }]}
       />
