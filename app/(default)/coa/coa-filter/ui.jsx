@@ -121,6 +121,7 @@ export default function App() {
             { key: "nama", label: "Nama" },
           ]}
           disableNama={coaFilterDisableNama}
+          addExtraColumnHandlers={{}}
         />
       </div>
       <DefaultModal
