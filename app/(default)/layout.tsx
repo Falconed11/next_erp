@@ -194,6 +194,11 @@ export default function RootLayout({
             ],
           },
           {
+            href: "/transaksi",
+            name: "Transaksi",
+            icon: <TbDeviceDesktopAnalytics />,
+          },
+          {
             href: "/laporan",
             name: "Laporan",
             icon: <TbDeviceDesktopAnalytics />,

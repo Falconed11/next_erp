@@ -20,7 +20,6 @@ export const SelectCoaType = ({
     setForm={setForm}
   />
 );
-
 export const AutocompleteCoaType = (props) => {
   const { component } = useAutocompleteField({
     endpoint: `${COA_TYPE_ENDPOINT}?aktif=1`,
@@ -32,7 +31,6 @@ export const AutocompleteCoaType = (props) => {
   });
   return component;
 };
-
 export const AutocompleteCoaSubtype = ({ id_coa_type, ...props }) => {
   const { component } = useAutocompleteField({
     endpoint: `${COA_SUBTYPE_ENDPOINT}?aktif=1${id_coa_type ? `&id_coa_type=${id_coa_type}` : ""}`,
@@ -48,8 +46,8 @@ export const AutocompleteCoaSubtype = ({ id_coa_type, ...props }) => {
   });
   return component;
 };
-
-export const AutocompleteCoa = ({ id_coa_type, id_coa_subtype, ...props }) => {
+export const AutocompleteCoa = ({ form, ...props }) => {
+  const { id_coa_type, id_coa_subtype } = form;
   const { component } = useAutocompleteField({
     endpoint: `${COA_ENDPOINT}?aktif=1${id_coa_type ? `&id_coa_type=${id_coa_type}` : ""}${id_coa_subtype ? `&id_coa_subtype=${id_coa_subtype}` : ""}`,
     title: "COA",
@@ -62,7 +60,26 @@ export const AutocompleteCoa = ({ id_coa_type, id_coa_subtype, ...props }) => {
       `${item.nama} | ${item.coa_subtype} | ${item.coa_type}`,
     getCustomValue: (item) =>
       `${item.nama} | ${item.coa_subtype} | ${item.coa_type}`,
+    form,
     ...props,
   });
   return component;
 };
+export const SelectDebitKredit = ({
+  form,
+  setForm,
+  disallowEmptySelection,
+}) => (
+  <DefaultSelect
+    fieldName={"tipe"}
+    label={"Tipe"}
+    options={[
+      { id: 1, nama: "Debit" },
+      { id: 0, nama: "Kredit" },
+    ]}
+    disallowEmptySelection={disallowEmptySelection}
+    form={form}
+    setForm={setForm}
+    placeholder={"Pilih tipe!"}
+  />
+);

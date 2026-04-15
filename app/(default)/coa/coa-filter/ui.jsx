@@ -117,11 +117,22 @@ export default function App() {
             // { key: "coa", label: "COA" },
             // { key: "coa_type", label: "Type" },
             // { key: "coa_subtype", label: "Subtype" },
-            { key: "type", label: "Tipe" },
+            { key: "tipe", label: "Tipe" },
             { key: "nama", label: "Nama" },
           ]}
           disableNama={coaFilterDisableNama}
-          addExtraColumnHandlers={{}}
+          addExtraColumnHandlers={(data) => {
+            // Define priority from most specific to least specific
+            const fields = ["coa", "coa_subtype", "coa_type"];
+
+            // Find the first field that has a value
+            const activeField = fields.find((field) => data[field]);
+            console.log({ activeField, data: data[activeField] });
+            return {
+              tipe: () => activeField || "",
+              nama: () => (activeField ? data[activeField] : ""),
+            };
+          }}
         />
       </div>
       <DefaultModal
