@@ -10,6 +10,8 @@ export const DefaultNumberInput = ({
   placeholder,
   className,
   endContent,
+  value = form[field] || "",
+  onValueChange = (v) => setForm((prev) => updateForm(prev, { [field]: v })),
 }) => (
   <NumberInput
     isRequired
@@ -19,11 +21,11 @@ export const DefaultNumberInput = ({
     formatOptions={{
       useGrouping: false,
     }}
-    value={form[field] || ""}
+    value={value}
     label={label}
     placeholder={placeholder}
     className={className}
     endContent={endContent}
-    onValueChange={(v) => setForm((prev) => updateForm(prev, { [field]: v }))}
+    onValueChange={onValueChange}
   />
 );

@@ -123,9 +123,8 @@ export const AutocompleteWithCustomValue = ({
     }));
   };
   const handleOnBlur = () => {
-    // If custom value not allowed, force reset
     setForm((prev) => {
-      if (!disableCustomValue) return prev;
+      if (!disableCustomValue) return prev; // If custom value not allowed, force reset
       if (prev[id] != null) return prev; // valid selection
       return {
         ...prev,

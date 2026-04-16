@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   Table,
   TableHeader,
@@ -23,10 +23,9 @@ import {
   AutocompleteItem,
   Select,
 } from "@heroui/react";
-import { useFilter } from "@react-aria/i18n";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { AddIcon, EditIcon, DeleteIcon } from "@/components/icon";
+import { AddIcon, DeleteIcon } from "@/components/icon";
 import { SelectPerusahaan } from "@/components/perusahaan/perusahaan";
 import { useClientFetch } from "@/hooks/useClientFetch";
 import { getDateFId, getDate } from "@/app/utils/date";
@@ -37,24 +36,37 @@ import {
 } from "@/services/transaksi.service";
 import {
   highRoleCheck,
+  key2set,
   renderQueryStates,
+  set2key,
   updateForm,
 } from "@/app/utils/tools";
 import { TableHeaderWithAddButton } from "@/components/mycomponent";
 import { useSession } from "next-auth/react";
 import { AutocompleteCoa, SelectDebitKredit } from "@/components/coa/coa";
 import { DefaultNumberInput } from "@/components/default/DefaultInput";
+import { renderDefaultTableCell } from "@/components/default/DefaultTable";
+import Harga, { NumberComp } from "@/components/harga";
+import { API_PATH } from "@/app/utils/apiconfig";
 
 const TransaksiForm = ({ form, setForm, onSubmit, isOpen, onOpenChange }) => {
-  const totals = useMemo(() => {
-    const debit = (form.transaksi || [])
-      .filter((t) => t.tipe === 1)
-      .reduce((sum, t) => sum + (parseFloat(t.amount) || 0), 0);
-    const kredit = (form.transaksi || [])
-      .filter((t) => t.tipe === 0)
-      .reduce((sum, t) => sum + (parseFloat(t.amount) || 0), 0);
-    return { debit, kredit, isBalanced: Math.abs(debit - kredit) < 0.01 };
-  }, [form.transaksi]);
+  const totals = useMemo(
+    () =>
+      (form.transaksi || []).reduce(
+        ({ debit, kredit }, { tipe, amount }) => {
+          if (tipe == 1) {
+            debit += +amount || 0;
+          } else {
+            kredit += +amount || 0;
+          }
+          return { debit, kredit };
+        },
+        { debit: 0, kredit: 0 },
+      ),
+    [form.transaksi],
+  );
+  totals.difference = Math.abs(totals.debit - totals.kredit);
+  totals.isBalanced = totals.difference <= 0.01;
   const handleAddTransaksi = () => {
     setForm({
       ...form,
@@ -68,12 +80,30 @@ const TransaksiForm = ({ form, setForm, onSubmit, isOpen, onOpenChange }) => {
     const newTransaksi = form.transaksi.filter((_, i) => i !== index);
     setForm({ ...form, transaksi: newTransaksi });
   };
+  const updateFormHelper = (form, setForm, label, field, index, trx, value) => {
+    const { [label]: section } = form;
+    section[index] = { ...trx, [field]: value };
+    updateForm(setForm, { [label]: [...section] });
+  };
+  const getFirstDuplicate = (arr, field) => {
+    const seen = new Set();
+    for (const obj of arr) {
+      if (seen.has(obj[field])) return obj[field];
+      seen.add(obj[field]);
+    }
+    return null; // Return null if everything is unique
+  };
+  const duplicateCoa = useMemo(
+    () => getFirstDuplicate(form.transaksi || [], "coa"),
+    [form.transaksi],
+  );
   return (
     <Modal
       isOpen={isOpen}
       onOpenChange={onOpenChange}
       size="4xl"
       backdrop="blur"
+      scrollBehavior="inside"
     >
       <ModalContent>
         {(onClose) => (
@@ -83,10 +113,10 @@ const TransaksiForm = ({ form, setForm, onSubmit, isOpen, onOpenChange }) => {
             </ModalHeader>
             <ModalBody className="gap-4">
               {/* Header Form */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="z-50">
+              <div className="flex">
+                <div className="z-50 bg-gray-100 p-2 rounded-lg border">
                   <label className="text-sm font-medium mb-2 block">
-                    Tanggal *
+                    Tanggal
                   </label>
                   <DatePicker
                     selected={form.tanggal ? new Date(form.tanggal) : null}
@@ -95,20 +125,20 @@ const TransaksiForm = ({ form, setForm, onSubmit, isOpen, onOpenChange }) => {
                         tanggal: date ? getDate(date) : "",
                       })
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white"
                     placeholderText="Pilih tanggal"
                   />
                 </div>
-                <SelectPerusahaan
-                  form={form}
-                  setForm={setForm}
-                  disallowEmptySelection
-                />
               </div>
+              <SelectPerusahaan
+                form={form}
+                setForm={setForm}
+                disallowEmptySelection
+              />
               {/* Keterangan */}
               <Textarea
                 variant="bordered"
-                label="Keterangan"
+                label={`Keterangan ( ${form.keterangan?.length || 0}/200 )`}
                 placeholder="Masukkan keterangan jurnal"
                 value={form.keterangan || ""}
                 onValueChange={(value) =>
@@ -116,7 +146,6 @@ const TransaksiForm = ({ form, setForm, onSubmit, isOpen, onOpenChange }) => {
                 }
                 className="w-full"
               />
-
               {/* Transaksi Table */}
               <div>
                 <div className="flex justify-between items-center mb-4">
@@ -129,7 +158,6 @@ const TransaksiForm = ({ form, setForm, onSubmit, isOpen, onOpenChange }) => {
                     <AddIcon />
                   </Button>
                 </div>
-
                 {/* Transaksi Items */}
                 <div className="space-y-3 max-h-96 overflow-y-auto">
                   {(form.transaksi || []).map((trx, index) => (
@@ -139,29 +167,49 @@ const TransaksiForm = ({ form, setForm, onSubmit, isOpen, onOpenChange }) => {
                     >
                       <SelectDebitKredit
                         disallowEmptySelection
-                        form={form}
-                        setForm={setForm}
+                        selectedKeys={key2set(trx.tipe)}
+                        onSelectionChange={(v) =>
+                          updateFormHelper(
+                            form,
+                            setForm,
+                            "transaksi",
+                            "tipe",
+                            index,
+                            trx,
+                            set2key(v),
+                          )
+                        }
                       />
-                      <AutocompleteCoa
-                        key={index}
-                        form={form}
-                        setForm={setForm}
-                        disallowEmptySelection
+                      <AutoCompleteCoaInTransaksi
+                        parentSetForm={setForm}
+                        transaksi={form.transaksi}
+                        trx={trx}
+                        index={index}
                       />
                       <DefaultNumberInput
                         variant="bordered"
-                        field="amount"
-                        form={form}
-                        setForm={setForm}
                         label="Jumlah"
                         placeholder="Masukkan jumlah!"
+                        value={trx.amount}
+                        onValueChange={(v) =>
+                          updateFormHelper(
+                            form,
+                            setForm,
+                            "transaksi",
+                            "amount",
+                            index,
+                            trx,
+                            v,
+                          )
+                        }
                       />
-                      <div className="flex items-end">
+                      <div className="flex items-end bg-green-400">
                         <Button
                           isIconOnly
                           color="danger"
                           variant="light"
                           onPress={() => handleRemoveTransaksi(index)}
+                          className="text-xl"
                         >
                           <DeleteIcon />
                         </Button>
@@ -169,51 +217,62 @@ const TransaksiForm = ({ form, setForm, onSubmit, isOpen, onOpenChange }) => {
                     </div>
                   ))}
                 </div>
-
                 {/* Summary */}
                 <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
                   <div className="grid grid-cols-3 gap-4 text-sm">
-                    <div>
-                      <p className="text-gray-600">Total Debit</p>
-                      <p className="text-lg font-bold text-blue-600">
-                        {totals.debit.toLocaleString("id-ID", {
-                          minimumFractionDigits: 2,
-                        })}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-gray-600">Total Kredit</p>
-                      <p className="text-lg font-bold text-red-600">
-                        {totals.kredit.toLocaleString("id-ID", {
-                          minimumFractionDigits: 2,
-                        })}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-gray-600">Selisih</p>
-                      <p
-                        className={`text-lg font-bold ${
-                          totals.isBalanced ? "text-green-600" : "text-red-600"
-                        }`}
-                      >
-                        {Math.abs(totals.debit - totals.kredit).toLocaleString(
-                          "id-ID",
-                          {
-                            minimumFractionDigits: 2,
-                          },
-                        )}
-                      </p>
-                    </div>
+                    {[
+                      {
+                        label: "Total Debit",
+                        value: totals.debit,
+                        color: "text-blue-600",
+                      },
+                      {
+                        label: "Total Kredit",
+                        value: totals.kredit,
+                        color: "text-red-600",
+                      },
+                      {
+                        label: "Selisih",
+                        value: Math.abs(totals.debit - totals.kredit),
+                        color: totals.isBalanced
+                          ? "text-green-600"
+                          : "text-red-600",
+                      },
+                    ].map((data, i) => (
+                      <div key={i}>
+                        <p className="text-gray-600">{data.label}</p>
+                        <p className={`text-lg font-bold ${data.color}`}>
+                          <Harga harga={data.value} />
+                        </p>
+                      </div>
+                    ))}
                   </div>
                 </div>
-
-                {!totals.isBalanced && (
-                  <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded-lg">
+                {[
+                  ...(form.tanggal ? [] : ["Tanggal harus diisi"]),
+                  ...(form.id_perusahaan ? [] : ["Perusahaan harus dipilih"]),
+                  ...(form.transaksi && form.transaksi.length > 1
+                    ? []
+                    : ["Minimal harus ada 2 transaksi"]),
+                  ...(totals.isBalanced
+                    ? []
+                    : ["Debit dan Kredit harus sama (seimbang)"]),
+                  ...(!(totals.debit || totals.kredit)
+                    ? ["Debit atau Kredit harus diisi"]
+                    : []),
+                  ...(duplicateCoa
+                    ? [`COA "${duplicateCoa}" tidak boleh duplikat`]
+                    : []),
+                ].map((msg, i) => (
+                  <div
+                    key={i}
+                    className="mt-2 p-2 bg-red-50 border border-red-200 rounded-lg"
+                  >
                     <p className="text-red-700 text-sm font-semibold">
-                      ⚠️ Debit dan Kredit harus sama (seimbang)
+                      ⚠️ {msg}
                     </p>
                   </div>
-                )}
+                ))}
               </div>
             </ModalBody>
             <ModalFooter>
@@ -224,10 +283,11 @@ const TransaksiForm = ({ form, setForm, onSubmit, isOpen, onOpenChange }) => {
                 color="primary"
                 onPress={() => onSubmit(onClose)}
                 isDisabled={
-                  !totals.isBalanced ||
+                  totals.difference > 0.01 ||
                   !form.id_perusahaan ||
                   !form.tanggal ||
-                  form.transaksi.length === 0
+                  form.transaksi.length < 2 ||
+                  !(totals.debit || totals.kredit)
                 }
               >
                 Simpan
@@ -237,6 +297,22 @@ const TransaksiForm = ({ form, setForm, onSubmit, isOpen, onOpenChange }) => {
         )}
       </ModalContent>
     </Modal>
+  );
+};
+
+const AutoCompleteCoaInTransaksi = ({
+  parentSetForm,
+  transaksi,
+  index,
+  trx,
+}) => {
+  const [form, setForm] = useState(trx);
+  useEffect(() => {
+    transaksi[index] = { ...form, ...trx };
+    updateForm(parentSetForm, { transaksi: [...transaksi] });
+  }, [form]);
+  return (
+    <AutocompleteCoa form={form} setForm={setForm} disallowEmptySelection />
   );
 };
 
@@ -253,6 +329,7 @@ export default function TransaksiUI() {
     transaksi: [],
     method: "POST",
   });
+  const [isLoading, setIsLoading] = useState(false);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   const transaksiData = useClientFetch(
@@ -265,10 +342,32 @@ export default function TransaksiUI() {
       : 0;
   }, [transaksiData?.data?.count]);
 
+  const handleEditForm = async (data) => {
+    setIsLoading(true);
+    const jurnal = await fetch(
+      `${API_PATH}${TRANSAKSI_ENDPOINT}/${data.id_jurnal}`,
+    );
+    const res = await jurnal.json();
+    setForm({ ...res.data, method: "PATCH" });
+    setIsLoading(false);
+    onOpen();
+    // setForm({
+    //   tanggal: "",
+    //   keterangan: "",
+    //   id_perusahaan: "",
+    //   transaksi: [],
+    //   method: "POST",
+    // });
+    // onOpen();
+  };
+
   const loadingState = transaksiData?.isLoading ? "loading" : "idle";
+  if (isLoading) return <Spinner />;
   const queryState = renderQueryStates({ transaksiData }, session);
   if (queryState) return queryState;
   const isHighRole = highRoleCheck(sessionUser.role);
+
+  // console.log(form);
 
   const handleOpenForm = () => {
     setForm({
@@ -280,19 +379,12 @@ export default function TransaksiUI() {
     });
     onOpen();
   };
-  const handleEditForm = (data) => {
-    setForm({
-      ...data,
-      method: "PATCH",
-    });
-    onOpen();
-  };
   const handleSubmitForm = async (onClose) => {
     if (!form.tanggal || !form.id_perusahaan) {
       return alert("Tanggal dan Perusahaan harus diisi");
     }
-    if (!form.transaksi || form.transaksi.length === 0) {
-      return alert("Minimal ada 1 transaksi");
+    if (!form.transaksi || form.transaksi.length < 2) {
+      return alert("Minimal ada 2 transaksi");
     }
     try {
       const res = await saveTransaksi({
@@ -300,13 +392,10 @@ export default function TransaksiUI() {
         id: form.method === "PATCH" ? form.id : undefined,
       });
       const json = await res.json();
-
       if (!res.ok) {
         alert(json.message || "Gagal menyimpan transaksi");
         return;
       }
-
-      alert("Transaksi berhasil disimpan");
       transaksiData.mutate();
       onClose();
     } catch (error) {
@@ -330,12 +419,25 @@ export default function TransaksiUI() {
       alert("Error: " + error.message);
     }
   };
-  const formatCurrency = (num) => {
-    return Math.abs(num).toLocaleString("id-ID", {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    });
+
+  const columns = [
+    { key: "aksi", label: "Aksi" },
+    { key: "id_jurnal", label: "Id Jurnal" },
+    { key: "coa", label: "COA" },
+    { key: "tanggal", label: "Tanggal" },
+    { key: "debit", label: "Debit" },
+    { key: "kredit", label: "Kredit" },
+    { key: "perusahaan", label: "Perusahaan" },
+  ];
+
+  const addExtraColumnHandlers = (data) => {
+    return {
+      tanggal: () => getDateFId(data.tanggal),
+      debit: () => <NumberComp value={data.tipe == 1 ? data.amount : 0} />,
+      kredit: () => <NumberComp value={data.tipe == 0 ? data.amount : 0} />,
+    };
   };
+
   console.log(form);
   return (
     <div className="w-full">
@@ -371,81 +473,44 @@ export default function TransaksiUI() {
             ) : null
           }
         >
-          <TableHeader>
-            <TableColumn>ID JURNAL</TableColumn>
-            <TableColumn>TANGGAL</TableColumn>
-            <TableColumn align="right">DEBIT</TableColumn>
-            <TableColumn align="right">KREDIT</TableColumn>
-            <TableColumn>PERUSAHAAN</TableColumn>
-            <TableColumn align="center">AKSI</TableColumn>
+          <TableHeader columns={columns}>
+            {(column) => (
+              <TableColumn
+                key={column.key}
+                align={column.key === "aksi" ? "center" : "start"}
+                allowsSorting
+              >
+                {column.label}
+              </TableColumn>
+            )}
           </TableHeader>
           <TableBody
-            emptyContent={
-              loadingState === "loading"
-                ? "Loading..."
-                : "Tidak ada data jurnal"
-            }
+            items={transaksiData?.data?.data ?? []}
+            loadingContent={"Loading..."}
+            emptyContent={"Tidak ada data jurnal"}
+            loadingState={loadingState}
           >
-            {(transaksiData?.data?.data ?? []).map((item) => {
-              // Calculate debit and kredit for this journal
-              const debit =
-                item.transaksi
-                  ?.filter((t) => t.tipe === 1)
-                  .reduce((sum, t) => sum + (parseFloat(t.amount) || 0), 0) ||
-                0;
-              const kredit =
-                item.transaksi
-                  ?.filter((t) => t.tipe === 0)
-                  .reduce(
-                    (sum, t) => sum + Math.abs(parseFloat(t.amount) || 0),
-                    0,
-                  ) || 0;
-
-              return (
-                <TableRow key={item.id}>
-                  <TableCell className="font-semibold">
-                    {item.id_jurnal}
-                  </TableCell>
-                  <TableCell>{getDateFId(item.tanggal)}</TableCell>
+            {(item) => (
+              <TableRow key={item.id}>
+                {(columnKey) => (
                   <TableCell
-                    align="right"
-                    className="text-blue-600 font-semibold"
+                    align={
+                      columnKey === "debit" || columnKey === "kredit"
+                        ? "right"
+                        : "start"
+                    }
                   >
-                    {formatCurrency(debit)}
+                    {renderDefaultTableCell({
+                      data: item,
+                      columnKey,
+                      onEdit: handleEditForm,
+                      onDelete: handleDelete,
+                      addExtraColumnHandlers,
+                    })}
                   </TableCell>
-                  <TableCell
-                    align="right"
-                    className="text-red-600 font-semibold"
-                  >
-                    {formatCurrency(kredit)}
-                  </TableCell>
-                  <TableCell>{item.nama_perusahaan}</TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2 justify-center">
-                      <Tooltip content="Edit">
-                        <Button
-                          isIconOnly
-                          variant="light"
-                          onPress={() => handleEditForm(item)}
-                        >
-                          <EditIcon />
-                        </Button>
-                      </Tooltip>
-                      <Tooltip color="danger" content="Delete">
-                        <Button
-                          isIconOnly
-                          color="danger"
-                          variant="light"
-                          onPress={() => handleDelete(item.id)}
-                        >
-                          <DeleteIcon />
-                        </Button>
-                      </Tooltip>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
+                )}
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </div>

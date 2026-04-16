@@ -15,6 +15,13 @@ export default function DefaultSelect({
   className,
   disallowEmptySelection,
   options,
+  selectedKeys = key2set(form[fieldName]),
+  onSelectionChange = (v) => {
+    setForm({
+      ...form,
+      [fieldName]: set2key(v),
+    });
+  },
 }) {
   const fetchData =
     options || useDefaultFetch({ endPoint, noInterval: true, filter });
@@ -29,13 +36,8 @@ export default function DefaultSelect({
       label={label}
       placeholder={placeholder}
       className={className}
-      selectedKeys={key2set(form[fieldName])}
-      onSelectionChange={(v) => {
-        setForm({
-          ...form,
-          [fieldName]: set2key(v),
-        });
-      }}
+      selectedKeys={selectedKeys}
+      onSelectionChange={onSelectionChange}
     >
       {data.map((item) => (
         <SelectItem

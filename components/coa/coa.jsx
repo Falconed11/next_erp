@@ -69,6 +69,8 @@ export const SelectDebitKredit = ({
   form,
   setForm,
   disallowEmptySelection,
+  onSelectionChange,
+  selectedKeys,
 }) => (
   <DefaultSelect
     fieldName={"tipe"}
@@ -81,5 +83,7 @@ export const SelectDebitKredit = ({
     form={form}
     setForm={setForm}
     placeholder={"Pilih tipe!"}
+    selectedKeys={selectedKeys}
+    onSelectionChange={onSelectionChange}
   />
 );
