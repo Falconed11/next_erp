@@ -3,6 +3,8 @@ import { COA_SUBTYPE_ENDPOINT } from "@/services/coa/coa-subtype.service";
 import { COA_ENDPOINT } from "@/services/coa/coa.service";
 import DefaultSelect from "../default/DefaultSelect";
 import { useAutocompleteField } from "../myautocomplete";
+import { useEffect, useState } from "react";
+import { updateForm } from "@/app/utils/tools";
 
 export const SelectCoaType = ({
   form,
@@ -87,3 +89,19 @@ export const SelectDebitKredit = ({
     onSelectionChange={onSelectionChange}
   />
 );
+export const AutoCompleteCoaInJurnal = ({
+  parentSetForm,
+  transaksi,
+  index,
+  trx,
+}) => {
+  const [form, setForm] = useState(trx);
+  useEffect(() => {
+    const { id_coa, coa, ...trxUpdate } = trx;
+    transaksi[index] = { ...form, ...trxUpdate };
+    updateForm(parentSetForm, { transaksi: [...transaksi] });
+  }, [form]);
+  return (
+    <AutocompleteCoa form={form} setForm={setForm} disallowEmptySelection />
+  );
+};

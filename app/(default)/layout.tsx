@@ -204,6 +204,10 @@ export default function RootLayout({
             icon: <TbDeviceDesktopAnalytics />,
             dropdown: [
               {
+                key: "data",
+                name: "Laporan",
+              },
+              {
                 key: "biaya-produksi",
                 name: "Biaya Produksi",
               },

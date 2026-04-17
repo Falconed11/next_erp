@@ -27,7 +27,7 @@ export const getTime = (date, separator) => {
   const pad = (n) => n.toString().padStart(2, "0");
   const hours = pad(date.getHours());
   const minutes = pad(date.getMinutes());
-  return `${hours}${separator || "-"}${minutes}`;
+  return `${hours}${separator || ":"}${minutes}`;
 };
 
 export const getDateF = (date) => {

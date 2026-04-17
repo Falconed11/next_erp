@@ -54,6 +54,7 @@ export function useDefaultColumns(
   );
 }
 export function useDefaultColumnsV2(
+  customId = { key: "id", label: "Id" },
   isHighRole,
   extraColumns = [],
   disableNama = false,
@@ -61,15 +62,15 @@ export function useDefaultColumnsV2(
   return useMemo(
     () => [
       ...(isHighRole ? [{ key: "aksi", label: "Aksi" }] : []),
-      { key: "id", label: "Id" },
+      customId,
       ...(!disableNama ? [{ key: "nama", label: "Nama" }] : []),
       ...extraColumns,
       { key: "keterangan", label: "Keterangan" },
-      { key: "created_at", label: "Tanggal Dibuat" },
+      { key: "created_at", label: "Dibuat" },
       { key: "created_by", label: "Pembuat" },
-      { key: "updated_at", label: "Terakhir Diubah" },
+      { key: "updated_at", label: "Diubah" },
       { key: "updated_by", label: "Pengubah" },
     ],
-    [isHighRole, disableNama],
+    [isHighRole, disableNama, customId],
   );
 }
