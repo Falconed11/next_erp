@@ -1,4 +1,7 @@
 "use client";
+
+import Harga from "@/components/harga";
+
 export default function App() {
   const rawNodes = [
     { id: "1", parentId: null, name: "Rugi Laba", order: 1 },
@@ -69,21 +72,18 @@ const ReportRow = ({ node, depth = 0 }) => {
       <div
         className={`flex justify-between items-center p-3 rounded-t-lg border-b
           ${hasChildren ? "bg-slate-100 font-bold" : "bg-white font-medium"}
-          ${depth === 0 ? "border-l-4 border-l-blue-600 shadow-sm" : "border-l-2 border-l-slate-300"}
+          ${depth === 0 ? "border-l-4 shadow-sm" : "border-l-2 border-l-slate-300"}
         `}
       >
         <span className="text-slate-700">{node.name}</span>
         <span className="text-slate-900">
-          {node.total.toLocaleString("id-ID", {
-            style: "currency",
-            currency: "IDR",
-          })}
+          <Harga harga={node.total} />
         </span>
       </div>
 
       {/* The Container for Siblings (The "Box") */}
       {hasChildren && (
-        <div className="ml-4 border-l border-r border-b border-slate-200 rounded-b-lg bg-slate-50/30 pl-2 shadow-inner">
+        <div className="border-l border-r border-b border-slate-200 rounded-b-lg bg-slate-50/30 pl-2 pb-2 shadow-inner">
           {node.children.map((child) => (
             <ReportRow key={child.id} node={child} depth={depth + 1} />
           ))}
