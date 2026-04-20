@@ -1,6 +1,7 @@
 import { COA_TYPE_ENDPOINT } from "@/services/coa/coa-type.service";
 import { COA_SUBTYPE_ENDPOINT } from "@/services/coa/coa-subtype.service";
 import { COA_ENDPOINT } from "@/services/coa/coa.service";
+import { COA_FILTER_ENDPOINT } from "@/services/coa/coa-filter.service";
 import DefaultSelect from "../default/DefaultSelect";
 import { useAutocompleteField } from "../myautocomplete";
 import { useEffect, useState } from "react";
@@ -63,6 +64,17 @@ export const AutocompleteCoa = ({ form, ...props }) => {
     getCustomValue: (item) =>
       `${item.nama} | ${item.coa_subtype} | ${item.coa_type}`,
     form,
+    ...props,
+  });
+  return component;
+};
+export const AutocompleteCoaFilter = (props) => {
+  const { component } = useAutocompleteField({
+    endpoint: `${COA_FILTER_ENDPOINT}?aktif=1`,
+    title: "COA Filter",
+    field: "coa_filter",
+    id: "id_coa_filter",
+    disableCustomValue: true,
     ...props,
   });
   return component;

@@ -9,6 +9,7 @@ import {
   ModalFooter,
   ModalHeader,
 } from "@heroui/react";
+import { useSession } from "next-auth/react";
 
 export default function DefaultModal({
   data = { mutate: () => {} },
@@ -22,9 +23,13 @@ export default function DefaultModal({
   extraFields,
   disableNama = false,
 }) {
+  const session = useSession();
+  const sessUser = session?.data?.user;
+  const { id_karyawan: sessIdKaryawan } = sessUser;
   const saveButtonPress = async (onClose) => {
     const res = await onSave({
       ...form,
+      sessIdKaryawan,
       lastid_karyawan: id_karyawan,
       ...(form.method == "POST"
         ? { authorid_karyawan: id_karyawan, created_by: id_karyawan }

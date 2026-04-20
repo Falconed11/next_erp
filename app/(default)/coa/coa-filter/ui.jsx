@@ -59,8 +59,6 @@ export default function App() {
     </>
   );
 
-  console.log(form);
-
   return (
     <>
       <div className="flex gap-2">
@@ -127,7 +125,6 @@ export default function App() {
 
             // Find the first field that has a value
             const activeField = fields.find((field) => data[field]);
-            console.log({ activeField, data: data[activeField] });
             return {
               tipe: () => activeField || "",
               nama: () => (activeField ? data[activeField] : ""),

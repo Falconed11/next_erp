@@ -142,12 +142,14 @@ export const DefaultTable = ({
   if (QueryState) return QueryState;
 
   const id_karyawan = sessUser.id_karyawan;
-
   const pages = Math.ceil(items[0]?.total / rowsPerPage);
   return (
     <>
       <Table
         isStriped
+        // selectionBehavior="toggle"
+        selectionMode="single"
+        color="primary"
         className="min-h-[40px]"
         aria-label="Example table with custom cells"
         sortDescriptor={sortDescriptor}

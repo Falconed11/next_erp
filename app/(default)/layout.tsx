@@ -208,6 +208,10 @@ export default function RootLayout({
                 name: "Laporan",
               },
               {
+                key: "laporan",
+                name: "Template",
+              },
+              {
                 key: "biaya-produksi",
                 name: "Biaya Produksi",
               },
