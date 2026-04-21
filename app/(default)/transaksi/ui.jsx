@@ -68,13 +68,6 @@ export default function TransaksiUI() {
   const transaksiData = useClientFetch(
     `${TRANSAKSI_ENDPOINT}?limit=${rowsPerPage}&offset=${offset}`,
   );
-
-  const pages = useMemo(() => {
-    return transaksiData?.data?.count
-      ? Math.ceil(transaksiData.data.count / rowsPerPage)
-      : 0;
-  }, [transaksiData?.data?.count]);
-
   const handleEditForm = async (data) => {
     onOpen();
     setIsLoading(true);
@@ -91,6 +84,7 @@ export default function TransaksiUI() {
   const loadingState = transaksiData?.isLoading ? "loading" : "idle";
   const queryState = renderQueryStates({ transaksiData }, session);
   if (queryState) return queryState;
+  const pages = Math.ceil(transaksiData.data.data[0]?.total / rowsPerPage);
   const handleOpenForm = () => {
     setForm({
       tanggal: "",
@@ -150,6 +144,7 @@ export default function TransaksiUI() {
       kredit: () => <NumberComp value={data.tipe == 0 ? data.amount : 0} />,
     };
   };
+  console.log(transaksiData.data);
 
   return (
     <div className="w-full">
@@ -164,6 +159,7 @@ export default function TransaksiUI() {
       {/* Transaksi Table */}
       <div className="bg-white rounded-lg shadow">
         <Table
+          isStriped
           aria-label="Jurnal Transaksi Table"
           topContent={
             <TableHeaderWithAddButton
@@ -177,7 +173,7 @@ export default function TransaksiUI() {
               <div className="flex w-full justify-center">
                 <Pagination
                   isCompact
-                  color="secondary"
+                  color="primary"
                   page={page}
                   total={pages}
                   onChange={(p) => setPage(p)}

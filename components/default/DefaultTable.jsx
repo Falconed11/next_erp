@@ -143,12 +143,13 @@ export const DefaultTable = ({
 
   const id_karyawan = sessUser.id_karyawan;
   const pages = Math.ceil(items[0]?.total / rowsPerPage);
+  console.log(form);
   return (
     <>
       <Table
         isStriped
         // selectionBehavior="toggle"
-        selectionMode="single"
+        // selectionMode="single"
         color="primary"
         className="min-h-[40px]"
         aria-label="Example table with custom cells"

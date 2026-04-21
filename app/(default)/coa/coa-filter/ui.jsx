@@ -70,7 +70,7 @@ export default function App() {
           onSave={patchCoaFilter}
           extraFields={(form, setForm) => (
             <>
-              <AutocompleteCoaType
+              {/* <AutocompleteCoaType
                 disallowEmptySelection
                 form={form}
                 setForm={setForm}
@@ -87,7 +87,7 @@ export default function App() {
                 disallowEmptySelection
                 form={form}
                 setForm={setForm}
-              />
+              /> */}
             </>
           )}
           extraColumns={[]}

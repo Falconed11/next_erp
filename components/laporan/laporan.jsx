@@ -4,8 +4,8 @@ import { useAutocompleteField } from "../myautocomplete";
 export const AutocompleteLaporan = (props) => {
   const { component } = useAutocompleteField({
     endpoint: `${LAPORAN_ENDPOINT}?aktif=1`,
-    title: "Laporan",
-    field: "laporan",
+    title: "Parent",
+    field: "parent",
     id: "id_parent",
     disableCustomValue: true,
     ...props,
