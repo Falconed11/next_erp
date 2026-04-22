@@ -23,7 +23,7 @@ export default function LaporanFilters({
   onRefresh,
 }) {
   return (
-    <div className="mb-6 grid gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4 md:grid-cols-2">
+    <div className="flex flex-col gap-2">
       <AutocompleteLaporan
         title="Laporan"
         field="laporan"
@@ -31,11 +31,7 @@ export default function LaporanFilters({
         form={form}
         setForm={setForm}
       />
-      <SelectPerusahaan
-        form={form}
-        setForm={setForm}
-        disallowEmptySelection
-      />
+      <SelectPerusahaan form={form} setForm={setForm} disallowEmptySelection />
       <div className="rounded-xl border border-slate-300 bg-white px-4 py-3 md:col-span-2">
         <RadioGroup
           label="Tipe Report"
