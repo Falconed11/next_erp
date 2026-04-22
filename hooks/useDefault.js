@@ -9,9 +9,15 @@ export function useDefaultFetch({
   noInterval,
   filter,
 }) {
+  if (!endPoint) {
+    return noInterval ? useClientFetchNoInterval(null) : useClientFetch(null);
+  }
+
   const isPagination = limit != null && offset != null;
-  const qPagination = `limit=${limit}&offset=${offset}`;
-  const finalEndPoint = `${endPoint}?${isPagination ? qPagination : ""}&${filter}`;
+  const qPagination = isPagination ? `limit=${limit}&offset=${offset}` : "";
+  const query = [qPagination, filter].filter(Boolean).join("&");
+  const finalEndPoint = query ? `${endPoint}?${query}` : endPoint;
+
   if (noInterval) return useClientFetchNoInterval(finalEndPoint);
   return useClientFetch(finalEndPoint);
 }

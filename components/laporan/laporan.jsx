@@ -3,11 +3,11 @@ import { useAutocompleteField } from "../myautocomplete";
 
 export const AutocompleteLaporan = (props) => {
   const { component } = useAutocompleteField({
-    endpoint: `${LAPORAN_ENDPOINT}?aktif=1`,
-    title: "Parent",
-    field: "parent",
-    id: "id_parent",
-    disableCustomValue: true,
+    endpoint: props.endpoint ?? `${LAPORAN_ENDPOINT}?aktif=1`,
+    title: props.title ?? "Parent",
+    field: props.field ?? "parent",
+    id: props.id ?? "id_parent",
+    disableCustomValue: props.disableCustomValue ?? true,
     ...props,
   });
   return component;

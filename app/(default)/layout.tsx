@@ -266,7 +266,9 @@ export default function RootLayout({
         <div className="bg-red-500- mx-3">
           <div className="grid grid-cols-2 py-2 mr-3 rounded-lg bg-background ">
             <div className="basis-3/4-">
-              <div className="p-3">ERP{pathname != "/" && pathname}</div>
+              <div className="p-3 font-bold text-xl">
+                ERP{pathname != "/" && pathname}
+              </div>
             </div>
             {/* <div className="basis-1/4- flex flex-row-reverse"> */}
             <div className="text-right">
