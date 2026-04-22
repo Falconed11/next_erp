@@ -11,7 +11,13 @@ export const deleteLaporan = (id) => {
   return defaultDelete(LAPORAN_ENDPOINT, id);
 };
 
-export const getTreeLaporanEndpoint = ({ id, from, to, id_perusahaan }) => {
+export const getTreeLaporanEndpoint = ({
+  id,
+  from,
+  to,
+  id_perusahaan,
+  fullReport,
+}) => {
   if (!id) return null;
 
   return urlBuilder(`${LAPORAN_ENDPOINT}/${id}`, [
@@ -19,5 +25,6 @@ export const getTreeLaporanEndpoint = ({ id, from, to, id_perusahaan }) => {
     { key: "from", val: from },
     { key: "to", val: to },
     { key: "idPerusahaan", val: id_perusahaan },
+    { key: "fullReport", val: fullReport ? true : null },
   ]);
 };
