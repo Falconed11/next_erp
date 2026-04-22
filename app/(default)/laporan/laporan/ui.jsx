@@ -142,6 +142,7 @@ export default function App() {
               reportType="simple"
               reportSummary={previewSummary}
               reportTree={previewTree}
+              showModifier
             />
           </>
         )}
