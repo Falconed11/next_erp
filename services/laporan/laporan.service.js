@@ -24,7 +24,7 @@ export const getTreeLaporanEndpoint = ({
     { key: "type", val: "tree" },
     { key: "from", val: from },
     { key: "to", val: to },
-    { key: "idPerusahaan", val: id_perusahaan },
+    { key: "id_perusahaan", val: id_perusahaan },
     { key: "fullReport", val: fullReport ? true : null },
   ]);
 };
