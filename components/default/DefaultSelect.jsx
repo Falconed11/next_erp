@@ -13,6 +13,7 @@ export default function DefaultSelect({
   buildTextValue = (data) => data.nama,
   buildText = (data) => data.nama,
   className,
+  variant = "bordered",
   disallowEmptySelection,
   options,
   selectedKeys = key2set(form[fieldName]),
@@ -32,7 +33,7 @@ export default function DefaultSelect({
     <Select
       isRequired={disallowEmptySelection}
       disallowEmptySelection={disallowEmptySelection}
-      variant="bordered"
+      variant={variant}
       label={label}
       placeholder={placeholder}
       className={className}

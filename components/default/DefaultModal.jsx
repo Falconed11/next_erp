@@ -22,22 +22,27 @@ export default function DefaultModal({
   id_karyawan,
   extraFields,
   disableNama = false,
+  onSaveSuccess,
 }) {
   const session = useSession();
   const sessUser = session?.data?.user;
   const { id_karyawan: sessIdKaryawan } = sessUser;
   const saveButtonPress = async (onClose) => {
-    const res = await onSave({
+    const payload = {
       ...form,
       sessIdKaryawan,
       lastid_karyawan: id_karyawan,
       ...(form.method == "POST"
         ? { authorid_karyawan: id_karyawan, created_by: id_karyawan }
         : { updated_by: id_karyawan }),
+    };
+    const res = await onSave({
+      ...payload,
     });
     const json = await res.json();
     if (!res.ok) return alert(json.message);
     data.mutate();
+    onSaveSuccess?.(json, payload);
     onClose();
   };
   return (

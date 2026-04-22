@@ -28,6 +28,7 @@ export const useAutocompleteField = ({
   labelKey = "nama",
   valueKey = "id",
   className,
+  variant = "bordered",
   disableCustomValue,
   disableSelectOnChange,
   getCustomLabel,
@@ -55,6 +56,7 @@ export const useAutocompleteField = ({
       labelKey={labelKey}
       valueKey={valueKey}
       className={className}
+      variant={variant}
       disableCustomValue={disableCustomValue}
       disableSelectOnChange={disableSelectOnChange}
       getCustomLabel={getCustomLabel}
@@ -78,6 +80,7 @@ export const AutocompleteWithCustomValue = ({
   valueKey,
   labelKey,
   className = "",
+  variant = "bordered",
   disableCustomValue,
   disableSelectOnChange,
   getCustomLabel,
@@ -144,7 +147,7 @@ export const AutocompleteWithCustomValue = ({
       }}
       isDisabled={isDisabled}
       isRequired={disallowEmptySelection}
-      variant="bordered"
+      variant={variant}
       allowsCustomValue={disableCustomValue ? undefined : true}
       label={
         <>

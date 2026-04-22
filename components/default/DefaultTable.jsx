@@ -81,6 +81,7 @@ export const DefaultTable = ({
   generateTableCellClassName = () => "",
   disableNama = false,
   addExtraColumnHandlers,
+  onSaveSuccess,
   customSort = {
     column: "nama",
     direction: "ascending",
@@ -248,6 +249,7 @@ export const DefaultTable = ({
         setForm={setForm}
         extraFields={extraFields}
         disableNama={disableNama}
+        onSaveSuccess={onSaveSuccess}
       />
     </>
   );
@@ -264,6 +266,7 @@ export const TableWithActiveStatus = ({
   extraColumns,
   disableNama = false,
   addExtraColumnHandlers,
+  onSaveSuccess,
   customSort,
   isRemoveAddButton = false,
 }) => (
@@ -279,6 +282,7 @@ export const TableWithActiveStatus = ({
     enableActiveStatus
     disableNama={disableNama}
     addExtraColumnHandlers={addExtraColumnHandlers}
+    onSaveSuccess={onSaveSuccess}
     customSort={customSort}
     isRemoveAddButton={isRemoveAddButton}
   />

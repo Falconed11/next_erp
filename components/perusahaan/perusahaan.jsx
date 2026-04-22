@@ -5,6 +5,7 @@ export const SelectPerusahaan = ({
   form,
   setForm,
   className,
+  variant,
   disallowEmptySelection,
 }) => {
   return (
@@ -16,6 +17,7 @@ export const SelectPerusahaan = ({
       form={form}
       setForm={setForm}
       className={className}
+      variant={variant}
       disallowEmptySelection={disallowEmptySelection}
     />
   );

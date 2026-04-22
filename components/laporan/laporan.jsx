@@ -8,6 +8,7 @@ export const AutocompleteLaporan = (props) => {
     field: props.field ?? "parent",
     id: props.id ?? "id_parent",
     disableCustomValue: props.disableCustomValue ?? true,
+    variant: props.variant,
     ...props,
   });
   return component;

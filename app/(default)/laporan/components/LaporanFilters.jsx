@@ -28,10 +28,16 @@ export default function LaporanFilters({
         title="Laporan"
         field="laporan"
         id="id_laporan"
+        variant="bordered"
         form={form}
         setForm={setForm}
       />
-      <SelectPerusahaan form={form} setForm={setForm} disallowEmptySelection />
+      <SelectPerusahaan
+        form={form}
+        setForm={setForm}
+        variant="bordered"
+        disallowEmptySelection
+      />
       <div className="rounded-xl border border-slate-300 bg-white px-4 py-3 md:col-span-2">
         <RadioGroup
           label="Tipe Report"
