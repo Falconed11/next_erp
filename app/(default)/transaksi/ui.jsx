@@ -40,7 +40,10 @@ import {
   set2key,
   updateForm,
 } from "@/app/utils/tools";
-import { TableHeaderWithAddButton } from "@/components/mycomponent";
+import {
+  TableHeaderWithAddButton,
+  OpenBlueLinkInNewTab,
+} from "@/components/mycomponent";
 import { useSession } from "next-auth/react";
 import { renderDefaultTableCell } from "@/components/default/DefaultTable";
 import Harga, { NumberComp } from "@/components/harga";
@@ -144,7 +147,14 @@ export default function TransaksiUI() {
       tanggal: () => getDateFId(data.tanggal),
       debit: () => <NumberComp value={data.tipe == 1 ? data.amount : 0} />,
       kredit: () => <NumberComp value={data.tipe == 0 ? data.amount : 0} />,
-      id_proyek: () => data.id_proyek || "-",
+      id_proyek: () =>
+        data.id_proyek ? (
+          <OpenBlueLinkInNewTab link={`/proyek?id_proyek=${data.id_proyek}`}>
+            {data.id_proyek}
+          </OpenBlueLinkInNewTab>
+        ) : (
+          "-"
+        ),
     };
   };
   return (
