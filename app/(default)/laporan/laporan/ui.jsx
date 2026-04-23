@@ -31,7 +31,7 @@ export default function App() {
       id: selectedTreeLaporan?.id,
       from: getDate(today),
       to: getDate(addDays(today, 1)),
-      id_perusahaan: 2,
+      // id_perusahaan: 2,
     }),
     noInterval: true,
   });
@@ -117,7 +117,7 @@ export default function App() {
         <div className="mb-4 border-b border-slate-200 pb-3">
           <h2 className="text-xl font-bold text-slate-800">Tree Preview</h2>
           <p className="text-sm text-slate-500">
-            Menggunakan tanggal hari ini dan perusahaan ID 2.
+            Menggunakan tanggal hari ini.
           </p>
         </div>
         {!selectedTreeLaporan ? (

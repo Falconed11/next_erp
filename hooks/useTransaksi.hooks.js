@@ -7,6 +7,7 @@ export const useTransaksiColumns = (isHighRole) =>
     [
       { key: "tanggal", label: "Tanggal" },
       { key: "keterangan_jurnal", label: "Jurnal" },
+      { key: "id_proyek", label: "Proyek" },
       { key: "coa", label: "COA" },
       { key: "debit", label: "Debit" },
       { key: "kredit", label: "Kredit" },

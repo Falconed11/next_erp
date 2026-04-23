@@ -14,7 +14,11 @@ export default function ReportTreeSection({
         <FullReportSummary summary={reportSummary} />
       ) : null}
       {reportTree.map((rootNode) => (
-        <ReportRow key={rootNode.id} node={rootNode} showModifier={showModifier} />
+        <ReportRow
+          key={rootNode.id}
+          node={rootNode}
+          showModifier={showModifier}
+        />
       ))}
     </div>
   );
@@ -23,7 +27,9 @@ export default function ReportTreeSection({
 const ReportRow = ({ node, depth = 0, showModifier = false }) => {
   const hasChildren = node.children && node.children.length > 0;
   const modifierText =
-    showModifier && node.modifier != null ? ` (${node.modifier})` : "";
+    showModifier && node.modifier != null
+      ? ` (${+node.modifier > 0 ? "+" : "-"})`
+      : "";
 
   return (
     <div className={`flex flex-col ${depth > 0 ? "mt-2" : "mt-4"}`}>

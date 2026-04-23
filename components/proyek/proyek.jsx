@@ -22,6 +22,8 @@ import { tableClassName, tableClassNames } from "@/app/utils/style";
 import { useMemo, useState } from "react";
 import { OpenBlueLinkInNewTab } from "../mycomponent";
 import { number2Nominal } from "@/app/utils/number";
+import { useAutocompleteField } from "../myautocomplete";
+import { PROYEK_ENDPOINT } from "@/services/proyek.service";
 
 export const renderTableCellProyek = ({ data, columnKey }) => {
   const cellValue = data[columnKey];
@@ -216,4 +218,20 @@ export const OpenBlueLinkInNewTabProyek = ({ children, idProyek }) => {
       {children}
     </OpenBlueLinkInNewTab>
   );
+};
+
+export const AutocompleteProyek = (props) => {
+  const { component } = useAutocompleteField({
+    endpoint: `proyek?aktif=1&sort=tanggal_penawaran`,
+    title: "Proyek",
+    field: "proyek",
+    id: "id_proyek",
+    disableCustomValue: true,
+    getCustomLabel: (item) =>
+      `${item.id} | ${item.nama} | ${item.namaperusahaan} | ${item.instansi} | ${getDateFId(item.tanggal_penawaran)}`,
+    getCustomValue: (item) =>
+      `${item.id} | ${item.nama} | ${item.namaperusahaan} | ${item.instansi} | ${getDateFId(item.tanggal_penawaran)}`,
+    ...props,
+  });
+  return component;
 };

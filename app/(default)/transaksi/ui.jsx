@@ -59,6 +59,7 @@ export default function TransaksiUI() {
     tanggal: "",
     keterangan: "",
     id_perusahaan: "",
+    id_proyek: "",
     transaksi: [],
     method: "POST",
   });
@@ -90,6 +91,7 @@ export default function TransaksiUI() {
       tanggal: "",
       keterangan: "",
       id_perusahaan: "",
+      id_proyek: "",
       transaksi: [],
       method: "POST",
     });
@@ -106,7 +108,7 @@ export default function TransaksiUI() {
       const res = await saveTransaksi({
         ...form,
         id: form.method === "PATCH" ? form.id : undefined,
-        id_karyawan: sessionUser?.id_karyawan,
+        sessIdKaryawan: sessionUser?.id_karyawan,
       });
       const json = await res.json();
       if (!res.ok) {
@@ -142,10 +144,9 @@ export default function TransaksiUI() {
       tanggal: () => getDateFId(data.tanggal),
       debit: () => <NumberComp value={data.tipe == 1 ? data.amount : 0} />,
       kredit: () => <NumberComp value={data.tipe == 0 ? data.amount : 0} />,
+      id_proyek: () => data.id_proyek || "-",
     };
   };
-  console.log(transaksiData.data);
-
   return (
     <div className="w-full">
       <ModalJurnal

@@ -120,3 +120,8 @@ export const nominalToText = (number) => {
 
 export const number2Nominal = (harga) =>
   harga ? (+harga).toLocaleString("id-ID") : 0;
+
+export default {
+  nominalToText,
+  number2Nominal,
+};

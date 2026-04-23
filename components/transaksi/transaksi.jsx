@@ -18,6 +18,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import Harga from "../harga";
 import { key2set, set2key, updateForm } from "@/app/utils/tools";
 import { getDate } from "@/app/utils/date";
+import { AutocompleteProyek } from "../proyek/proyek";
 
 export const ModalJurnal = ({
   form,
@@ -75,6 +76,7 @@ export const ModalJurnal = ({
     [form.transaksi],
   );
   // if (isLoading) return <Spinner />;
+  // console.log(form);
   return (
     <Modal
       isOpen={isOpen}
@@ -116,6 +118,7 @@ export const ModalJurnal = ({
                   setForm={setForm}
                   disallowEmptySelection
                 />
+                <AutocompleteProyek form={form} setForm={setForm} />
                 {/* Keterangan */}
                 <Textarea
                   variant="bordered"
