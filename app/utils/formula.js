@@ -22,7 +22,7 @@ export const countRecapitulation = (
   const countModalJual = (data) =>
     data.reduce(
       (acc, v) => {
-        acc.modal += v.hargamodal * v.jumlah;
+        acc.modal += v.temphargamodal * v.jumlah;
         acc.jual += v.harga * v.jumlah;
         return acc;
       },

@@ -17,6 +17,7 @@ import { useSession } from "next-auth/react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useEffect, useState } from "react";
+import { getDate } from "@/app/utils/date";
 
 const FormProduct = ({ form, setForm }) => {
   const session = useSession();
