@@ -168,20 +168,20 @@ export default function RootLayout({
             icon: <TbDeviceDesktopAnalytics />,
             dropdown: [
               {
-                key: "data",
-                name: "COA",
-              },
-              {
                 key: "coa-type",
                 name: "COA Type",
               },
               {
-                key: "coa-filter",
-                name: "COA Filter",
-              },
-              {
                 key: "coa-subtype",
                 name: "COA Sub Type",
+              },
+              {
+                key: "data",
+                name: "COA",
+              },
+              {
+                key: "coa-filter",
+                name: "COA Filter",
               },
               {
                 key: "peristiwa",

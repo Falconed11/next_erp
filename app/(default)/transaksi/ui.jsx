@@ -26,7 +26,7 @@ import {
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useClientFetch } from "@/hooks/useClientFetch";
-import { getDateFId } from "@/app/utils/date";
+import { getDate, getDateF, getDateFId } from "@/app/utils/date";
 import {
   TRANSAKSI_ENDPOINT,
   saveTransaksi,
@@ -91,7 +91,7 @@ export default function TransaksiUI() {
   const pages = Math.ceil(transaksiData.data.data[0]?.total / rowsPerPage);
   const handleOpenForm = () => {
     setForm({
-      tanggal: "",
+      tanggal: getDate(new Date()),
       keterangan: "",
       id_perusahaan: "",
       id_proyek: "",
@@ -125,18 +125,18 @@ export default function TransaksiUI() {
     } finally {
     }
   };
-  const handleDelete = async (id) => {
-    if (!confirm("Hapus jurnal ini?")) return;
+  const handleDelete = async (id, { id_jurnal }) => {
+    if (!confirm(`Hapus jurnal id: ${id_jurnal}?`)) return;
 
     try {
-      const res = await deleteTransaksi(id);
+      const res = await deleteTransaksi(id_jurnal);
       if (!res.ok) {
         const json = await res.json();
         alert(json.message || "Gagal menghapus");
         return;
       }
-      alert("Jurnal berhasil dihapus");
       transaksiData.mutate();
+      alert("Jurnal berhasil dihapus");
     } catch (error) {
       alert("Error: " + error.message);
     }
@@ -157,6 +157,7 @@ export default function TransaksiUI() {
         ),
     };
   };
+  console.log(form);
   return (
     <div className="w-full">
       <ModalJurnal

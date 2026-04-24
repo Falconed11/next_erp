@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import {
   Button,
   Modal,
@@ -16,7 +16,13 @@ import { DefaultNumberInput } from "../default/DefaultInput";
 import { AddIcon, DeleteIcon } from "../icon";
 import "react-datepicker/dist/react-datepicker.css";
 import Harga from "../harga";
-import { key2set, set2key, updateForm } from "@/app/utils/tools";
+import {
+  key2set,
+  set2key,
+  updateForm,
+  updateNestedForm,
+  useDebounce,
+} from "@/app/utils/tools";
 import { getDate } from "@/app/utils/date";
 import { AutocompleteProyek } from "../proyek/proyek";
 
@@ -28,6 +34,18 @@ export const ModalJurnal = ({
   onOpenChange,
   isLoading,
 }) => {
+  const [keterangan, setKeterangan] = useState(form.keterangan || "");
+  const debouncedKeterangan = useDebounce(keterangan, 1000);
+
+  useEffect(() => {
+    if (debouncedKeterangan !== form.keterangan) {
+      updateForm(setForm, { keterangan: debouncedKeterangan });
+    }
+  }, [debouncedKeterangan, setForm]);
+
+  useEffect(() => {
+    setKeterangan(form.keterangan || "");
+  }, [form.keterangan]);
   const totals = useMemo(
     () =>
       (form.transaksi || []).reduce(
@@ -58,10 +76,8 @@ export const ModalJurnal = ({
     const newTransaksi = form.transaksi.filter((_, i) => i !== index);
     setForm({ ...form, transaksi: newTransaksi });
   };
-  const updateFormHelper = (form, setForm, label, field, index, trx, value) => {
-    const { [label]: section } = form;
-    section[index] = { ...trx, [field]: value };
-    updateForm(setForm, { [label]: [...section] });
+  const handleUpdateTransaksi = (index, field, value) => {
+    updateNestedForm(setForm, `transaksi.${index}.${field}`, value);
   };
   const getFirstDuplicate = (arr, field) => {
     const seen = new Set();
@@ -122,12 +138,10 @@ export const ModalJurnal = ({
                 {/* Keterangan */}
                 <Textarea
                   variant="bordered"
-                  label={`Keterangan ( ${form.keterangan?.length || 0}/200 )`}
+                  label={`Keterangan ( ${keterangan?.length || 0}/200 )`}
                   placeholder="Masukkan keterangan jurnal"
-                  value={form.keterangan || ""}
-                  onValueChange={(value) =>
-                    setForm({ ...form, keterangan: value })
-                  }
+                  value={keterangan}
+                  onValueChange={setKeterangan}
                   className="w-full"
                 />
                 {/* Transaksi Table */}
@@ -153,15 +167,7 @@ export const ModalJurnal = ({
                           disallowEmptySelection
                           selectedKeys={key2set(trx.tipe)}
                           onSelectionChange={(v) =>
-                            updateFormHelper(
-                              form,
-                              setForm,
-                              "transaksi",
-                              "tipe",
-                              index,
-                              trx,
-                              set2key(v),
-                            )
+                            handleUpdateTransaksi(index, "tipe", set2key(v))
                           }
                         />
                         <AutoCompleteCoaInJurnal
@@ -176,15 +182,7 @@ export const ModalJurnal = ({
                           placeholder="Masukkan jumlah!"
                           value={trx.amount}
                           onValueChange={(v) =>
-                            updateFormHelper(
-                              form,
-                              setForm,
-                              "transaksi",
-                              "amount",
-                              index,
-                              trx,
-                              v,
-                            )
+                            handleUpdateTransaksi(index, "amount", v)
                           }
                         />
                         <div className="grid items-end content-center">

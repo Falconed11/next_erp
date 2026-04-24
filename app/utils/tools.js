@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getApiPath } from "./apiconfig";
+import { produce } from "immer";
 const api_path = getApiPath();
 export const getNextDomain = () => {
   return process.env.NEXT_PUBLIC_MAIN_URL;
@@ -75,6 +76,22 @@ export const urlBuilder = (endPoint = "", params = []) =>
   `${endPoint}${paramBuilder(params)}`;
 export const updateForm = (setForm, data = {}) =>
   setForm((prev) => ({ ...prev, ...data }));
+export const updateNestedForm = (setForm, path, value) => {
+  setForm((prev) =>
+    produce(prev, (draft) => {
+      const keys = path.split(".");
+      let current = draft;
+      for (let i = 0; i < keys.length - 1; i++) {
+        const key = keys[i];
+        if (!current[key]) {
+          current[key] = isNaN(keys[i + 1]) ? {} : [];
+        }
+        current = current[key];
+      }
+      current[keys[keys.length - 1]] = value;
+    }),
+  );
+};
 export const buildURLPathQuery = (path = "", params = { sample: "test" }) => {
   const cleanData = Object.fromEntries(
     Object.entries(params).filter(([_, value]) => value != null),

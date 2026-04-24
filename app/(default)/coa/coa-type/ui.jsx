@@ -7,12 +7,16 @@ import {
   COA_TYPE_ENDPOINT,
   patchCoaType,
 } from "@/services/coa/coa-type.service";
+import Link from "next/link";
+import { Button } from "@heroui/react";
+import CoaNavigation from "@/components/coa/CoaNavigation";
 
 export default function App() {
   const queryStates = renderQueryStates({});
   if (queryStates) return queryStates;
   return (
     <div className="flex flex-col gap-2">
+      <CoaNavigation />
       <TableWithActiveStatus
         endPoint={COA_TYPE_ENDPOINT}
         rowsPerPage={10}
@@ -36,7 +40,11 @@ export default function App() {
         extraColumns={[{ key: "normal_balance", label: "Normal Balance" }]}
         addExtraColumnHandlers={(data, cellValue) => ({
           normal_balance: () =>
-            cellValue == null ? "" : String(cellValue) === "1" ? "Debit" : "Kredit",
+            cellValue == null
+              ? ""
+              : String(cellValue) === "1"
+                ? "Debit"
+                : "Kredit",
         })}
       />
     </div>

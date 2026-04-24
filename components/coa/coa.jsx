@@ -5,7 +5,7 @@ import { COA_FILTER_ENDPOINT } from "@/services/coa/coa-filter.service";
 import DefaultSelect from "../default/DefaultSelect";
 import { useAutocompleteField } from "../myautocomplete";
 import { useEffect, useState } from "react";
-import { updateForm } from "@/app/utils/tools";
+import { updateForm, updateNestedForm } from "@/app/utils/tools";
 
 export const SelectCoaType = ({
   form,
@@ -110,8 +110,10 @@ export const AutoCompleteCoaInJurnal = ({
   const [form, setForm] = useState(trx);
   useEffect(() => {
     const { id_coa, coa, ...trxUpdate } = trx;
-    transaksi[index] = { ...form, ...trxUpdate };
-    updateForm(parentSetForm, { transaksi: [...transaksi] });
+    updateNestedForm(parentSetForm, `transaksi.${index}`, {
+      ...form,
+      ...trxUpdate,
+    });
   }, [form]);
   return (
     <AutocompleteCoa form={form} setForm={setForm} disallowEmptySelection />

@@ -8,6 +8,9 @@ import {
   AutocompleteCoaSubtype,
 } from "@/components/coa/coa";
 import { TableWithActiveStatus } from "@/components/default/DefaultTable";
+import Link from "next/link";
+import { Button } from "@heroui/react";
+import CoaNavigation from "@/components/coa/CoaNavigation";
 
 export default function App() {
   const queryStates = renderQueryStates({});
@@ -16,6 +19,7 @@ export default function App() {
     `${data.nama}${form.id_coa_type ? `` : ` | ${data.coa_type}`}`;
   return (
     <div className="flex flex-col gap-2">
+      <CoaNavigation />
       <TableWithActiveStatus
         endPoint={COA_ENDPOINT}
         rowsPerPage={10}

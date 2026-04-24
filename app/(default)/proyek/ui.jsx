@@ -63,7 +63,7 @@ import {
 import { BadgeStatusProyek } from "@/components/badgestatusproyek";
 import { useReactToPrint } from "react-to-print";
 import { useClientFetch } from "@/hooks/useClientFetch";
-import { saveProyek } from "@/services/proyek.service";
+import { saveProyek, duplicateProyek } from "@/services/proyek.service";
 import { FilterHidden } from "@/components/filter";
 import { countOffset, countPages } from "@/app/utils/formula";
 
@@ -219,6 +219,21 @@ export default function App({
       const json = await res.json();
       if (res.status == 400) return alert(json.message);
       proyek.mutate();
+    }
+  };
+  const handleDuplicatePress = async (id) => {
+    if (!confirm("Duplicate this proyek?")) return;
+    try {
+      const res = await duplicateProyek(id);
+      const json = await res.json();
+      if (!res.ok) {
+        alert(json.message || "Gagal menduplikasi proyek");
+        return;
+      }
+      proyek.mutate();
+      alert("Proyek berhasil diduplikasi");
+    } catch (error) {
+      alert("Error: " + error.message);
     }
   };
   const handleFileUpload = (jsonData) => {
@@ -438,6 +453,14 @@ export default function App({
                 isHighRole ||
                 sessUser.id_karyawan == data.id_karyawan) && (
                 <>
+                  <Tooltip content="Duplicate">
+                    <span
+                      onClick={() => handleDuplicatePress(data.id)}
+                      className="text-lg text-default-400 cursor-pointer active:opacity-50"
+                    >
+                      ⧉
+                    </span>
+                  </Tooltip>
                   <Tooltip content="Edit">
                     <span
                       onClick={() => editButtonPress(data)}

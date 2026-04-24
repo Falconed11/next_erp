@@ -54,7 +54,7 @@ export const renderDefaultTableCell = ({
         {renderActionButton(data)}
         <Tooltip color="danger" content="Delete">
           <span
-            onClick={() => onDelete(data.id)}
+            onClick={() => onDelete(data.id, data)}
             className="cursor-pointer text-danger"
           >
             <DeleteIcon />
@@ -87,6 +87,7 @@ export const DefaultTable = ({
     direction: "ascending",
   },
   isRemoveAddButton = false,
+  extraDataBeforeAdd = {},
 }) => {
   const session = useSession();
   const sessUser = session?.data?.user;
@@ -117,6 +118,7 @@ export const DefaultTable = ({
     setForm({
       method: "POST",
       nama: "",
+      ...extraDataBeforeAdd,
     });
     onOpen();
   };
@@ -269,6 +271,7 @@ export const TableWithActiveStatus = ({
   onSaveSuccess,
   customSort,
   isRemoveAddButton = false,
+  extraDataBeforeAdd,
 }) => (
   <DefaultTable
     endPoint={endPoint}
@@ -285,5 +288,6 @@ export const TableWithActiveStatus = ({
     onSaveSuccess={onSaveSuccess}
     customSort={customSort}
     isRemoveAddButton={isRemoveAddButton}
+    extraDataBeforeAdd={extraDataBeforeAdd}
   />
 );
