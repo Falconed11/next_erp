@@ -475,7 +475,7 @@ export const UpdateActiveStatus = ({ data, onFetch, mutate }) => {
       method: "PATCH",
     });
     const json = await res.json();
-    if (res.status == 400) return alert(json.message);
+    if (!res.ok) return alert(json.message);
     mutate();
   }, [id_karyawan, id, aktif, onFetch, mutate]);
   return (

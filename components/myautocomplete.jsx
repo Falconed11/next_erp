@@ -266,11 +266,18 @@ export const AutocompleteVendor = (props) => {
 };
 export const AutocompleteProduk = ({
   id_kategori,
+  id_merek,
   disableCustomValue,
+  aktif = 1,
   ...props
 }) => {
+  const urlParam = [
+    ...(id_kategori ? [`kategori=${id_kategori}`] : []),
+    ...(id_merek ? [`merek=${id_merek}`] : []),
+    `aktif=${aktif}`,
+  ].join("&");
   const { component } = useAutocompleteField({
-    endpoint: `produk?${id_kategori ? `kategori=${id_kategori}` : ""}`,
+    endpoint: `produk?${urlParam}`,
     title: "Produk",
     field: "produk",
     id: "id_produk",
@@ -295,7 +302,7 @@ export const AutocompleteProduk = ({
       merek: item?.nmerek,
     }),
     disableCustomValue,
-    key: id_kategori,
+    key: `${id_kategori}-${id_merek}`,
     ...props,
   });
   return component;

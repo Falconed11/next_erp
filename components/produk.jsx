@@ -18,6 +18,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useEffect, useState } from "react";
 import { getDate } from "@/app/utils/date";
+import { MyDatePicker } from "./mycomponent";
 
 const FormProduct = ({ form, setForm }) => {
   const session = useSession();
@@ -81,6 +82,13 @@ const FormProduct = ({ form, setForm }) => {
             value={form.stok}
             onValueChange={(val) => setForm({ ...form, stok: val })}
           />
+          <MyDatePicker
+            isDisabled={!form.stok}
+            form={form}
+            setForm={setForm}
+            field="tanggal_masuk"
+            title="Tanggal Masuk"
+          />
           <AutocompleteVendor
             isDisabled={!form.stok}
             form={form}
@@ -122,6 +130,12 @@ const FormProduct = ({ form, setForm }) => {
         value={form.hargamodal}
         onValueChange={(val) => setForm({ ...form, hargamodal: val })}
       />
+      <MyDatePicker
+        form={form}
+        setForm={setForm}
+        field="tanggal_update_harga_modal"
+        title="Tanggal Update Harga Modal"
+      />
       <NumberInput
         variant="bordered"
         hideStepper
@@ -133,6 +147,12 @@ const FormProduct = ({ form, setForm }) => {
         placeholder="Masukkan harga jual!"
         value={form.hargajual}
         onValueChange={(val) => setForm({ ...form, hargajual: val })}
+      />
+      <MyDatePicker
+        form={form}
+        setForm={setForm}
+        field="tanggal_update_harga_jual"
+        title="Tanggal Update Harga Jual"
       />
       <NumberInput
         variant="bordered"
@@ -219,7 +239,7 @@ const FormProduct = ({ form, setForm }) => {
                   }}
                   onValueChange={setPersenProvit}
                 /> */}
-      <div className="bg-gray-100 p-3 rounded-lg z-40">
+      {/* <div className="bg-gray-100 p-3 rounded-lg z-40">
         <div>Tanggal</div>
         <DatePicker
           className="z-40 bg-white"
@@ -230,7 +250,7 @@ const FormProduct = ({ form, setForm }) => {
             setForm({ ...form, startdate: v, tanggal: getDate(v) })
           }
         />
-      </div>
+      </div> */}
       {form.modalmode == "Tambah" && form.stok > 0 ? (
         <>
           <RadioGroup

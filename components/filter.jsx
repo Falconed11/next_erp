@@ -15,22 +15,30 @@ export const FilterProduk = ({
   setIsReadyStock,
   kategori = [],
   hideReadyStock,
+  isShowInactive,
+  setIsShowInactive,
 }) => {
   return (
     <>
       <div>Filter</div>
       <div className="flex gap-3">
-        {!hideReadyStock && (
-          <Checkbox
-            isSelected={isReadyStock}
-            onValueChange={(v) => {
-              setIsReadyStock(v);
-              setPage(1);
-            }}
-          >
-            Stok Siap
-          </Checkbox>
-        )}
+        <div className="flex flex-col gap-3">
+          <FilterActive
+            isShowInactive={isShowInactive}
+            setIsShowInactive={setIsShowInactive}
+          />
+          {!hideReadyStock && (
+            <Checkbox
+              isSelected={isReadyStock}
+              onValueChange={(v) => {
+                setIsReadyStock(v);
+                setPage(1);
+              }}
+            >
+              Stok Siap
+            </Checkbox>
+          )}
+        </div>
         <Select
           label="Kategori"
           variant="bordered"

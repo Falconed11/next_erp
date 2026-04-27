@@ -13,6 +13,7 @@ import {
   AutocompleteVendor,
 } from "./myautocomplete";
 import { useClientFetch } from "@/hooks/useClientFetch";
+import { MyCheckBox } from "./mycomponent";
 
 const api_path = getApiPath();
 
@@ -28,20 +29,19 @@ export default function TambahProduk({
   className,
   disableCustomValue,
 }) {
-  const idKategori = form.id_kategori;
+  const { id_kategori: idKategori, id_merek: idMerek } = form;
   const session = useSession();
   const sessUser = session.data?.user;
   const [nama, setNama] = useState("");
   const [sVendor, setSVendor] = useState("");
   const [idProduk, setIdProduk] = useState(null);
-  const kategori = useClientFetch(`kategoriproduk`);
   const produk = useClientFetch(
-    `produk?${idKategori ? `kategori=${idKategori}` : ""}`,
+    `produk?${[...(idKategori ? [`kategori=${idKategori}`] : []), ...(idMerek ? [`merek=${idMerek}`] : [])].join("&")}`,
   );
   const vendor = useClientFetch("vendor");
   // const pilihProduk = useClientFetch(`produk`)
   const errorsJumlah = [];
-  const queryStates = renderQueryStates({ kategori, produk, vendor }, session);
+  const queryStates = renderQueryStates({ produk, vendor }, session);
   if (queryStates) return queryStates;
   const isHighRole = highRoleCheck(sessUser.rank);
   if ((form.jumlah < 1 || !form.jumlah) && form.selectProduk?.length > 0)
@@ -65,12 +65,10 @@ export default function TambahProduk({
   fvendor = fvendor.slice(0, 100);
   const selectProduk = produk.data.filter((v) => v.id == form.id_produk)[0];
   const hideComponent = isHighRole ? "" : "hidden";
-  // console.log(form.selectProduk);
-  // console.log({ nama });
-  const dataProduk = produk.data;
   const defStyleFormWidth = "group";
   const variant = "bordered";
   const isProdukSelected = !!form.id_produk;
+  console.log(idMerek);
   return (
     <div
       // className={`flex flex-wrap gap-3 ${className}`}
@@ -82,16 +80,17 @@ export default function TambahProduk({
         setForm={setForm}
         className={defStyleFormWidth}
       />
-      <AutocompleteProduk
+      <AutocompleteMerek
         disableCustomValue={disableCustomValue}
-        id_kategori={idKategori}
+        isDisabled={isProdukSelected}
         form={form}
         setForm={setForm}
         className={defStyleFormWidth}
       />
-      <AutocompleteMerek
+      <AutocompleteProduk
         disableCustomValue={disableCustomValue}
-        isDisabled={isProdukSelected}
+        id_kategori={idKategori}
+        id_merek={idMerek}
         form={form}
         setForm={setForm}
         className={defStyleFormWidth}
@@ -234,6 +233,11 @@ export default function TambahProduk({
           }
         />
       )}
+      {isProdukSelected && (
+        <MyCheckBox field="isUpdateHargaModal" form={form} setForm={setForm}>
+          Update Harga Modal
+        </MyCheckBox>
+      )}
       {/* harga jual / satuan */}
       <NumberInput
         variant={variant}
@@ -271,6 +275,11 @@ export default function TambahProduk({
           })
         }
       />
+      {isProdukSelected && (
+        <MyCheckBox field="isUpdateHargaJual" form={form} setForm={setForm}>
+          Update Harga Jual
+        </MyCheckBox>
+      )}
       {customInput ? customInput : <></>}
     </div>
   );

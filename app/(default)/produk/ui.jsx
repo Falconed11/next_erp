@@ -52,7 +52,7 @@ import {
 } from "@heroui/react";
 import { RadioGroup, Radio } from "@heroui/react";
 import Harga from "@/components/harga";
-import { TemplateImport } from "@/components/input";
+import { TemplateImport, UpdateActiveStatus } from "@/components/input";
 import { FilterProduk } from "@/components/filter";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -63,6 +63,7 @@ import { getDate, getDateF, getDateFId } from "@/app/utils/date";
 import {
   FilterCard,
   LinkOpenNewTab,
+  MyCheckBox,
   OpenBlueLinkInNewTab,
 } from "@/components/mycomponent";
 import { FormProduct } from "@/components/produk";
@@ -78,11 +79,13 @@ import {
   key2set,
   renderQueryStates,
   set2key,
+  updateForm,
   useDebounce,
 } from "@/app/utils/tools";
 import { useFilter } from "@react-aria/i18n";
 import ModalTransferData from "@/components/modaltransferdata";
 import { useClientFetch } from "@/hooks/useClientFetch";
+import { patchProduk } from "@/services/produk/produk.service";
 
 const apiPath = getApiPath();
 
@@ -112,12 +115,18 @@ export default function App({ id }) {
   const [page, setPage] = useState(1);
   const [isReadyStock, setIsReadyStock] = useState(false);
   const rowsPerPage = 10;
-
-  const produk = useClientFetch(
-    `produk?kategori=${set2key(selectKategori) ?? ""}${
-      isReadyStock ? `&isReadyStock=${isReadyStock}` : ""
-    }${id ? `&id=${id}` : ""}`,
-  );
+  const [isShowInactive, setIsShowInactive] = useState(false);
+  const urlParam = [
+    [
+      ...(isShowInactive ? [] : [`aktif=1`]),
+      ...(selectKategori.length > 0
+        ? [`kategori=${set2key(selectKategori) ?? ""}`]
+        : []),
+      ...(isReadyStock ? [`isReadyStock=${isReadyStock}`] : []),
+      ...(id ? [`id=${id}`] : []),
+    ].join("&"),
+  ];
+  const produk = useClientFetch(`produk?${urlParam}`);
   const merek = useClientFetch("merek");
   const vendor = useClientFetch("vendor?columnName=nama");
   const metodepengeluaran = useClientFetch("metodepengeluaran");
@@ -193,6 +202,9 @@ export default function App({ id }) {
       hargajual: "",
       startdate: new Date(),
       tanggal: getDate(new Date()),
+      tanggal_update_harga_modal: new Date(),
+      tanggal_update_harga_jual: new Date(),
+      tanggal_masuk: new Date(),
       lunas: "1",
       keterangan: "",
     });
@@ -410,7 +422,11 @@ export default function App({ id }) {
           </div>
         );
       case "tanggal":
-        return getDateFId(new Date(data.tanggal));
+        return getDateFId(data.tanggal);
+      case "tanggal_update_harga_modal":
+        return getDateFId(data.tanggal_update_harga_modal);
+      case "tanggal_update_harga_jual":
+        return getDateFId(data.tanggal_update_harga_jual);
       case "hargajual":
         return (
           <div className="text-right">
@@ -488,6 +504,11 @@ export default function App({ id }) {
             ) : (
               <></>
             )} */}
+            <UpdateActiveStatus
+              data={data}
+              onFetch={patchProduk}
+              mutate={produk.mutate}
+            />
             <Tooltip color="danger" content="Delete">
               <span
                 onClick={() => deleteButtonPress(data.id)}
@@ -597,6 +618,14 @@ export default function App({ id }) {
       label: "Tanggal",
     },
     {
+      key: "tanggal_update_harga_modal",
+      label: "Tanggal Modal",
+    },
+    {
+      key: "tanggal_update_harga_jual",
+      label: "Tanggal Jual",
+    },
+    {
       key: "keterangan",
       label: "Keterangan",
     },
@@ -644,6 +673,8 @@ export default function App({ id }) {
   //     if (item.id_kategoriproduk == form.id_kategori) return item;
   //   });
   // }
+  const isPriceSame = form.hargamodal == form.harga;
+  const { isUpdateHarga } = form;
   console.log(form);
   return (
     <div className="">
@@ -698,6 +729,8 @@ export default function App({ id }) {
               isReadyStock={isReadyStock}
               setIsReadyStock={setIsReadyStock}
               kategori={kategori.data}
+              isShowInactive={isShowInactive}
+              setIsShowInactive={setIsShowInactive}
             />
             {/* <div className="flex flex-row gap-2">
               <Button color="primary" onClick={handleButtonExportToExcelPress}>
@@ -750,7 +783,7 @@ export default function App({ id }) {
           loadingState={loadingState}
         >
           {(item) => (
-            <TableRow key={item.id}>
+            <TableRow className={item.aktif ? "" : `bg-red-200`} key={item.id}>
               {(columnKey) => (
                 <TableCell>{renderCell(item, columnKey)}</TableCell>
               )}
@@ -859,8 +892,18 @@ export default function App({ id }) {
                   }
                   placeholder="Masukkan harga modal!"
                   value={form.harga}
-                  onValueChange={(val) => setForm({ ...form, harga: val })}
+                  onValueChange={(val) =>
+                    updateForm(setForm, {
+                      harga: val,
+                      ...(form.hargamodal == val
+                        ? { isUpdateHarga: false }
+                        : {}),
+                    })
+                  }
                 />
+                <MyCheckBox field="isUpdateHarga" form={form} setForm={setForm}>
+                  Update Harga
+                </MyCheckBox>
                 <div className="bg-gray-100 p-3 rounded-lg z-40">
                   <div>Tanggal</div>
                   <DatePicker

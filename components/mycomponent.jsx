@@ -1,8 +1,14 @@
 import { API_PATH } from "@/app/utils/apiconfig";
-import { key2set, renderQueryStates, set2key } from "@/app/utils/tools";
+import {
+  key2set,
+  renderQueryStates,
+  set2key,
+  updateForm,
+} from "@/app/utils/tools";
 import {
   Badge,
   Button,
+  Checkbox,
   Input,
   Modal,
   ModalBody,
@@ -662,7 +668,6 @@ export const TableHeaderWithAddButton = ({ title, onPress, isHighRole }) => (
     )}
   </div>
 );
-
 /**
  * @typedef {{ label: string, value: string | number }} Item
  */
@@ -692,3 +697,43 @@ export const FilterCard = ({ title, arrayContent = [], link }) => {
     </Badge>
   );
 };
+export const MyDatePicker = ({
+  title = "Tanggal",
+  placeholderText = "Pilih tanggal",
+  form,
+  setForm,
+  field = "tanggal",
+  extraField = {},
+  isDisabled = false,
+}) => (
+  <div className="flex">
+    <div
+      className={`border border-gray-300 rounded-lg p-3 rounded-lg ${isDisabled ? "opacity-40" : ""}`}
+    >
+      <div>{title}</div>
+      <DatePicker
+        disabled={isDisabled}
+        placeholderText={placeholderText}
+        dateFormat="dd/MM/yyyy"
+        selected={new Date(form[field])}
+        onChange={(v) => updateForm(setForm, { [field]: v, ...extraField })}
+      />
+    </div>
+  </div>
+);
+export const MyCheckBox = ({
+  isDisabled,
+  form,
+  setForm,
+  field,
+  extraField,
+  children,
+}) => (
+  <Checkbox
+    isDisabled={isDisabled}
+    isSelected={form[field]}
+    onValueChange={(v) => updateForm(setForm, { [field]: v, ...extraField })}
+  >
+    {children}
+  </Checkbox>
+);
