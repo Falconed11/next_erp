@@ -12,12 +12,21 @@ import {
   AutocompleteMerek,
   AutocompleteVendor,
 } from "@/components/myautocomplete";
-import { Input, NumberInput, Radio, RadioGroup, Textarea } from "@heroui/react";
+import {
+  DatePicker,
+  Input,
+  NumberInput,
+  Radio,
+  RadioGroup,
+  Textarea,
+} from "@heroui/react";
 import { useSession } from "next-auth/react";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
 import { useEffect, useState } from "react";
-import { getDate } from "@/app/utils/date";
+import {
+  dateHeroUIToMysql,
+  dateMysqlToHeroUI,
+  getDate,
+} from "@/app/utils/date";
 import { MyDatePicker } from "./mycomponent";
 
 const FormProduct = ({ form, setForm }) => {
@@ -39,6 +48,7 @@ const FormProduct = ({ form, setForm }) => {
   const sessUser = session.data.user;
   const isHighRole = highRoleCheck(sessUser.rank);
   const classCompByRole = isHighRole ? "" : "hidden";
+  const isStock = form?.stok || false;
   return (
     <>
       <AutocompleteKategoriProduk form={form} setForm={setForm} />
@@ -67,7 +77,7 @@ const FormProduct = ({ form, setForm }) => {
         value={form.tipe}
         onValueChange={(val) => setForm({ ...form, tipe: val })}
       />
-      {form.modalmode == "Tambah" ? (
+      {form.modalmode == "Tambah" && (
         <>
           <NumberInput
             variant="bordered"
@@ -82,32 +92,31 @@ const FormProduct = ({ form, setForm }) => {
             value={form.stok}
             onValueChange={(val) => setForm({ ...form, stok: val })}
           />
-          <MyDatePicker
-            isDisabled={!form.stok}
-            form={form}
-            setForm={setForm}
-            field="tanggal_masuk"
-            title="Tanggal Masuk"
-          />
-          <AutocompleteVendor
-            isDisabled={!form.stok}
-            form={form}
-            setForm={setForm}
-          />
-          <Textarea
-            variant="bordered"
-            isDisabled={
-              !form.stok || !form.vendor || form.id_vendor ? true : undefined
-            }
-            label="alamat"
-            labelPlacement="inside"
-            placeholder="Masukkan alamat!"
-            value={form.alamat || ""}
-            onValueChange={(val) => setForm({ ...form, alamat: val })}
-          />
+          {isStock && (
+            <>
+              <MyDatePicker
+                form={form}
+                setForm={setForm}
+                field="tanggalMasuk"
+                label="Tanggal Masuk"
+              />
+              <AutocompleteVendor form={form} setForm={setForm} />
+              <Textarea
+                variant="bordered"
+                isDisabled={
+                  !form.stok || !form.vendor || form.id_vendor
+                    ? true
+                    : undefined
+                }
+                label="alamat"
+                labelPlacement="inside"
+                placeholder="Masukkan alamat!"
+                value={form.alamat || ""}
+                onValueChange={(val) => setForm({ ...form, alamat: val })}
+              />
+            </>
+          )}
         </>
-      ) : (
-        <></>
       )}
       <Input
         variant="bordered"
@@ -130,12 +139,6 @@ const FormProduct = ({ form, setForm }) => {
         value={form.hargamodal}
         onValueChange={(val) => setForm({ ...form, hargamodal: val })}
       />
-      <MyDatePicker
-        form={form}
-        setForm={setForm}
-        field="tanggal_update_harga_modal"
-        title="Tanggal Update Harga Modal"
-      />
       <NumberInput
         variant="bordered"
         hideStepper
@@ -147,12 +150,6 @@ const FormProduct = ({ form, setForm }) => {
         placeholder="Masukkan harga jual!"
         value={form.hargajual}
         onValueChange={(val) => setForm({ ...form, hargajual: val })}
-      />
-      <MyDatePicker
-        form={form}
-        setForm={setForm}
-        field="tanggal_update_harga_jual"
-        title="Tanggal Update Harga Jual"
       />
       <NumberInput
         variant="bordered"
@@ -204,54 +201,13 @@ const FormProduct = ({ form, setForm }) => {
           })
         }
       />
-      {/* <NumberInput
-                  hideStepper
-                  isWheelDisabled
-                  label="Persen Provit"
-                  placeholder="Masukkan Persen Provit!"
-                  value={persenProvit}
-                  endContent={
-                    <Button
-                      ref={terapkanButton}
-                      size="sm"
-                      color="primary"
-                      type="button"
-                      onPress={() => {
-                        setForm({
-                          ...form,
-                          hargajual: Math.ceil(
-                            countPriceByPercentProfit(
-                              form.hargamodal,
-                              persenProvit
-                            )
-                          ),
-                        });
-                      }}
-                    >
-                      Terapkan
-                    </Button>
-                  }
-                  onKeyDown={(e) => {
-                    if (e.key == "Enter") {
-                      e.preventDefault();
-                      terapkanButton.current?.click();
-                    }
-                  }}
-                  onValueChange={setPersenProvit}
-                /> */}
-      {/* <div className="bg-gray-100 p-3 rounded-lg z-40">
-        <div>Tanggal</div>
-        <DatePicker
-          className="z-40 bg-white"
-          placeholderText="Pilih tanggal"
-          dateFormat="dd/MM/yyyy"
-          selected={form.startdate}
-          onChange={(v) =>
-            setForm({ ...form, startdate: v, tanggal: getDate(v) })
-          }
-        />
-      </div> */}
-      {form.modalmode == "Tambah" && form.stok > 0 ? (
+      <MyDatePicker
+        form={form}
+        setForm={setForm}
+        field="tanggalHarga"
+        label="Tanggal Harga"
+      />
+      {form.modalmode == "Tambah" && form.stok > 0 && (
         <>
           <RadioGroup
             orientation="horizontal"
@@ -262,24 +218,8 @@ const FormProduct = ({ form, setForm }) => {
             <Radio value="1">Lunas</Radio>
             <Radio value="0">Hutang</Radio>
           </RadioGroup>
-          {form.lunas == "0" ? (
+          {form.lunas == "0" && (
             <>
-              <div className="bg-gray-100 p-3 rounded-lg z-40">
-                <div>Jatuh Tempo</div>
-                <DatePicker
-                  className="z-40"
-                  placeholderText="Pilih tanggal"
-                  dateFormat="dd/MM/yyyy"
-                  selected={form.startdateJatuhtempo}
-                  onChange={(v) =>
-                    setForm({
-                      ...form,
-                      startdateJatuhtempo: v,
-                      jatuhtempo: getDate(v),
-                    })
-                  }
-                />
-              </div>
               <Input
                 variant="bordered"
                 type="number"
@@ -288,13 +228,15 @@ const FormProduct = ({ form, setForm }) => {
                 value={form.terbayar}
                 onValueChange={(val) => setForm({ ...form, terbayar: val })}
               />
+              <MyDatePicker
+                form={form}
+                setForm={setForm}
+                field="jatuhTempo"
+                label="Jatuh Tempo"
+              />
             </>
-          ) : (
-            <></>
           )}
         </>
-      ) : (
-        <></>
       )}
       <Textarea
         variant="bordered"

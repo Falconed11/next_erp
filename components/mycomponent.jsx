@@ -9,6 +9,7 @@ import {
   Badge,
   Button,
   Checkbox,
+  DatePicker,
   Input,
   Modal,
   ModalBody,
@@ -31,8 +32,6 @@ import { Link } from "@heroui/react";
 import { useCallback, useMemo, useState } from "react";
 import { AddIcon, DeleteIcon, EditIcon, EyeIcon } from "./icon";
 import { useSession } from "next-auth/react";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
 import { getDate, getDateFId } from "@/app/utils/date";
 import Harga from "./harga";
 import { TITLE_STYLE } from "@/app/utils/const";
@@ -698,27 +697,27 @@ export const FilterCard = ({ title, arrayContent = [], link }) => {
   );
 };
 export const MyDatePicker = ({
-  title = "Tanggal",
-  placeholderText = "Pilih tanggal",
   form,
+  label = "Tanggal",
   setForm,
   field = "tanggal",
   extraField = {},
   isDisabled = false,
 }) => (
-  <div className="flex">
-    <div
-      className={`border border-gray-300 rounded-lg p-3 rounded-lg ${isDisabled ? "opacity-40" : ""}`}
-    >
-      <div>{title}</div>
-      <DatePicker
-        disabled={isDisabled}
-        placeholderText={placeholderText}
-        dateFormat="dd/MM/yyyy"
-        selected={new Date(form[field])}
-        onChange={(v) => updateForm(setForm, { [field]: v, ...extraField })}
-      />
-    </div>
+  <div className="w-full max-w-xl flex flex-row gap-4">
+    <DatePicker
+      isDisabled={isDisabled}
+      showMonthAndYearPickers
+      label={label}
+      variant="bordered"
+      value={form[field]}
+      onChange={(val) =>
+        updateForm(setForm, {
+          [field]: val,
+          ...extraField,
+        })
+      }
+    />
   </div>
 );
 export const MyCheckBox = ({

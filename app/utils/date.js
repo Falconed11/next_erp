@@ -1,3 +1,5 @@
+import { parseDate } from "@internationalized/date";
+
 export const monthNamesIndonesian = [
   "Januari",
   "Februari",
@@ -13,8 +15,20 @@ export const monthNamesIndonesian = [
   "Desember",
 ];
 
+export const dateHeroUIToMysql = (value) => {
+  const year = value.year;
+  const month = String(value.month).padStart(2, "0");
+  const day = String(value.day).padStart(2, "0");
+  const formatted = `${year}-${month}-${day}`;
+  return formatted;
+};
+export const dateMysqlToHeroUI = (value) => {
+  return parseDate(value);
+};
+
 export const getDate = (date) => {
   if (date === "0000-00-00" || !date) return "";
+  date = new Date(date);
   const year = date.getFullYear();
   const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Note that months are zero-based
   const day = date.getDate().toString().padStart(2, "0");

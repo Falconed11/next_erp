@@ -59,7 +59,13 @@ import "react-datepicker/dist/react-datepicker.css";
 import { getApiPath } from "@/app/utils/apiconfig";
 import { Button } from "@heroui/react";
 import { Input, Textarea } from "@heroui/react";
-import { getDate, getDateF, getDateFId } from "@/app/utils/date";
+import {
+  dateHeroUIToMysql,
+  dateMysqlToHeroUI,
+  getDate,
+  getDateF,
+  getDateFId,
+} from "@/app/utils/date";
 import {
   FilterCard,
   LinkOpenNewTab,
@@ -86,6 +92,7 @@ import { useFilter } from "@react-aria/i18n";
 import ModalTransferData from "@/components/modaltransferdata";
 import { useClientFetch } from "@/hooks/useClientFetch";
 import { patchProduk } from "@/services/produk/produk.service";
+import { CalendarDate, today } from "@internationalized/date";
 
 const apiPath = getApiPath();
 
@@ -178,7 +185,12 @@ export default function App({ id }) {
         "Content-Type": "application/json",
         // 'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: JSON.stringify(form),
+      body: JSON.stringify({
+        ...form,
+        tanggalHarga: dateHeroUIToMysql(form.tanggalHarga),
+        tanggalMasuk: dateHeroUIToMysql(form.tanggalMasuk),
+        jatuhTempo: dateHeroUIToMysql(form.jatuhTempo),
+      }),
     });
     const json = await res.json();
     if (res.status == 400) return alert(json.message);
@@ -187,6 +199,8 @@ export default function App({ id }) {
     // return alert(json.message);
   };
   const tambahButtonPress = () => {
+    const now = today();
+    console.log(now);
     setForm({
       modalmode: "Tambah",
       id: "",
@@ -200,11 +214,9 @@ export default function App({ id }) {
       satuan: "",
       hargamodal: "",
       hargajual: "",
-      startdate: new Date(),
-      tanggal: getDate(new Date()),
-      tanggal_update_harga_modal: new Date(),
-      tanggal_update_harga_jual: new Date(),
-      tanggal_masuk: new Date(),
+      tanggalMasuk: now,
+      tanggalHarga: now,
+      jatuhTempo: now,
       lunas: "1",
       keterangan: "",
     });
@@ -212,6 +224,7 @@ export default function App({ id }) {
     onOpen();
   };
   const editButtonPress = (data) => {
+    console.log(data.tanggal);
     const newForm = {
       ...data,
       modalmode: "Edit",
@@ -219,8 +232,7 @@ export default function App({ id }) {
       id_merek: data.id_merek,
       vendor: data.nvendor,
       id_vendor: data.id_vendor,
-      startdate: new Date(data.tanggal),
-      tanggal: data.tanggal,
+      tanggalHarga: dateMysqlToHeroUI(getDate(data.tanggal)),
     };
     setForm(newForm);
     setMethod("PUT");
@@ -615,15 +627,11 @@ export default function App({ id }) {
     },
     {
       key: "tanggal",
-      label: "Tanggal",
+      label: "Tanggal Harga",
     },
     {
-      key: "tanggal_update_harga_modal",
-      label: "Tanggal Modal",
-    },
-    {
-      key: "tanggal_update_harga_jual",
-      label: "Tanggal Jual",
+      key: "created_at",
+      label: "Dibuat Pada",
     },
     {
       key: "keterangan",
