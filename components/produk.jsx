@@ -126,80 +126,10 @@ const FormProduct = ({ form, setForm }) => {
         value={form.satuan}
         onValueChange={(val) => setForm({ ...form, satuan: val })}
       />
-      <NumberInput
-        variant="bordered"
-        hideStepper
-        isWheelDisabled
-        formatOptions={{
-          useGrouping: false,
-        }}
+      <HargaGenerator
+        form={form}
+        setForm={setForm}
         className={classCompByRole}
-        label="Harga Modal"
-        placeholder="Masukkan harga modal!"
-        value={form.hargamodal}
-        onValueChange={(val) => setForm({ ...form, hargamodal: val })}
-      />
-      <NumberInput
-        variant="bordered"
-        hideStepper
-        isWheelDisabled
-        formatOptions={{
-          useGrouping: false,
-        }}
-        label="Harga Jual"
-        placeholder="Masukkan harga jual!"
-        value={form.hargajual}
-        onValueChange={(val) => setForm({ ...form, hargajual: val })}
-      />
-      <NumberInput
-        variant="bordered"
-        hideStepper
-        isWheelDisabled
-        formatOptions={{
-          useGrouping: false,
-        }}
-        className={classCompByRole}
-        label="Provit"
-        // label={`Provit (${
-        //   Math.round(
-        //     countPercentProvit(
-        //       form.hargamodal || 0,
-        //       form.hargajual || 0
-        //     ) * 100
-        //   ) / 100
-        // }%)`}
-        placeholder="Masukkan Provit!"
-        value={form.hargajual - form.hargamodal}
-        onValueChange={(v) =>
-          setForm({
-            ...form,
-            hargajual: (+form.hargamodal || 0) + (+v || 0),
-          })
-        }
-      />
-      <NumberInput
-        variant="bordered"
-        hideStepper
-        isWheelDisabled
-        formatOptions={{
-          useGrouping: false,
-        }}
-        className={classCompByRole}
-        label="Persen Provit (%)"
-        placeholder="Masukkan persen provit!"
-        value={
-          Math.round(
-            countPercentProvit(form.hargamodal, form.hargajual) * 100,
-          ) / 100
-        }
-        onValueChange={(v) =>
-          setForm({
-            ...form,
-            hargajual: Math.round(
-              countPriceByPercentProfit(form.hargamodal, v),
-            ),
-          })
-        }
       />
       <MyDatePicker
         form={form}
@@ -246,6 +176,97 @@ const FormProduct = ({ form, setForm }) => {
         value={form.keterangan}
         onValueChange={(val) => setForm({ ...form, keterangan: val })}
       />
+    </>
+  );
+};
+
+export const HargaGenerator = ({
+  className,
+  form,
+  setForm,
+  hideJual = false,
+  extraLabelHargaModal = "",
+}) => {
+  return (
+    <>
+      <NumberInput
+        variant="bordered"
+        hideStepper
+        isWheelDisabled
+        formatOptions={{
+          useGrouping: false,
+        }}
+        className={className}
+        label={`Harga Modal${extraLabelHargaModal}`}
+        placeholder="Masukkan harga modal!"
+        value={form.hargamodal}
+        onValueChange={(val) => updateForm(setForm, { hargamodal: val })}
+      />
+      {!hideJual && (
+        <>
+          <NumberInput
+            variant="bordered"
+            hideStepper
+            isWheelDisabled
+            formatOptions={{
+              useGrouping: false,
+            }}
+            className={className}
+            label="Harga Jual"
+            placeholder="Masukkan harga jual!"
+            value={form.hargajual}
+            onValueChange={(val) => updateForm(setForm, { hargajual: val })}
+          />
+          <NumberInput
+            variant="bordered"
+            hideStepper
+            isWheelDisabled
+            formatOptions={{
+              useGrouping: false,
+            }}
+            className={className}
+            label="Provit"
+            // label={`Provit (${
+            //   Math.round(
+            //     countPercentProvit(
+            //       form.hargamodal || 0,
+            //       form.hargajual || 0
+            //     ) * 100
+            //   ) / 100
+            // }%)`}
+            placeholder="Masukkan Provit!"
+            value={form.hargajual - form.hargamodal}
+            onValueChange={(v) =>
+              updateForm(setForm, {
+                hargajual: (+form.hargamodal || 0) + (+v || 0),
+              })
+            }
+          />
+          <NumberInput
+            variant="bordered"
+            hideStepper
+            isWheelDisabled
+            formatOptions={{
+              useGrouping: false,
+            }}
+            className={className}
+            label="Persen Provit (%)"
+            placeholder="Masukkan persen provit!"
+            value={
+              Math.round(
+                countPercentProvit(form.hargamodal, form.hargajual) * 100,
+              ) / 100
+            }
+            onValueChange={(v) =>
+              updateForm(setForm, {
+                hargajual: Math.round(
+                  countPriceByPercentProfit(form.hargamodal, v),
+                ),
+              })
+            }
+          />
+        </>
+      )}
     </>
   );
 };

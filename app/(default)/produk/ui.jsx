@@ -70,9 +70,10 @@ import {
   FilterCard,
   LinkOpenNewTab,
   MyCheckBox,
+  MyDatePicker,
   OpenBlueLinkInNewTab,
 } from "@/components/mycomponent";
-import { FormProduct } from "@/components/produk";
+import { FormProduct, HargaGenerator } from "@/components/produk";
 import { AuthorizationComponent } from "@/components/componentmanipulation";
 import {
   AutocompleteKategoriProduk,
@@ -93,6 +94,7 @@ import ModalTransferData from "@/components/modaltransferdata";
 import { useClientFetch } from "@/hooks/useClientFetch";
 import { patchProduk } from "@/services/produk/produk.service";
 import { CalendarDate, today } from "@internationalized/date";
+import { number2Nominal } from "@/app/utils/number";
 
 const apiPath = getApiPath();
 
@@ -187,9 +189,13 @@ export default function App({ id }) {
       },
       body: JSON.stringify({
         ...form,
-        tanggalHarga: dateHeroUIToMysql(form.tanggalHarga),
-        tanggalMasuk: dateHeroUIToMysql(form.tanggalMasuk),
-        jatuhTempo: dateHeroUIToMysql(form.jatuhTempo),
+        ...(method == "POST"
+          ? {
+              tanggalHarga: dateHeroUIToMysql(form.tanggalHarga),
+              tanggalMasuk: dateHeroUIToMysql(form.tanggalMasuk),
+              jatuhTempo: dateHeroUIToMysql(form.jatuhTempo),
+            }
+          : { tanggal: form.tanggalHarga }),
       }),
     });
     const json = await res.json();
@@ -342,10 +348,9 @@ export default function App({ id }) {
     console.log(data);
     setForm({
       ...data,
-      startdate: new Date(),
-      tanggal: getDate(new Date()),
+      tanggal: today(),
       id_produk: data.id,
-      harga: data.hargamodal,
+      refHargaModal: data.hargamodal,
       lunas: "1",
     });
     modal.masuk.onOpen();
@@ -359,7 +364,7 @@ export default function App({ id }) {
         "Content-Type": "application/json",
         // 'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: JSON.stringify(form),
+      body: JSON.stringify({ ...form, harga: form.hargamodal }),
     });
     const json = await res.json();
     if (res.status == 400) return alert(json.message);
@@ -886,7 +891,16 @@ export default function App({ id }) {
                   value={form.jumlah}
                   onValueChange={(val) => setForm({ ...form, jumlah: val })}
                 />
-                <NumberInput
+                <MyDatePicker
+                  form={form}
+                  setForm={setForm}
+                  field="tanggal"
+                  label="Tanggal Masuk"
+                />
+                <MyCheckBox field="isUpdateHarga" form={form} setForm={setForm}>
+                  Update Harga
+                </MyCheckBox>
+                {/* <NumberInput
                   hideStepper
                   isWheelDisabled
                   formatOptions={{
@@ -908,22 +922,14 @@ export default function App({ id }) {
                         : {}),
                     })
                   }
+                /> */}
+                <HargaGenerator
+                  className={classCompByRole}
+                  form={form}
+                  setForm={setForm}
+                  hideJual={!form.isUpdateHarga}
+                  extraLabelHargaModal={` (Ref: ${number2Nominal(form.refHargaModal)}`}
                 />
-                <MyCheckBox field="isUpdateHarga" form={form} setForm={setForm}>
-                  Update Harga
-                </MyCheckBox>
-                <div className="bg-gray-100 p-3 rounded-lg z-40">
-                  <div>Tanggal</div>
-                  <DatePicker
-                    className="z-40"
-                    placeholderText="Pilih tanggal"
-                    dateFormat="dd/MM/yyyy"
-                    selected={form.startdate}
-                    onChange={(v) =>
-                      setForm({ ...form, startdate: v, tanggal: getDate(v) })
-                    }
-                  />
-                </div>
                 <RadioGroup
                   orientation="horizontal"
                   defaultValue={"1"}
