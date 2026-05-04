@@ -233,11 +233,6 @@ export default function TambahProduk({
           }
         />
       )}
-      {isProdukSelected && (
-        <MyCheckBox field="isUpdateHargaModal" form={form} setForm={setForm}>
-          Update Harga Modal
-        </MyCheckBox>
-      )}
       {/* harga jual / satuan */}
       <NumberInput
         variant={variant}
@@ -275,11 +270,6 @@ export default function TambahProduk({
           })
         }
       />
-      {isProdukSelected && (
-        <MyCheckBox field="isUpdateHargaJual" form={form} setForm={setForm}>
-          Update Harga Jual
-        </MyCheckBox>
-      )}
       {customInput ? customInput : <></>}
     </div>
   );

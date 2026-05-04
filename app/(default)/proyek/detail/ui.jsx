@@ -239,7 +239,6 @@ export default function App({ id, versi }) {
   const terapkanButtonPress = async (e) => {
     e.preventDefault();
     if (!confirm("Anda yakin untuk merubah seluruh harga jual?")) return;
-    // console.log({ id_proyek: id, provitmarginpersen: inputMargin });
     if (inputPersenProvit < 0) return alert("Persen provit tidak valid.");
     // if (data.jumlah <= 0) return alert("Jumlah belum diisi");
     const res = await fetch(
@@ -258,8 +257,6 @@ export default function App({ id, versi }) {
     );
     const json = await res.json();
     if (res.status >= 400 && res.status < 500) return alert(json.message);
-    // alert(json);
-    // console.log(json);
     return alert(json.message);
   };
   const handleButtonSimpanJenisProyek = async (data, onClose) => {
@@ -298,8 +295,6 @@ export default function App({ id, versi }) {
     });
     const json = await res.json();
     if (res.status == 400) return alert(json.message);
-    // console.log(json.message);
-    // return alert(json.message);
     proyek.mutate();
   };
   const handleButtonSetAsRejectClick = async () => {
@@ -317,8 +312,6 @@ export default function App({ id, versi }) {
     });
     const json = await res.json();
     if (res.status == 400) return alert(json.message);
-    // console.log(json.message);
-    // return alert(json.message);
     proyek.mutate();
   };
   const handleButtonCancelDealRejectClick = async () => {
@@ -336,8 +329,6 @@ export default function App({ id, versi }) {
     });
     const json = await res.json();
     if (res.status == 400) return alert(json.message);
-    // console.log(json.message);
-    // return alert(json.message);
     proyek.mutate();
   };
   const selectedProyek = proyek?.data?.[0];

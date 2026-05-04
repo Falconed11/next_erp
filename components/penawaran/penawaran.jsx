@@ -9,6 +9,8 @@ import {
 import { key2set, renderQueryStates, set2key } from "@/app/utils/tools";
 import { useClientFetch } from "@/hooks/useClientFetch";
 import { API_PATH } from "@/app/utils/apiconfig";
+import { MyCheckBox, MyDatePicker } from "../mycomponent";
+import { dateHeroUIToMysql } from "@/app/utils/date";
 
 export const TambahProdukPenawaran = ({
   title = "",
@@ -27,6 +29,7 @@ export const TambahProdukPenawaran = ({
     if (!form.selectProduk && !form.produk)
       return alert("Silahkan pilih produk");
     if (!jumlah) return alert("Jumlah belum diisi");
+    const { tanggalHarga } = form;
     const res = await fetch(`${API_PATH}keranjangproyek`, {
       method: "POST",
       headers: {
@@ -37,9 +40,9 @@ export const TambahProdukPenawaran = ({
         ...form,
         id_proyek: idProyek,
         versi,
-        tanggal: null,
         stok: 0, //
         instalasi,
+        tanggal: tanggalHarga ? dateHeroUIToMysql(tanggalHarga) : null,
       }),
     });
     const json = await res.json();
@@ -52,6 +55,8 @@ export const TambahProdukPenawaran = ({
   // if (QueryState) return QueryState;
   const hideComponent = isHighRole ? "" : "hidden";
   const defStyleFormWidth = "w-2/12-";
+  console.log(form);
+  const { id_produk: idProduk } = form;
   return (
     <div className="relative">
       <div>{title}</div>
@@ -106,6 +111,19 @@ export const TambahProdukPenawaran = ({
                   });
                 }}
               />
+              {idProduk && (
+                <MyCheckBox field="isUpdateHarga" form={form} setForm={setForm}>
+                  Update Harga
+                </MyCheckBox>
+              )}
+              {((idProduk && form.isUpdateHarga) || !idProduk) && (
+                <MyDatePicker
+                  form={form}
+                  setForm={setForm}
+                  field="tanggalHarga"
+                  label="Tanggal Harga"
+                />
+              )}
               <Input
                 type="text"
                 value={form.namakustom}

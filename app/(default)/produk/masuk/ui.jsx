@@ -42,8 +42,17 @@ import "react-datepicker/dist/react-datepicker.css";
 import { getApiPath } from "@/app/utils/apiconfig";
 import { Button } from "@heroui/react";
 import { Input, Textarea } from "@heroui/react";
-import { getDate, getDateFId } from "@/app/utils/date";
+import {
+  dateMysqlToHeroUI,
+  getDate,
+  getDateF,
+  getDateFId,
+} from "@/app/utils/date";
 import { useClientFetch } from "@/hooks/useClientFetch";
+import { ModalProdukMasuk } from "@/components/produk";
+import { renderQueryStates } from "@/app/utils/tools";
+import { p } from "framer-motion/client";
+import { number2Nominal } from "@/app/utils/number";
 
 const apiPath = getApiPath();
 
@@ -134,19 +143,22 @@ export default function App({ id_produk }) {
     onOpen();
   };
   const editButtonPress = (data) => {
+    const { jatuhtempo } = data;
     setForm({
       ...data,
       modalmode: "Edit",
-      startdate: new Date(data.tanggal),
-      tanggal: getDate(new Date(data.tanggal)),
-      startdateJatuhtempo: data.jatuhtempo ? new Date(data.jatuhtempo) : null,
-      jatuhtempo: data.jatuhtempo ? getDate(new Date(data.jatuhtempo)) : null,
+      refHargaModal: data.hargamodal,
+      hargamodal: data.harga,
+      tanggalHarga: dateMysqlToHeroUI(getDate(data.tanggalharga)),
+      tanggal: dateMysqlToHeroUI(getDate(data.tanggal)),
+      jatuhTempo: jatuhtempo
+        ? dateMysqlToHeroUI(getDate(data.jatuhtempo))
+        : null,
       oldJumlah: data.jumlah,
       oldTerbayar: data.terbayar,
       lunas: data.jumlah * data.harga > data.terbayar ? "0" : "1",
       method: "PUT",
     });
-    setMethod("PUT");
     onOpen();
   };
   const deleteButtonPress = async (data) => {
@@ -359,12 +371,8 @@ export default function App({ id_produk }) {
   const loadingState = produkmasuk.isLoading ? "loading" : "idle";
   const offset = (page - 1) * rowsPerPage;
 
-  if (produkmasuk.error) return <div>failed to load</div>;
-  if (produkmasuk.isLoading) return <div>loading...</div>;
-  if (produk.error) return <div>failed to load</div>;
-  if (produk.isLoading) return <div>loading...</div>;
-  if (vendor.error) return <div>failed to load</div>;
-  if (vendor.isLoading) return <div>loading...</div>;
+  const queryState = renderQueryStates({ produkmasuk, produk, vendor });
+  if (queryState) return queryState;
 
   const col = [
     {
@@ -430,7 +438,7 @@ export default function App({ id_produk }) {
   ];
 
   const selectedProduk = produk.data[0];
-  console.log(selectedProduk);
+  console.log(form);
   return (
     <div className="flex flex-col gap-2">
       <div className="bg-white rounded-lg p-2">
@@ -438,6 +446,8 @@ export default function App({ id_produk }) {
         <div>Merek: {selectedProduk?.nmerek}</div>
         <div>Tipe: {selectedProduk?.tipe}</div>
         <div>Stok: {selectedProduk?.stok}</div>
+        <div>Ref. Harga: {number2Nominal(selectedProduk?.hargamodal)}</div>
+        <div>Tanggal Harga: {getDateF(selectedProduk?.tanggalharga)}</div>
       </div>
       {/* <div className="flex flex-row gap-2">
         <Button color="primary" onPress={tambahButtonPress}>
@@ -514,152 +524,14 @@ export default function App({ id_produk }) {
         </TableBody>
       </Table>
       <TabelProdukKeluar id_produk={id_produk ?? null} />
-      <Modal
+      <ModalProdukMasuk
+        form={form}
+        setForm={setForm}
+        titleMode={"Edit"}
         isOpen={isOpen}
         onOpenChange={onOpenChange}
-        scrollBehavior="inside"
-      >
-        <ModalContent>
-          {(onClose) => (
-            <>
-              <ModalHeader className="flex flex-col gap-1">
-                {form.modalmode} Produk Masuk
-              </ModalHeader>
-              <ModalBody>
-                {/* <Select
-                  label="Kategori"
-                  placeholder="Pilih Kategori"
-                  className="max-w-xs"
-                  selectedKeys={form.selectKategori}
-                  onSelectionChange={(val) =>
-                    setForm({
-                      ...form,
-                      selectKategori: val,
-                      id_kategori: new Set(val).values().next().value,
-                    })
-                  }
-                >
-                  {kategori.data.map((item) => (
-                    <SelectItem key={item.id} value={item.id}>
-                      {item.nama}
-                    </SelectItem>
-                  ))}
-                </Select> */}
-                <div>
-                  {form.id_kustom} | {form.nama} | {form.merek} |{form.tipe}
-                </div>
-                <Input
-                  type="text"
-                  label={`Jumlah (Min ${form.keluar}) :`}
-                  placeholder="Masukkan jumlah!"
-                  value={form.jumlah}
-                  onValueChange={(val) => setForm({ ...form, jumlah: val })}
-                />
-                <Input
-                  type="number"
-                  label={<>Harga (Ref. {<Harga harga={form.hargamodal} />})</>}
-                  placeholder="Masukkan harga!"
-                  value={form.harga}
-                  onValueChange={(val) => setForm({ ...form, harga: val })}
-                />
-                <Autocomplete
-                  label="Vendor"
-                  variant="bordered"
-                  defaultItems={vendor.data}
-                  placeholder="Cari vendor"
-                  className="max-w-xs"
-                  selectedKey={form.id_vendor}
-                  defaultSelectedKey={form.id_vendor}
-                  defaultInputValue={form.vendor}
-                  onSelectionChange={(v) => setForm({ ...form, id_vendor: v })}
-                >
-                  {(item) => (
-                    <AutocompleteItem key={item.id} textValue={item.nama}>
-                      {item.nama}
-                    </AutocompleteItem>
-                  )}
-                </Autocomplete>
-                <div className="bg-gray-100 p-3 rounded-lg z-40">
-                  <div>Tanggal</div>
-                  <DatePicker
-                    className="z-40"
-                    placeholderText="Pilih tanggal"
-                    dateFormat="dd/MM/yyyy"
-                    selected={form.startdate}
-                    onChange={(v) =>
-                      setForm({ ...form, startdate: v, tanggal: getDate(v) })
-                    }
-                  />
-                </div>
-                <RadioGroup
-                  orientation="horizontal"
-                  defaultValue={form.lunas}
-                  value={form.lunas}
-                  onValueChange={(v) => setForm({ ...form, lunas: v })}
-                >
-                  <Radio value="1">Lunas</Radio>
-                  <Radio value="0">Hutang</Radio>
-                </RadioGroup>
-                {form.lunas == "0" ? (
-                  <>
-                    <div className="bg-gray-100 p-3 rounded-lg z-40">
-                      <div>Jatuh Tempo</div>
-                      <DatePicker
-                        className="z-40"
-                        placeholderText="Pilih tanggal"
-                        dateFormat="dd/MM/yyyy"
-                        selected={form.startdateJatuhtempo}
-                        onChange={(v) =>
-                          setForm({
-                            ...form,
-                            startdateJatuhtempo: v,
-                            jatuhtempo: getDate(v),
-                          })
-                        }
-                      />
-                    </div>
-                    <Input
-                      type="number"
-                      label={
-                        <Harga
-                          harga={form.oldTerbayar}
-                          label="Terbayar ("
-                          endContent=")"
-                        />
-                      }
-                      placeholder="Masukkan nominal!"
-                      value={form.terbayar}
-                      onValueChange={(val) =>
-                        setForm({ ...form, terbayar: val })
-                      }
-                    />
-                  </>
-                ) : (
-                  <></>
-                )}
-                <Textarea
-                  label="Keterangan"
-                  labelPlacement="inside"
-                  placeholder="Masukkan keterangan! (Opsional)"
-                  value={form.keterangan}
-                  onValueChange={(val) => setForm({ ...form, keterangan: val })}
-                />
-              </ModalBody>
-              <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
-                  Batal
-                </Button>
-                <Button
-                  color="primary"
-                  onPress={() => saveButtonPress(onClose)}
-                >
-                  Simpan
-                </Button>
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
-      </Modal>
+        mutate={produkmasuk.mutate}
+      />
     </div>
   );
 }

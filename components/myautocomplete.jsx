@@ -10,11 +10,12 @@ import {
   useState,
 } from "react";
 import Harga from "./harga";
-import { getDateFId } from "@/app/utils/date";
+import { dateMysqlToHeroUI, getDate, getDateFId } from "@/app/utils/date";
 import { JENIS_PROYEK_ENDPOINT } from "@/services/jenis-proyek.service";
 import { JENIS_INSTANSI_ENDPOINT } from "@/services/jenis-instansi.service";
 import { GOLONGAN_INSTANSI_ENDPOINT } from "@/services/golongan-instansi.service";
 import { useClientFetch } from "@/hooks/useClientFetch";
+import { today } from "@internationalized/date";
 
 // ✅ Reusable Hook
 export const useAutocompleteField = ({
@@ -36,6 +37,7 @@ export const useAutocompleteField = ({
   getFormUpdateOnSelectionChange,
   disallowEmptySelection,
   key,
+  onClear,
 }) => {
   const query = useClientFetch(endpoint);
   const data = useMemo(
@@ -64,6 +66,7 @@ export const useAutocompleteField = ({
       getFormUpdateOnSelectionChange={getFormUpdateOnSelectionChange}
       disallowEmptySelection={disallowEmptySelection}
       key={key}
+      onClear={onClear}
     />
   );
   return { component };
@@ -87,6 +90,7 @@ export const AutocompleteWithCustomValue = ({
   getCustomValue = (i) => i[labelKey],
   getFormUpdateOnSelectionChange = () => {},
   disallowEmptySelection,
+  onClear = undefined,
 }) => {
   const { contains } = useFilter({ sensitivity: "base" });
   const [items, setItems] = useState(data);
@@ -164,6 +168,7 @@ export const AutocompleteWithCustomValue = ({
       onInputChange={handleInputChange}
       onSelectionChange={handleSelectionChange}
       onBlur={handleOnBlur}
+      onClear={onClear}
     >
       {(item) => (
         <AutocompleteItem key={item[valueKey]} textValue={item[labelKey]}>
@@ -300,9 +305,13 @@ export const AutocompleteProduk = ({
       harga: item?.hargajual,
       isSelected: false,
       merek: item?.nmerek,
+      tanggalHarga: item?.tanggal
+        ? dateMysqlToHeroUI(getDate(item?.tanggal))
+        : today(),
     }),
     disableCustomValue,
     key: `${id_kategori}-${id_merek}`,
+    // onClear: ()=>{setForm()},
     ...props,
   });
   return component;

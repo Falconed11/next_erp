@@ -34,7 +34,6 @@ export const getDate = (date) => {
   const day = date.getDate().toString().padStart(2, "0");
   return `${year}-${month}-${day}`;
 };
-
 export const getTime = (date, separator) => {
   if (!date) return "";
   date = new Date(date);
@@ -42,6 +41,9 @@ export const getTime = (date, separator) => {
   const hours = pad(date.getHours());
   const minutes = pad(date.getMinutes());
   return `${hours}${separator || ":"}${minutes}`;
+};
+export const getDateTimeF = (date, separator) => {
+  return `${getDateF(date)} ${getTime(date, separator)}`;
 };
 
 export const getDateF = (date) => {

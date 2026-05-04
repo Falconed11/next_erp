@@ -65,6 +65,7 @@ import {
   getDate,
   getDateF,
   getDateFId,
+  getDateTimeF,
 } from "@/app/utils/date";
 import {
   FilterCard,
@@ -73,7 +74,11 @@ import {
   MyDatePicker,
   OpenBlueLinkInNewTab,
 } from "@/components/mycomponent";
-import { FormProduct, HargaGenerator } from "@/components/produk";
+import {
+  FormProduct,
+  HargaGenerator,
+  ModalProdukMasuk,
+} from "@/components/produk";
 import { AuthorizationComponent } from "@/components/componentmanipulation";
 import {
   AutocompleteKategoriProduk,
@@ -191,7 +196,7 @@ export default function App({ id }) {
         ...form,
         ...(method == "POST"
           ? {
-              tanggalHarga: dateHeroUIToMysql(form.tanggalHarga),
+              tanggal: dateHeroUIToMysql(form.tanggalHarga),
               tanggalMasuk: dateHeroUIToMysql(form.tanggalMasuk),
               jatuhTempo: dateHeroUIToMysql(form.jatuhTempo),
             }
@@ -206,7 +211,6 @@ export default function App({ id }) {
   };
   const tambahButtonPress = () => {
     const now = today();
-    console.log(now);
     setForm({
       modalmode: "Tambah",
       id: "",
@@ -230,7 +234,6 @@ export default function App({ id }) {
     onOpen();
   };
   const editButtonPress = (data) => {
-    console.log(data.tanggal);
     const newForm = {
       ...data,
       modalmode: "Edit",
@@ -349,9 +352,12 @@ export default function App({ id }) {
     setForm({
       ...data,
       tanggal: today(),
+      tanggalHarga: today(),
+      jatuhTempo: today(),
       id_produk: data.id,
       refHargaModal: data.hargamodal,
       lunas: "1",
+      method: "POST",
     });
     modal.masuk.onOpen();
   };
@@ -364,7 +370,13 @@ export default function App({ id }) {
         "Content-Type": "application/json",
         // 'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: JSON.stringify({ ...form, harga: form.hargamodal }),
+      body: JSON.stringify({
+        ...form,
+        harga: form.hargamodal,
+        tanggal: dateHeroUIToMysql(form.tanggal),
+        tanggalHarga: dateHeroUIToMysql(form.tanggalHarga),
+        jatuhTempo: dateHeroUIToMysql(form.jatuhTempo),
+      }),
     });
     const json = await res.json();
     if (res.status == 400) return alert(json.message);
@@ -457,6 +469,7 @@ export default function App({ id }) {
           </div>
         );
       case "totaljual":
+        ``;
         return (
           <div className="text-right">
             <Harga harga={data.hargajual * data.stok} />
@@ -472,6 +485,8 @@ export default function App({ id }) {
         );
       case "nprodukmasuk":
         return harga(cellValue);
+      case "created_at":
+        return getDateTimeF(cellValue);
       case "aksi":
         return (
           <div className="relative flex items-center gap-2">
@@ -863,6 +878,13 @@ export default function App({ id }) {
         </ModalContent>
       </Modal>
       {/* masuk */}
+      <ModalProdukMasuk
+        form={form}
+        setForm={setForm}
+        isOpen={modal.isOpen}
+        onOpenChange={modal.onOpenChange}
+        titleMode="Tambah"
+      />
       <Modal
         isOpen={modal.masuk.isOpen}
         onOpenChange={modal.masuk.onOpenChange}
@@ -900,6 +922,14 @@ export default function App({ id }) {
                 <MyCheckBox field="isUpdateHarga" form={form} setForm={setForm}>
                   Update Harga
                 </MyCheckBox>
+                {form.isUpdateHarga && (
+                  <MyDatePicker
+                    form={form}
+                    setForm={setForm}
+                    field="tanggalHarga"
+                    label="Tanggal Harga"
+                  />
+                )}
                 {/* <NumberInput
                   hideStepper
                   isWheelDisabled
@@ -941,22 +971,12 @@ export default function App({ id }) {
                 </RadioGroup>
                 {form.lunas == "0" ? (
                   <>
-                    <div className="bg-gray-100 p-3 rounded-lg z-40">
-                      <div>Jatuh Tempo</div>
-                      <DatePicker
-                        className="z-40"
-                        placeholderText="Pilih tanggal"
-                        dateFormat="dd/MM/yyyy"
-                        selected={form.startdateJatuhtempo}
-                        onChange={(v) =>
-                          setForm({
-                            ...form,
-                            startdateJatuhtempo: v,
-                            jatuhtempo: getDate(v),
-                          })
-                        }
-                      />
-                    </div>
+                    <MyDatePicker
+                      form={form}
+                      setForm={setForm}
+                      field="jatuhTempo"
+                      label="Jatuh Tempo"
+                    />
                     <Input
                       type="number"
                       label="Terbayar"

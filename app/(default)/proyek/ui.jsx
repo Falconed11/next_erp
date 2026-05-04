@@ -111,9 +111,8 @@ export default function App({
         ? [`id_karyawan=${set2key(selectkaryawan)}`]
         : []),
       ...(current.startDate ? [`start=${getDate(current.startDate)}`] : []),
-      ...(current.endDate ? [`start=${getDate(current.endDate)}`] : []),
+      ...(current.endDate ? [`end=${getDate(current.endDate)}`] : []),
       ...(selectStatusProyek ? [`id_statusproyek=${selectStatusProyek}`] : []),
-      ...(current.endDate ? [`start=${getDate(current.endDate)}`] : []),
       ...(id_produk ? [`id_produk=${id_produk}`] : []),
       `sort=${sort}`,
       `limit=${rowsPerPage}`,

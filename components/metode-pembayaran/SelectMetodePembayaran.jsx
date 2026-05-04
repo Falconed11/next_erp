@@ -17,6 +17,7 @@ export default function SelectMetodePembayaran({
   label = "Metode Pembayaran",
   fieldName = "id_metodepembayaran",
 }) {
+  console.log(id_perusahaan);
   const metodePembayaran = useClientFetch(
     urlBuilder(METODE_PEMBAYARAN_ENDPOINT, [
       { key: "id_perusahaan", val: id_perusahaan },
