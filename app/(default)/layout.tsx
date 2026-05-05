@@ -133,6 +133,10 @@ export default function RootLayout({
             href: "/vendor",
             name: "Vendor",
             icon: <MdOutlineFactory />,
+            dropdown: [
+              { key: "data", name: "Vendor" },
+              { key: "vendor-jenis", name: "Vendor Jenis" },
+            ],
           },
           {
             href: "/bank",
@@ -211,26 +215,30 @@ export default function RootLayout({
                 key: "laporan",
                 name: "Template",
               },
-              {
-                key: "biaya-produksi",
-                name: "Biaya Produksi",
-              },
-              {
-                key: "proyek",
-                name: "Proyek",
-              },
-              {
-                key: "operasional-kantor",
-                name: "Operasional Kantor",
-              },
-              {
-                key: "labarugi",
-                name: "Laba Rugi",
-              },
-              {
-                key: "perubahan-modal",
-                name: "Perubahan Modal",
-              },
+              ...(rolesCheck(["super"], sessUser?.peran)
+                ? [
+                    {
+                      key: "biaya-produksi",
+                      name: "Biaya Produksi",
+                    },
+                    {
+                      key: "proyek",
+                      name: "Proyek",
+                    },
+                    {
+                      key: "operasional-kantor",
+                      name: "Operasional Kantor",
+                    },
+                    {
+                      key: "labarugi",
+                      name: "Laba Rugi",
+                    },
+                    {
+                      key: "perubahan-modal",
+                      name: "Perubahan Modal",
+                    },
+                  ]
+                : []),
               {
                 key: "omset",
                 name: "Omset",

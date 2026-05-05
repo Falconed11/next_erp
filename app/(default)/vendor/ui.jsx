@@ -39,6 +39,7 @@ import {
   ReportMoneyIcon,
   TransferIcon,
 } from "../../../components/icon";
+import { SelectVendorJenis } from "@/components/vendor/vendor";
 import {
   getCurFirstLastDay,
   excelToJSDate,
@@ -56,7 +57,12 @@ import { useClientFetch } from "@/hooks/useClientFetch";
 const apiPath = getApiPath();
 
 export default function App() {
-  const vendor = useClientFetch(`vendor?columnName=nama`);
+  const [filterVendorJenis, setFilterVendorJenis] = useState({
+    id_vendor_jenis: null,
+  });
+  const vendor = useClientFetch(
+    `vendor?columnName=nama${filterVendorJenis.id_vendor_jenis ? `&id_vendor_jenis=${filterVendorJenis.id_vendor_jenis}` : ""}`,
+  );
   const [value, setValue] = React.useState("");
   const [form, setForm] = useState({});
   const [page, setPage] = React.useState(1);
@@ -99,6 +105,7 @@ export default function App() {
       id: "",
       nama: "",
       alamat: "",
+      id_vendor_jenis: null,
       method: "POST",
       title: "Tambah",
     });
@@ -107,6 +114,7 @@ export default function App() {
   const editButtonPress = (data) => {
     setForm({
       ...data,
+      id_vendor_jenis: data.id_vendor_jenis ?? null,
       method: "PUT",
       title: "Edit",
     });
@@ -202,6 +210,8 @@ export default function App() {
         return getDateF(new Date(data.tanggal));
       case "totalharga":
         return data.jumlah * data.harga;
+      case "vendorjenis":
+        return cellValue;
       case "hutang":
         return compCurrency(cellValue);
       case "nprodukmasuk":
@@ -250,8 +260,12 @@ export default function App() {
   const transfer = useDisclosure();
   const report = useDisclosure();
 
-  const data = vendor.data?.filter((row) =>
-    row.nama.toLowerCase().includes(value.toLowerCase()),
+  const data = vendor.data?.filter(
+    (row) =>
+      row.nama.toLowerCase().includes(value.toLowerCase()) &&
+      (!filterVendorJenis.id_vendor_jenis ||
+        String(row.id_vendor_jenis) ===
+          String(filterVendorJenis.id_vendor_jenis)),
   );
 
   const pages = useMemo(() => {
@@ -272,6 +286,10 @@ export default function App() {
     {
       key: "nama",
       label: "Nama",
+    },
+    {
+      key: "vendorjenis",
+      label: "Vendor Jenis",
     },
     // {
     //   key: "hutang",
@@ -317,12 +335,21 @@ export default function App() {
         topContent={
           <>
             <div>Filter</div>
-            <Input
-              label="Nama"
-              placeholder="Masukkan nama!"
-              value={value}
-              onValueChange={setValue}
-            />
+            <div className="flex gap-2 flex-wrap">
+              <Input
+                variant="bordered"
+                label="Nama"
+                placeholder="Masukkan nama!"
+                value={value}
+                onValueChange={setValue}
+              />
+              <SelectVendorJenis
+                form={filterVendorJenis}
+                setForm={setFilterVendorJenis}
+                className="max-w-xs"
+                variant="bordered"
+              />
+            </div>
           </>
         }
         bottomContent={
@@ -411,6 +438,12 @@ export default function App() {
                   placeholder="Masukkan alamat!"
                   value={form.alamat}
                   onValueChange={(val) => setForm({ ...form, alamat: val })}
+                />
+                <SelectVendorJenis
+                  form={form}
+                  setForm={setForm}
+                  className="max-w-xs"
+                  variant="bordered"
                 />
                 {/* <Textarea
                   label="Keterangan"
