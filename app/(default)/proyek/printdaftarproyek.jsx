@@ -191,7 +191,7 @@ const PrintDaftarProyek = forwardRef(
             )}
           </TableHeader>
           <TableBody
-            items={data.slice(0, 100)}
+            items={(data || []).slice(0, 100)}
             loadingContent={"Loading..."}
             emptyContent={"Kosong"}
             loadingState={loadingState}

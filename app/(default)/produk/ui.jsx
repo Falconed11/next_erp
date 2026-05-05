@@ -133,7 +133,7 @@ export default function App({ id }) {
   const urlParam = [
     [
       ...(isShowInactive ? [] : [`aktif=1`]),
-      ...(selectKategori.length > 0
+      ...(selectKategori.size > 0
         ? [`kategori=${set2key(selectKategori) ?? ""}`]
         : []),
       ...(isReadyStock ? [`isReadyStock=${isReadyStock}`] : []),
@@ -703,7 +703,7 @@ export default function App({ id }) {
   // }
   const isPriceSame = form.hargamodal == form.harga;
   const { isUpdateHarga } = form;
-  console.log(form);
+  // console.log(form);
   return (
     <div className="">
       <div className="flex flex-col gap-2">

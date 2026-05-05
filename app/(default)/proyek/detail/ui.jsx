@@ -43,7 +43,13 @@ import {
 } from "@heroui/react";
 import { useReactToPrint } from "react-to-print";
 import { getApiPath } from "@/app/utils/apiconfig";
-import { getDate, getDateF, getDateFId } from "@/app/utils/date";
+import {
+  dateHeroUIToMysql,
+  dateMysqlToHeroUI,
+  getDate,
+  getDateF,
+  getDateFId,
+} from "@/app/utils/date";
 import { invoice, penawaran } from "@/app/utils/formatid";
 import { removePrefixIfMatchIgnoreCase } from "@/app/utils/stringmanipulation";
 import Harga from "@/components/harga";
@@ -53,6 +59,8 @@ import {
   BKSHeader,
   CompanyHeader,
   LinkOpenNewTab,
+  MyCheckBox,
+  MyDatePicker,
   NavLinkNewTab,
   OpenBlueLinkInNewTab,
   SVTHeader,
@@ -162,6 +170,7 @@ export default function App({ id, versi }) {
         data.temphargamodal,
         data.harga,
       ),
+      tanggalHarga: dateMysqlToHeroUI(getDate(data.tanggal)),
     });
     modal.produk.onOpen();
   };
@@ -228,7 +237,8 @@ export default function App({ id, versi }) {
       },
       body: JSON.stringify({
         ...data,
-        hargamodal: form.temphargamodal,
+        hargamodal: data.temphargamodal,
+        tanggal: dateHeroUIToMysql(data.tanggalHarga),
       }),
     });
     const json = await res.json();
@@ -949,7 +959,7 @@ export default function App({ id, versi }) {
   const selectedStatusProyek = selectedProyek.statusproyek.toLowerCase();
   // const sTable = "max-w-3/4";
   const sTable = "";
-  // console.log(form);
+  console.log(form);
   return (
     <div className="flex gap-2 flex-col item-start">
       <div className="flex gap-2">
@@ -1496,7 +1506,7 @@ export default function App({ id, versi }) {
                   value={form.temphargamodal}
                   label={
                     <>
-                      Harga Modal (Ref: <Harga harga={form.oldHargaModal} />)
+                      Harga Modal (Ref: <Harga harga={form.hargamodal} />)
                     </>
                   }
                   placeholder="Masukkan harga!"
@@ -1518,7 +1528,7 @@ export default function App({ id, versi }) {
                   // label={`Harga Jual (Ref: ${form.refHarga})`}
                   label={
                     <>
-                      Harga Jual (Ref: <Harga harga={+form.oldHarga} />)
+                      Harga Jual (Ref: <Harga harga={form.hargajual} />)
                     </>
                   }
                   placeholder="Masukkan harga!"
@@ -1582,6 +1592,17 @@ export default function App({ id, versi }) {
                     })
                   }
                 />
+                <MyCheckBox field="isUpdateHarga" form={form} setForm={setForm}>
+                  Update Harga
+                </MyCheckBox>
+                {form.isUpdateHarga && (
+                  <MyDatePicker
+                    form={form}
+                    setForm={setForm}
+                    field="tanggalHarga"
+                    label="Tanggal Harga"
+                  />
+                )}
                 {isHighRole && (
                   <div>
                     Total Harga Modal :{" "}

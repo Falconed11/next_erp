@@ -44,6 +44,7 @@ import {
   renderQueryStates,
   rolesCheck,
   set2key,
+  useDebounce,
 } from "@/app/utils/tools";
 import { UpdateShowHide } from "@/components/input";
 import { RangeDate } from "@/components/input";
@@ -92,6 +93,9 @@ export default function App({
   );
   const [stat, setStat] = useState(1);
   const [selectStatusProyek, setSelectStatusProyek] = useState();
+  const [filterText, setFilterText] = useState("");
+  const [filterBy, setFilterBy] = useState("nama");
+  const debouncedFilterText = useDebounce(filterText, 500);
   const printProyekRef = useRef(null);
   const handlePrintProyek = useReactToPrint({
     // content: () => printProyekRef.current,
@@ -114,6 +118,7 @@ export default function App({
       ...(current.endDate ? [`end=${getDate(current.endDate)}`] : []),
       ...(selectStatusProyek ? [`id_statusproyek=${selectStatusProyek}`] : []),
       ...(id_produk ? [`id_produk=${id_produk}`] : []),
+      ...(debouncedFilterText ? [`${filterBy}=${debouncedFilterText}`] : []),
       `sort=${sort}`,
       `limit=${rowsPerPage}`,
       `offset=${offset}`,
@@ -133,7 +138,7 @@ export default function App({
   const kategoriproyek = useClientFetch("kategoriproyek");
   const queries = {
     produk,
-    proyek,
+    // proyek,
     penawaran,
     perusahaan,
     karyawan,
@@ -509,7 +514,7 @@ export default function App({
   const queryStates = renderQueryStates(queries, session);
   if (queryStates) return queryStates;
 
-  const selectedProyek = proyek.data[0];
+  const selectedProyek = proyek?.data?.[0];
   const totalRows = selectedProyek?.totalrows;
   const pages = countPages(totalRows, rowsPerPage);
 
@@ -607,8 +612,8 @@ export default function App({
       label: "Keterangan",
     },
   ];
-  const nPenawaran = proyek.data.length;
-  const summary = proyek.data.reduce(
+  const nPenawaran = proyek?.data?.length;
+  const summary = proyek?.data?.reduce(
     (acc, current) => {
       const versi = current.versi;
       if (versi == 0) {
@@ -639,16 +644,16 @@ export default function App({
       totalModalReject: 0,
       totalModalWaiting: 0,
     },
-  );
+  ) || { totalModal: 0, totalPenawaran: 0, totalProvit: 0 };
   summary.totalModal =
-    summary.totalModalDeal +
-    summary.totalModalReject +
-    summary.totalModalWaiting;
+    summary?.totalModalDeal +
+    summary?.totalModalReject +
+    summary?.totalModalWaiting;
   summary.totalPenawaran =
-    summary.totalPenawaranDeal +
-    summary.totalPenawaranReject +
-    summary.totalPenawaranWaiting;
-  summary.totalProvit = summary.totalPenawaran - summary.totalModal;
+    summary?.totalPenawaranDeal +
+    summary?.totalPenawaranReject +
+    summary?.totalPenawaranWaiting;
+  summary.totalProvit = summary?.totalPenawaran - summary?.totalModal;
   const isCustomerSelected =
     form.id_instansi || !form.instansi ? true : undefined;
 
@@ -768,6 +773,30 @@ export default function App({
                             setSelect={setSelectStatusProyek}
                             setPage={setPage}
                           />
+                          {/* filter */}
+                          <div className="grid grid-cols-5 gap-2">
+                            <Input
+                              className="col-span-3"
+                              type="text"
+                              variant="bordered"
+                              label="Filter"
+                              placeholder="Masukkan nama atau klien"
+                              value={filterText}
+                              onValueChange={setFilterText}
+                            />
+                            <Select
+                              className="col-span-2"
+                              label="Filter By"
+                              variant="bordered"
+                              selectedKeys={new Set([filterBy])}
+                              onSelectionChange={(keys) =>
+                                setFilterBy(Array.from(keys)[0])
+                              }
+                            >
+                              <SelectItem key="nama">Nama Proyek</SelectItem>
+                              <SelectItem key="klien">Klien</SelectItem>
+                            </Select>
+                          </div>
                           <FilterHidden
                             isShowHidden={isShowHidden}
                             setIsShowHidden={setIsShowHidden}
@@ -827,122 +856,89 @@ export default function App({
                       </div>
                     </div>
                     {/* Ringkasan */}
-                    <div>
-                      <div className="text-lg shadow-lg border border-black- p-3 rounded-xl">
-                        <div className="font-bold">Ringkasan</div>
-                        <div className="flex gap-2">
-                          {/* PENAWARAN */}
-                          <Section
-                            title="Penawaran"
-                            items={[
-                              {
-                                label: "Total",
-                                value: nPenawaran,
-                                color: "primary",
-                              },
-                              {
-                                label: "Waiting",
-                                value: summary.nOfferingWaiting,
-                                color: "warning",
-                              },
-                              {
-                                label: "Deal",
-                                value: summary.nOfferingDeal,
-                                color: "success",
-                              },
-                              {
-                                label: "Reject",
-                                value: summary.nOfferingReject,
-                                color: "danger",
-                              },
-                            ]}
-                          />
-                          {/* MODAL */}
-                          {isHighRole && (
+                    {false && (
+                      <div>
+                        <div className="text-lg shadow-lg border border-black- p-3 rounded-xl">
+                          <div className="font-bold">Ringkasan</div>
+                          <div className="flex gap-2">
+                            {/* PENAWARAN */}
                             <Section
-                              title="Modal"
+                              title="Penawaran"
                               items={[
                                 {
                                   label: "Total",
-                                  value: <Harga harga={summary.totalModal} />,
+                                  value: nPenawaran,
                                   color: "primary",
                                 },
                                 {
                                   label: "Waiting",
-                                  value: (
-                                    <Harga harga={summary.totalModalWaiting} />
-                                  ),
+                                  value: summary.nOfferingWaiting,
                                   color: "warning",
                                 },
                                 {
                                   label: "Deal",
-                                  value: (
-                                    <Harga harga={summary.totalModalDeal} />
-                                  ),
+                                  value: summary.nOfferingDeal,
                                   color: "success",
                                 },
                                 {
                                   label: "Reject",
-                                  value: (
-                                    <Harga harga={summary.totalModalReject} />
-                                  ),
+                                  value: summary.nOfferingReject,
                                   color: "danger",
                                 },
                               ]}
                             />
-                          )}
-                          {/* NILAI PENAWARAN */}
-                          <Section
-                            title="Nilai Penawaran"
-                            items={[
-                              {
-                                label: "Total",
-                                value: <Harga harga={summary.totalPenawaran} />,
-                                color: "primary",
-                              },
-                              {
-                                label: "Waiting",
-                                value: (
-                                  <Harga
-                                    harga={summary.totalPenawaranWaiting}
-                                  />
-                                ),
-                                color: "warning",
-                              },
-                              {
-                                label: "Deal",
-                                value: (
-                                  <Harga harga={summary.totalPenawaranDeal} />
-                                ),
-                                color: "success",
-                              },
-                              {
-                                label: "Reject",
-                                value: (
-                                  <Harga harga={summary.totalPenawaranReject} />
-                                ),
-                                color: "danger",
-                              },
-                            ]}
-                          />
-                          {/* PROVIT */}
-                          {isHighRole && (
+                            {/* MODAL */}
+                            {isHighRole && (
+                              <Section
+                                title="Modal"
+                                items={[
+                                  {
+                                    label: "Total",
+                                    value: <Harga harga={summary.totalModal} />,
+                                    color: "primary",
+                                  },
+                                  {
+                                    label: "Waiting",
+                                    value: (
+                                      <Harga
+                                        harga={summary.totalModalWaiting}
+                                      />
+                                    ),
+                                    color: "warning",
+                                  },
+                                  {
+                                    label: "Deal",
+                                    value: (
+                                      <Harga harga={summary.totalModalDeal} />
+                                    ),
+                                    color: "success",
+                                  },
+                                  {
+                                    label: "Reject",
+                                    value: (
+                                      <Harga harga={summary.totalModalReject} />
+                                    ),
+                                    color: "danger",
+                                  },
+                                ]}
+                              />
+                            )}
+                            {/* NILAI PENAWARAN */}
                             <Section
-                              title="Provit"
+                              title="Nilai Penawaran"
                               items={[
                                 {
                                   label: "Total",
-                                  value: <Harga harga={summary.totalProvit} />,
+                                  value: (
+                                    <Harga harga={summary.totalPenawaran} />
+                                  ),
                                   color: "primary",
                                 },
                                 {
                                   label: "Waiting",
                                   value: (
                                     <Harga
-                                      harga={
-                                        summary.totalPenawaranWaiting -
-                                        summary.totalModalWaiting
-                                      }
+                                      harga={summary.totalPenawaranWaiting}
                                     />
                                   ),
                                   color: "warning",
@@ -950,12 +946,7 @@ export default function App({
                                 {
                                   label: "Deal",
                                   value: (
-                                    <Harga
-                                      harga={
-                                        summary.totalPenawaranDeal -
-                                        summary.totalModalDeal
-                                      }
-                                    />
+                                    <Harga harga={summary.totalPenawaranDeal} />
                                   ),
                                   color: "success",
                                 },
@@ -963,20 +954,68 @@ export default function App({
                                   label: "Reject",
                                   value: (
                                     <Harga
-                                      harga={
-                                        summary.totalPenawaranReject -
-                                        summary.totalModalReject
-                                      }
+                                      harga={summary.totalPenawaranReject}
                                     />
                                   ),
                                   color: "danger",
                                 },
                               ]}
                             />
-                          )}
+                            {/* PROVIT */}
+                            {isHighRole && (
+                              <Section
+                                title="Provit"
+                                items={[
+                                  {
+                                    label: "Total",
+                                    value: (
+                                      <Harga harga={summary.totalProvit} />
+                                    ),
+                                    color: "primary",
+                                  },
+                                  {
+                                    label: "Waiting",
+                                    value: (
+                                      <Harga
+                                        harga={
+                                          summary.totalPenawaranWaiting -
+                                          summary.totalModalWaiting
+                                        }
+                                      />
+                                    ),
+                                    color: "warning",
+                                  },
+                                  {
+                                    label: "Deal",
+                                    value: (
+                                      <Harga
+                                        harga={
+                                          summary.totalPenawaranDeal -
+                                          summary.totalModalDeal
+                                        }
+                                      />
+                                    ),
+                                    color: "success",
+                                  },
+                                  {
+                                    label: "Reject",
+                                    value: (
+                                      <Harga
+                                        harga={
+                                          summary.totalPenawaranReject -
+                                          summary.totalModalReject
+                                        }
+                                      />
+                                    ),
+                                    color: "danger",
+                                  },
+                                ]}
+                              />
+                            )}
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    )}
                     {/* Status Proyek */}
                     <div>
                       <StatusProyek />
@@ -1034,10 +1073,10 @@ export default function App({
             )}
           </TableHeader>
           <TableBody
-            items={proyek.data}
+            items={proyek?.data || []}
             loadingContent={"Loading..."}
             emptyContent={"Kosong"}
-            loadingState={loadingState}
+            loadingState={proyek.isLoading}
           >
             {(item) => (
               <TableRow key={item.id}>
