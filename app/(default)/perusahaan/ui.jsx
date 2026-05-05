@@ -32,7 +32,7 @@ import {
 } from "@heroui/react";
 import "react-datepicker/dist/react-datepicker.css";
 import { getApiPath } from "@/app/utils/apiconfig";
-import { rolesCheck } from "@/app/utils/tools";
+import { renderQueryStates, rolesCheck } from "@/app/utils/tools";
 import { Button } from "@heroui/react";
 import { Input, Textarea } from "@heroui/react";
 import { useClientFetch } from "@/hooks/useClientFetch";
@@ -161,11 +161,11 @@ export default function App() {
     perusahaan: useDisclosure(),
   };
 
-  if (perusahaan.error) return <div>failed to load</div>;
-  if (perusahaan.isLoading) return <div>loading...</div>;
-  if (session.status === "loading") return <>Loading...</>;
-  if (!rolesCheck(["admin", "super"], session.data.user.peran))
+  const queryState = renderQueryStates({ perusahaan }, session);
+  if (queryState) return queryState;
+  if (!rolesCheck(["admin", "super", "owner"], session?.data?.user?.peran))
     return <div>Anda tidak memiliki akses pada laman ini.</div>;
+  console.log(form);
   return (
     <div>
       <Button onPress={tambahButtonPress} color="primary">

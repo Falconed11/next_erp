@@ -27,7 +27,6 @@ const PrintDaftarProyek = forwardRef(
     },
     ref,
   ) => {
-    console.log(idKaryawan);
     const karyawan = useClientFetch(`karyawan?id=${idKaryawan}`);
     const status = useClientFetch(`statusproyek?id=${idStatusProyek}`);
     const renderCell = useCallback((data, columnKey) => {

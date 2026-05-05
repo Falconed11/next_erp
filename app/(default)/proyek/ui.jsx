@@ -78,7 +78,7 @@ export default function App({
 }) {
   const [sort, setSort] = useState("tanggal_penawaran");
   const session = useSession();
-  const sessUser = session.data?.user;
+  const sessUser = session?.data?.user;
   const { peran } = sessUser;
   // filter
   const [isShowHidden, setIsShowHidden] = useState(false);
@@ -680,6 +680,7 @@ export default function App({
   const selectedProduct = produk.data?.[0];
   const selectedCustomer = customer.data.find((item) => item.id == id_instansi);
   // console.log(selectkaryawan);
+  console.log("rerender");
   return (
     <div
     // className="flex flex-col gap-2 w-7/8- h-3/4"
