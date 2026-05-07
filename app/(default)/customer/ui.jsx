@@ -58,10 +58,9 @@ import { useClientFetch } from "@/hooks/useClientFetch";
 
 const apiPath = getApiPath();
 
-export default function App() {
-  const session = useSession();
-  const sessionuser = session.data?.user;
-  const user = session.data?.user;
+export default function App({ user }) {
+  console.log(user);
+  const sessionuser = user;
 
   const [value, setValue] = useState("");
   const customer = useClientFetch("customer");
@@ -197,7 +196,6 @@ export default function App() {
 
   const renderCell = useCallback(
     (data, columnKey) => {
-      console.log(sessionuser);
       const cellValue = data[columnKey];
       const date = new Date(data.tanggal);
       const hutang = data.hutang ?? 0;
@@ -235,7 +233,7 @@ export default function App() {
                   <EditIcon />
                 </span>
               </Tooltip>
-              {sessionuser?.rank <= 10 && (
+              {user?.rank <= 10 && (
                 <>
                   <LinkOpenNewTab
                     content="Detail"
@@ -266,7 +264,7 @@ export default function App() {
           return cellValue;
       }
     },
-    [sessionuser?.rank],
+    [user],
   );
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const transfer = useDisclosure();
@@ -279,7 +277,6 @@ export default function App() {
     return data ? Math.ceil(data?.length / rowsPerPage) : 0;
   }, [data, rowsPerPage]);
   const loadingState = customer.isLoading ? "loading" : "idle";
-  if (session.status === "loading") return <>Loading...</>;
   const offset = (page - 1) * rowsPerPage;
 
   const columns = [
@@ -329,7 +326,7 @@ export default function App() {
       key: "alamat",
       label: "Alamat",
     },
-    ...(sessionuser.rank <= 20
+    ...(user.rank <= 20
       ? [
           {
             key: "lastupdate",

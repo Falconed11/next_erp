@@ -1,13 +1,5 @@
-"use client";
-import { usePathname } from "next/navigation";
-import { useSession } from "next-auth/react";
 import Nav from "@/components/nav";
 import User from "@/components/user";
-import {
-  highRoleCheck,
-  renderQueryStates,
-  rolesCheck,
-} from "@/app/utils/tools";
 import { highRoles } from "@/app/utils/roles";
 import { RiDashboard2Line } from "react-icons/ri";
 import { AiOutlineProduct } from "react-icons/ai";
@@ -21,19 +13,19 @@ import { TbDeviceDesktopAnalytics } from "react-icons/tb";
 import { FaRegUser } from "react-icons/fa";
 import { LiaToolsSolid } from "react-icons/lia";
 import { Spinner } from "@heroui/react";
+import { NextRequest } from "next/server";
+import { verify } from "jsonwebtoken";
+import { cookies } from "next/headers";
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const session = useSession();
-  const sessUser = session?.data?.user;
-  const pathname = usePathname();
-
-  const queryState = renderQueryStates({}, session);
-  if (queryState) return <div className="p-3 w-screen">{queryState}</div>;
-  const isHighRole = highRoleCheck(sessUser?.rank);
+  const cookie = await cookies();
+  const token = cookie.get("token")?.value;
+  const user = verify(token!, process.env.JWT_SECRET!);
+  const isHighRole = highRoles.includes(user?.peran);
   const links = [
     { href: "/", name: "Dashboard", icon: <RiDashboard2Line /> },
     {
@@ -71,7 +63,7 @@ export default function RootLayout({
                 name: "Proyek",
                 href: "",
               },
-              ...(rolesCheck(["admin", "super"], sessUser?.peran)
+              ...(highRoles.includes(user?.peran)
                 ? [
                     {
                       key: "jenisproyek",
@@ -95,7 +87,7 @@ export default function RootLayout({
         : {}),
       icon: <VscGithubProject />,
     },
-    ...(rolesCheck(highRoles, sessUser?.peran)
+    ...(highRoles.includes(user?.peran)
       ? [
           {
             href: "/operasionalkantor",
@@ -127,7 +119,7 @@ export default function RootLayout({
           }
         : {}),
     },
-    ...(rolesCheck([...highRoles, "admin"], sessUser?.peran)
+    ...([...highRoles, "admin"].includes(user?.peran)
       ? [
           {
             href: "/vendor",
@@ -142,7 +134,7 @@ export default function RootLayout({
             href: "/bank",
             name: "Bank",
             icon: <BsBank />,
-            ...(isHighRole
+            ...(["super", "owner", "admin"].includes(user?.peran)
               ? {
                   dropdown: [
                     { key: "data", name: "Bank" },
@@ -215,7 +207,7 @@ export default function RootLayout({
                 key: "laporan",
                 name: "Template",
               },
-              ...(rolesCheck(["super"], sessUser?.peran)
+              ...(user?.peran == "super"
                 ? [
                     {
                       key: "biaya-produksi",
@@ -260,7 +252,7 @@ export default function RootLayout({
           },
         ]
       : []),
-    ...(rolesCheck(["super"], sessUser?.peran)
+    ...(user?.peran == "super"
       ? [
           { href: "/user", name: "User", icon: <FaRegUser /> },
           { href: "/alat", name: "Alat", icon: <LiaToolsSolid /> },
@@ -274,14 +266,12 @@ export default function RootLayout({
         <div className="bg-red-500- mx-3">
           <div className="grid grid-cols-2 py-2 mr-3 rounded-lg bg-background ">
             <div className="basis-3/4-">
-              <div className="p-3 font-bold text-xl">
-                ERP{pathname != "/" && pathname}
-              </div>
+              <div className="p-3 font-bold text-xl">ERP</div>
             </div>
             {/* <div className="basis-1/4- flex flex-row-reverse"> */}
             <div className="text-right">
               <div className="px-3">
-                <User user={session} />
+                <User user={user} />
               </div>
             </div>
           </div>
@@ -292,16 +282,7 @@ export default function RootLayout({
         <div className={"sticky top-3"}>
           <Nav navLinks={links} className="" />
         </div>
-        <div className="w-8/9- shrink-0-">
-          {session.status == "loading" ? (
-            <Spinner />
-          ) : session ? (
-            children
-          ) : (
-            "Login Needed!"
-          )}
-        </div>
-        <div></div>
+        <div>{children}</div>
       </div>
     </section>
   );

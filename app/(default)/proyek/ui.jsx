@@ -75,10 +75,10 @@ export default function App({
   startDate,
   endDate,
   id_produk,
+  user,
 }) {
   const [sort, setSort] = useState("tanggal_penawaran");
-  const session = useSession();
-  const sessUser = session?.data?.user;
+  const sessUser = user;
   const { peran } = sessUser;
   // filter
   const [isShowHidden, setIsShowHidden] = useState(false);
@@ -506,12 +506,12 @@ export default function App({
           return cellValue;
       }
     },
-    [session],
+    [user],
   );
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [reportList, setReportList] = useState([]);
   const report = useDisclosure();
-  const queryStates = renderQueryStates(queries, session);
+  const queryStates = renderQueryStates(queries);
   if (queryStates) return queryStates;
 
   const selectedProyek = proyek?.data?.[0];
@@ -1019,7 +1019,7 @@ export default function App({
                     )}
                     {/* Status Proyek */}
                     <div>
-                      <StatusProyek />
+                      <StatusProyek user={user} />
                     </div>
                   </div>
                 </ShowHideComponent2>

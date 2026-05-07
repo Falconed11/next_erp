@@ -111,9 +111,8 @@ import {
 
 const api_path = getApiPath();
 
-export default function App({ id, versi }) {
-  const session = useSession();
-  const sessUser = session.data?.user;
+export default function App({ id, versi, user }) {
+  const sessUser = user;
   const router = useRouter();
   const componentRef = {
     penawaran: useRef(null),
@@ -519,7 +518,7 @@ export default function App({ id, versi }) {
             return cellValue;
         }
       },
-      [session, proyek],
+      [user, proyek],
     ),
     penawaran: React.useCallback((data, columnKey) => {
       const cellValue = data[columnKey];
@@ -649,19 +648,16 @@ export default function App({ id, versi }) {
         countRecapitulation(keranjangProduk, keranjangInstalasi, rekapitulasi),
       [keranjangProduk, keranjangInstalasi, rekapitulasi],
     );
-  const queryStates = renderQueryStates(
-    {
-      proyek,
-      keranjangProyek,
-      keranjangProyekInstalasi,
-      rekapitulasiProyek,
-      keteranganPenawaran,
-      versiKeranjangProyek,
-      statusProyek,
-      subProyek,
-    },
-    session,
-  );
+  const queryStates = renderQueryStates({
+    proyek,
+    keranjangProyek,
+    keranjangProyekInstalasi,
+    rekapitulasiProyek,
+    keteranganPenawaran,
+    versiKeranjangProyek,
+    statusProyek,
+    subProyek,
+  });
   if (queryStates) return queryStates;
   if (!selectedProyek) return <>Proyek tidak ditemukan</>;
   const col = {
@@ -1270,6 +1266,7 @@ export default function App({ id, versi }) {
                   instalasi={0}
                   mutateKeranjang={mutateKeranjang}
                   versi={versi}
+                  user={user}
                 />
               }
             />
@@ -1362,6 +1359,7 @@ export default function App({ id, versi }) {
                   instalasi={1}
                   mutateKeranjang={mutateKeranjang}
                   versi={versi}
+                  user={user}
                 />
               }
             />

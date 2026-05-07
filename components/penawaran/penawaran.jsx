@@ -1,4 +1,3 @@
-import { useSession } from "next-auth/react";
 import { useState } from "react";
 import TambahProduk from "../tambahproduk";
 import { Button, Input, NumberInput, Select, SelectItem } from "@heroui/react";
@@ -19,9 +18,9 @@ export const TambahProdukPenawaran = ({
   instalasi,
   mutateKeranjang,
   versi,
+  user,
 }) => {
-  const session = useSession();
-  const { user: sessUser } = session?.data;
+  const sessUser = user;
   const rank = sessUser?.rank;
   const [form, setForm] = useState({});
   const tambahButtonPress = async () => {

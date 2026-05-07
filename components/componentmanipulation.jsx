@@ -7,7 +7,7 @@ const ConditionalComponent = ({ condition, component }) => {
 };
 
 const AuthorizationComponent = ({ roles, user, component }) => {
-  return roles.includes(user.peran) ? component : <></>;
+  return roles.includes(user?.peran) ? component : <></>;
 };
 
 const ShowHideComponent = ({

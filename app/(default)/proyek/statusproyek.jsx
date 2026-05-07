@@ -39,9 +39,8 @@ import { isValidProgress } from "@/app/utils/validation";
 import { useClientFetch } from "@/hooks/useClientFetch";
 import { countOffset, countPages } from "@/app/utils/formula";
 
-const StatusProyek = () => {
-  const { data: session } = useSession();
-  const sessUser = session?.user;
+const StatusProyek = ({ user }) => {
+  const sessUser = user;
   const [page, setPage] = useState(1);
   const rowsPerPage = 5;
   const offset = countOffset(page, rowsPerPage);
@@ -79,7 +78,7 @@ const StatusProyek = () => {
   };
   const isHighRole = highRoleCheck(sessUser?.rank);
   const col = useStatusProyekColumns(isHighRole);
-  const queryStates = renderQueryStates({ statusproyek }, session);
+  const queryStates = renderQueryStates({ statusproyek });
   if (queryStates) return queryStates;
   const loadingState = statusproyek.isLoading ? "loading" : "idle";
 

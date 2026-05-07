@@ -1,5 +1,5 @@
-import UI from "./ui"
+import UI from "./ui";
 
-export default function app() {
-    return <UI />
+export default async function app() {
+  return <UI />;
 }

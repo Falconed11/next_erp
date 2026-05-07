@@ -37,9 +37,7 @@ import { MyCheckBox, MyDatePicker } from "./mycomponent";
 import { number2Nominal } from "@/app/utils/number";
 import { API_PATH } from "@/app/utils/apiconfig";
 
-const FormProduct = ({ form, setForm }) => {
-  const session = useSession();
-
+const FormProduct = ({ form, setForm, user }) => {
   // const [inputId, setInputId] = useState(form.id_kustom);
   // useEffect(() => {
   //   const handler = setTimeout(() => {
@@ -51,9 +49,9 @@ const FormProduct = ({ form, setForm }) => {
   //   };
   // }, [inputId]);
 
-  const queryStates = renderQueryStates(null, session);
+  const queryStates = renderQueryStates(null);
   if (queryStates) return queryStates;
-  const sessUser = session.data.user;
+  const sessUser = user;
   const isHighRole = highRoleCheck(sessUser.rank);
   const classCompByRole = isHighRole ? "" : "hidden";
   const isStock = form?.stok || false;

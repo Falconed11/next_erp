@@ -187,9 +187,8 @@ export const PrintWithHeader = ({ header, body }) => {
     </table>
   );
 };
-export const ToDoList = () => {
-  const session = useSession();
-  const sessUser = session.data?.user;
+export const ToDoList = ({ user }) => {
+  const sessUser = user;
   const userId = sessUser?.id;
   const todolist = useClientFetch(userId ? `todolist?id_user=${userId}` : null);
   const status = useClientFetch("statustodolist");
@@ -318,7 +317,7 @@ export const ToDoList = () => {
       label: "Status",
     },
   ];
-  const queryStates = renderQueryStates({ todolist, status }, session);
+  const queryStates = renderQueryStates({ todolist, status });
   if (queryStates) return queryStates;
   return (
     <>

@@ -461,9 +461,8 @@ export const UpdateShowHide = ({ data, onFetch, mutate }) => {
   );
 };
 
-export const UpdateActiveStatus = ({ data, onFetch, mutate }) => {
-  const session = useSession();
-  const sessUser = session?.data?.user;
+export const UpdateActiveStatus = ({ data, onFetch, mutate, user }) => {
+  const sessUser = user;
   const { id_karyawan } = sessUser;
   const { id, aktif } = data;
   const onPress = useCallback(async () => {

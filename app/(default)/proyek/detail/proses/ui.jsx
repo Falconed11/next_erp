@@ -63,9 +63,8 @@ import { useGetOfferingSummary } from "@/hooks/keranjang-proyek.hooks";
 
 const api_path = getApiPath();
 
-export default function App({ id }) {
-  const session = useSession();
-  const sessUser = session.data?.user;
+export default function App({ id, user }) {
+  const sessUser = user;
   const componentRef = {
     nota: useRef(),
   };
@@ -355,8 +354,6 @@ export default function App({ id }) {
   const renderCell = {
     pengeluaranproyek: React.useCallback(
       (data, columnKey) => {
-        if (session.status === "loading") return;
-        if (session.status === "unauthenticated") return;
         const cellValue = data[columnKey];
         const harga = data.hargaprodukmasuk || data.hargapengeluaran;
         switch (columnKey) {
@@ -588,22 +585,19 @@ export default function App({ id }) {
       },
     ],
   };
-  const queryStates = renderQueryStates(
-    {
-      dataBiayaProduksi,
-      proyek,
-      proyekSummary,
-      pengeluaranproyek,
-      pembayaranProyek,
-      pembayaranproyek,
-      karyawan,
-      kategori,
-      keranjangPeralatan,
-      keranjangInstalasi,
-      rekapitulasiProyek,
-    },
-    session,
-  );
+  const queryStates = renderQueryStates({
+    dataBiayaProduksi,
+    proyek,
+    proyekSummary,
+    pengeluaranproyek,
+    pembayaranProyek,
+    pembayaranproyek,
+    karyawan,
+    kategori,
+    keranjangPeralatan,
+    keranjangInstalasi,
+    rekapitulasiProyek,
+  });
   if (queryStates) return queryStates;
   if (!selectedProyek) return <>Proyek tidak ditemukan</>;
   const { totalpengeluaran: biayaProduksi } = dataBiayaProduksi.data.data || {};

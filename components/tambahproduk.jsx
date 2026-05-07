@@ -28,10 +28,10 @@ export default function TambahProduk({
   rank = 21,
   className,
   disableCustomValue,
+  user,
 }) {
   const { id_kategori: idKategori, id_merek: idMerek } = form;
-  const session = useSession();
-  const sessUser = session.data?.user;
+  const sessUser = user;
   const [nama, setNama] = useState("");
   const [sVendor, setSVendor] = useState("");
   const [idProduk, setIdProduk] = useState(null);
@@ -41,9 +41,9 @@ export default function TambahProduk({
   const vendor = useClientFetch("vendor");
   // const pilihProduk = useClientFetch(`produk`)
   const errorsJumlah = [];
-  const queryStates = renderQueryStates({ produk, vendor }, session);
+  const queryStates = renderQueryStates({ produk, vendor });
   if (queryStates) return queryStates;
-  const isHighRole = highRoleCheck(sessUser.rank);
+  const isHighRole = highRoleCheck(sessUser?.rank);
   if ((form.jumlah < 1 || !form.jumlah) && form.selectProduk?.length > 0)
     errorsJumlah.push("Jumlah minimal 1");
   if (form.jumlah > form.stok && form.isSelected)
@@ -68,7 +68,7 @@ export default function TambahProduk({
   const defStyleFormWidth = "group";
   const variant = "bordered";
   const isProdukSelected = !!form.id_produk;
-  console.log(idMerek);
+  // console.log(idMerek);
   return (
     <div
       // className={`flex flex-wrap gap-3 ${className}`}

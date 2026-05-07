@@ -103,9 +103,8 @@ import { number2Nominal } from "@/app/utils/number";
 
 const apiPath = getApiPath();
 
-export default function App({ id }) {
-  const session = useSession();
-  const sessUser = session?.data?.user;
+export default function App({ id, user }) {
+  const sessUser = user;
   const [inputs, setInputs] = useState([{ id: uuidv4(), value: "" }]);
   const handleChange = (id, value) => {
     setInputs((prevInputs) =>
@@ -436,95 +435,96 @@ export default function App({ id }) {
     });
   };
 
-  const renderCell = React.useCallback((data, columnKey) => {
-    const cellValue = data[columnKey];
-    const harga = (harga) => (
-      <div className="text-right">
-        <Harga harga={harga} />
-      </div>
-    );
-    switch (columnKey) {
-      case "hargamodal":
-        return (
-          <div className="text-right">
-            <Harga harga={data.hargamodal} />
-          </div>
-        );
-      case "tanggal":
-        return getDateFId(data.tanggal);
-      case "tanggal_update_harga_modal":
-        return getDateFId(data.tanggal_update_harga_modal);
-      case "tanggal_update_harga_jual":
-        return getDateFId(data.tanggal_update_harga_jual);
-      case "hargajual":
-        return (
-          <div className="text-right">
-            <Harga harga={data.hargajual} />
-          </div>
-        );
-      case "totalmodal":
-        return (
-          <div className="text-right">
-            <Harga harga={data.hargamodal * data.stok} />
-          </div>
-        );
-      case "totaljual":
-        ``;
-        return (
-          <div className="text-right">
-            <Harga harga={data.hargajual * data.stok} />
-          </div>
-        );
-      case "nkeranjangproyek":
-        return (
-          <div className="text-right">
-            <OpenBlueLinkInNewTab link={`/proyek?id_produk=${data.id}`}>
-              <Harga harga={cellValue} />
-            </OpenBlueLinkInNewTab>
-          </div>
-        );
-      case "nprodukmasuk":
-        return harga(cellValue);
-      case "created_at":
-        return getDateTimeF(cellValue);
-      case "aksi":
-        return (
-          <div className="relative flex items-center gap-2">
-            {/* <Tooltip content="Details">
+  const renderCell = React.useCallback(
+    (data, columnKey) => {
+      const cellValue = data[columnKey];
+      const harga = (harga) => (
+        <div className="text-right">
+          <Harga harga={harga} />
+        </div>
+      );
+      switch (columnKey) {
+        case "hargamodal":
+          return (
+            <div className="text-right">
+              <Harga harga={data.hargamodal} />
+            </div>
+          );
+        case "tanggal":
+          return getDateFId(data.tanggal);
+        case "tanggal_update_harga_modal":
+          return getDateFId(data.tanggal_update_harga_modal);
+        case "tanggal_update_harga_jual":
+          return getDateFId(data.tanggal_update_harga_jual);
+        case "hargajual":
+          return (
+            <div className="text-right">
+              <Harga harga={data.hargajual} />
+            </div>
+          );
+        case "totalmodal":
+          return (
+            <div className="text-right">
+              <Harga harga={data.hargamodal * data.stok} />
+            </div>
+          );
+        case "totaljual":
+          ``;
+          return (
+            <div className="text-right">
+              <Harga harga={data.hargajual * data.stok} />
+            </div>
+          );
+        case "nkeranjangproyek":
+          return (
+            <div className="text-right">
+              <OpenBlueLinkInNewTab link={`/proyek?id_produk=${data.id}`}>
+                <Harga harga={cellValue} />
+              </OpenBlueLinkInNewTab>
+            </div>
+          );
+        case "nprodukmasuk":
+          return harga(cellValue);
+        case "created_at":
+          return getDateTimeF(cellValue);
+        case "aksi":
+          return (
+            <div className="relative flex items-center gap-2">
+              {/* <Tooltip content="Details">
               <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
                 <EyeIcon />
               </span>
             </Tooltip> */}
-            <LinkOpenNewTab
-              content="Riwayat"
-              link={`/produk/masuk?id_produk=${data.id}`}
-              icon={<NoteIcon />}
-            />
-            <Tooltip content="Edit">
-              <span
-                onClick={() => editButtonPress(data)}
-                className="text-lg text-default-400 cursor-pointer active:opacity-50"
-              >
-                <EditIcon />
-              </span>
-            </Tooltip>
-            <Tooltip content="Transfer">
-              <span
-                onClick={() => transferButtonPress(data)}
-                className="text-lg text-default-400 cursor-pointer active:opacity-50"
-              >
-                <TransferIcon />
-              </span>
-            </Tooltip>
-            <Tooltip content="Produk Masuk">
-              <span
-                onClick={() => onProdukMasukClick(data)}
-                className="text-lg text-default-400 cursor-pointer active:opacity-50"
-              >
-                <AddIcon />
-              </span>
-            </Tooltip>
-            {/* {data.stok > 0 ? (
+              <LinkOpenNewTab
+                content="Riwayat"
+                link={`/produk/masuk?id_produk=${data.id}`}
+                icon={<NoteIcon />}
+              />
+              <Tooltip content="Edit">
+                <span
+                  onClick={() => editButtonPress(data)}
+                  className="text-lg text-default-400 cursor-pointer active:opacity-50"
+                >
+                  <EditIcon />
+                </span>
+              </Tooltip>
+              <Tooltip content="Transfer">
+                <span
+                  onClick={() => transferButtonPress(data)}
+                  className="text-lg text-default-400 cursor-pointer active:opacity-50"
+                >
+                  <TransferIcon />
+                </span>
+              </Tooltip>
+              <Tooltip content="Produk Masuk">
+                <span
+                  onClick={() => onProdukMasukClick(data)}
+                  className="text-lg text-default-400 cursor-pointer active:opacity-50"
+                >
+                  <AddIcon />
+                </span>
+              </Tooltip>
+              {/* {data.stok > 0 ? (
               <Tooltip content="Produk Keluar">
                 <span
                   onClick={() => onProdukKeluarClick(data)}
@@ -536,25 +536,28 @@ export default function App({ id }) {
             ) : (
               <></>
             )} */}
-            <UpdateActiveStatus
-              data={data}
-              onFetch={patchProduk}
-              mutate={produk.mutate}
-            />
-            <Tooltip color="danger" content="Delete">
-              <span
-                onClick={() => deleteButtonPress(data.id)}
-                className="text-lg text-danger cursor-pointer active:opacity-50"
-              >
-                <DeleteIcon />
-              </span>
-            </Tooltip>
-          </div>
-        );
-      default:
-        return cellValue;
-    }
-  }, []);
+              <UpdateActiveStatus
+                data={data}
+                onFetch={patchProduk}
+                mutate={produk.mutate}
+                user={user}
+              />
+              <Tooltip color="danger" content="Delete">
+                <span
+                  onClick={() => deleteButtonPress(data.id)}
+                  className="text-lg text-danger cursor-pointer active:opacity-50"
+                >
+                  <DeleteIcon />
+                </span>
+              </Tooltip>
+            </div>
+          );
+        default:
+          return cellValue;
+      }
+    },
+    [user],
+  );
   const filteredData = useMemo(() => {
     if (!produk?.data) return [];
     const name = debounceSearchByName.toLowerCase();
@@ -571,18 +574,15 @@ export default function App({ id }) {
   }, [filteredData?.length, rowsPerPage]);
   const loadingState = produk.isLoading ? "loading" : "idle";
   const offset = (page - 1) * rowsPerPage;
-  const queryStates = renderQueryStates(
-    {
-      produk,
-      merek,
-      vendor,
-      metodepengeluaran,
-      kategori,
-    },
-    session,
-  );
+  const queryStates = renderQueryStates({
+    produk,
+    merek,
+    vendor,
+    metodepengeluaran,
+    kategori,
+  });
   if (queryStates) return queryStates;
-  const isHighRole = highRoleCheck(sessUser.rank);
+  const isHighRole = highRoleCheck(sessUser?.rank);
 
   const col = [
     {
@@ -832,7 +832,7 @@ export default function App({ id }) {
                 {form.modalmode} Produk
               </ModalHeader>
               <ModalBody>
-                <FormProduct form={form} setForm={setForm} />
+                <FormProduct form={form} setForm={setForm} user={user} />
               </ModalBody>
               <ModalFooter>
                 <Button color="danger" variant="light" onPress={onClose}>

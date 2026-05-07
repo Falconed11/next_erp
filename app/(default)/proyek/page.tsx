@@ -1,4 +1,5 @@
 import UI from "./ui";
+import { getUser } from "@/app/utils/user";
 export default async function Produk(props: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
@@ -9,6 +10,7 @@ export default async function Produk(props: {
   const id_produk = searchParams.id_produk;
   const start = searchParams.start;
   const end = searchParams.end;
+  const user = await getUser();
   return (
     <>
       <UI
@@ -18,6 +20,7 @@ export default async function Produk(props: {
         id_produk={id_produk}
         startDate={start}
         endDate={end}
+        user={user}
       />
     </>
   );
