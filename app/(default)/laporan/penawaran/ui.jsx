@@ -1,6 +1,5 @@
 "use client";
 import React, { useState, useMemo } from "react";
-import { useSession } from "next-auth/react";
 import * as XLSX from "xlsx";
 import { RadioGroup, Radio } from "@heroui/react";
 import { getApiPath } from "@/app/utils/apiconfig";
@@ -61,10 +60,9 @@ import { useClientFetch } from "@/hooks/useClientFetch";
 const apiPath = getApiPath();
 const [startDate, endDate] = getCurFirstLastDay();
 
-export default function App({ id_instansi }) {
+export default function App({ id_instansi, user }) {
   const [sort, setSort] = React.useState("tanggal_penawaran");
   const [isLoading, setIsLoading] = useState(0);
-  const session = useSession();
 
   const [selectedKeys, setSelectedKeys] = React.useState(new Set([]));
 
@@ -272,9 +270,7 @@ export default function App({ id_instansi }) {
   if (isLoading) return <div>loading...</div>;
   if (laporan.error) return <div>failed to load</div>;
   if (laporan.isLoading) return <div>loading...</div>;
-  if (session.data?.user == undefined) return <div>loading...</div>;
-
-  const user = session.data?.user;
+  if (!user) return <div>loading...</div>;
 
   const data = laporan.data.map((v) => ({
     ...v,

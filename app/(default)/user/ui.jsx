@@ -1,6 +1,5 @@
 "use client";
 import React, { useState } from "react";
-import { useSession } from "next-auth/react";
 import {
   Table,
   TableHeader,
@@ -45,9 +44,8 @@ import { TableHeaderWithAddButton } from "@/components/mycomponent";
 
 const api_path = getApiPath();
 
-export default function App() {
-  const session = useSession();
-  const sessUser = session?.data?.user;
+export default function App({ user }) {
+  const sessUser = user;
   const user = useClientFetch(
     sessUser
       ? `user?id=${sessUser.id}&peran=${sessUser.peran}&rank=${sessUser.rank}`
@@ -103,7 +101,7 @@ export default function App() {
         "Content-Type": "application/json",
         // 'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: JSON.stringify({ ...data, srcperan: session.data.user.peran }),
+      body: JSON.stringify({ ...data, srcperan: user?.peran }),
     });
     const json = await res.json();
     if (res.status == 400) return alert(json.message);
@@ -165,10 +163,10 @@ export default function App() {
     user: useDisclosure(),
   };
 
-  const QueryStates = renderQueryStates({ karyawan, user, peran }, session);
+  const QueryStates = renderQueryStates({ karyawan, user, peran });
   if (QueryStates) return QueryStates;
   const isHighRole = highRoleCheck(sessUser.rank);
-  // if (session.data.user.peran != "super")
+  // if (user?.peran != "super")
   //   return <div>Anda tidak memiliki akses pada laman ini.</div>;
   // console.log(peran);
   return (

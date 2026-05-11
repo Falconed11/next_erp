@@ -12,7 +12,6 @@ import {
   NumberInput,
   Textarea,
 } from "@heroui/react";
-import { useSession } from "next-auth/react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -23,9 +22,9 @@ const TransferBankModal = ({
   setForm,
   onSave,
   mutate,
+  user,
 }) => {
-  const session = useSession();
-  const sessUser = session?.data?.user;
+  const sessUser = user;
   const saveButtonPress = async (onClose) => {
     const res = await onSave(form, sessUser?.id_karyawan);
     const json = await res.json();
@@ -33,7 +32,7 @@ const TransferBankModal = ({
     mutate();
     onClose();
   };
-  const QueryState = renderQueryStates({}, session);
+  const QueryState = renderQueryStates({});
   if (QueryState) return QueryState;
   return (
     <Modal isOpen={isOpen} onOpenChange={onOpenChange} scrollBehavior="inside">

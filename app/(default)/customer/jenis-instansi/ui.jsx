@@ -7,7 +7,7 @@ import {
 } from "@/services/jenis-instansi.service";
 import { DefaultTable } from "@/components/default/DefaultTable";
 
-export default function App() {
+export default function App({ user }) {
   const queryStates = renderQueryStates({});
   if (queryStates) return queryStates;
   return (
@@ -18,6 +18,7 @@ export default function App() {
         name={"Jenis Instansi"}
         onDelete={deleteJenisInstansi}
         onSave={saveJenisInstansi}
+        user={user}
       />
     </div>
   );

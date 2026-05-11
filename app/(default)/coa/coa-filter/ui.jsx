@@ -26,14 +26,12 @@ import {
   ModalBody,
 } from "@heroui/react";
 import DefaultModal from "@/components/default/DefaultModal";
-import { useSession } from "next-auth/react";
 import { useState } from "react";
 import { useSWRConfig } from "swr";
 import CoaNavigation from "@/components/coa/CoaNavigation";
 
-export default function App() {
-  const session = useSession();
-  const { user: sessionUser } = session?.data || {};
+export default function App({ user }) {
+  const sessionUser = user;
   const { mutate } = useSWRConfig();
   const [form, setForm] = useState({});
   const [viewMode, setViewMode] = useState(null); // 'add' or 'view'
@@ -59,7 +57,7 @@ export default function App() {
 
   const onSave = patchCoaFilterMap;
 
-  const queryStates = renderQueryStates({}, session);
+  const queryStates = renderQueryStates({});
   if (queryStates) return queryStates;
   const { id_karyawan } = sessionUser;
 
@@ -150,6 +148,7 @@ export default function App() {
           onSave={onSave}
           setForm={setForm}
           extraFields={renderCoaFilterExtraFields}
+          user={user}
           disableNama={coaFilterDisableNama}
         />
       ) : (

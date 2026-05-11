@@ -56,7 +56,7 @@ import { useClientFetch } from "@/hooks/useClientFetch";
 
 const apiPath = getApiPath();
 
-export default function App() {
+export default function App({ user }) {
   const [filterVendorJenis, setFilterVendorJenis] = useState({
     id_vendor_jenis: null,
   });

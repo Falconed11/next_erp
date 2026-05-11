@@ -13,19 +13,19 @@ import { TbDeviceDesktopAnalytics } from "react-icons/tb";
 import { FaRegUser } from "react-icons/fa";
 import { LiaToolsSolid } from "react-icons/lia";
 import { Spinner } from "@heroui/react";
-import { NextRequest } from "next/server";
-import { verify } from "jsonwebtoken";
-import { cookies } from "next/headers";
+import { getUser } from "../utils/user";
 
 export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const cookie = await cookies();
-  const token = cookie.get("token")?.value;
-  const user = verify(token!, process.env.JWT_SECRET!);
-  const isHighRole = highRoles.includes(user?.peran);
+  const user = await getUser();
+  if (!user) {
+    // Redirect to login or show loading
+    return <div>Please log in</div>;
+  }
+  const isHighRole = highRoles.includes(user.peran);
   const links = [
     { href: "/", name: "Dashboard", icon: <RiDashboard2Line /> },
     {
@@ -63,7 +63,7 @@ export default async function RootLayout({
                 name: "Proyek",
                 href: "",
               },
-              ...(highRoles.includes(user?.peran)
+              ...(highRoles.includes(user.peran)
                 ? [
                     {
                       key: "jenisproyek",
@@ -87,7 +87,7 @@ export default async function RootLayout({
         : {}),
       icon: <VscGithubProject />,
     },
-    ...(highRoles.includes(user?.peran)
+    ...(highRoles.includes(user.peran)
       ? [
           {
             href: "/operasionalkantor",
@@ -119,7 +119,7 @@ export default async function RootLayout({
           }
         : {}),
     },
-    ...([...highRoles, "admin"].includes(user?.peran)
+    ...([...highRoles, "admin"].includes(user.peran)
       ? [
           {
             href: "/vendor",
@@ -134,7 +134,7 @@ export default async function RootLayout({
             href: "/bank",
             name: "Bank",
             icon: <BsBank />,
-            ...(["super", "owner", "admin"].includes(user?.peran)
+            ...(["super", "owner", "admin"].includes(user.peran)
               ? {
                   dropdown: [
                     { key: "data", name: "Bank" },
@@ -207,7 +207,7 @@ export default async function RootLayout({
                 key: "laporan",
                 name: "Template",
               },
-              ...(user?.peran == "super"
+              ...(user.peran == "super"
                 ? [
                     {
                       key: "biaya-produksi",
@@ -252,7 +252,7 @@ export default async function RootLayout({
           },
         ]
       : []),
-    ...(user?.peran == "super"
+    ...(user.peran == "super"
       ? [
           { href: "/user", name: "User", icon: <FaRegUser /> },
           { href: "/alat", name: "Alat", icon: <LiaToolsSolid /> },

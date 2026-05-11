@@ -23,7 +23,7 @@ import {
   normalizeReportResponse,
 } from "../utils/reportTree";
 
-export default function App() {
+export default function App({ user }) {
   const [selectedTreeLaporan, setSelectedTreeLaporan] = useState(null);
   const today = useMemo(() => new Date(), []);
   const treePreview = useDefaultFetch({
@@ -111,6 +111,7 @@ export default function App() {
               </span>
             </Tooltip>
           )}
+          user={user}
         />
       </div>
       <div className="w-full- max-w-3xl rounded-xl border bg-white p-4">

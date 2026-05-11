@@ -26,7 +26,6 @@ import {
   Tooltip,
   useDisclosure,
 } from "@heroui/react";
-import { useSession } from "next-auth/react";
 import { useCallback, useMemo, useState } from "react";
 import {
   deleteStatusProyek,

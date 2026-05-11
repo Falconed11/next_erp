@@ -1,6 +1,5 @@
 "use client";
 import React, { useState, useRef, useMemo } from "react";
-import { useSession } from "next-auth/react";
 import {
   Table,
   TableHeader,
@@ -59,9 +58,7 @@ import { useClientFetch } from "@/hooks/useClientFetch";
 const api_path = getApiPath();
 const [startDate, endDate] = getCurFirstLastDay();
 
-export default function App({ id }) {
-  const session = useSession();
-  const user = session.data?.user;
+export default function App({ id, user }) {
   const router = useRouter();
   const componentRef = {
     penawaran: useRef(),

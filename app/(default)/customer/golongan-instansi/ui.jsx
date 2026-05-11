@@ -7,7 +7,7 @@ import {
 } from "@/services/golongan-instansi.service";
 import { DefaultTable } from "@/components/default/DefaultTable";
 
-export default function App() {
+export default function App({ user }) {
   const queryStates = renderQueryStates({});
   if (queryStates) return queryStates;
   return (
@@ -18,6 +18,7 @@ export default function App() {
         name={"Golongan Instansi"}
         onDelete={deleteGolonganInstansi}
         onSave={saveGolonganInstansi}
+        user={user}
       />
     </div>
   );

@@ -49,7 +49,6 @@ import { RangeDate } from "@/components/input";
 import Kategori from "./kategori";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { useSession } from "next-auth/react";
 import {
   capitalizeEachWord,
   highRoleCheck,
@@ -66,9 +65,8 @@ import { buildTableClassNames, tableClassNames } from "@/app/utils/style";
 const apiPath = getApiPath();
 const [startDate, endDate] = getCurFirstLastDay();
 
-export default function App() {
-  const session = useSession();
-  const sessUser = session.data?.user;
+export default function App({ user }) {
+  const sessUser = user;
   const [filter, setFilter] = useState({
     startDate,
     endDate,
@@ -280,10 +278,11 @@ export default function App() {
   const isHighRole = highRoleCheck(sessUser?.rank);
   const col = useOperasionalKantorColumns(isHighRole);
 
-  const QueryState = renderQueryStates(
-    { kategorioperasionalkantor, karyawan, operasionalkantor },
-    session,
-  );
+  const QueryState = renderQueryStates({
+    kategorioperasionalkantor,
+    karyawan,
+    operasionalkantor,
+  });
   if (QueryState) return QueryState;
   if (!isHighRole) return "Anda tidak memiliki izin untuk mengakses laman ini.";
   return (

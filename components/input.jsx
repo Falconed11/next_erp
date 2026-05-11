@@ -18,7 +18,6 @@ import { Input, Textarea } from "@heroui/react";
 import { getDate, excelToJSDate, getDateF } from "@/app/utils/date";
 import { getApiPath } from "@/app/utils/apiconfig";
 import { SelectPerusahaan } from "./perusahaan/perusahaan";
-import { useSession } from "next-auth/react";
 import { GoEye, GoEyeClosed } from "react-icons/go";
 import { styleActionButton } from "@/app/utils/style";
 

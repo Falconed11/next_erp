@@ -18,18 +18,16 @@ import {
   excelToJSDate,
 } from "@/app/utils/date";
 import { getApiPath } from "../../utils/apiconfig";
-import { useSession } from "next-auth/react";
 
 const apiPath = getApiPath();
 
-export default function App() {
-  const session = useSession();
+export default function App({ user }) {
   const [isLoading, setIsLoading] = useState(0);
   const [reportList, setReportList] = useState([]);
   const report = useDisclosure();
   if (isLoading) return <>Loading...</>;
-  if (session.status === "loading") return <>Loading...</>;
-  if (!["super"].includes(session.data.user.peran))
+  if (!user) return <>Loading...</>;
+  if (!["super"].includes(user.peran))
     return <>Anda tidak memiliki akses pada laman ini.</>;
   return (
     <div className="flex flex-col gap-2">

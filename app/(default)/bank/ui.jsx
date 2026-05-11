@@ -54,7 +54,6 @@ import {
 import { FileUploader, UpdateShowHide } from "@/components/input";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { useSession } from "next-auth/react";
 import { highRoleCheck, renderQueryStates } from "@/app/utils/tools";
 import { useClientFetch } from "@/hooks/useClientFetch";
 import { SelectPerusahaan } from "@/components/perusahaan/perusahaan";
@@ -68,9 +67,8 @@ import { COA_ENDPOINT } from "@/services/coa/coa.service";
 
 const apiPath = getApiPath();
 
-export default function App() {
-  const session = useSession();
-  const sessUser = session?.data?.user;
+export default function App({ user }) {
+  const sessUser = user;
   const bank = useClientFetch("bank");
   const [isShowHidden, setIsShowHidden] = useState(false);
   const metodepembayaran = useClientFetch(
@@ -305,7 +303,7 @@ export default function App() {
   // if (bank.isLoading) return <div>loading...</div>;
 
   if (isLoading) return <div>loading...</div>;
-  const QueryState = renderQueryStates({ bank, metodepembayaran }, session);
+  const QueryState = renderQueryStates({ bank, metodepembayaran });
   if (QueryState) return QueryState;
   const columns = [
     ...(isHighRole
@@ -355,7 +353,7 @@ export default function App() {
   ];
   return (
     <div className="flex gap-2">
-      <Bank bank={bank} />
+      <Bank bank={bank} user={user} />
       <div className="flex flex-col gap-2">
         {/* <div className="flex flex-row gap-2">
           <div>
@@ -619,9 +617,8 @@ export default function App() {
   );
 }
 
-const Bank = ({ bank }) => {
-  const session = useSession();
-  const sessUser = session?.data?.user;
+const Bank = ({ bank, user }) => {
+  const sessUser = user;
   const [form, setForm] = useState();
 
   const onSubmit = async (e, onClose) => {
@@ -706,7 +703,7 @@ const Bank = ({ bank }) => {
 
   const isHighRole = highRoleCheck(sessUser?.rank);
 
-  const QueryState = renderQueryStates({}, session);
+  const QueryState = renderQueryStates({});
   if (QueryState) return QueryState;
 
   const columns = [

@@ -40,9 +40,10 @@ export const capitalizeEachWord = (str = "") => {
     (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(),
   );
 };
-export const renderQueryStates = (queries, session) => {
+export const renderQueryStates = (queries) => {
   for (const [name, data] of Object.entries(queries ?? {})) {
-    const error = data.error;
+    console.log(data);
+    const { error } = data;
     if (error)
       return (
         <div>
@@ -51,7 +52,6 @@ export const renderQueryStates = (queries, session) => {
       );
     if (data.isLoading) return <div>Loading {name}...</div>;
   }
-  if (session?.status === "loading") return <div>Session Loading...</div>;
 };
 export const useDebounce = (value, delay = 1000) => {
   const [debounced, setDebounced] = useState(value);

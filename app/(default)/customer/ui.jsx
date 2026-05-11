@@ -1,6 +1,5 @@
 "use client";
 import { useState, useMemo, useCallback } from "react";
-import { useSession } from "next-auth/react";
 import * as XLSX from "xlsx";
 import { getApiPath } from "@/app/utils/apiconfig";
 import {
@@ -59,7 +58,6 @@ import { useClientFetch } from "@/hooks/useClientFetch";
 const apiPath = getApiPath();
 
 export default function App({ user }) {
-  console.log(user);
   const sessionuser = user;
 
   const [value, setValue] = useState("");

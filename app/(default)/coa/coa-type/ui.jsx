@@ -11,7 +11,7 @@ import Link from "next/link";
 import { Button } from "@heroui/react";
 import CoaNavigation from "@/components/coa/CoaNavigation";
 
-export default function App() {
+export default function App({ user }) {
   const queryStates = renderQueryStates({});
   if (queryStates) return queryStates;
   return (
@@ -23,6 +23,7 @@ export default function App() {
         name={"Tipe COA"}
         onDelete={deleteCoaType}
         onSave={patchCoaType}
+        user={user}
         extraFields={(form, setForm) => (
           <DefaultSelect
             fieldName="normal_balance"

@@ -31,7 +31,6 @@ import {
 import { Link } from "@heroui/react";
 import { useCallback, useMemo, useState } from "react";
 import { AddIcon, DeleteIcon, EditIcon, EyeIcon } from "./icon";
-import { useSession } from "next-auth/react";
 import { getDate, getDateFId } from "@/app/utils/date";
 import Harga from "./harga";
 import { TITLE_STYLE } from "@/app/utils/const";

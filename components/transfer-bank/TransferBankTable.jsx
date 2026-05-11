@@ -19,7 +19,6 @@ import { getDateFId, getTime } from "@/app/utils/date";
 import { TableHeaderWithAddButton } from "../mycomponent";
 import { useState } from "react";
 import { TransferBankModal } from "@/components/transfer-bank/TransferBankModal";
-import { useSession } from "next-auth/react";
 import {
   useTransferBankColumns,
   useTransferBankFetch,
@@ -68,10 +67,9 @@ export const renderTransferBankTableCell = ({
       return cellValue;
   }
 };
-export const TransferBankTable = ({ rowsPerPage, onDelete, onSave }) => {
+export const TransferBankTable = ({ rowsPerPage, onDelete, onSave, user }) => {
   const name = "Transfer Bank";
-  const session = useSession();
-  const sessUser = session?.data?.user;
+  const sessUser = user;
 
   const [form, setForm] = useState({});
   const [page, setPage] = useState(1);
@@ -109,7 +107,7 @@ export const TransferBankTable = ({ rowsPerPage, onDelete, onSave }) => {
   };
   const isHighRole = highRoleCheck(sessUser?.rank);
   const columns = useTransferBankColumns(isHighRole);
-  const QueryState = renderQueryStates({ data }, session);
+  const QueryState = renderQueryStates({ data });
   if (QueryState) return QueryState;
 
   const pages = Math.ceil(items[0]?.total / rowsPerPage);
@@ -185,6 +183,7 @@ export const TransferBankTable = ({ rowsPerPage, onDelete, onSave }) => {
         isOpen={isOpen}
         onOpenChange={onOpenChange}
         onSave={onSave}
+        user={user}
       />
     </>
   );

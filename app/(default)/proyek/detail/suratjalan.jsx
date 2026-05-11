@@ -115,7 +115,6 @@ export default function SuratJalan({ id_proyek, versi, isAuthorized }) {
     if (data.isLoading) return <div>Loading {name}...</div>;
   }
   const selectedProyek = proyek.data[0];
-  // if (session.status === "loading") return <>Session Loading ...</>;
   return (
     <>
       <Button

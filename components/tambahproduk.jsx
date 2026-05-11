@@ -4,7 +4,6 @@ import { Input, NumberInput } from "@heroui/react";
 import { Checkbox } from "@heroui/react";
 import { getApiPath } from "@/app/utils/apiconfig";
 import Harga from "@/components/harga";
-import { useSession } from "next-auth/react";
 import { highRoleCheck, renderQueryStates } from "@/app/utils/tools";
 import {
   AutocompleteKategoriProduk,

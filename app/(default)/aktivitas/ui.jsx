@@ -52,7 +52,6 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { NavLinkNewTab, LinkOpenNewTab } from "@/components/mycomponent";
 import { highRoleCheck, key2set, set2key } from "@/app/utils/tools";
-import { useSession } from "next-auth/react";
 import { AutocompleteCustomer } from "@/components/myautocomplete";
 import { RangeDate } from "@/components/input";
 import { LIST_SWASTA_NEGRI } from "@/app/utils/const";
@@ -60,9 +59,8 @@ import { useClientFetch } from "@/hooks/useClientFetch";
 
 const api_path = getApiPath();
 
-export default function App({ id, curDate }) {
-  const session = useSession();
-  const sessUser = session.data?.user;
+export default function App({ id, curDate, user }) {
+  const sessUser = user;
   const [current, setCurrent] = useState({
     startDate: null,
     endDate: null,
@@ -212,8 +210,7 @@ export default function App({ id, curDate }) {
   const renderCell = {
     aktivitassales: React.useCallback(
       (data, columnKey) => {
-        if (session.status === "loading") return;
-        if (session.status === "unauthenticated") return;
+        if (!sessUser) return;
         const cellValue = data[columnKey];
         const harga = data.hargaprodukmasuk || data.hargapengeluaran;
         switch (columnKey) {
@@ -327,7 +324,7 @@ export default function App({ id, curDate }) {
     if (data.error) return <div>Failed to load {name}</div>;
     if (data.isLoading) return <div>Loading {name}...</div>;
   }
-  if (session.status === "loading") return <>Session Loading ...</>;
+  if (!sessUser) return <>Loading...</>;
   const isHighRole = highRoleCheck(sessUser.rank);
   const selectedProyek = proyek.data?.[0];
   const isInstansiSelectedOrEmpty = form.id_instansi != null || !form.instansi;

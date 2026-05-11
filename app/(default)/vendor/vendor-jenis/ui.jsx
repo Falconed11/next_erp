@@ -7,7 +7,7 @@ import {
   VENDOR_JENIS_ENDPOINT,
 } from "@/services/vendor-jenis.service";
 
-export default function App() {
+export default function App({ user }) {
   const queryStates = renderQueryStates({});
   if (queryStates) return queryStates;
 
@@ -19,6 +19,7 @@ export default function App() {
         name="Vendor Jenis"
         onDelete={deleteVendorJenis}
         onSave={saveVendorJenis}
+        user={user}
       />
     </div>
   );

@@ -11,7 +11,6 @@ import {
   useDisclosure,
 } from "@heroui/react";
 import { highRoleCheck, renderQueryStates, sortItems } from "@/app/utils/tools";
-import { useSession } from "next-auth/react";
 import { NumberComp } from "../harga";
 import { LIST_SWASTA_NEGRI } from "@/app/utils/const";
 import {
@@ -87,9 +86,9 @@ export const TableProyek = ({
   jenisinstansi,
   golonganinstansi,
   perusahaan,
+  user,
 }) => {
-  const session = useSession();
-  const sessUser = session?.data?.user;
+  const sessUser = user;
 
   const proyekReports = useGetMonthlyReportByPeriode({
     from,
@@ -130,7 +129,7 @@ export const TableProyek = ({
   const loadingState = proyekReports.isLoading ? "loading" : "idle";
   const isHighRole = highRoleCheck(sessUser?.rank);
   const columns = useProyekReportsColumns(isHighRole);
-  const QueryState = renderQueryStates({ proyekReports }, session);
+  const QueryState = renderQueryStates({ proyekReports });
   if (QueryState) return QueryState;
   const { data: items } = proyekReports.data;
   console.log(items);

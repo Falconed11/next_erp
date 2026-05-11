@@ -44,7 +44,6 @@ import {
   TableHeaderWithAddButton,
   OpenBlueLinkInNewTab,
 } from "@/components/mycomponent";
-import { useSession } from "next-auth/react";
 import { renderDefaultTableCell } from "@/components/default/DefaultTable";
 import Harga, { NumberComp } from "@/components/harga";
 import { API_PATH } from "@/app/utils/apiconfig";
@@ -52,9 +51,8 @@ import { useTransaksiColumns } from "@/hooks/useTransaksi.hooks";
 import { ModalJurnal } from "@/components/transaksi/transaksi";
 import { fetchJurnalById } from "@/services/transaksi/jurnal.service";
 
-export default function TransaksiUI() {
-  const session = useSession();
-  const { user: sessionUser } = session?.data || {};
+export default function TransaksiUI({ user }) {
+  const sessionUser = user;
   const [page, setPage] = useState(1);
   const rowsPerPage = 25;
   const offset = (page - 1) * rowsPerPage;
@@ -86,7 +84,7 @@ export default function TransaksiUI() {
   const columns = useTransaksiColumns(isAuthorized);
 
   const loadingState = transaksiData?.isLoading ? "loading" : "idle";
-  const queryState = renderQueryStates({ transaksiData }, session);
+  const queryState = renderQueryStates({ transaksiData });
   if (queryState) return queryState;
   const pages = Math.ceil(transaksiData.data.data[0]?.total / rowsPerPage);
   const handleOpenForm = () => {

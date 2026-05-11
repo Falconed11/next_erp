@@ -21,7 +21,6 @@ import { TableHeaderWithAddButton, TableTitle } from "../mycomponent";
 import { useDefaultColumns, useDefaultFetch } from "@/hooks/useDefault";
 import { useMemo, useState } from "react";
 import DefaultModal from "./DefaultModal";
-import { useSession } from "next-auth/react";
 import { renderFilterActive } from "@/app/utils/render";
 import { FilterActive } from "../filter";
 
@@ -88,9 +87,9 @@ export const DefaultTable = ({
   },
   isRemoveAddButton = false,
   extraDataBeforeAdd = {},
+  user,
 }) => {
-  const session = useSession();
-  const sessUser = session?.data?.user;
+  const sessUser = user;
 
   const [form, setForm] = useState({});
   const [page, setPage] = useState(1);
@@ -141,7 +140,7 @@ export const DefaultTable = ({
   };
   const isHighRole = highRoleCheck(sessUser?.rank);
   const columns = useDefaultColumns(isHighRole, extraColumns, disableNama);
-  const QueryState = renderQueryStates({ data }, session);
+  const QueryState = renderQueryStates({ data });
   if (QueryState) return QueryState;
 
   const id_karyawan = sessUser.id_karyawan;
@@ -226,7 +225,7 @@ export const DefaultTable = ({
                       renderActionButton: (data) => (
                         <>
                           {enableActiveStatus &&
-                            renderFilterActive(data, mutate, onSave)}
+                            renderFilterActive(data, mutate, onSave, user)}
                           {renderActionButton &&
                             renderActionButton(data, mutate, onSave)}
                         </>
@@ -252,6 +251,7 @@ export const DefaultTable = ({
         extraFields={extraFields}
         disableNama={disableNama}
         onSaveSuccess={onSaveSuccess}
+        user={user}
       />
     </>
   );
@@ -272,6 +272,7 @@ export const TableWithActiveStatus = ({
   customSort,
   isRemoveAddButton = false,
   extraDataBeforeAdd,
+  user,
 }) => (
   <DefaultTable
     endPoint={endPoint}
@@ -289,5 +290,6 @@ export const TableWithActiveStatus = ({
     customSort={customSort}
     isRemoveAddButton={isRemoveAddButton}
     extraDataBeforeAdd={extraDataBeforeAdd}
+    user={user}
   />
 );

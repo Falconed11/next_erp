@@ -1,6 +1,5 @@
 "use client";
 import { useState, useRef, useCallback } from "react";
-import { useSession } from "next-auth/react";
 import * as XLSX from "xlsx";
 import { RadioGroup, Radio, Badge } from "@heroui/react";
 import { getApiPath } from "@/app/utils/apiconfig";

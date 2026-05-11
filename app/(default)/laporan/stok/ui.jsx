@@ -1,6 +1,5 @@
 "use client";
 import React, { useState, useMemo, useRef } from "react";
-import { useSession } from "next-auth/react";
 import * as XLSX from "xlsx";
 import Link from "next/link";
 import { useReactToPrint } from "react-to-print";
@@ -50,8 +49,7 @@ import { useClientFetch } from "@/hooks/useClientFetch";
 
 const apiPath = getApiPath();
 
-export default function App({ id_produk }) {
-  const session = useSession();
+export default function App({ id_produk, user }) {
   const componentRef = {
     laporanstok: useRef(null),
   };
@@ -381,9 +379,7 @@ export default function App({ id_produk }) {
   if (produk.isLoading) return <div>loading...</div>;
   if (vendor.error) return <div>failed to load</div>;
   if (vendor.isLoading) return <div>loading...</div>;
-  if (session.data?.user == undefined) return <div>loading...</div>;
-
-  const user = session.data?.user;
+  if (!user) return <div>loading...</div>;
 
   const col = [
     // {

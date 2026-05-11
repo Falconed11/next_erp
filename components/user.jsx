@@ -8,7 +8,6 @@ import { capitalizeEachWord } from "@/app/utils/tools";
 
 export default function App({ user }) {
   // const status = user.user.status;
-  console.log(user);
   const router = useRouter();
   const handleLogout = async () => {
     await fetch("/api/logout", {
@@ -20,7 +19,7 @@ export default function App({ user }) {
   return (
     <Tooltip
       content={
-        <Button onPress={handleLogout}>
+        <Button onPress={handleLogout} variant="bordered">
           <GoSignOut />
           Signout
         </Button>

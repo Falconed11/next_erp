@@ -12,7 +12,7 @@ import Link from "next/link";
 import { Button } from "@heroui/react";
 import CoaNavigation from "@/components/coa/CoaNavigation";
 
-export default function App() {
+export default function App({ user }) {
   const queryStates = renderQueryStates({});
   if (queryStates) return queryStates;
   const generateCustomSelectCoaSubtypeText = (data, form) =>
@@ -48,6 +48,7 @@ export default function App() {
           { key: "coa_type", label: "Tipe COA" },
           { key: "coa_subtype", label: "Sub Tipe COA" },
         ]}
+        user={user}
       />
     </div>
   );

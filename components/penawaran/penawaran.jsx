@@ -50,8 +50,6 @@ export const TambahProdukPenawaran = ({
     setForm(newForm);
     mutateKeranjang();
   };
-  // const QueryState = renderQueryStates({}, session);
-  // if (QueryState) return QueryState;
   const hideComponent = isHighRole ? "" : "hidden";
   const defStyleFormWidth = "w-2/12-";
   console.log(form);

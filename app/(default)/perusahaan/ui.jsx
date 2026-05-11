@@ -1,7 +1,6 @@
 "use client";
 import React, { useState } from "react";
 import Image from "next/image";
-import { useSession } from "next-auth/react";
 import {
   Table,
   TableHeader,
@@ -39,9 +38,7 @@ import { useClientFetch } from "@/hooks/useClientFetch";
 
 const api_path = getApiPath();
 
-export default function App() {
-  const session = useSession();
-
+export default function App({ user }) {
   const perusahaan = useClientFetch(`perusahaan`);
   const [form, setForm] = useState({});
   const [method, setMethod] = useState();
@@ -161,9 +158,9 @@ export default function App() {
     perusahaan: useDisclosure(),
   };
 
-  const queryState = renderQueryStates({ perusahaan }, session);
+  const queryState = renderQueryStates({ perusahaan });
   if (queryState) return queryState;
-  if (!rolesCheck(["admin", "super", "owner"], session?.data?.user?.peran))
+  if (!rolesCheck(["admin", "super", "owner"], user?.peran))
     return <div>Anda tidak memiliki akses pada laman ini.</div>;
   console.log(form);
   return (

@@ -26,7 +26,6 @@ import {
   RadioGroup,
   Textarea,
 } from "@heroui/react";
-import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import {
   dateHeroUIToMysql,
