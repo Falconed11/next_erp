@@ -5,14 +5,19 @@ import Link from "next/link";
 import { GoSignOut } from "react-icons/go";
 import { useRouter } from "next/navigation";
 import { capitalizeEachWord } from "@/app/utils/tools";
+import { apiFetch } from "@/app/utils/fetchHelper";
 
 export default function App({ user }) {
   // const status = user.user.status;
   const router = useRouter();
   const handleLogout = async () => {
-    await fetch("/api/logout", {
-      method: "POST",
-    });
+    try {
+      await apiFetch("/api/logout", {
+        method: "POST",
+      });
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
     router.push("/login");
     router.refresh();
   };

@@ -1,5 +1,6 @@
 import { getApiPath } from "./apiconfig";
 import { getNextDomain } from "./tools";
+import { apiFetch } from "./fetchHelper";
 
 export const api_path = getApiPath();
 
@@ -12,16 +13,10 @@ export const updateSwitch = async (
   referenceData,
 ) => {
   if (switchValue === currentValue) return;
-  const res = await fetch(`${api_path}${apiEndPoint}`, {
+  const json = await apiFetch(`${api_path}${apiEndPoint}`, {
     method,
-    headers: {
-      "Content-Type": "application/json",
-      // 'Content-Type': 'application/x-www-form-urlencoded',
-    },
     body: JSON.stringify(data),
   });
-  const json = await res.json();
-  // if (res.status == 400) return alert(json.message);
   //return alert(json.message);
   referenceData.forEach((data) => data.mutate());
 };

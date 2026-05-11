@@ -54,6 +54,7 @@ import { v4 as uuidv4 } from "uuid";
 import { FilterProduk } from "@/components/filter";
 import { RangeDate } from "@/components/input";
 import { useClientFetch } from "@/hooks/useClientFetch";
+import { apiFetch } from "@/app/utils/fetchHelper";
 
 const api_path = getApiPath();
 const [startDate, endDate] = getCurFirstLastDay();
@@ -108,7 +109,7 @@ export default function App({ id, user }) {
 
   const tambahButtonPress = async (form, setForm) => {
     if (form.selectProduk.size == 0) return alert("Silahkan pilih produk");
-    const res = await fetch(`${api_path}keranjangproyek`, {
+    const json = await apiFetch(`${api_path}keranjangproyek`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -125,8 +126,6 @@ export default function App({ id, user }) {
         versi,
       }),
     });
-    const json = await res.json();
-    if (res.status == 400) return alert(json.message);
     setForm({ jumlah: "", harga: "" });
     // console.log(json.message);
     // return alert(json.message);
@@ -143,7 +142,7 @@ export default function App({ id, user }) {
   };
   const deleteButtonPress = async (id) => {
     if (confirm("Hapus produk?")) {
-      const res = await fetch(`${api_path}keranjangproyek`, {
+      const json = await apiFetch(`${api_path}keranjangproyek`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -151,13 +150,12 @@ export default function App({ id, user }) {
         },
         body: JSON.stringify({ id }),
       });
-      const json = await res.json();
       return;
       // return alert(json.message);
     }
   };
   const simpanButtonPress = async (data, onClose) => {
-    const res = await fetch(`${api_path}keranjangproyek`, {
+    const json = await apiFetch(`${api_path}keranjangproyek`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -168,8 +166,6 @@ export default function App({ id, user }) {
         id_subproyek: form.selectSubProyek?.values().next().value ?? 0,
       }),
     });
-    const json = await res.json();
-    if (res.status == 400) return alert(json.message);
     onClose();
     // console.log(json.message);
     //return alert(json.message);

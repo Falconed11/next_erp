@@ -42,6 +42,7 @@ import {
   NoteIcon,
 } from "@/components/icon";
 import { useClientFetch } from "@/hooks/useClientFetch";
+import { apiFetch } from "@/app/utils/fetchHelper";
 import date, {
   getDateF,
   getDate,
@@ -95,7 +96,7 @@ export default function App() {
       return alert("Keterangan guna membayar maksimal 150 huruf!");
     if (form.nominal.length > 15)
       return alert("Nominal uang sebanyak maksimal 15 digit!");
-    const res = await fetch(`${apiPath}kwitansi`, {
+    const json = await apiFetch(`${apiPath}kwitansi`, {
       method,
       headers: {
         "Content-Type": "application/json",
@@ -103,8 +104,6 @@ export default function App() {
       },
       body: JSON.stringify(form),
     });
-    const json = await res.json();
-    if (res.status == 400) return alert(json.message);
     onClose();
     // return alert(json.message);
   };
@@ -139,7 +138,7 @@ export default function App() {
   };
   const deleteButtonPress = async (id) => {
     if (confirm("Hapus kwitansi?")) {
-      const res = await fetch(`${apiPath}kwitansi`, {
+      const json = await apiFetch(`${apiPath}kwitansi`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",

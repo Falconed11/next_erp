@@ -111,7 +111,6 @@ export default function TransaksiUI({ user }) {
         id: form.method === "PATCH" ? form.id : undefined,
         sessIdKaryawan: sessionUser?.id_karyawan,
       });
-      const json = await res.json();
       if (!res.ok) {
         alert(json.message || "Gagal menyimpan transaksi");
         return;
@@ -129,7 +128,6 @@ export default function TransaksiUI({ user }) {
     try {
       const res = await deleteTransaksi(id_jurnal);
       if (!res.ok) {
-        const json = await res.json();
         alert(json.message || "Gagal menghapus");
         return;
       }

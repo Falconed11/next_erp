@@ -56,6 +56,7 @@ import { AutocompleteCustomer } from "@/components/myautocomplete";
 import { RangeDate } from "@/components/input";
 import { LIST_SWASTA_NEGRI } from "@/app/utils/const";
 import { useClientFetch } from "@/hooks/useClientFetch";
+import { apiFetch } from "@/app/utils/fetchHelper";
 
 const api_path = getApiPath();
 
@@ -112,19 +113,17 @@ export default function App({ id, curDate, user }) {
   };
   const deleteButtonPress = async (data) => {
     if (confirm("Hapus data?")) {
-      const res = await fetch(`${api_path}aktivitassales`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          // 'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: JSON.stringify({
-          id: data.id,
-        }),
-      });
-      const json = await res.json();
-      if (res.status == 400) return alert(json.message);
-      aktivitassales.mutate();
+      try {
+        await apiFetch(`${api_path}aktivitassales`, {
+          method: "DELETE",
+          body: JSON.stringify({
+            id: data.id,
+          }),
+        });
+        aktivitassales.mutate();
+      } catch (error) {
+        alert(error.message || "Delete failed");
+      }
     }
   };
   const tambahButtonPress = async ({ selectProduk, selectKaryawan, form }) => {
@@ -132,78 +131,69 @@ export default function App({ id, curDate, user }) {
     if (!selectKaryawan) return alert("Karyawan belum dipilih");
     if (form.isSelected && form.stok < form.jumlah)
       return alert("Jumlah melebihi stok.");
-    let res;
-    if (form.isSelected) {
-      res = await fetch(`${api_path}produkkeluar`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          // 'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: JSON.stringify({
-          ...form,
-          id_proyek: id,
-          id_produk: form.selectProduk,
-          id_karyawan: selectKaryawan ?? 0,
-          tanggal: form.startdate ? getDate(form.startdate) : "",
-          jumlah: form.jumlah,
-          harga: form.harga,
-          keterangan: form.keterangan ? form.keterangan : "",
-          status: form.status ? form.status : "",
-        }),
+    try {
+      if (form.isSelected) {
+        await apiFetch(`${api_path}produkkeluar`, {
+          method: "POST",
+          body: JSON.stringify({
+            ...form,
+            id_proyek: id,
+            id_produk: form.selectProduk,
+            id_karyawan: selectKaryawan ?? 0,
+            tanggal: form.startdate ? getDate(form.startdate) : "",
+            jumlah: form.jumlah,
+            harga: form.harga,
+            keterangan: form.keterangan ? form.keterangan : "",
+            status: form.status ? form.status : "",
+          }),
+        });
+      } else {
+        await apiFetch(`${api_path}aktivitassales`, {
+          method: "POST",
+          body: JSON.stringify({
+            ...form,
+            id_proyek: id,
+            id_produk: form.selectProduk,
+            id_karyawan: selectKaryawan ?? 0,
+            id_vendor: form.selectVendor,
+            tanggal: form.startdate ? getDate(form.startdate) : "",
+            jumlah: form.jumlah,
+            harga: form.harga,
+            keterangan: form.keterangan ? form.keterangan : "",
+            status: form.status ? form.status : "",
+          }),
+        });
+      }
+      setForm({
+        ...form,
+        stok: 0,
+        satuan: "",
+        jumlah: 0,
+        selectKategori: new Set([]),
+        selectProduk: new Set([]),
       });
-    } else {
-      res = await fetch(`${api_path}aktivitassales`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          // 'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: JSON.stringify({
-          ...form,
-          id_proyek: id,
-          id_produk: form.selectProduk,
-          id_karyawan: selectKaryawan ?? 0,
-          id_vendor: form.selectVendor,
-          tanggal: form.startdate ? getDate(form.startdate) : "",
-          jumlah: form.jumlah,
-          harga: form.harga,
-          keterangan: form.keterangan ? form.keterangan : "",
-          status: form.status ? form.status : "",
-        }),
-      });
+      aktivitassales.mutate();
+    } catch (error) {
+      alert(error.message || "Save failed");
     }
-    const json = await res.json();
-    if (res.status == 400) return alert(json.message);
-    setForm({
-      ...form,
-      stok: 0,
-      satuan: "",
-      jumlah: 0,
-      selectKategori: new Set([]),
-      selectProduk: new Set([]),
-    });
-    aktivitassales.mutate();
     // return alert(json.message);
   };
   const simpanButtonPress = async (data, onClose) => {
     // return console.log({ form, id });
-    const res = await fetch(`${api_path}aktivitassales`, {
-      method: form.method,
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify({
-        ...data,
-        id_karyawan: sessUser.id_karyawan,
-        isSelesai: data.isSelected,
-      }),
-    });
-    const json = await res.json();
-    if (res.status == 400) return alert(json.message);
-    aktivitassales.mutate();
-    onClose();
+    try {
+      await apiFetch(`${api_path}aktivitassales`, {
+        method: form.method,
+        body: JSON.stringify({
+          ...data,
+          id_karyawan: sessUser.id_karyawan,
+          isSelesai: data.isSelected,
+        }),
+      });
+      aktivitassales.mutate();
+      onClose();
+    } catch (error) {
+      alert(error.message || "Save failed");
+    }
     // console.log(json.message);
   };
 

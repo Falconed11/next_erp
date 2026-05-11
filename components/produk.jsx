@@ -288,7 +288,7 @@ export const ModalProdukMasuk = ({
     // if (form.jumlah <= 0 || form.harga < 0 || !form.harga)
     //   return alert("Jumlah, dan Harga wajib diisi!");
     const { jatuhTempo } = form;
-    const res = await fetch(`${API_PATH}produkmasuk`, {
+    const json = await apiFetch(`${API_PATH}produkmasuk`, {
       method,
       headers: {
         "Content-Type": "application/json",
@@ -302,8 +302,6 @@ export const ModalProdukMasuk = ({
         jatuhTempo: jatuhTempo ? dateHeroUIToMysql(jatuhTempo) : null,
       }),
     });
-    const json = await res.json();
-    if (!res.ok) return alert(json.message);
     mutate();
     onClose();
   };

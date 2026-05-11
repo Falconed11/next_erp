@@ -36,6 +36,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { getDate, getDateF } from "../../utils/date";
 import { useClientFetch } from "@/hooks/useClientFetch";
+import { apiFetch } from "@/app/utils/fetchHelper";
 
 const apiPath = getApiPath();
 
@@ -49,7 +50,7 @@ export default function App({ id_proyek }) {
   const saveButtonPress = async () => {
     // if (form.nama == "" || form.kategori == "")
     //   return alert("Nama, dan Kategori harus diisi!");
-    const res = await fetch(`${apiPath}stok`, {
+    const json = await apiFetch(`${apiPath}stok`, {
       method,
       headers: {
         "Content-Type": "application/json",
@@ -57,7 +58,6 @@ export default function App({ id_proyek }) {
       },
       body: JSON.stringify(form),
     });
-    const json = await res.json();
     return alert(json.message);
   };
   const tambahButtonPress = () => {
@@ -104,7 +104,7 @@ export default function App({ id_proyek }) {
   };
   const deleteButtonPress = async (id) => {
     if (confirm("Hapus product?")) {
-      const res = await fetch(`${apiPath}stok`, {
+      const json = await apiFetch(`${apiPath}stok`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -468,7 +468,7 @@ export default function App({ id_proyek }) {
 
 function TambahButton({ id_proyek, id_stok }) {
   const tambahButtonPress = async () => {
-    const res = await fetch(`${apiPath}keranjangproyek`, {
+    const json = await apiFetch(`${apiPath}keranjangproyek`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -476,7 +476,6 @@ function TambahButton({ id_proyek, id_stok }) {
       },
       body: JSON.stringify({ id_proyek, id_stok }),
     });
-    const json = await res.json();
     return alert(json.message);
   };
   if (id_proyek)

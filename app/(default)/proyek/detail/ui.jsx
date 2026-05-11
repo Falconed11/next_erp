@@ -103,6 +103,7 @@ import { NEXT_DOMAIN } from "@/app/utils/const";
 import { TemplateImportV2 } from "@/components/input";
 import { BadgeStatusProyek } from "@/components/badgestatusproyek";
 import { useClientFetch } from "@/hooks/useClientFetch";
+import { apiFetch } from "@/app/utils/fetchHelper";
 import {
   SelectSubProyek,
   TambahProdukPenawaran,
@@ -174,7 +175,7 @@ export default function App({ id, versi, user }) {
   };
   const deleteButtonPress = async (id) => {
     if (confirm("Hapus produk?")) {
-      const res = await fetch(`${api_path}keranjangproyek`, {
+      const json = await apiFetch(`${api_path}keranjangproyek`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -182,15 +183,13 @@ export default function App({ id, versi, user }) {
         },
         body: JSON.stringify({ id }),
       });
-      const json = await res.json();
-      if (res.status == 400) return alert(json.message);
       mutateKeranjang();
       return;
       // return alert(json.message);
     }
   };
   const handleButtonVersi = async () => {
-    let res = await fetch(`${api_path}versibarukeranjangproyek`, {
+    let res = await apiFetch(`${api_path}versibarukeranjangproyek`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -203,7 +202,7 @@ export default function App({ id, versi, user }) {
       }),
     });
     let json = await res.json();
-    res = await fetch(`${api_path}versibarurekapitulasiproyek`, {
+    res = await apiFetch(`${api_path}versibarurekapitulasiproyek`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -227,7 +226,7 @@ export default function App({ id, versi, user }) {
   };
   const simpanButtonPress = async (data, onClose) => {
     // if (data.jumlah <= 0) return alert("Jumlah belum diisi");
-    const res = await fetch(`${api_path}keranjangproyek`, {
+    const json = await apiFetch(`${api_path}keranjangproyek`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -239,8 +238,6 @@ export default function App({ id, versi, user }) {
         tanggal: dateHeroUIToMysql(data.tanggalHarga),
       }),
     });
-    const json = await res.json();
-    if (res.status == 400) return alert(json.message);
     mutateKeranjang();
     onClose();
   };
@@ -249,7 +246,7 @@ export default function App({ id, versi, user }) {
     if (!confirm("Anda yakin untuk merubah seluruh harga jual?")) return;
     if (inputPersenProvit < 0) return alert("Persen provit tidak valid.");
     // if (data.jumlah <= 0) return alert("Jumlah belum diisi");
-    const res = await fetch(
+    const json = await apiFetch(
       `${api_path}keranjangproyekupdatehargabypersenprovit`,
       {
         method: "PUT",
@@ -263,13 +260,12 @@ export default function App({ id, versi, user }) {
         }),
       },
     );
-    const json = await res.json();
     if (res.status >= 400 && res.status < 500) return alert(json.message);
     return alert(json.message);
   };
   const handleButtonSimpanJenisProyek = async (data, onClose) => {
     const method = rekapitulasiProyek.data.length == 0 ? "POST" : "PUT";
-    const res = await fetch(`${api_path}jenisproyek`, {
+    const json = await apiFetch(`${api_path}jenisproyek`, {
       method,
       headers: {
         "Content-Type": "application/json",
@@ -282,13 +278,11 @@ export default function App({ id, versi, user }) {
         versi: selectedVersion,
       }),
     });
-    const json = await res.json();
-    if (res.status == 400) return alert(json.message);
     onClose();
     // return alert(json.message);
   };
   const handleButtonSetAsDealClick = async () => {
-    const res = await fetch(`${api_path}proyek`, {
+    const json = await apiFetch(`${api_path}proyek`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -301,12 +295,10 @@ export default function App({ id, versi, user }) {
         id_statusproyek: 2,
       }),
     });
-    const json = await res.json();
-    if (res.status == 400) return alert(json.message);
     proyek.mutate();
   };
   const handleButtonSetAsRejectClick = async () => {
-    const res = await fetch(`${api_path}proyek`, {
+    const json = await apiFetch(`${api_path}proyek`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -318,12 +310,10 @@ export default function App({ id, versi, user }) {
         id_statusproyek: -1,
       }),
     });
-    const json = await res.json();
-    if (res.status == 400) return alert(json.message);
     proyek.mutate();
   };
   const handleButtonCancelDealRejectClick = async () => {
-    const res = await fetch(`${api_path}proyek`, {
+    const json = await apiFetch(`${api_path}proyek`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -335,8 +325,6 @@ export default function App({ id, versi, user }) {
         id_statusproyek: 1,
       }),
     });
-    const json = await res.json();
-    if (res.status == 400) return alert(json.message);
     proyek.mutate();
   };
   const selectedProyek = proyek?.data?.[0];

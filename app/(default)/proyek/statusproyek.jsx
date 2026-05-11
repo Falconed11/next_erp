@@ -62,16 +62,12 @@ const StatusProyek = ({ user }) => {
       return;
     }
     const res = await saveStatusProyek(form);
-    const json = await res.json();
-    if (res.status == 400) return alert(json.message);
     statusproyek.mutate();
     onClose();
   };
   const deletePress = async ({ id, nama }) => {
     if (confirm(`Hapus status proyek id: ${id} nama: ${nama}?`)) {
       const res = await deleteStatusProyek(id);
-      const json = await res.json();
-      if (res.status == 400) return alert(json.message);
       statusproyek.mutate();
     }
   };

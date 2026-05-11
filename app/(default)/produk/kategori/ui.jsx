@@ -50,6 +50,7 @@ import { FileUploader } from "@/components/input";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useClientFetch } from "@/hooks/useClientFetch";
+import { apiFetch } from "@/app/utils/fetchHelper";
 
 const apiPath = getApiPath();
 
@@ -61,7 +62,7 @@ export default function App() {
 
   const saveButtonPress = async (onClose) => {
     // if (form.isSwasta.size == 0) return alert("Swasta/Negri belum diisi");
-    const res = await fetch(`${apiPath}kategoriproduk`, {
+    const json = await apiFetch(`${apiPath}kategoriproduk`, {
       method: form.method,
       headers: {
         "Content-Type": "application/json",
@@ -69,15 +70,13 @@ export default function App() {
       },
       body: JSON.stringify(form),
     });
-    const json = await res.json();
-    if (res.status == 400) return alert(json.message);
     kategoriproduk.mutate();
     onClose();
     //return alert(json.message);
   };
   const saveTransferButtonPress = async (onClose) => {
     // if (form.isSwasta.size == 0) return alert("Swasta/Negri belum diisi");
-    const res = await fetch(`${apiPath}transferkategoriproduk`, {
+    const json = await apiFetch(`${apiPath}transferkategoriproduk`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -88,8 +87,6 @@ export default function App() {
         targetId: form.targetId,
       }),
     });
-    const json = await res.json();
-    if (res.status == 400) return alert(json.message);
     onClose();
     //return alert(json.message);
   };
@@ -120,7 +117,7 @@ export default function App() {
   };
   const deleteButtonPress = async (id) => {
     if (confirm("Hapus kategoriproduk?")) {
-      const res = await fetch(`${apiPath}kategoriproduk`, {
+      const json = await apiFetch(`${apiPath}kategoriproduk`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -129,8 +126,6 @@ export default function App() {
         body: JSON.stringify({ id }),
       });
       // return alert(await res.json().then((json) => json.message));
-      const json = await res.json();
-      if (res.status == 400) return alert(json.message);
       kategoriproduk.mutate();
     }
   };
@@ -151,7 +146,7 @@ export default function App() {
     try {
       const responses = await Promise.all(
         json.map((v) =>
-          fetch(`${apiPath}proyek`, {
+          apiFetch(`${apiPath}proyek`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",

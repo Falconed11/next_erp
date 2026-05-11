@@ -46,6 +46,7 @@ import { Input, Textarea } from "@heroui/react";
 import { getDate, getDateFId, getTime } from "@/app/utils/date";
 import { export2excel } from "@/app/utils/export";
 import { useClientFetch } from "@/hooks/useClientFetch";
+import { apiFetch } from "@/app/utils/fetchHelper";
 
 const apiPath = getApiPath();
 
@@ -103,7 +104,7 @@ export default function App({ id_produk, user }) {
       return alert(
         `Jumlah tidak boleh kurang dari produk keluar. (Min ${form.keluar})`,
       );
-    const res = await fetch(`${apiPath}produkmasuk`, {
+    const json = await apiFetch(`${apiPath}produkmasuk`, {
       method: form.method,
       headers: {
         "Content-Type": "application/json",
@@ -111,8 +112,6 @@ export default function App({ id_produk, user }) {
       },
       body: JSON.stringify(form),
     });
-    const json = await res.json();
-    if (res.status == 400) return alert(json.message);
     onClose();
     // return alert(json.message);
   };
@@ -162,7 +161,7 @@ export default function App({ id_produk, user }) {
     if (data.keluar > 0)
       return alert("Tidak dapat menghapus. Data keluar tidak kosong.");
     if (confirm("Hapus produk masuk?")) {
-      const res = await fetch(`${apiPath}produkmasuk`, {
+      const json = await apiFetch(`${apiPath}produkmasuk`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -174,8 +173,6 @@ export default function App({ id_produk, user }) {
           jumlah: data.jumlah,
         }),
       });
-      const json = await res.json();
-      if (res.status == 400) return alert(json.message);
       // return alert(await res.json().then((json) => json.message));
     }
   };
@@ -192,7 +189,7 @@ export default function App({ id_produk, user }) {
     try {
       const responses = await Promise.all(
         json.map((v) =>
-          fetch(`${apiPath}produk`, {
+          apiFetch(`${apiPath}produk`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -248,7 +245,7 @@ export default function App({ id_produk, user }) {
   const onSimpanClick = async (onClose) => {
     // if (form.nama == "" || !form.selectKategori.size > 0)
     //   return alert("Nama, dan Kategori wajib diisi!");
-    const res = await fetch(`${apiPath}produkmasuk`, {
+    const json = await apiFetch(`${apiPath}produkmasuk`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -256,8 +253,6 @@ export default function App({ id_produk, user }) {
       },
       body: JSON.stringify(form),
     });
-    const json = await res.json();
-    if (res.status == 400) return alert(json.message);
     onClose();
     // return alert(json.message);
   };

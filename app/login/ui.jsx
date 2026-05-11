@@ -3,8 +3,7 @@ import React, { useState } from "react";
 import { Input, Button, Form } from "@heroui/react";
 import Link from "next/link";
 import { EyeFilledIcon, EyeSlashFilledIcon } from "../../components/icon";
-import { updateForm } from "../utils/tools";
-import { useRouter } from "next/navigation";
+import { apiFetch } from "../utils/fetchHelper";
 
 export default function App({ error }) {
   const router = useRouter();
@@ -16,18 +15,14 @@ export default function App({ error }) {
     event.preventDefault();
     console.log("Login pressed", form);
 
-    const res = await fetch(`/api/login`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(form),
-    });
-    const data = await res.json();
-    if (res.ok) {
+    try {
+      const data = await apiFetch(`/api/login`, {
+        method: "POST",
+        body: JSON.stringify(form),
+      });
       router.push("/");
-    } else {
-      alert(data.message || "Login failed");
+    } catch (error) {
+      alert(error.message || "Login failed");
     }
   };
 

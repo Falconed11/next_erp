@@ -30,7 +30,7 @@ export default function KeteranganPenawaran({
   const simpanButtonPress = async (data, onClose) => {
     // if (data.jumlah <= 0) return alert("Jumlah belum diisi");
     if (!data.keterangan) return alert("Keterangan belum diisi.");
-    const res = await fetch(`${API_PATH}keteranganpenawaran`, {
+    const json = await apiFetch(`${API_PATH}keteranganpenawaran`, {
       method: data.mode == "Tambah" ? "POST" : "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -40,8 +40,6 @@ export default function KeteranganPenawaran({
         ...data,
       }),
     });
-    const json = await res.json();
-    if (res.status == 400) return alert(json.message);
     mutate();
     onClose();
     // console.log(json.message);
@@ -60,7 +58,7 @@ export default function KeteranganPenawaran({
               isSelected={isChecked}
               onValueChange={async (v) => {
                 if (v === isChecked) return;
-                const res = await fetch(
+                const json = await apiFetch(
                   `${API_PATH}proyek_keteranganpenawaran`,
                   {
                     method: v ? "POST" : "DELETE",
@@ -74,9 +72,7 @@ export default function KeteranganPenawaran({
                     }),
                   },
                 );
-                const json = await res.json();
                 // if (res.status == 400) console.log(json.message);
-                // if (res.status == 400) return alert(json.message);
                 // console.log(json.message);
                 //return alert(json.message);
                 mutate();
@@ -107,7 +103,7 @@ export default function KeteranganPenawaran({
                   onClick={async () => {
                     if (confirm("Hapus keterangan?")) {
                       console.log(data.id);
-                      const res = await fetch(
+                      const json = await apiFetch(
                         `${API_PATH}keteranganpenawaran`,
                         {
                           method: "DELETE",
@@ -118,8 +114,6 @@ export default function KeteranganPenawaran({
                           body: JSON.stringify({ id: data.id }),
                         },
                       );
-                      const json = await res.json();
-                      if (res.status == 400) return alert(json.message);
                       mutate();
                       return;
                       // return alert(json.message);

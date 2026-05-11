@@ -20,6 +20,7 @@ import { getApiPath } from "@/app/utils/apiconfig";
 import { SelectPerusahaan } from "./perusahaan/perusahaan";
 import { GoEye, GoEyeClosed } from "react-icons/go";
 import { styleActionButton } from "@/app/utils/style";
+import { apiFetch } from "@/app/utils/fetchHelper";
 
 const apiPath = getApiPath();
 
@@ -275,18 +276,16 @@ export function TemplateImport({
     if (json.length == 0) return alert("File belum dipilih");
     setIsLoading(1);
     setReportList([]);
-    const res = await fetch(`${apiPath}${apiendpoint}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify({ customInputCode, json }),
-    });
-    const json2 = await res.json();
-    if (res.status == 400) return alert(json2?.message ?? "no msg");
-    setReportList(json2.result);
-    setJson([]);
+    try {
+      const json2 = await apiFetch(`${apiPath}${apiendpoint}`, {
+        method: "POST",
+        body: JSON.stringify({ customInputCode, json }),
+      });
+      setReportList(json2.result);
+      setJson([]);
+    } catch (error) {
+      alert(error.message || "Upload failed");
+    }
     setIsLoading(0);
     report.onOpen();
   };
@@ -355,20 +354,18 @@ export function TemplateImportV2({
     if (json.length == 0) return alert("File belum dipilih");
     setIsLoading(1);
     setReportList([]);
-    const res = await fetch(`${apiPath}${apiendpoint}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify({
-        customInputCode: customInputCode || getDateF(new Date()),
-        json,
-      }),
-    });
-    const json2 = await res.json();
-    if (res.status == 400) return alert(json2?.message ?? "no msg");
-    setReportList(json2.result);
+    try {
+      const json2 = await apiFetch(`${apiPath}${apiendpoint}`, {
+        method: "POST",
+        body: JSON.stringify({
+          customInputCode: customInputCode || getDateF(new Date()),
+          json,
+        }),
+      });
+      setReportList(json2.result);
+    } catch (error) {
+      alert(error.message || "Upload failed");
+    }
     setJson([]);
     setFile();
     setIsLoading(0);
@@ -446,10 +443,12 @@ export const UpdateShowHide = ({ data, onFetch, mutate }) => {
   const { id, hide } = data;
   const onPress = async () => {
     if (!hide) if (!confirm("Sembunyikan data?")) return;
-    const res = await onFetch({ id, hide: hide ? 0 : 1, method: "PATCH" });
-    const json = await res.json();
-    if (res.status == 400) return alert(json.message);
-    mutate();
+    try {
+      await onFetch({ id, hide: hide ? 0 : 1, method: "PATCH" });
+      mutate();
+    } catch (error) {
+      alert(error.message || "Update failed");
+    }
   };
   return (
     <Tooltip content={`Klik untuk ${hide ? "menampilkan!" : "Menyembunyikan"}`}>
@@ -466,15 +465,17 @@ export const UpdateActiveStatus = ({ data, onFetch, mutate, user }) => {
   const { id, aktif } = data;
   const onPress = useCallback(async () => {
     if (aktif) if (!confirm("Non aktifkan data?")) return;
-    const res = await onFetch({
-      id,
-      updated_by: id_karyawan,
-      aktif: aktif ? 0 : 1,
-      method: "PATCH",
-    });
-    const json = await res.json();
-    if (!res.ok) return alert(json.message);
-    mutate();
+    try {
+      await onFetch({
+        id,
+        updated_by: id_karyawan,
+        aktif: aktif ? 0 : 1,
+        method: "PATCH",
+      });
+      mutate();
+    } catch (error) {
+      alert(error.message || "Update failed");
+    }
   }, [id_karyawan, id, aktif, onFetch, mutate]);
   return (
     <Tooltip

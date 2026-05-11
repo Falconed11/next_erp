@@ -38,8 +38,6 @@ export default function DefaultModal({
     const res = await onSave({
       ...payload,
     });
-    const json = await res.json();
-    if (!res.ok) return alert(json.message);
     data.mutate();
     onSaveSuccess?.(json, payload);
     onClose();

@@ -37,6 +37,7 @@ import { invoice } from "@/app/utils/formatid";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useClientFetch } from "@/hooks/useClientFetch";
+import { apiFetch } from "@/app/utils/fetchHelper";
 
 export default function SuratJalan({ id_proyek, versi, isAuthorized }) {
   const componentRef = useRef(null);
@@ -192,7 +193,7 @@ export default function SuratJalan({ id_proyek, versi, isAuthorized }) {
                         <Button
                           color="primary"
                           onPress={async () => {
-                            const res = await fetch(`${apiPath}proyek`, {
+                            const json = await apiFetch(`${apiPath}proyek`, {
                               method: "PUT",
                               headers: {
                                 "Content-Type": "application/json",
@@ -200,8 +201,6 @@ export default function SuratJalan({ id_proyek, versi, isAuthorized }) {
                               },
                               body: JSON.stringify({ ...form, id: id_proyek }),
                             });
-                            const json = await res.json();
-                            if (res.status == 400) return alert(json.message);
                             proyek.mutate();
                           }}
                         >

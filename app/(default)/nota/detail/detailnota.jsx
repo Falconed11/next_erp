@@ -30,6 +30,7 @@ import {
 } from "@heroui/react";
 import { useReactToPrint } from "react-to-print";
 import { useClientFetch } from "@/hooks/useClientFetch";
+import { apiFetch } from "@/app/utils/fetchHelper";
 import { getDateFId } from "@/app/utils/date";
 import { penawaran } from "@/app/utils/formatid";
 import Harga from "../../../../components/harga";
@@ -73,7 +74,7 @@ export default function App({ id }) {
   };
   const deleteButtonPress = async (id) => {
     if (confirm("Hapus produk?")) {
-      const res = await fetch(`${api_path}keranjangnota`, {
+      const json = await apiFetch(`${api_path}keranjangnota`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -81,7 +82,6 @@ export default function App({ id }) {
         },
         body: JSON.stringify({ id }),
       });
-      const json = await res.json();
       return;
       // return alert(json.message);
     }
@@ -90,7 +90,7 @@ export default function App({ id }) {
     console.log(form);
     if (!form.selectProduk) return alert("Silahkan pilih produk");
     if (form.jumlah <= 0 || !form.jumlah) return alert("Jumlah belum diisi");
-    const res = await fetch(`${api_path}keranjangnota`, {
+    const json = await apiFetch(`${api_path}keranjangnota`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -103,13 +103,11 @@ export default function App({ id }) {
         harga: form.harga,
       }),
     });
-    const json = await res.json();
-    if (res.status == 400) return alert(json.message);
     setForm({ selectProduk: "", jumlah: "", harga: "" });
     // return alert(json.message);
   };
   const simpanButtonPress = async (data, onClose) => {
-    const res = await fetch(`${api_path}keranjangnota`, {
+    const json = await apiFetch(`${api_path}keranjangnota`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -122,7 +120,6 @@ export default function App({ id }) {
         // harga: data.hargajual,
       }),
     });
-    const json = await res.json();
     onClose();
     console.log(json.message);
     //return alert(json.message);

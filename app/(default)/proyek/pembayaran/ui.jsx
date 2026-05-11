@@ -49,6 +49,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { LinkOpenNewTab } from "@/components/mycomponent";
 import { useClientFetch } from "@/hooks/useClientFetch";
+import { apiFetch } from "@/app/utils/fetchHelper";
 
 const api_path = getApiPath();
 const [startDate, endDate] = getCurFirstLastDay();
@@ -92,7 +93,7 @@ export default function UI() {
   };
   const deleteButtonPress = async (id) => {
     if (confirm("Hapus produk?")) {
-      const res = await fetch(`${api_path}pembayaranproyek`, {
+      const json = await apiFetch(`${api_path}pembayaranproyek`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -100,12 +101,11 @@ export default function UI() {
         },
         body: JSON.stringify({ id }),
       });
-      const json = await res.json();
       // return alert(json.message);
     }
   };
   const simpanButtonPress = async (data, onClose) => {
-    const res = await fetch(`${api_path}pembayaranproyek`, {
+    const json = await apiFetch(`${api_path}pembayaranproyek`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -120,7 +120,6 @@ export default function UI() {
         // harga: data.hargajual,
       }),
     });
-    const json = await res.json();
     onClose();
     // console.log(json.message);
     // return alert(json.message);
@@ -142,7 +141,7 @@ export default function UI() {
     try {
       const responses = await Promise.all(
         json.map((v) =>
-          fetch(`${api_path}pembayaranproyek`, {
+          apiFetch(`${api_path}pembayaranproyek`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",

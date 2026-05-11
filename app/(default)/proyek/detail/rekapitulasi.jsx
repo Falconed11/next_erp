@@ -63,7 +63,7 @@ export default function Rekapitulasi({
     const isPresent = rekapitulasi.id;
     const method = isPresent ? "PUT" : "POST";
     try {
-      const res = await fetch(`${api_path}rekapitulasiproyek`, {
+      const json = await apiFetch(`${api_path}rekapitulasiproyek`, {
         method,
         headers: {
           "Content-Type": "application/json",

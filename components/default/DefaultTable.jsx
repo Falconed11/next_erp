@@ -132,8 +132,6 @@ export const DefaultTable = ({
   const deleteButtonPress = async (id) => {
     if (confirm(`Hapus ${name}?`)) {
       const res = await onDelete(id);
-      const json = await res.json();
-      if (!res.ok) return alert(json.message);
       mutate();
       setPage(1);
     }

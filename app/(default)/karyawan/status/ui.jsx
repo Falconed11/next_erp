@@ -30,6 +30,7 @@ import {
   useDisclosure,
 } from "@heroui/react";
 import { useClientFetch } from "@/hooks/useClientFetch";
+import { apiFetch } from "@/app/utils/fetchHelper";
 import { Button } from "@heroui/react";
 import { Input } from "@heroui/react";
 import { API_PATH } from "@/app/utils/apiconfig";
@@ -51,7 +52,7 @@ export default function App() {
   };
   const deleteButtonPress = async (id) => {
     if (confirm("Hapus statuskaryawan?")) {
-      const res = await fetch(`${API_PATH}statuskaryawan`, {
+      const json = await apiFetch(`${API_PATH}statuskaryawan`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -59,12 +60,11 @@ export default function App() {
         },
         body: JSON.stringify({ id }),
       });
-      const json = await res.json();
       // return alert(json.message);
     }
   };
   const simpanButtonPress = async (data, onClose) => {
-    const res = await fetch(`${API_PATH}statuskaryawan`, {
+    const json = await apiFetch(`${API_PATH}statuskaryawan`, {
       method,
       headers: {
         "Content-Type": "application/json",
@@ -72,8 +72,6 @@ export default function App() {
       },
       body: JSON.stringify(data),
     });
-    const json = await res.json();
-    if (res.status == 400) return alert(json.message);
     statuskaryawan.mutate();
     onClose();
     // return alert(json.message);
@@ -91,7 +89,7 @@ export default function App() {
     try {
       const responses = await Promise.all(
         json.map((v) =>
-          fetch(`${API_PATH}statuskaryawan`, {
+          apiFetch(`${API_PATH}statuskaryawan`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",

@@ -7,6 +7,7 @@ import {
 } from "@/app/utils/formula";
 import { key2set, renderQueryStates, set2key } from "@/app/utils/tools";
 import { useClientFetch } from "@/hooks/useClientFetch";
+import { apiFetch } from "@/app/utils/fetchHelper";
 import { API_PATH } from "@/app/utils/apiconfig";
 import { MyCheckBox, MyDatePicker } from "../mycomponent";
 import { dateHeroUIToMysql } from "@/app/utils/date";
@@ -29,7 +30,7 @@ export const TambahProdukPenawaran = ({
       return alert("Silahkan pilih produk");
     if (!jumlah) return alert("Jumlah belum diisi");
     const { tanggalHarga } = form;
-    const res = await fetch(`${API_PATH}keranjangproyek`, {
+    const json = await apiFetch(`${API_PATH}keranjangproyek`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -44,8 +45,6 @@ export const TambahProdukPenawaran = ({
         tanggal: tanggalHarga ? dateHeroUIToMysql(tanggalHarga) : null,
       }),
     });
-    const json = await res.json();
-    if (res.status == 400) return alert(json.message);
     const newForm = { namakustom: "" };
     setForm(newForm);
     mutateKeranjang();

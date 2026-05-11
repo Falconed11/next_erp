@@ -49,6 +49,7 @@ import {
   getDateFId,
 } from "@/app/utils/date";
 import { useClientFetch } from "@/hooks/useClientFetch";
+import { apiFetch } from "@/app/utils/fetchHelper";
 import { ModalProdukMasuk } from "@/components/produk";
 import { renderQueryStates } from "@/app/utils/tools";
 import { p } from "framer-motion/client";
@@ -102,7 +103,7 @@ export default function App({ id_produk }) {
       return alert(
         `Jumlah tidak boleh kurang dari produk keluar. (Min ${form.keluar})`,
       );
-    const res = await fetch(`${apiPath}produkmasuk`, {
+    const json = await apiFetch(`${apiPath}produkmasuk`, {
       method: form.method,
       headers: {
         "Content-Type": "application/json",
@@ -110,8 +111,6 @@ export default function App({ id_produk }) {
       },
       body: JSON.stringify(form),
     });
-    const json = await res.json();
-    if (res.status == 400) return alert(json.message);
     produkmasuk.mutate();
     onClose();
     // return alert(json.message);
@@ -165,7 +164,7 @@ export default function App({ id_produk }) {
     if (data.keluar > 0)
       return alert("Tidak dapat menghapus. Data keluar tidak kosong.");
     if (confirm("Hapus produk masuk?")) {
-      const res = await fetch(`${apiPath}produkmasuk`, {
+      const json = await apiFetch(`${apiPath}produkmasuk`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -177,8 +176,6 @@ export default function App({ id_produk }) {
           jumlah: data.jumlah,
         }),
       });
-      const json = await res.json();
-      if (res.status == 400) return alert(json.message);
       produkmasuk.mutate();
     }
   };
@@ -195,7 +192,7 @@ export default function App({ id_produk }) {
     try {
       const responses = await Promise.all(
         json.map((v) =>
-          fetch(`${apiPath}produk`, {
+          apiFetch(`${apiPath}produk`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -251,7 +248,7 @@ export default function App({ id_produk }) {
   const onSimpanClick = async (onClose) => {
     // if (form.nama == "" || !form.selectKategori.size > 0)
     //   return alert("Nama, dan Kategori wajib diisi!");
-    const res = await fetch(`${apiPath}produkmasuk`, {
+    const json = await apiFetch(`${apiPath}produkmasuk`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -259,8 +256,6 @@ export default function App({ id_produk }) {
       },
       body: JSON.stringify(form),
     });
-    const json = await res.json();
-    if (res.status == 400) return alert(json.message);
     onClose();
     // return alert(json.message);
   };
@@ -552,7 +547,7 @@ const TabelProdukKeluar = ({ id_produk }) => {
     //   return alert("Nama, dan Kategori wajib diisi!");
     if (form.selectMetodePengeluaran?.size == 0)
       return alert(`Metode pengeluaran belum diisi.`);
-    const res = await fetch(`${apiPath}produkkeluar`, {
+    const json = await apiFetch(`${apiPath}produkkeluar`, {
       method: form.method,
       headers: {
         "Content-Type": "application/json",
@@ -560,14 +555,12 @@ const TabelProdukKeluar = ({ id_produk }) => {
       },
       body: JSON.stringify(form),
     });
-    const json = await res.json();
-    if (res.status == 400) return alert(json.message);
     onClose();
     // return alert(json.message);
   };
   const deleteButtonPress = async (data) => {
     if (confirm("Hapus produk keluar?")) {
-      const res = await fetch(`${apiPath}produkkeluar`, {
+      const json = await apiFetch(`${apiPath}produkkeluar`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -575,8 +568,6 @@ const TabelProdukKeluar = ({ id_produk }) => {
         },
         body: JSON.stringify(data),
       });
-      const json = await res.json();
-      if (res.status == 400) return alert(json.message);
       // return alert(await res.json().then((json) => json.message));
     }
   };

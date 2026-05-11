@@ -38,6 +38,7 @@ import Link from "next/link";
 import ModalTransferData from "@/components/modaltransferdata";
 import Harga from "@/components/harga";
 import { useClientFetch } from "@/hooks/useClientFetch";
+import { apiFetch } from "@/app/utils/fetchHelper";
 
 const apiPath = getApiPath();
 
@@ -69,32 +70,28 @@ export default function App() {
     if (id_statuskaryawan == 1)
       return alert("Tidak dapat menghapus karyawan dengan status aktif.");
     if (confirm("Hapus karyawan?")) {
-      const res = await fetch(`${apiPath}karyawan`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          // 'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: JSON.stringify({ id }),
-      });
-      const json = await res.json();
-      if (res.status == 400) return alert(json.message);
-      karyawan.mutate();
+      try {
+        await apiFetch(`${apiPath}karyawan`, {
+          method: "DELETE",
+          body: JSON.stringify({ id }),
+        });
+        karyawan.mutate();
+      } catch (error) {
+        alert(error.message || "Delete failed");
+      }
     }
   };
   const simpanButtonPress = async (data, onClose) => {
-    const res = await fetch(`${apiPath}karyawan`, {
-      method,
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify(data),
-    });
-    const json = await res.json();
-    if (res.status == 400) return alert(json.message);
-    karyawan.mutate();
-    onClose();
+    try {
+      await apiFetch(`${apiPath}karyawan`, {
+        method,
+        body: JSON.stringify(data),
+      });
+      karyawan.mutate();
+      onClose();
+    } catch (error) {
+      alert(error.message || "Save failed");
+    }
     // return alert(json.message);
   };
   const transferButtonPress = (data) => {
@@ -105,18 +102,16 @@ export default function App() {
   };
   const onSave = async (onClose) => {
     // if (form.isSwasta.size == 0) return alert("Swasta/Negri belum diisi");
-    const res = await fetch(`${apiPath}transferkaryawan`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify({ id, newId }),
-    });
-    const json = await res.json();
-    if (res.status == 400) return alert(json.message);
-    karyawan.mutate();
-    onClose();
+    try {
+      await apiFetch(`${apiPath}transferkaryawan`, {
+        method: "PUT",
+        body: JSON.stringify({ id, newId }),
+      });
+      karyawan.mutate();
+      onClose();
+    } catch (error) {
+      alert(error.message || "Transfer failed");
+    }
     //return alert(json.message);
   };
 
@@ -130,24 +125,17 @@ export default function App() {
     if (json.length == 0) return alert("File belum dipilih");
     setReportList([]);
     try {
-      const responses = await Promise.all(
+      const dataArray = await Promise.all(
         json.map((v) =>
-          fetch(`${apiPath}karyawan`, {
+          apiFetch(`${apiPath}karyawan`, {
             method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              // 'Content-Type': 'application/x-www-form-urlencoded',
-            },
             body: JSON.stringify(v),
           }),
         ),
       );
-      const dataArray = await Promise.all(
-        responses.map((response) => response.json()),
-      );
       setReportList(dataArray.map((v, i) => `${i + 1}. ${v.message}`));
-    } catch (e) {
-      console.error(e);
+    } catch (error) {
+      alert(error.message || "Upload failed");
     }
     setJson([]);
     report.onOpen();

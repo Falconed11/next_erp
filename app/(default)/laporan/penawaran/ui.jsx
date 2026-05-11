@@ -56,6 +56,7 @@ import Harga from "@/components/harga";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useClientFetch } from "@/hooks/useClientFetch";
+import { apiFetch } from "@/app/utils/fetchHelper";
 
 const apiPath = getApiPath();
 const [startDate, endDate] = getCurFirstLastDay();
@@ -75,7 +76,7 @@ export default function App({ id_instansi, user }) {
 
   const saveButtonPress = async (onClose) => {
     // if (form.isSwasta.size == 0) return alert("Swasta/Negri belum diisi");
-    const res = await fetch(`${apiPath}proyek`, {
+    const json = await apiFetch(`${apiPath}proyek`, {
       method,
       headers: {
         "Content-Type": "application/json",
@@ -83,8 +84,6 @@ export default function App({ id_instansi, user }) {
       },
       body: JSON.stringify(form),
     });
-    const json = await res.json();
-    if (res.status == 400) return alert(json.message);
     onClose();
     //return alert(json.message);
   };
@@ -129,7 +128,7 @@ export default function App({ id_instansi, user }) {
   };
   const deleteButtonPress = async (id) => {
     if (confirm("Hapus proyek?")) {
-      const res = await fetch(`${apiPath}proyek`, {
+      const json = await apiFetch(`${apiPath}proyek`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -158,7 +157,7 @@ export default function App({ id_instansi, user }) {
     try {
       const responses = await Promise.all(
         json.map((v) =>
-          fetch(`${apiPath}proyek`, {
+          apiFetch(`${apiPath}proyek`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",

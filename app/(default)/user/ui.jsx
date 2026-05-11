@@ -40,6 +40,7 @@ import {
   set2key,
 } from "@/app/utils/tools";
 import { useClientFetch } from "@/hooks/useClientFetch";
+import { apiFetch } from "@/app/utils/fetchHelper";
 import { TableHeaderWithAddButton } from "@/components/mycomponent";
 
 const api_path = getApiPath();
@@ -80,7 +81,7 @@ export default function App({ user }) {
   };
   const deleteButtonPress = async (id) => {
     if (confirm("Hapus user?")) {
-      const res = await fetch(`${api_path}user`, {
+      const json = await apiFetch(`${api_path}user`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -88,14 +89,13 @@ export default function App({ user }) {
         },
         body: JSON.stringify({ id }),
       });
-      const json = await res.json();
       return alert(json.message);
     }
   };
   const simpanButtonPress = async (data, onClose) => {
     if (data.password != data.ulangipassword)
       return alert("Ulangi Password tidak sesuai");
-    const res = await fetch(`${api_path}user`, {
+    const json = await apiFetch(`${api_path}user`, {
       method,
       headers: {
         "Content-Type": "application/json",
@@ -103,8 +103,6 @@ export default function App({ user }) {
       },
       body: JSON.stringify({ ...data, srcperan: user?.peran }),
     });
-    const json = await res.json();
-    if (res.status == 400) return alert(json.message);
     onClose();
     user.mutate();
   };

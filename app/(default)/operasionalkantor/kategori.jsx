@@ -28,6 +28,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { capitalizeEachWord, highRoleCheck } from "@/app/utils/tools";
 import { TableHeaderWithAddButton } from "@/components/mycomponent";
 import { useClientFetch } from "@/hooks/useClientFetch";
+import { apiFetch } from "@/app/utils/fetchHelper";
 
 const apiPath = getApiPath();
 
@@ -40,7 +41,7 @@ export default function App({ sessionuser }) {
   const queries = { kategorioperasionalkantor };
   const saveButtonPress = async (onClose) => {
     // if (form.isSwasta.size == 0) return alert("Swasta/Negri belum diisi");
-    const res = await fetch(`${apiPath}kategorioperasionalkantor`, {
+    const json = await apiFetch(`${apiPath}kategorioperasionalkantor`, {
       method: form.method,
       headers: {
         "Content-Type": "application/json",
@@ -48,14 +49,12 @@ export default function App({ sessionuser }) {
       },
       body: JSON.stringify({ ...form, lastuser: sessionuser.id_karyawan }),
     });
-    const json = await res.json();
-    if (res.status == 400) return alert(json.message);
     kategorioperasionalkantor.mutate();
     onClose();
     //return alert(json.message);
   };
   const onSave = async (onClose) => {
-    const res = await fetch(`${apiPath}transferoperasionalkantor`, {
+    const json = await apiFetch(`${apiPath}transferoperasionalkantor`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -63,8 +62,6 @@ export default function App({ sessionuser }) {
       },
       body: JSON.stringify({ id, newId }),
     });
-    const json = await res.json();
-    if (res.status == 400) return alert(json.message);
     console.log(json);
     kategorioperasionalkantor.mutate();
     onClose();
@@ -96,7 +93,7 @@ export default function App({ sessionuser }) {
   };
   const deleteButtonPress = async (id, nama) => {
     if (confirm(`Hapus kategori id: ${id}, nama: ${nama}?`)) {
-      const res = await fetch(`${apiPath}kategorioperasionalkantor`, {
+      const json = await apiFetch(`${apiPath}kategorioperasionalkantor`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -104,8 +101,6 @@ export default function App({ sessionuser }) {
         },
         body: JSON.stringify({ id }),
       });
-      const json = await res.json();
-      if (res.status == 400) return alert(json.message);
       kategorioperasionalkantor.mutate();
       // return alert(await res.json().then((json) => json.message));
     }

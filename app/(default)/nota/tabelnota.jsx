@@ -36,6 +36,7 @@ import {
   UserIcon,
 } from "../../../components/icon";
 import { useClientFetch } from "@/hooks/useClientFetch";
+import { apiFetch } from "@/app/utils/fetchHelper";
 import { getDateF, getDate, getCurFirstLastDay } from "@/app/utils/date";
 import { RangeDate } from "@/components/input";
 import { LinkOpenNewTab } from "@/components/mycomponent";
@@ -60,7 +61,7 @@ export default function App() {
   const rowsPerPage = 25;
 
   const saveButtonPress = async (onClose) => {
-    const res = await fetch(`${apiPath}nota`, {
+    const json = await apiFetch(`${apiPath}nota`, {
       method,
       headers: {
         "Content-Type": "application/json",
@@ -68,7 +69,6 @@ export default function App() {
       },
       body: JSON.stringify(form),
     });
-    const json = await res.json();
     onClose();
     // return alert(json.message);
   };
@@ -99,7 +99,7 @@ export default function App() {
   };
   const deleteButtonPress = async (id) => {
     if (confirm("Hapus proyek?")) {
-      const res = await fetch(`${apiPath}nota`, {
+      const json = await apiFetch(`${apiPath}nota`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",

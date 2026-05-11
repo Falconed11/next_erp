@@ -99,8 +99,6 @@ export const TransferBankTable = ({ rowsPerPage, onDelete, onSave, user }) => {
   const deleteButtonPress = async (id) => {
     if (confirm("Hapus transfer bank?")) {
       const res = await onDelete(id);
-      const json = await res.json();
-      if (!res.ok) return alert(json.message);
       data.mutate();
       setPage(1);
     }

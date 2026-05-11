@@ -19,6 +19,7 @@ import {
 } from "@heroui/react";
 import { getApiPath } from "@/app/utils/apiconfig";
 import { useClientFetch } from "@/hooks/useClientFetch";
+import { apiFetch } from "@/app/utils/fetchHelper";
 
 const api_path = getApiPath();
 
@@ -30,7 +31,7 @@ export default function SubProyek({ id, selectedProyek, isAuthorized }) {
 
   const tambahSubProyekButtonPress = async () => {
     if (!form.namaSubProyek) return alert("Silahkan masukkan nama sub proyek!");
-    const res = await fetch(`${api_path}subproyek`, {
+    const json = await apiFetch(`${api_path}subproyek`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -41,8 +42,6 @@ export default function SubProyek({ id, selectedProyek, isAuthorized }) {
         nama: form.namaSubProyek,
       }),
     });
-    const json = await res.json();
-    if (res.status == 400) return alert(json.message);
     subProyek.mutate();
     setForm({ namaSubProyek: "" });
   };
@@ -51,7 +50,7 @@ export default function SubProyek({ id, selectedProyek, isAuthorized }) {
     modal.onOpen();
   };
   const simpanButtonPress = async (data, onClose) => {
-    const res = await fetch(`${api_path}subproyek`, {
+    const json = await apiFetch(`${api_path}subproyek`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -59,14 +58,12 @@ export default function SubProyek({ id, selectedProyek, isAuthorized }) {
       },
       body: JSON.stringify(data),
     });
-    const json = await res.json();
-    if (res.status == 400) return alert(json.message);
     subProyek.mutate();
     onClose();
   };
   const deleteButtonPress = async (data) => {
     if (confirm(`Hapus sub proyek ${data.nama}?`)) {
-      const res = await fetch(`${api_path}subproyek`, {
+      const json = await apiFetch(`${api_path}subproyek`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -74,7 +71,6 @@ export default function SubProyek({ id, selectedProyek, isAuthorized }) {
         },
         body: JSON.stringify({ id: data.id }),
       });
-      const json = await res.json();
       if (res.status == 400)
         return alert(
           `Gagal menghapus. Sub proyek masih terikat pada tabel produk atau instalasi. ` +

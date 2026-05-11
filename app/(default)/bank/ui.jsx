@@ -56,6 +56,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { highRoleCheck, renderQueryStates } from "@/app/utils/tools";
 import { useClientFetch } from "@/hooks/useClientFetch";
+import { apiFetch } from "@/app/utils/fetchHelper";
 import { SelectPerusahaan } from "@/components/perusahaan/perusahaan";
 import {
   METODE_PEMBAYARAN_ENDPOINT,
@@ -79,37 +80,33 @@ export default function App({ user }) {
 
   const saveButtonPress = async (onClose) => {
     if (!form.id_bank) return alert("Bank belum dipilih!");
-    const res = await fetch(`${apiPath}metodepembayaran`, {
-      method: form.method,
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify(form),
-    });
-    const json = await res.json();
-    if (res.status == 400) return alert(json.message);
-    metodepembayaran.mutate();
-    onClose();
+    try {
+      await apiFetch(`${apiPath}metodepembayaran`, {
+        method: form.method,
+        body: JSON.stringify(form),
+      });
+      metodepembayaran.mutate();
+      onClose();
+    } catch (error) {
+      alert(error.message || "Save failed");
+    }
     //return alert(json.message);
   };
   const saveTransferButtonPress = async (onClose) => {
     // if (form.isSwasta.size == 0) return alert("Swasta/Negri belum diisi");
-    const res = await fetch(`${apiPath}transferbank`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify({
-        src: form.currentId,
-        dst: form.metodepembayaran,
-      }),
-    });
-    const json = await res.json();
-    if (res.status == 400) return alert(json.message);
-    metodepembayaran;
-    onClose();
+    try {
+      await apiFetch(`${apiPath}transferbank`, {
+        method: "PUT",
+        body: JSON.stringify({
+          src: form.currentId,
+          dst: form.metodepembayaran,
+        }),
+      });
+      metodepembayaran.mutate();
+      onClose();
+    } catch (error) {
+      alert(error.message || "Transfer failed");
+    }
     //return alert(json.message);
   };
   const tambahButtonPress = () => {
@@ -141,7 +138,7 @@ export default function App({ user }) {
   const deleteButtonPress = async (id) => {
     if (confirm("Hapus metode pembayaran?")) {
       // setIsLoading(true);
-      const res = await fetch(`${apiPath}metodepembayaran`, {
+      const json = await apiFetch(`${apiPath}metodepembayaran`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -149,8 +146,6 @@ export default function App({ user }) {
         },
         body: JSON.stringify({ id }),
       });
-      const json = await res.json();
-      if (res.status == 400) return alert(json.message);
       metodepembayaran.mutate();
     }
   };
@@ -171,7 +166,7 @@ export default function App({ user }) {
     try {
       const responses = await Promise.all(
         json.map((v) =>
-          fetch(`${apiPath}proyek`, {
+          apiFetch(`${apiPath}proyek`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -624,7 +619,7 @@ const Bank = ({ bank, user }) => {
   const onSubmit = async (e, onClose) => {
     e.preventDefault();
     // if (form.isSwasta.size == 0) return alert("Swasta/Negri belum diisi");
-    const res = await fetch(`${apiPath}bank`, {
+    const json = await apiFetch(`${apiPath}bank`, {
       method: form.method,
       headers: {
         "Content-Type": "application/json",
@@ -632,8 +627,6 @@ const Bank = ({ bank, user }) => {
       },
       body: JSON.stringify(form),
     });
-    const json = await res.json();
-    if (res.status == 400) return alert(json.message);
     onClose();
     //return alert(json.message);
   };
@@ -657,7 +650,7 @@ const Bank = ({ bank, user }) => {
   };
   const deleteButtonPress = async (id) => {
     if (confirm("Hapus bank?")) {
-      const res = await fetch(`${apiPath}bank`, {
+      const json = await apiFetch(`${apiPath}bank`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",

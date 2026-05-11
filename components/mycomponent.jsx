@@ -35,6 +35,7 @@ import { getDate, getDateFId } from "@/app/utils/date";
 import Harga from "./harga";
 import { TITLE_STYLE } from "@/app/utils/const";
 import { useClientFetch } from "@/hooks/useClientFetch";
+import { apiFetch } from "@/app/utils/fetchHelper";
 
 export const MyChip = ({ text, theme }) => {
   console.log(text, theme);
@@ -204,38 +205,32 @@ export const ToDoList = ({ user }) => {
   const endpoint = "todolist";
   const deleteButtonPress = async (data) => {
     if (confirm(`Hapus status id:${data.id}, nama:${data.status}?`)) {
-      const res = await fetch(`${API_PATH}${endpoint}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          // 'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: JSON.stringify(data),
-      });
-      const json = await res.json();
-      if (res.status == 400) return alert(json.message);
-      todolist.mutate();
-      return;
-      // return alert(json.message);
+      try {
+        await apiFetch(`${API_PATH}${endpoint}`, {
+          method: "DELETE",
+          body: JSON.stringify(data),
+        });
+        todolist.mutate();
+      } catch (error) {
+        alert(error.message || "Delete failed");
+      }
     }
   };
   const simpanButtonPress = async (data, onClose) => {
     if (!data.kegiatan) return alert("Kegiatan wajib diisi");
-    const res = await fetch(`${API_PATH}${endpoint}`, {
-      method: data.mode == "Tambah" ? "POST" : "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify({
-        ...data,
-        id_user: userId,
-      }),
-    });
-    const json = await res.json();
-    if (res.status == 400) return alert(json.message);
-    todolist.mutate();
-    onClose();
+    try {
+      await apiFetch(`${API_PATH}${endpoint}`, {
+        method: data.mode == "Tambah" ? "POST" : "PUT",
+        body: JSON.stringify({
+          ...data,
+          id_user: userId,
+        }),
+      });
+      todolist.mutate();
+      onClose();
+    } catch (error) {
+      alert(error.message || "Save failed");
+    }
   };
   const renderCell = useCallback((data, columnKey) => {
     const cellValue = data[columnKey];
@@ -460,37 +455,31 @@ export const StatusToDoList = () => {
   };
   const deleteButtonPress = async (data) => {
     if (confirm(`Hapus status id:${data.id}, nama:${data.status}?`)) {
-      const res = await fetch(`${API_PATH}statustodolist`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          // 'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: JSON.stringify(data),
-      });
-      const json = await res.json();
-      if (res.status == 400) return alert(json.message);
-      status.mutate();
-      return;
-      // return alert(json.message);
+      try {
+        await apiFetch(`${API_PATH}statustodolist`, {
+          method: "DELETE",
+          body: JSON.stringify(data),
+        });
+        status.mutate();
+      } catch (error) {
+        alert(error.message || "Delete failed");
+      }
     }
   };
   const simpanButtonPress = async (data, onClose) => {
     if (!data.status) return alert("Status wajib diisi");
-    const res = await fetch(`${API_PATH}statustodolist`, {
-      method: data.mode == "Tambah" ? "POST" : "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify({
-        ...data,
-      }),
-    });
-    const json = await res.json();
-    if (res.status == 400) return alert(json.message);
-    status.mutate();
-    onClose();
+    try {
+      await apiFetch(`${API_PATH}statustodolist`, {
+        method: data.mode == "Tambah" ? "POST" : "PUT",
+        body: JSON.stringify({
+          ...data,
+        }),
+      });
+      status.mutate();
+      onClose();
+    } catch (error) {
+      alert(error.message || "Save failed");
+    }
   };
   const renderCell = useCallback((data, columnKey) => {
     const cellValue = data[columnKey];

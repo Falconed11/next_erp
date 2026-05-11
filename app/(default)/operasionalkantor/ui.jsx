@@ -60,6 +60,7 @@ import SelectMetodePembayaran from "@/components/metode-pembayaran/SelectMetodeP
 import { SelectPerusahaan } from "@/components/perusahaan/perusahaan";
 import useOperasionalKantorColumns from "@/hooks/useOperasionalKantorColumns";
 import { useClientFetch } from "@/hooks/useClientFetch";
+import { apiFetch } from "@/app/utils/fetchHelper";
 import { buildTableClassNames, tableClassNames } from "@/app/utils/style";
 
 const apiPath = getApiPath();
@@ -111,7 +112,7 @@ export default function App({ user }) {
     try {
       const responses = await Promise.all(
         json.map((v) =>
-          fetch(`${apiPath}operasionalkantor`, {
+          apiFetch(`${apiPath}operasionalkantor`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -168,7 +169,7 @@ export default function App({ user }) {
       return alert(
         "Perusahaan, Kategori, Biaya, dan Metode Pembayaran wajib diisi.",
       );
-    const res = await fetch(`${apiPath}operasionalkantor`, {
+    const json = await apiFetch(`${apiPath}operasionalkantor`, {
       method,
       headers: {
         "Content-Type": "application/json",
@@ -182,8 +183,6 @@ export default function App({ user }) {
         id_karyawan: sessUser?.id_karyawan,
       }),
     });
-    const json = await res.json();
-    if (res.status == 400) return alert(json.message);
     setForm({});
     operasionalkantor.mutate();
     // return alert(json.message);
@@ -204,7 +203,7 @@ export default function App({ user }) {
   };
   const deleteButtonPress = async (id) => {
     if (confirm("Hapus operasinal kantor?")) {
-      const res = await fetch(`${apiPath}operasionalkantor`, {
+      const json = await apiFetch(`${apiPath}operasionalkantor`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",

@@ -33,6 +33,7 @@ import { getApiPath } from "../../utils/apiconfig";
 import { Button } from "@heroui/react";
 import { Input } from "@heroui/react";
 import { useClientFetch } from "@/hooks/useClientFetch";
+import { apiFetch } from "@/app/utils/fetchHelper";
 
 const api_path = getApiPath();
 
@@ -61,29 +62,29 @@ export default function App() {
   };
   const deleteButtonPress = async (id) => {
     if (confirm("Hapus distributor?")) {
-      const res = await fetch(`${api_path}distributor`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          // 'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: JSON.stringify({ id }),
-      });
-      const json = await res.json();
-      return alert(json.message);
+      try {
+        const json = await apiFetch(`${api_path}distributor`, {
+          method: "DELETE",
+          body: JSON.stringify({ id }),
+        });
+        alert(json.message);
+        distributor.mutate();
+      } catch (error) {
+        alert(error.message || "Delete failed");
+      }
     }
   };
   const simpanButtonPress = async (data) => {
-    const res = await fetch(`${api_path}distributor`, {
-      method,
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify(data),
-    });
-    const json = await res.json();
-    return alert(json.message);
+    try {
+      const json = await apiFetch(`${api_path}distributor`, {
+        method,
+        body: JSON.stringify(data),
+      });
+      alert(json.message);
+      distributor.mutate();
+    } catch (error) {
+      alert(error.message || "Save failed");
+    }
   };
   const renderCell = {
     distributor: React.useCallback((data, columnKey) => {

@@ -63,6 +63,7 @@ import {
 import { BadgeStatusProyek } from "@/components/badgestatusproyek";
 import { useReactToPrint } from "react-to-print";
 import { useClientFetch } from "@/hooks/useClientFetch";
+import { apiFetch } from "@/app/utils/fetchHelper";
 import { saveProyek, duplicateProyek } from "@/services/proyek.service";
 import { FilterHidden } from "@/components/filter";
 import { countOffset, countPages } from "@/app/utils/formula";
@@ -151,19 +152,16 @@ export default function App({
   const loadingState = proyek.isLoading ? "loading" : "idle";
   const saveButtonPress = async (onClose) => {
     // if (form.isSwasta.size == 0) return alert("Swasta/Negri belum diisi");
-    const res = await fetch(`${apiPath}proyek`, {
-      method,
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify(form),
-    });
-    const json = await res.json();
-    if (res.status == 400) return alert(json.message);
-    proyek.mutate();
-    onClose();
-    //return alert(json.message);
+    try {
+      await apiFetch(`${apiPath}proyek`, {
+        method,
+        body: JSON.stringify(form),
+      });
+      proyek.mutate();
+      onClose();
+    } catch (error) {
+      alert(error.message || "Save failed");
+    }
   };
   const tambahButtonPress = () => {
     const now = new Date();
@@ -210,25 +208,21 @@ export default function App({
   };
   const deleteButtonPress = async (id) => {
     if (confirm("Hapus proyek?")) {
-      const res = await fetch(`${apiPath}proyek`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          // 'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: JSON.stringify({ id }),
-      });
-      // return alert(await res.json().then((json) => json.message));
-      const json = await res.json();
-      if (res.status == 400) return alert(json.message);
-      proyek.mutate();
+      try {
+        await apiFetch(`${apiPath}proyek`, {
+          method: "DELETE",
+          body: JSON.stringify({ id }),
+        });
+        proyek.mutate();
+      } catch (error) {
+        alert(error.message || "Delete failed");
+      }
     }
   };
   const handleDuplicatePress = async (id) => {
     if (!confirm("Duplicate this proyek?")) return;
     try {
       const res = await duplicateProyek(id);
-      const json = await res.json();
       if (!res.ok) {
         alert(json.message || "Gagal menduplikasi proyek");
         return;
@@ -254,24 +248,17 @@ export default function App({
     if (json.length == 0) return alert("File belum dipilih");
     setReportList([]);
     try {
-      const responses = await Promise.all(
+      const dataArray = await Promise.all(
         json.map((v) =>
-          fetch(`${apiPath}proyek`, {
+          apiFetch(`${apiPath}proyek`, {
             method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              // 'Content-Type': 'application/x-www-form-urlencoded',
-            },
             body: JSON.stringify({ ...v, id_second: v.id }),
           }),
         ),
       );
-      const dataArray = await Promise.all(
-        responses.map((response) => response.json()),
-      );
       setReportList(dataArray.map((v, i) => `${i + 1}. ${v.message}`));
-    } catch (e) {
-      console.error(e);
+    } catch (error) {
+      alert(error.message || "Upload failed");
     }
     setJson([]);
     report.onOpen();

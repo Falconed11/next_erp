@@ -27,8 +27,6 @@ const TransferBankModal = ({
   const sessUser = user;
   const saveButtonPress = async (onClose) => {
     const res = await onSave(form, sessUser?.id_karyawan);
-    const json = await res.json();
-    if (!res.ok) return alert(json.message);
     mutate();
     onClose();
   };

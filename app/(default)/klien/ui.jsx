@@ -33,6 +33,7 @@ import { getApiPath } from "../../utils/apiconfig";
 import { Button } from "@heroui/react";
 import { Input } from "@heroui/react";
 import { useClientFetch } from "@/hooks/useClientFetch";
+import { apiFetch } from "@/app/utils/fetchHelper";
 
 const api_path = getApiPath();
 
@@ -62,7 +63,7 @@ export default function App() {
   };
   const deleteButtonPress = async (id) => {
     if (confirm("Hapus klien?")) {
-      const res = await fetch(`${api_path}klien`, {
+      const json = await apiFetch(`${api_path}klien`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -70,12 +71,11 @@ export default function App() {
         },
         body: JSON.stringify({ id }),
       });
-      const json = await res.json();
       return alert(json.message);
     }
   };
   const simpanButtonPress = async (data) => {
-    const res = await fetch(`${api_path}klien`, {
+    const json = await apiFetch(`${api_path}klien`, {
       method,
       headers: {
         "Content-Type": "application/json",
@@ -83,7 +83,6 @@ export default function App() {
       },
       body: JSON.stringify(data),
     });
-    const json = await res.json();
     return alert(json.message);
   };
   const renderCell = {

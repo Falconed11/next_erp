@@ -53,6 +53,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import ModalTransferData from "@/components/modaltransferdata";
 import { useClientFetch } from "@/hooks/useClientFetch";
+import { apiFetch } from "@/app/utils/fetchHelper";
 
 const apiPath = getApiPath();
 
@@ -70,34 +71,30 @@ export default function App({ user }) {
 
   const saveButtonPress = async (onClose) => {
     // if (form.isSwasta.size == 0) return alert("Swasta/Negri belum diisi");
-    const res = await fetch(`${apiPath}vendor`, {
-      method: form.method,
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify(form),
-    });
-    const json = await res.json();
-    if (res.status == 400) return alert(json.message);
-    vendor.mutate();
-    onClose();
+    try {
+      await apiFetch(`${apiPath}vendor`, {
+        method: form.method,
+        body: JSON.stringify(form),
+      });
+      vendor.mutate();
+      onClose();
+    } catch (error) {
+      alert(error.message || "Save failed");
+    }
     //return alert(json.message);
   };
   const onSave = async (onClose) => {
     // if (form.isSwasta.size == 0) return alert("Swasta/Negri belum diisi");
-    const res = await fetch(`${apiPath}transfervendor`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify({ id, newId }),
-    });
-    const json = await res.json();
-    if (res.status == 400) return alert(json.message);
-    vendor.mutate();
-    onClose();
+    try {
+      await apiFetch(`${apiPath}transfervendor`, {
+        method: "PUT",
+        body: JSON.stringify({ id, newId }),
+      });
+      vendor.mutate();
+      onClose();
+    } catch (error) {
+      alert(error.message || "Transfer failed");
+    }
     //return alert(json.message);
   };
   const tambahButtonPress = () => {
@@ -131,17 +128,15 @@ export default function App({ user }) {
   };
   const deleteButtonPress = async (id) => {
     if (confirm("Hapus vendor?")) {
-      const res = await fetch(`${apiPath}vendor`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          // 'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: JSON.stringify({ id }),
-      });
-      const json = await res.json();
-      if (res.status == 400) return alert(json.message);
-      vendor.mutate();
+      try {
+        await apiFetch(`${apiPath}vendor`, {
+          method: "DELETE",
+          body: JSON.stringify({ id }),
+        });
+        vendor.mutate();
+      } catch (error) {
+        alert(error.message || "Delete failed");
+      }
     }
   };
 
@@ -159,24 +154,17 @@ export default function App({ user }) {
     if (json.length == 0) return alert("File belum dipilih");
     setReportList([]);
     try {
-      const responses = await Promise.all(
+      const dataArray = await Promise.all(
         json.map((v) =>
-          fetch(`${apiPath}proyek`, {
+          apiFetch(`${apiPath}proyek`, {
             method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              // 'Content-Type': 'application/x-www-form-urlencoded',
-            },
             body: JSON.stringify({ ...v, id_second: v.id }),
           }),
         ),
       );
-      const dataArray = await Promise.all(
-        responses.map((response) => response.json()),
-      );
       setReportList(dataArray.map((v, i) => `${i + 1}. ${v.message}`));
-    } catch (e) {
-      console.error(e);
+    } catch (error) {
+      alert(error.message || "Upload failed");
     }
     setJson([]);
     report.onOpen();

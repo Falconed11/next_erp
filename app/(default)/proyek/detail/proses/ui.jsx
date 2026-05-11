@@ -54,6 +54,7 @@ import {
   ShowHideComponent2,
 } from "@/components/componentmanipulation";
 import { useClientFetch } from "@/hooks/useClientFetch";
+import { apiFetch } from "@/app/utils/fetchHelper";
 import {
   useCalculatePembayaranProyekByid,
   useCalculatePengeluaranProyekByid,
@@ -149,7 +150,7 @@ export default function App({ id, user }) {
   const deleteButtonPress = async (data) => {
     if (confirm(`Hapus pengeluaran proyek: ${data.nama}?`)) {
       if (data.id_produkkeluar == null) {
-        const res = await fetch(`${api_path}pengeluaranproyek`, {
+        const json = await apiFetch(`${api_path}pengeluaranproyek`, {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
@@ -157,10 +158,8 @@ export default function App({ id, user }) {
           },
           body: JSON.stringify({ id: data.id_pengeluaranproyek }),
         });
-        const json = await res.json();
-        if (res.status == 400) return alert(json.message);
       } else {
-        const res = await fetch(`${api_path}produkkeluar`, {
+        const json = await apiFetch(`${api_path}produkkeluar`, {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
@@ -173,8 +172,6 @@ export default function App({ id, user }) {
             id_produk: data.id,
           }),
         });
-        const json = await res.json();
-        if (res.status == 400) return alert(json.message);
       }
       pengeluaranproyek.mutate();
     }
@@ -187,7 +184,7 @@ export default function App({ id, user }) {
     let res;
     const keteranganpengeluaranproyek = form.keteranganpengeluaranproyek;
     if (form.isSelected) {
-      res = await fetch(`${api_path}produkkeluar`, {
+      res = await apiFetch(`${api_path}produkkeluar`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -201,7 +198,7 @@ export default function App({ id, user }) {
         }),
       });
     } else {
-      res = await fetch(`${api_path}pengeluaranproyek`, {
+      res = await apiFetch(`${api_path}pengeluaranproyek`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -216,8 +213,6 @@ export default function App({ id, user }) {
         }),
       });
     }
-    const json = await res.json();
-    if (res.status == 400) return alert(json.message);
     setForm((prev) => ({
       id_karyawan: prev.id_karyawan,
       startdate: prev.startdate,
@@ -231,7 +226,7 @@ export default function App({ id, user }) {
     if (data.id_produkkeluar) {
       if (data.stok + data.oldJumlah < data.jumlah)
         return alert("Jumlah melebihi batas maksimal.");
-      res = await fetch(`${api_path}produkkeluar`, {
+      res = await apiFetch(`${api_path}produkkeluar`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -249,7 +244,7 @@ export default function App({ id, user }) {
         }),
       });
     } else
-      res = await fetch(`${api_path}pengeluaranproyek`, {
+      res = await apiFetch(`${api_path}pengeluaranproyek`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -262,8 +257,6 @@ export default function App({ id, user }) {
           // harga: data.hargajual,
         }),
       });
-    const json = await res.json();
-    if (res.status == 400) return alert(json.message);
     updateDataPengeluaran();
     setForm({});
     onClose();
@@ -284,7 +277,7 @@ export default function App({ id, user }) {
   };
   const deleteButtonPressPembayaran = async (id) => {
     if (confirm("Hapus pembayaran?")) {
-      const res = await fetch(`${api_path}pembayaranproyek`, {
+      const json = await apiFetch(`${api_path}pembayaranproyek`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -292,7 +285,6 @@ export default function App({ id, user }) {
         },
         body: JSON.stringify({ id }),
       });
-      const json = await res.json();
       // return alert(json.message);
       pembayaranproyek.mutate();
       pembayaranProyek.mutate();
@@ -300,7 +292,7 @@ export default function App({ id, user }) {
   };
   const tambahButtonPressPembayaran = async (form) => {
     // if (select.size == 0) return alert("Produk belum dipilih.");
-    const res = await fetch(`${api_path}pembayaranproyek`, {
+    const json = await apiFetch(`${api_path}pembayaranproyek`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -311,8 +303,6 @@ export default function App({ id, user }) {
         id_proyek: id,
       }),
     });
-    const json = await res.json();
-    if (res.status == 400) return alert(json.message);
     setFormPembayaran({
       ...formPembayaran,
       nominal: 0,
@@ -321,7 +311,7 @@ export default function App({ id, user }) {
     pembayaranProyek.mutate();
   };
   const simpanButtonPressPembayaran = async (data, onClose) => {
-    const res = await fetch(`${api_path}pembayaranproyek`, {
+    const json = await apiFetch(`${api_path}pembayaranproyek`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -329,8 +319,6 @@ export default function App({ id, user }) {
       },
       body: JSON.stringify(data),
     });
-    const json = await res.json();
-    if (res.status == 400) return alert(json.message);
     const startdate = new Date();
     setFormPembayaran({
       selectMetodePembayaran: new Set([String(data.id_metodepembayaran)]),

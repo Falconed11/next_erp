@@ -1,4 +1,5 @@
 "use client";
+import { v4 as uuidv4 } from "uuid";
 import React, {
   useCallback,
   useState,
@@ -6,7 +7,6 @@ import React, {
   useRef,
   useEffect,
 } from "react";
-import { v4 as uuidv4 } from "uuid";
 import * as XLSX from "xlsx";
 import Link from "next/link";
 import {
@@ -96,6 +96,7 @@ import {
 import { useFilter } from "@react-aria/i18n";
 import ModalTransferData from "@/components/modaltransferdata";
 import { useClientFetch } from "@/hooks/useClientFetch";
+import { apiFetch } from "@/app/utils/fetchHelper";
 import { patchProduk } from "@/services/produk/produk.service";
 import { CalendarDate, today } from "@internationalized/date";
 import { number2Nominal } from "@/app/utils/number";
@@ -184,28 +185,25 @@ export default function App({ id, user }) {
       form.stok > 0
     )
       return alert("Jika mengisi stok maka vendor wajib dipilih!");
-    const res = await fetch(`${apiPath}produk`, {
-      method,
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify({
-        ...form,
-        ...(method == "POST"
-          ? {
-              tanggal: dateHeroUIToMysql(form.tanggalHarga),
-              tanggalMasuk: dateHeroUIToMysql(form.tanggalMasuk),
-              jatuhTempo: dateHeroUIToMysql(form.jatuhTempo),
-            }
-          : { tanggal: form.tanggalHarga }),
-      }),
-    });
-    const json = await res.json();
-    if (res.status == 400) return alert(json.message);
-    produk.mutate();
-    onClose();
-    // return alert(json.message);
+    try {
+      await apiFetch(`${apiPath}produk`, {
+        method,
+        body: JSON.stringify({
+          ...form,
+          ...(method == "POST"
+            ? {
+                tanggal: dateHeroUIToMysql(form.tanggalHarga),
+                tanggalMasuk: dateHeroUIToMysql(form.tanggalMasuk),
+                jatuhTempo: dateHeroUIToMysql(form.jatuhTempo),
+              }
+            : { tanggal: form.tanggalHarga }),
+        }),
+      });
+      produk.mutate();
+      onClose();
+    } catch (error) {
+      alert(error.message || "Save failed");
+    }
   };
   const tambahButtonPress = () => {
     const now = today();
@@ -247,17 +245,15 @@ export default function App({ id, user }) {
   };
   const deleteButtonPress = async (id) => {
     if (confirm("Hapus product?")) {
-      const res = await fetch(`${apiPath}produk`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          // 'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: JSON.stringify({ id }),
-      });
-      const json = await res.json();
-      if (res.status == 400) return alert(json.message);
-      produk.mutate();
+      try {
+        await apiFetch(`${apiPath}produk`, {
+          method: "DELETE",
+          body: JSON.stringify({ id }),
+        });
+        produk.mutate();
+      } catch (error) {
+        alert(error.message || "Delete failed");
+      }
       // return alert(await res.json().then((json) => json.message));
     }
   };
@@ -273,19 +269,17 @@ export default function App({ id, user }) {
   };
   const onSave = async (onClose) => {
     // if (form.isSwasta.size == 0) return alert("Swasta/Negri belum diisi");
-    const res = await fetch(`${apiPath}transferproduk`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify({ curId, newId }),
-    });
-    const json = await res.json();
-    if (res.status == 400) return alert(json.message);
-    produk.mutate();
-    alert(json.message);
-    onClose();
+    try {
+      const json = await apiFetch(`${apiPath}transferproduk`, {
+        method: "PUT",
+        body: JSON.stringify({ curId, newId }),
+      });
+      produk.mutate();
+      alert(json.message);
+      onClose();
+    } catch (error) {
+      alert(error.message || "Transfer failed");
+    }
     //return alert(json.message);
   };
 
@@ -299,24 +293,17 @@ export default function App({ id, user }) {
     if (json.length == 0) return alert("File belum dipilih");
     setReportList([]);
     try {
-      const responses = await Promise.all(
+      const dataArray = await Promise.all(
         json.map((v) =>
-          fetch(`${apiPath}produk`, {
+          apiFetch(`${apiPath}produk`, {
             method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              // 'Content-Type': 'application/x-www-form-urlencoded',
-            },
             body: JSON.stringify(v),
           }),
         ),
       );
-      const dataArray = await Promise.all(
-        responses.map((response) => response.json()),
-      );
       setReportList(dataArray.map((v, i) => `${i}. ${v.message}`));
-    } catch (e) {
-      console.error(e);
+    } catch (error) {
+      alert(error.message || "Upload failed");
     }
     setJson([]);
     report.onOpen();
@@ -362,24 +349,22 @@ export default function App({ id, user }) {
   const onSimpanClick = async (onClose) => {
     // if (form.jumlah <= 0 || form.harga < 0 || !form.harga)
     //   return alert("Jumlah, dan Harga wajib diisi!");
-    const res = await fetch(`${apiPath}produkmasuk`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify({
-        ...form,
-        harga: form.hargamodal,
-        tanggal: dateHeroUIToMysql(form.tanggal),
-        tanggalHarga: dateHeroUIToMysql(form.tanggalHarga),
-        jatuhTempo: dateHeroUIToMysql(form.jatuhTempo),
-      }),
-    });
-    const json = await res.json();
-    if (res.status == 400) return alert(json.message);
-    produk.mutate();
-    onClose();
+    try {
+      await apiFetch(`${apiPath}produkmasuk`, {
+        method: "POST",
+        body: JSON.stringify({
+          ...form,
+          harga: form.hargamodal,
+          tanggal: dateHeroUIToMysql(form.tanggal),
+          tanggalHarga: dateHeroUIToMysql(form.tanggalHarga),
+          jatuhTempo: dateHeroUIToMysql(form.jatuhTempo),
+        }),
+      });
+      produk.mutate();
+      onClose();
+    } catch (error) {
+      alert(error.message || "Save failed");
+    }
     // return alert(json.message);
   };
 
@@ -407,17 +392,15 @@ export default function App({ id, user }) {
       )
         return alert("Serial number belum diisi.");
     }
-    const res = await fetch(`${apiPath}produkkeluar`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify({ ...form, serialnumbers: inputs }),
-    });
-    const json = await res.json();
-    if (res.status == 400) return alert(json.message);
-    onClose();
+    try {
+      await apiFetch(`${apiPath}produkkeluar`, {
+        method: "POST",
+        body: JSON.stringify({ ...form, serialnumbers: inputs }),
+      });
+      onClose();
+    } catch (error) {
+      alert(error.message || "Save failed");
+    }
     // return alert(json.message);
   };
 

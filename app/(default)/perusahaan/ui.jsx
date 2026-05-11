@@ -35,6 +35,7 @@ import { renderQueryStates, rolesCheck } from "@/app/utils/tools";
 import { Button } from "@heroui/react";
 import { Input, Textarea } from "@heroui/react";
 import { useClientFetch } from "@/hooks/useClientFetch";
+import { apiFetch } from "@/app/utils/fetchHelper";
 
 const api_path = getApiPath();
 
@@ -57,16 +58,15 @@ export default function App({ user }) {
   };
   const deleteButtonPress = async (id) => {
     if (confirm("Hapus perusahaan?")) {
-      const res = await fetch(`${api_path}perusahaan`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          // 'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: JSON.stringify({ id }),
-      });
-      const json = await res.json();
-      return alert(json.message);
+      try {
+        const json = await apiFetch(`${api_path}perusahaan`, {
+          method: "DELETE",
+          body: JSON.stringify({ id }),
+        });
+        alert(json.message);
+      } catch (error) {
+        alert(error.message || "Delete failed");
+      }
     }
   };
   const simpanButtonPress = async (data) => {
@@ -75,13 +75,15 @@ export default function App({ user }) {
       if (key !== "newLogo") formData.append(key, value);
     });
     formData.append("file", data.newLogo);
-    const res = await fetch(`${api_path}perusahaan`, {
-      method,
-      body: formData,
-    });
-    const json = await res.json();
-    if (res.status == 400) return alert(json.message);
-    perusahaan.mutate();
+    try {
+      await apiFetch(`${api_path}perusahaan`, {
+        method,
+        body: formData,
+      });
+      perusahaan.mutate();
+    } catch (error) {
+      alert(error.message || "Save failed");
+    }
     modal.perusahaan.onClose();
     // return alert(json.message);
   };
