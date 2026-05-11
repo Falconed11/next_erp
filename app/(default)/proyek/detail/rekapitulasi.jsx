@@ -122,8 +122,8 @@ export default function Rekapitulasi({
           <div className="text-right">
             <Button
               isDisabled={!isAuthorized}
-              color="primary"
-              onPress={editButtonPress}
+              color="primary" variant="solid"
+              onClick={editButtonPress}
             >
               Edit
             </Button>
@@ -177,12 +177,12 @@ export default function Rekapitulasi({
                 </div>
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
+                <Button color="danger" variant="flat" onClick={onClose}>
                   Batal
                 </Button>
                 <Button
-                  color="primary"
-                  onPress={() =>
+                  color="primary" variant="solid"
+                  onClick={() =>
                     handleButtonSimpan(
                       formPeralatan.diskon,
                       formInstalasi.diskon,

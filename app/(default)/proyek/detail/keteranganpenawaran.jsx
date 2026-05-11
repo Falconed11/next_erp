@@ -98,7 +98,7 @@ export default function KeteranganPenawaran({
                   <EditIcon />
                 </span>
               </Tooltip>
-              <Tooltip color="danger" content="Delete">
+              <Tooltip color="danger" variant="solid" content="Delete">
                 <span
                   onClick={async () => {
                     if (confirm("Hapus keterangan?")) {
@@ -160,8 +160,8 @@ export default function KeteranganPenawaran({
         topContent={
           <div>
             <Button
-              color="primary"
-              onPress={() => {
+              color="primary" variant="solid"
+              onClick={() => {
                 setForm({ ...form, mode: "Tambah" });
                 onOpen();
               }}
@@ -218,12 +218,12 @@ export default function KeteranganPenawaran({
                 />
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
+                <Button color="danger" variant="flat" onClick={onClose}>
                   Batal
                 </Button>
                 <Button
-                  color="primary"
-                  onPress={() => simpanButtonPress(form, onClose)}
+                  color="primary" variant="solid"
+                  onClick={() => simpanButtonPress(form, onClose)}
                 >
                   Simpan
                 </Button>

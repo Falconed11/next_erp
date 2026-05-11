@@ -44,10 +44,10 @@ const TransferBankModal = ({
               <TransferBankForm form={form} setForm={setForm} />
             </ModalBody>
             <ModalFooter>
-              <Button color="danger" variant="light" onPress={onClose}>
+              <Button color="danger" variant="flat" onClick={onClose}>
                 Batal
               </Button>
-              <Button color="primary" onPress={() => saveButtonPress(onClose)}>
+              <Button color="primary" variant="solid" onClick={() => saveButtonPress(onClose)}>
                 Simpan
               </Button>
             </ModalFooter>
@@ -77,7 +77,7 @@ const TransferBankForm = ({ form, setForm }) => {
           }
         />
         <Button
-          onPress={() => {
+          onClick={() => {
             const now = new Date();
             setForm({
               ...form,
@@ -86,7 +86,7 @@ const TransferBankForm = ({ form, setForm }) => {
           }}
           className="ml-2"
           size="sm"
-          color="primary"
+          color="primary" variant="solid"
         >
           Sekarang
         </Button>
@@ -111,14 +111,14 @@ const TransferBankForm = ({ form, setForm }) => {
         formatOptions={{
           useGrouping: false,
         }}
-        variant="bordered"
+        color="default" variant="bordered"
         label="Nominal"
         placeholder="Masukkan nominal!"
         value={form.nominal}
         onValueChange={(val) => setForm({ ...form, nominal: val })}
       />
       <Textarea
-        variant="bordered"
+        color="default" variant="bordered"
         label="Keterangan"
         labelPlacement="inside"
         placeholder="Masukkan keterangan! (Opsional)"

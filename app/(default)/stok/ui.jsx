@@ -141,7 +141,7 @@ export default function App({ id_proyek }) {
                 <EditIcon />
               </span>
             </Tooltip>
-            <Tooltip color="danger" content="Delete">
+            <Tooltip color="danger" variant="solid" content="Delete">
               <span
                 onClick={() => deleteButtonPress(data.id)}
                 className="text-lg text-danger cursor-pointer active:opacity-50"
@@ -232,7 +232,7 @@ export default function App({ id_proyek }) {
 
   return (
     <div className="flex-col">
-      <Button className="bg-background" onPress={tambahButtonPress}>
+      <Button className="bg-background" onClick={tambahButtonPress}>
         Tambah
       </Button>
       <Modal
@@ -425,10 +425,10 @@ export default function App({ id_proyek }) {
                 />
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
+                <Button color="danger" variant="flat" onClick={onClose}>
                   Batal
                 </Button>
-                <Button color="primary" onPress={saveButtonPress}>
+                <Button color="primary" variant="solid" onClick={saveButtonPress}>
                   Simpan
                 </Button>
               </ModalFooter>
@@ -499,7 +499,7 @@ function KembaliButton({ id_proyek }) {
     return (
       <>
         <Link href={`/proyek/detail?id=${id_proyek}`}>
-          <Button color="primary">Kembalik ke Proyek {"==>"}</Button>
+          <Button color="primary" variant="solid">Kembalik ke Proyek {"==>"}</Button>
         </Link>
       </>
     );

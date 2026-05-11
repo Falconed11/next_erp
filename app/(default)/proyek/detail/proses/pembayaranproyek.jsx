@@ -59,9 +59,9 @@ export default function PembayaranProyek({
         endContent={
           <Button
             isDisabled={!piutang}
-            color="primary"
+            color="primary" variant="solid"
             size="sm"
-            onPress={() => setForm((prev) => ({ ...prev, nominal: piutang }))}
+            onClick={() => setForm((prev) => ({ ...prev, nominal: piutang }))}
           >
             Terapkan
           </Button>

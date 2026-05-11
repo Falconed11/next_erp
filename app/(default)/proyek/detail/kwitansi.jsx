@@ -51,12 +51,12 @@ export default function Kwitansi({ proyek, nilaiProyek }) {
         <div>
           <Button
             isDisabled={!lengthPembayaran}
-            onPress={() => {
+            onClick={() => {
               setVersi(lengthPembayaran - 1);
               onOpen();
             }}
             className=""
-            color="primary"
+            color="primary" variant="solid"
           >
             Kwitansi
           </Button>
@@ -177,7 +177,7 @@ export default function Kwitansi({ proyek, nilaiProyek }) {
                 </div>
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
+                <Button color="danger" variant="flat" onClick={onClose}>
                   Tutup
                 </Button>
                 <Tooltip
@@ -196,9 +196,9 @@ export default function Kwitansi({ proyek, nilaiProyek }) {
                 >
                   <div>
                     <Button
-                      color="primary"
+                      color="primary" variant="solid"
                       isDisabled={!isPrintable}
-                      onPress={handlePrintInvoice}
+                      onClick={handlePrintInvoice}
                     >
                       Cetak
                     </Button>

@@ -1,6 +1,13 @@
 import { useState } from "react";
 import TambahProduk from "../tambahproduk";
-import { Button, Input, NumberInput, Select, SelectItem } from "@heroui/react";
+import {
+  Button,
+  Input,
+  NumberInput,
+  Select,
+  SelectItem,
+  Divider,
+} from "@heroui/react";
 import {
   countPercentProvit,
   countPriceByPercentProfit,
@@ -147,10 +154,11 @@ export const TambahProdukPenawaran = ({
       <div className="text-right sticky absolute top-0 right-0 z-50">
         <Button
           className=""
-          onPress={() => {
+          onClick={() => {
             tambahButtonPress(form, setForm);
           }}
           color="primary"
+          variant="solid"
         >
           Tambah
         </Button>
@@ -384,10 +392,14 @@ const Penawaran = ({ proyek }) => {
               </div>
             </ModalBody>
             <ModalFooter>
-              <Button color="danger" variant="light" onPress={onClose}>
+              <Button color="danger" variant="flat" onClick={onClose}>
                 Tutup
               </Button>
-              <Button onPress={handlePrintPenawaran} color="primary">
+              <Button
+                onClick={handlePrintPenawaran}
+                color="primary"
+                variant="solid"
+              >
                 Cetak
               </Button>
             </ModalFooter>

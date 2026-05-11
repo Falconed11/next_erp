@@ -251,7 +251,7 @@ export default function App({ id, curDate, user }) {
                   }`}
                   icon={<NoteIcon />}
                 />
-                <Tooltip color="danger" content="Delete">
+                <Tooltip color="danger" variant="solid" content="Delete">
                   <span
                     onClick={() => deleteButtonPress(data)}
                     className="text-lg text-danger cursor-pointer active:opacity-50"
@@ -325,8 +325,8 @@ export default function App({ id, curDate, user }) {
       <div className="flex gap-2">
         <div>
           <Button
-            color="primary"
-            onPress={() => {
+            color="primary" variant="solid"
+            onClick={() => {
               setForm({ tanggal: new Date(), method: "POST" });
               modal.aktivitassales.onOpen();
             }}
@@ -351,7 +351,7 @@ export default function App({ id, curDate, user }) {
             </div>
             {isHighRole && (
               <Select
-                variant="bordered"
+                color="default" variant="bordered"
                 label="Pilih Karyawan"
                 placeholder="Pilih karyawan!"
                 selectedKeys={selectKaryawan}
@@ -373,7 +373,7 @@ export default function App({ id, curDate, user }) {
                 isCompact
                 showControls
                 showShadow
-                color="primary"
+                color="primary" variant="solid"
                 page={page}
                 total={pages}
                 onChange={(page) => setPage(page)}
@@ -435,7 +435,7 @@ export default function App({ id, curDate, user }) {
                   />
                 </div> */}
                 {/* <Select
-                  variant="bordered"
+                  color="default" variant="bordered"
                   label="Karyawan"
                   placeholder="Pilih karyawan!"
                   className=""
@@ -458,7 +458,7 @@ export default function App({ id, curDate, user }) {
                 {form.method == "PUT" && (
                   <Input
                     isDisabled
-                    variant="bordered"
+                    color="default" variant="bordered"
                     type="text"
                     label="Tanggal"
                     value={getDateFId(form.tanggal)}
@@ -467,7 +467,7 @@ export default function App({ id, curDate, user }) {
                 <AutocompleteCustomer form={form} setForm={setForm} />
                 <Select
                   isDisabled={isInstansiSelectedOrEmpty}
-                  variant="bordered"
+                  color="default" variant="bordered"
                   label="Pilih Swasta/Negri"
                   placeholder="Pilih S/N!"
                   selectedKeys={key2set(form.swasta)}
@@ -483,7 +483,7 @@ export default function App({ id, curDate, user }) {
                 </Select>
                 <Input
                   isDisabled={isInstansiSelectedOrEmpty}
-                  variant="bordered"
+                  color="default" variant="bordered"
                   type="text"
                   label="Kota"
                   placeholder="Masukkan kota!"
@@ -494,7 +494,7 @@ export default function App({ id, curDate, user }) {
                 />
                 <Textarea
                   isDisabled={isInstansiSelectedOrEmpty}
-                  variant="bordered"
+                  color="default" variant="bordered"
                   type="text"
                   label="Alamat"
                   placeholder="Masukkan alamat!"
@@ -504,7 +504,7 @@ export default function App({ id, curDate, user }) {
                   }}
                 />
                 <Textarea
-                  variant="bordered"
+                  color="default" variant="bordered"
                   value={form.aktivitas}
                   label="Aktivitas"
                   placeholder="Masukkan aktivitas!"
@@ -517,7 +517,7 @@ export default function App({ id, curDate, user }) {
                   }
                 />
                 <Textarea
-                  variant="bordered"
+                  color="default" variant="bordered"
                   value={form.catatan}
                   label="Catatan"
                   placeholder="Masukkan catatan!"
@@ -532,7 +532,7 @@ export default function App({ id, curDate, user }) {
                 {form.method == "PUT" && (
                   <>
                     <Input
-                      variant="bordered"
+                      color="default" variant="bordered"
                       type="text"
                       label="PIC"
                       placeholder="Masukkan PIC"
@@ -563,12 +563,12 @@ export default function App({ id, curDate, user }) {
                 )}
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
+                <Button color="danger" variant="flat" onClick={onClose}>
                   Batal
                 </Button>
                 <Button
-                  color="primary"
-                  onPress={() => simpanButtonPress(form, onClose)}
+                  color="primary" variant="solid"
+                  onClick={() => simpanButtonPress(form, onClose)}
                 >
                   Simpan
                 </Button>

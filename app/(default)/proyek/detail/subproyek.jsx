@@ -107,10 +107,10 @@ export default function SubProyek({ id, selectedProyek, isAuthorized }) {
           />
           <div>
             <Button
-              onPress={() => {
+              onClick={() => {
                 tambahSubProyekButtonPress();
               }}
-              color="primary"
+              color="primary" variant="solid"
             >
               Tambah
             </Button>
@@ -132,7 +132,7 @@ export default function SubProyek({ id, selectedProyek, isAuthorized }) {
                       <EditIcon />
                     </span>
                   </Tooltip>
-                  <Tooltip color="danger" content="Delete">
+                  <Tooltip color="danger" variant="solid" content="Delete">
                     <span
                       onClick={() => deleteButtonPress(data)}
                       className="text-lg text-danger cursor-pointer active:opacity-50"
@@ -175,9 +175,8 @@ export default function SubProyek({ id, selectedProyek, isAuthorized }) {
               </ModalBody>
               <ModalFooter>
                 <Button
-                  color="danger"
-                  variant="light"
-                  onPress={() => {
+                  color="danger" variant="flat"
+                  onClick={() => {
                     setForm({ nama: "" });
                     onClose();
                   }}
@@ -185,8 +184,8 @@ export default function SubProyek({ id, selectedProyek, isAuthorized }) {
                   Batal
                 </Button>
                 <Button
-                  color="primary"
-                  onPress={() => simpanButtonPress(form, onClose)}
+                  color="primary" variant="solid"
+                  onClick={() => simpanButtonPress(form, onClose)}
                 >
                   Simpan
                 </Button>

@@ -24,7 +24,7 @@ export default function App({ user }) {
   return (
     <Tooltip
       content={
-        <Button onPress={handleLogout} variant="bordered">
+        <Button onClick={handleLogout} color="default" variant="bordered">
           <GoSignOut />
           Signout
         </Button>

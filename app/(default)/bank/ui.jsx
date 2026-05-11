@@ -273,7 +273,7 @@ export default function App({ user }) {
                 mutate={metodepembayaran.mutate}
                 onFetch={saveMetodePembayaranV2}
               />
-              <Tooltip color="danger" content="Delete">
+              <Tooltip color="danger" variant="solid" content="Delete">
                 <span
                   onClick={() => deleteButtonPress(data.id)}
                   className="text-lg text-danger cursor-pointer active:opacity-50"
@@ -360,7 +360,7 @@ export default function App({ user }) {
             </Link>
           </div>
           <FileUploader onFileUpload={handleFileUpload} />
-          <Button color="primary" onPress={handleButtonUploadExcelPress}>
+          <Button color="primary" variant="solid" onClick={handleButtonUploadExcelPress}>
             Upload Excel
           </Button>
         </div> */}
@@ -425,7 +425,7 @@ export default function App({ user }) {
                 <SelectPerusahaan form={form} setForm={setForm} />
                 <Select
                   label="Bank"
-                  variant="bordered"
+                  color="default" variant="bordered"
                   placeholder="Pilih perusahaan!"
                   selectedKeys={form.selectbank}
                   className="max-w-xs"
@@ -494,12 +494,12 @@ export default function App({ user }) {
                 /> */}
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
+                <Button color="danger" variant="flat" onClick={onClose}>
                   Batal
                 </Button>
                 <Button
-                  color="primary"
-                  onPress={() => saveButtonPress(onClose)}
+                  color="primary" variant="solid"
+                  onClick={() => saveButtonPress(onClose)}
                 >
                   Simpan
                 </Button>
@@ -530,7 +530,7 @@ export default function App({ user }) {
                 />
                 <Select
                   label="Targer metodepembayaran"
-                  variant="bordered"
+                  color="default" variant="bordered"
                   placeholder="Pilih target metodepembayaran"
                   selectedKeys={form.selectedBank}
                   className="max-w-xs"
@@ -565,15 +565,14 @@ export default function App({ user }) {
               </ModalBody>
               <ModalFooter>
                 <Button
-                  color="danger"
-                  variant="light"
-                  onPress={transfer.onClose}
+                  color="danger" variant="flat"
+                  onClick={transfer.onClose}
                 >
                   Batal
                 </Button>
                 <Button
-                  color="primary"
-                  onPress={() => saveTransferButtonPress(transfer.onClose)}
+                  color="primary" variant="solid"
+                  onClick={() => saveTransferButtonPress(transfer.onClose)}
                 >
                   Simpan
                 </Button>
@@ -600,7 +599,7 @@ export default function App({ user }) {
                 ))}
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
+                <Button color="danger" variant="flat" onClick={onClose}>
                   Tutup
                 </Button>
               </ModalFooter>
@@ -677,7 +676,7 @@ const Bank = ({ bank, user }) => {
                 <EditIcon />
               </span>
             </Tooltip>
-            <Tooltip color="danger" content="Delete">
+            <Tooltip color="danger" variant="solid" content="Delete">
               <span
                 onClick={() => deleteButtonPress(data.id)}
                 className="text-lg text-danger cursor-pointer active:opacity-50"
@@ -770,10 +769,10 @@ const Bank = ({ bank, user }) => {
                 />
               </ModalBody>
               <ModalFooter className="w-full">
-                <Button color="danger" variant="light" onPress={onClose}>
+                <Button color="danger" variant="flat" onClick={onClose}>
                   Batal
                 </Button>
-                <Button type="submit" color="primary">
+                <Button type="submit" color="primary" variant="solid">
                   Simpan
                 </Button>
               </ModalFooter>

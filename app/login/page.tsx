@@ -4,6 +4,6 @@ export default async function app(props: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const searchParams = await props.searchParams;
-  const { error } = searchParams;
-  return <UI error={error} />;
+  const { error, redirect } = searchParams;
+  return <UI error={error} redirect={redirect} />;
 }

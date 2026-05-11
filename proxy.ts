@@ -1,6 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verify } from "jsonwebtoken";
 
+export function createLoginRedirectUrl(req: NextRequest, error: string) {
+  const requestedPath = `${req.nextUrl.pathname}${req.nextUrl.search}`;
+  const redirectParam = encodeURIComponent(requestedPath);
+  return new URL(`/login?error=${error}&redirect=${redirectParam}`, req.url);
+}
+
+export function redirectToLogin(req: NextRequest, error: string) {
+  return NextResponse.redirect(createLoginRedirectUrl(req, error));
+}
+
 export default function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
@@ -9,24 +19,21 @@ export default function proxy(req: NextRequest) {
   }
 
   const token = req.cookies.get("token")?.value;
+
   if (!token) {
     console.log("No token found, redirecting to login");
-    return NextResponse.redirect(new URL("/login?error=unauthorized", req.url));
+    return redirectToLogin(req, "unauthorized");
   }
 
   try {
     const user = verify(token, process.env.JWT_SECRET!);
     if (!user) {
       console.log("Invalid token, redirecting to login");
-      return NextResponse.redirect(
-        new URL("/login?error=invalid_token", req.url),
-      );
+      return redirectToLogin(req, "invalid_token");
     }
   } catch (err) {
     console.log("Error occurred while verifying token, redirecting to login");
-    return NextResponse.redirect(
-      new URL("/login?error=verification_failed", req.url),
-    );
+    return redirectToLogin(req, "verification_failed");
   }
 
   return NextResponse.next();

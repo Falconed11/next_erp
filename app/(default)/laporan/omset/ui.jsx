@@ -276,7 +276,7 @@ export default function App() {
                 <EditIcon />
               </span>
             </Tooltip>
-            <Tooltip color="danger" content="Delete">
+            <Tooltip color="danger" variant="solid" content="Delete">
               <span
                 onClick={() => deleteButtonPress(data.id)}
                 className="text-lg text-danger cursor-pointer active:opacity-50"
@@ -361,7 +361,7 @@ export default function App() {
   return (
     <div className="flex flex-col">
       {/* <div className="flex flex-row gap-2">
-        <Button color="primary" onPress={tambahButtonPress}>
+        <Button color="primary" variant="solid" onClick={tambahButtonPress}>
           Tambah
         </Button>
         <div>
@@ -373,7 +373,7 @@ export default function App() {
           </Link>
         </div>
         <FileUploader onFileUpload={handleFileUpload} />
-        <Button color="primary" onPress={handleButtonUploadExcelPress}>
+        <Button color="primary" variant="solid" onClick={handleButtonUploadExcelPress}>
           Upload Excel
         </Button>
       </div> */}
@@ -388,7 +388,7 @@ export default function App() {
               <RangeDate current={current} setCurrent={setCurrent} />
             </div>
             {/* <div className="flex flex-row gap-2"> */}
-            {/* <Button color="primary" onClick={handleButtonExportToExcelPress}>
+            {/* <Button color="primary" variant="solid" onClick={handleButtonExportToExcelPress}>
                 Export to Excel
               </Button>
             </div> */}
@@ -441,7 +441,7 @@ export default function App() {
               <ModalBody>
                 <Select
                   label="Perusahaan"
-                  variant="bordered"
+                  color="default" variant="bordered"
                   placeholder="Pilih omset!"
                   selectedKeys={form.selectperusahaan}
                   className="max-w-xs"
@@ -461,7 +461,7 @@ export default function App() {
                 </Select>
                 <Select
                   label="Swasta/Negri"
-                  variant="bordered"
+                  color="default" variant="bordered"
                   placeholder="Pilih swasta/negri!"
                   selectedKeys={form.isSwasta}
                   className="max-w-xs"
@@ -481,7 +481,7 @@ export default function App() {
                 </Select>
                 <Select
                   label="Kategori Proyek"
-                  variant="bordered"
+                  color="default" variant="bordered"
                   placeholder="Pilih kategori proyek!"
                   selectedKeys={form.selectkategoriproyek}
                   className="max-w-xs"
@@ -515,7 +515,7 @@ export default function App() {
                 />
                 <Select
                   label="Customer"
-                  variant="bordered"
+                  color="default" variant="bordered"
                   placeholder="Pilih customer!"
                   selectedKeys={form.selectcustomer}
                   className="max-w-xs"
@@ -542,7 +542,7 @@ export default function App() {
                 />
                 <Select
                   label="Sales"
-                  variant="bordered"
+                  color="default" variant="bordered"
                   placeholder="Pilih sales!"
                   selectedKeys={form.selectkaryawan}
                   className="max-w-xs"
@@ -563,7 +563,7 @@ export default function App() {
                 </Select>
                 {/* <Select
                   label="Status"
-                  variant="bordered"
+                  color="default" variant="bordered"
                   placeholder="Pilih status!"
                   selectedKeys={form.selectstatus}
                   className="max-w-xs"
@@ -601,12 +601,12 @@ export default function App() {
                 />
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
+                <Button color="danger" variant="flat" onClick={onClose}>
                   Batal
                 </Button>
                 <Button
-                  color="primary"
-                  onPress={() => saveButtonPress(onClose)}
+                  color="primary" variant="solid"
+                  onClick={() => saveButtonPress(onClose)}
                 >
                   Simpan
                 </Button>
@@ -633,7 +633,7 @@ export default function App() {
                 ))}
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
+                <Button color="danger" variant="flat" onClick={onClose}>
                   Tutup
                 </Button>
               </ModalFooter>

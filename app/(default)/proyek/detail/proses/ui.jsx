@@ -387,7 +387,7 @@ export default function App({ id, user }) {
                     <EditIcon />
                   </span>
                 </Tooltip>
-                <Tooltip color="danger" content="Delete">
+                <Tooltip color="danger" variant="solid" content="Delete">
                   <span
                     onClick={() => deleteButtonPress(data)}
                     className="text-lg text-danger cursor-pointer active:opacity-50"
@@ -429,7 +429,7 @@ export default function App({ id, user }) {
                   <EditIcon />
                 </span>
               </Tooltip>
-              <Tooltip color="danger" content="Delete">
+              <Tooltip color="danger" variant="solid" content="Delete">
                 <span
                   onClick={() => deleteButtonPressPembayaran(data.id)}
                   className="text-lg text-danger cursor-pointer active:opacity-50"
@@ -672,7 +672,7 @@ export default function App({ id, user }) {
       {/* tombol print */}
       {/* <div className="flex flex-row gap-2">
         <div>
-          <Button onClick={modal.nota.onOpen} color="primary" className="mt-3">
+          <Button onClick={modal.nota.onOpen} color="primary" variant="solid" className="mt-3">
             Nota
           </Button>
         </div>
@@ -702,7 +702,7 @@ export default function App({ id, user }) {
                     onPress={() => {
                       tambahButtonPressPembayaran(formPembayaran);
                     }}
-                    color="primary"
+                    color="primary" variant="solid"
                     className="ml-2"
                   >
                     Tambah
@@ -851,14 +851,14 @@ export default function App({ id, user }) {
               <div className="text-right">
                 <Button
                   isDisabled={!form.id_produk}
-                  onPress={() => {
+                  onClick={() => {
                     tambahButtonPress({
                       selectProduk,
                       selectKaryawan,
                       form,
                     });
                   }}
-                  color="primary"
+                  color="primary" variant="solid"
                   className="ml-2"
                 >
                   Tambah
@@ -1020,12 +1020,12 @@ export default function App({ id, user }) {
                 )}
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
+                <Button color="danger" variant="flat" onClick={onClose}>
                   Batal
                 </Button>
                 <Button
-                  color="primary"
-                  onPress={() => simpanButtonPress(form, onClose)}
+                  color="primary" variant="solid"
+                  onClick={() => simpanButtonPress(form, onClose)}
                 >
                   Simpan
                 </Button>
@@ -1057,9 +1057,8 @@ export default function App({ id, user }) {
               </ModalBody>
               <ModalFooter>
                 <Button
-                  color="danger"
-                  variant="light"
-                  onPress={() => {
+                  color="danger" variant="flat"
+                  onClick={() => {
                     const startdate = new Date();
                     setFormPembayaran({
                       selectMetodePembayaran: new Set([
@@ -1074,8 +1073,8 @@ export default function App({ id, user }) {
                   Batal
                 </Button>
                 <Button
-                  color="primary"
-                  onPress={() =>
+                  color="primary" variant="solid"
+                  onClick={() =>
                     simpanButtonPressPembayaran(formPembayaran, onClose)
                   }
                 >
@@ -1113,11 +1112,11 @@ export default function App({ id, user }) {
                 </div>
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
+                <Button color="danger" variant="flat" onClick={onClose}>
                   Tutup
                 </Button>
-                <Button color="primary">Cetak</Button>
-                <Button onPress={handlePrintNota} color="primary">
+                <Button color="primary" variant="solid">Cetak</Button>
+                <Button onClick={handlePrintNota} color="primary" variant="solid">
                   React to Print
                 </Button>
               </ModalFooter>

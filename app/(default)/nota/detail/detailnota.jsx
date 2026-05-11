@@ -159,7 +159,7 @@ export default function App({ id }) {
                   <EditIcon />
                 </span>
               </Tooltip>
-              <Tooltip color="danger" content="Delete">
+              <Tooltip color="danger" variant="solid" content="Delete">
                 <span
                   onClick={() => deleteButtonPress(data.id_keranjangnota)}
                   className="text-lg text-danger cursor-pointer active:opacity-50"
@@ -209,7 +209,7 @@ export default function App({ id }) {
                   <EditIcon />
                 </span>
               </Tooltip>
-              <Tooltip color="danger" content="Delete">
+              <Tooltip color="danger" variant="solid" content="Delete">
                 <span
                   onClick={() => deleteButtonPress(data.id_keranjangnota)}
                   className="text-lg text-danger cursor-pointer active:opacity-50"
@@ -342,7 +342,7 @@ export default function App({ id }) {
       {/* tombol print */}
       <div className="flex flex-row gap-2">
         <div>
-          <Button onClick={modal.nota.onOpen} color="primary" className="mt-3">
+          <Button onClick={modal.nota.onOpen} color="primary" variant="solid" className="mt-3">
             Nota
           </Button>
         </div>
@@ -362,7 +362,7 @@ export default function App({ id }) {
               disableVendor
             />
             <div>
-              <Button color="primary" onClick={() => tambahButtonPress(form)}>
+              <Button color="primary" variant="solid" onClick={() => tambahButtonPress(form)}>
                 Tambah
               </Button>
             </div>
@@ -455,12 +455,12 @@ export default function App({ id }) {
                 </div>
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
+                <Button color="danger" variant="flat" onClick={onClose}>
                   Batal
                 </Button>
                 <Button
-                  color="primary"
-                  onPress={() => simpanButtonPress(form, onClose)}
+                  color="primary" variant="solid"
+                  onClick={() => simpanButtonPress(form, onClose)}
                 >
                   Simpan
                 </Button>
@@ -563,11 +563,11 @@ export default function App({ id }) {
                 </div>
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
+                <Button color="danger" variant="flat" onClick={onClose}>
                   Tutup
                 </Button>
-                <Button color="primary">Cetak</Button>
-                <Button onClick={handlePrintNota} color="primary">
+                <Button color="primary" variant="solid">Cetak</Button>
+                <Button onClick={handlePrintNota} color="primary" variant="solid">
                   React to Print
                 </Button>
               </ModalFooter>

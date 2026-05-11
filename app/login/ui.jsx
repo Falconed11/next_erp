@@ -4,8 +4,10 @@ import { Input, Button, Form } from "@heroui/react";
 import Link from "next/link";
 import { EyeFilledIcon, EyeSlashFilledIcon } from "../../components/icon";
 import { apiFetch } from "../utils/fetchHelper";
+import { useRouter } from "next/navigation";
+import { updateForm } from "../utils/tools";
 
-export default function App({ error }) {
+export default function App({ error, redirect }) {
   const router = useRouter();
   const [isVisible, setIsVisible] = React.useState(false);
   const [form, setForm] = useState({ username: "", password: "" });
@@ -20,7 +22,7 @@ export default function App({ error }) {
         method: "POST",
         body: JSON.stringify(form),
       });
-      router.push("/");
+      router.push(redirect || "/");
     } catch (error) {
       alert(error.message || "Login failed");
     }
@@ -39,6 +41,7 @@ export default function App({ error }) {
           )}
           <div>
             <Input
+              color="default"
               variant="bordered"
               label="Username"
               placeholder="Masukkan username"
@@ -66,13 +69,14 @@ export default function App({ error }) {
               label="Password"
               placeholder="Enter your password"
               type={isVisible ? "text" : "password"}
+              color="default"
               variant="bordered"
               value={form.password}
               onValueChange={(val) => updateForm(setForm, { password: val })}
             />
           </div>
           <div className="flex flex-row-reverse">
-            <Button type="submit" color="primary">
+            <Button type="submit" color="primary" variant="solid">
               Login
             </Button>
           </div>

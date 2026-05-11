@@ -233,7 +233,7 @@ export default function UI() {
                 <EditIcon />
               </span>
             </Tooltip>
-            <Tooltip color="danger" content="Delete">
+            <Tooltip color="danger" variant="solid" content="Delete">
               <span
                 onClick={() => deleteButtonPress(data.id_pengeluaranproyek)}
                 className="text-lg text-danger cursor-pointer active:opacity-50"
@@ -334,7 +334,7 @@ export default function UI() {
           </Link>
         </div>
         <FileUploader onFileUpload={handleFileUpload} />
-        <Button color="primary" onPress={handleButtonUploadExcelPress}>
+        <Button color="primary" variant="solid" onClick={handleButtonUploadExcelPress}>
           Upload Excel
         </Button>
       </div> */}
@@ -367,7 +367,7 @@ export default function UI() {
               </div>
             </div>
             {/* <div className="flex flex-row gap-2">
-              <Button color="primary" onClick={handleButtonExportToExcelPress}>
+              <Button color="primary" variant="solid" onClick={handleButtonExportToExcelPress}>
                 Export to Excel
               </Button>
             </div> */}
@@ -380,7 +380,7 @@ export default function UI() {
                 isCompact
                 showControls
                 showShadow
-                color="primary"
+                color="primary" variant="solid"
                 page={page}
                 total={pages}
                 onChange={(page) => setPage(page)}
@@ -500,12 +500,12 @@ export default function UI() {
                 /> */}
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
+                <Button color="danger" variant="flat" onClick={onClose}>
                   Batal
                 </Button>
                 <Button
-                  color="primary"
-                  onPress={() => simpanButtonPress(form, onClose)}
+                  color="primary" variant="solid"
+                  onClick={() => simpanButtonPress(form, onClose)}
                 >
                   Simpan
                 </Button>
@@ -532,7 +532,7 @@ export default function UI() {
                 ))}
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
+                <Button color="danger" variant="flat" onClick={onClose}>
                   Tutup
                 </Button>
               </ModalFooter>

@@ -75,7 +75,7 @@ export default function App({ user }) {
                 ))}
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
+                <Button color="danger" variant="flat" onClick={onClose}>
                   Tutup
                 </Button>
               </ModalFooter>

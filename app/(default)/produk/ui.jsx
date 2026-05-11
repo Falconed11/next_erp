@@ -524,7 +524,7 @@ export default function App({ id, user }) {
                 mutate={produk.mutate}
                 user={user}
               />
-              <Tooltip color="danger" content="Delete">
+              <Tooltip color="danger" variant="solid" content="Delete">
                 <span
                   onClick={() => deleteButtonPress(data.id)}
                   className="text-lg text-danger cursor-pointer active:opacity-50"
@@ -678,25 +678,19 @@ export default function App({ id, user }) {
   //   return acc;
   // }, []);
   const classCompByRole = isHighRole ? "" : "hidden";
-  // if (form.id_kategori) {
-  //   filteredsubkategori = subkategori.data.filter((item) => {
-  //     if (item.id_kategoriproduk == form.id_kategori) return item;
-  //   });
-  // }
-  const isPriceSame = form.hargamodal == form.harga;
-  const { isUpdateHarga } = form;
-  // console.log(form);
+
+  console.log(produk);
   return (
     <div className="">
       <div className="flex flex-col gap-2">
         <div className="flex gap-2">
           {isHighRole && (
-            <Button color="primary" onPress={tambahButtonPress}>
+            <Button color="primary" variant="solid" onClick={tambahButtonPress}>
               Tambah
             </Button>
           )}
           <div className="flex flex-row gap-2">
-            <Button color="primary" onPress={exportStok}>
+            <Button color="primary" variant="solid" onClick={exportStok}>
               Export Stok
             </Button>
           </div>
@@ -743,7 +737,7 @@ export default function App({ id, user }) {
               setIsShowInactive={setIsShowInactive}
             />
             {/* <div className="flex flex-row gap-2">
-              <Button color="primary" onClick={handleButtonExportToExcelPress}>
+              <Button color="primary" variant="solid" onClick={handleButtonExportToExcelPress}>
                 Export to Excel
               </Button>
             </div> */}
@@ -766,6 +760,7 @@ export default function App({ id, user }) {
                 showControls
                 showShadow
                 color="primary"
+                variant="solid"
                 page={page}
                 total={pages}
                 onChange={(page) => setPage(page)}
@@ -817,12 +812,13 @@ export default function App({ id, user }) {
                 <FormProduct form={form} setForm={setForm} user={user} />
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
+                <Button color="danger" variant="flat" onClick={onClose}>
                   Batal
                 </Button>
                 <Button
                   color="primary"
-                  onPress={() => saveButtonPress(onClose)}
+                  variant="solid"
+                  onClick={() => saveButtonPress(onClose)}
                 >
                   Simpan
                 </Button>
@@ -851,7 +847,7 @@ export default function App({ id, user }) {
                 ))}
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
+                <Button color="danger" variant="flat" onClick={onClose}>
                   Tutup
                 </Button>
               </ModalFooter>
@@ -974,10 +970,14 @@ export default function App({ id, user }) {
                 )}
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
+                <Button color="danger" variant="flat" onClick={onClose}>
                   Batal
                 </Button>
-                <Button color="primary" onPress={() => onSimpanClick(onClose)}>
+                <Button
+                  color="primary"
+                  variant="solid"
+                  onClick={() => onSimpanClick(onClose)}
+                >
                   Simpan
                 </Button>
               </ModalFooter>
@@ -1004,7 +1004,7 @@ export default function App({ id, user }) {
                 </div>
                 {/* <Autocomplete
                   label="Vendor"
-                  variant="bordered"
+                  color="default" variant="bordered"
                   defaultItems={vendor.data}
                   placeholder="Cari vendor"
                   className="max-w-xs"
@@ -1063,8 +1063,8 @@ export default function App({ id, user }) {
                             inputs.length !== 1 ? (
                               <Button
                                 color="danger"
-                                variant="light"
-                                onPress={() => removeInput(input.id)}
+                                variant="flat"
+                                onClick={() => removeInput(input.id)}
                               >
                                 Hapus
                               </Button>
@@ -1079,7 +1079,11 @@ export default function App({ id, user }) {
                     ))}
                     {inputs.length < form.stok ? (
                       <div>
-                        <Button color="primary" onPress={addInput}>
+                        <Button
+                          color="primary"
+                          variant="solid"
+                          onClick={addInput}
+                        >
                           Tambah SN
                         </Button>
                       </div>
@@ -1125,12 +1129,13 @@ export default function App({ id, user }) {
                 />
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
+                <Button color="danger" variant="flat" onClick={onClose}>
                   Batal
                 </Button>
                 <Button
                   color="primary"
-                  onPress={() => onSimpanProdukKeluarClick(onClose)}
+                  variant="solid"
+                  onClick={() => onSimpanProdukKeluarClick(onClose)}
                 >
                   Simpan
                 </Button>

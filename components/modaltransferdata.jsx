@@ -3,12 +3,11 @@ import {
   Autocomplete,
   AutocompleteItem,
   Button,
-  Input,
   Modal,
-  ModalBody,
   ModalContent,
-  ModalFooter,
   ModalHeader,
+  ModalBody,
+  ModalFooter,
 } from "@heroui/react";
 
 const ModalTransferData = ({
@@ -35,17 +34,6 @@ const ModalTransferData = ({
               Transfer {title}
             </ModalHeader>
             <ModalBody>
-              {/* <Input
-                isDisabled={1}
-                type="text"
-                label={`${title} Terpilih`}
-                value={
-                  <>
-                    {capitalizeEachWord(name)} {customLabel?.(selected)}
-                  </>
-                }
-                className="max-w-xs"
-              /> */}
               <div>{title} Terpilih :</div>
               <div>
                 {capitalizeEachWord(name)}{" "}
@@ -54,7 +42,7 @@ const ModalTransferData = ({
               <Autocomplete
                 isVirtualized={false}
                 label={`Target ${title}`}
-                variant="bordered"
+                color="default" variant="bordered"
                 placeholder={`Pilih target ${title}`}
                 defaultItems={data}
                 defaultSelectedKey={newId}
@@ -77,13 +65,13 @@ const ModalTransferData = ({
               </Autocomplete>
             </ModalBody>
             <ModalFooter>
-              <Button color="danger" variant="light" onPress={onClose}>
+              <Button color="danger" variant="flat" onClick={onClose}>
                 Batal
               </Button>
               <Button
                 isDisabled={!newId}
-                color="primary"
-                onPress={() => onSave(onClose)}
+                color="primary" variant="solid"
+                onClick={() => onSave(onClose)}
               >
                 Transfer
               </Button>

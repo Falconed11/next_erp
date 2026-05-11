@@ -327,7 +327,7 @@ export default function App({ id_produk, user }) {
                 <MinIcon />
               </span>
             </Tooltip> */}
-            <Tooltip color="danger" content="Delete">
+            <Tooltip color="danger" variant="solid" content="Delete">
               <span
                 onClick={() => deleteButtonPress(data)}
                 className="text-lg text-danger cursor-pointer active:opacity-50"
@@ -487,7 +487,7 @@ export default function App({ id_produk, user }) {
   return (
     <div className="flex flex-col gap-2">
       {/* <div className="flex flex-row gap-2">
-        <Button color="primary" onPress={tambahButtonPress}>
+        <Button color="primary" variant="solid" onClick={tambahButtonPress}>
           Tambah
         </Button>
         <div>
@@ -499,17 +499,17 @@ export default function App({ id_produk, user }) {
           </Link>
         </div>
         <FileUploader onFileUpload={handleFileUpload} />
-        <Button color="primary" onPress={handleButtonUploadExcelPress}>
+        <Button color="primary" variant="solid" onClick={handleButtonUploadExcelPress}>
           Upload Excel
         </Button>
       </div> */}
       {/* Table Laporan Stok */}
       <div className="flex gap-2">
-        <Button onPress={handlePrintLaporanStok} color="primary">
+        <Button onClick={handlePrintLaporanStok} color="primary" variant="solid">
           Cetak
         </Button>
         <Button
-          onPress={() => {
+          onClick={() => {
             const date = new Date();
             const format = result.map((i, index) => ({
               id: i.id,
@@ -538,7 +538,7 @@ export default function App({ id_produk, user }) {
               `Laporan Stok_${getDate(date)}_${getTime(date)}_${user.peran}`,
             );
           }}
-          color="primary"
+          color="primary" variant="solid"
         >
           Export
         </Button>
@@ -585,7 +585,7 @@ export default function App({ id_produk, user }) {
           //         isCompact
           //         showControls
           //         showShadow
-          //         color="primary"
+          //         color="primary" variant="solid"
           //         page={page}
           //         total={pages}
           //         onChange={(page) => setPage(page)}
@@ -674,7 +674,7 @@ export default function App({ id_produk, user }) {
                 />
                 <Autocomplete
                   label="Vendor"
-                  variant="bordered"
+                  color="default" variant="bordered"
                   defaultItems={vendor.data}
                   placeholder="Cari vendor"
                   className="max-w-xs"
@@ -756,12 +756,12 @@ export default function App({ id_produk, user }) {
                 />
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
+                <Button color="danger" variant="flat" onClick={onClose}>
                   Batal
                 </Button>
                 <Button
-                  color="primary"
-                  onPress={() => saveButtonPress(onClose)}
+                  color="primary" variant="solid"
+                  onClick={() => saveButtonPress(onClose)}
                 >
                   Simpan
                 </Button>

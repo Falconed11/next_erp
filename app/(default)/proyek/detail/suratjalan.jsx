@@ -119,8 +119,8 @@ export default function SuratJalan({ id_proyek, versi, isAuthorized }) {
   return (
     <>
       <Button
-        color="primary"
-        onPress={() => {
+        color="primary" variant="solid"
+        onClick={() => {
           setForm({
             alamatsuratjalan: selectedProyek.alamatsuratjalan,
             tanggalsuratjalan: selectedProyek.tanggalsuratjalan,
@@ -148,7 +148,7 @@ export default function SuratJalan({ id_proyek, versi, isAuthorized }) {
                     <div className="flex gap-2">
                       <Textarea
                         type="text"
-                        variant="bordered"
+                        color="default" variant="bordered"
                         className=""
                         label="Alamat"
                         placeholder="Masukkan alamat!"
@@ -177,8 +177,8 @@ export default function SuratJalan({ id_proyek, versi, isAuthorized }) {
                     <div className="flex gap-2 justify-end">
                       <div>
                         <Button
-                          color="primary"
-                          onPress={() => {
+                          color="primary" variant="solid"
+                          onClick={() => {
                             setForm({
                               alamatsuratjalan: selectedProyek.alamatsuratjalan,
                               tanggalsuratjalan:
@@ -191,8 +191,8 @@ export default function SuratJalan({ id_proyek, versi, isAuthorized }) {
                       </div>
                       <div>
                         <Button
-                          color="primary"
-                          onPress={async () => {
+                          color="primary" variant="solid"
+                          onClick={async () => {
                             const json = await apiFetch(`${apiPath}proyek`, {
                               method: "PUT",
                               headers: {
@@ -349,16 +349,15 @@ export default function SuratJalan({ id_proyek, versi, isAuthorized }) {
               </ModalBody>
               <ModalFooter>
                 <Button
-                  color="danger"
-                  variant="light"
-                  onPress={() => {
+                  color="danger" variant="flat"
+                  onClick={() => {
                     setForm({});
                     onClose();
                   }}
                 >
                   Tutup
                 </Button>
-                <Button color="primary" onPress={handlePrintInvoice}>
+                <Button color="primary" variant="solid" onClick={handlePrintInvoice}>
                   Cetak
                 </Button>
               </ModalFooter>

@@ -271,7 +271,7 @@ export const ToDoList = ({ user }) => {
               icon={<EyeIcon />}
               link={`/produk?id=${data.id_produk || null}`}
             />
-            <Tooltip color="danger" content="Delete">
+            <Tooltip color="danger" variant="solid" content="Delete">
               <span
                 onClick={() => deleteButtonPress(data)}
                 className="text-lg text-danger cursor-pointer active:opacity-50"
@@ -360,6 +360,7 @@ export const ToDoList = ({ user }) => {
               </ModalHeader>
               <ModalBody>
                 <Input
+                  color="default"
                   variant="bordered"
                   type="text"
                   label="Kegiatan"
@@ -373,6 +374,7 @@ export const ToDoList = ({ user }) => {
                   }
                 />
                 <Textarea
+                  color="default"
                   variant="bordered"
                   label="Keterangan"
                   placeholder="Masukkan keterangan!"
@@ -397,6 +399,7 @@ export const ToDoList = ({ user }) => {
                 </div>
                 <Select
                   label="Status"
+                  color="default"
                   variant="bordered"
                   placeholder="Pilih status!"
                   // disallowEmptySelection
@@ -419,8 +422,8 @@ export const ToDoList = ({ user }) => {
               <ModalFooter>
                 <Button
                   color="danger"
-                  variant="light"
-                  onPress={() => {
+                  variant="flat"
+                  onClick={() => {
                     setForm({});
                     onClose();
                   }}
@@ -429,7 +432,8 @@ export const ToDoList = ({ user }) => {
                 </Button>
                 <Button
                   color="primary"
-                  onPress={() => simpanButtonPress(form, onClose)}
+                  variant="solid"
+                  onClick={() => simpanButtonPress(form, onClose)}
                 >
                   Simpan
                 </Button>
@@ -506,7 +510,7 @@ export const StatusToDoList = () => {
               icon={<EyeIcon />}
               link={`/produk?id=${data.id_produk || null}`}
             />
-            <Tooltip color="danger" content="Delete">
+            <Tooltip color="danger" variant="solid" content="Delete">
               <span
                 onClick={() => deleteButtonPress(data)}
                 className="text-lg text-danger cursor-pointer active:opacity-50"
@@ -583,6 +587,7 @@ export const StatusToDoList = () => {
               </ModalHeader>
               <ModalBody>
                 <Input
+                  color="default"
                   variant="bordered"
                   type="text"
                   label="Status"
@@ -596,6 +601,7 @@ export const StatusToDoList = () => {
                   }
                 />
                 <Textarea
+                  color="default"
                   variant="bordered"
                   label="Keterangan"
                   placeholder="Masukkan keterangan!"
@@ -606,8 +612,8 @@ export const StatusToDoList = () => {
               <ModalFooter>
                 <Button
                   color="danger"
-                  variant="light"
-                  onPress={() => {
+                  variant="flat"
+                  onClick={() => {
                     setForm({});
                     onClose();
                   }}
@@ -616,7 +622,8 @@ export const StatusToDoList = () => {
                 </Button>
                 <Button
                   color="primary"
-                  onPress={() => simpanButtonPress(form, onClose)}
+                  variant="solid"
+                  onClick={() => simpanButtonPress(form, onClose)}
                 >
                   Simpan
                 </Button>
@@ -630,7 +637,7 @@ export const StatusToDoList = () => {
 };
 export const MyAddButton = ({ onPress }) => {
   return (
-    <Button variant="shadow" size="sm" color="primary" onPress={onPress}>
+    <Button variant="shadow" size="sm" color="primary" onClick={onPress}>
       <span className="text-xl font-bold">
         <AddIcon />
       </span>
@@ -645,7 +652,7 @@ export const TableHeaderWithAddButton = ({ title, onPress, isHighRole }) => (
   <div className="flex justify-between items-center">
     <TableTitle>{title}</TableTitle>
     {isHighRole && (
-      <Button onPress={onPress} variant="shadow" size="sm" color="primary">
+      <Button onClick={onPress} variant="shadow" size="sm" color="primary">
         <span className="text-xl font-bold">
           <AddIcon />
         </span>
@@ -666,6 +673,7 @@ export const FilterCard = ({ title, arrayContent = [], link }) => {
   return (
     <Badge
       color="danger"
+      variant="solid"
       content={
         <Link className="px-1 text-white" href={link}>
           X
@@ -696,6 +704,7 @@ export const MyDatePicker = ({
       isDisabled={isDisabled}
       showMonthAndYearPickers
       label={label}
+      color="default"
       variant="bordered"
       value={form[field]}
       onChange={(val) =>

@@ -254,7 +254,7 @@ export default function App({ id, user }) {
                   <EditIcon />
                 </span>
               </Tooltip>
-              <Tooltip color="danger" content="Delete">
+              <Tooltip color="danger" variant="solid" content="Delete">
                 <span
                   onClick={() => deleteButtonPress(data.id_keranjangproyek)}
                   className="text-lg text-danger cursor-pointer active:opacity-50"
@@ -384,7 +384,7 @@ export default function App({ id, user }) {
                   isCompact
                   showControls
                   showShadow
-                  color="primary"
+                  color="primary" variant="solid"
                   page={page}
                   total={pages}
                   onChange={(page) => setPage(page)}
@@ -539,12 +539,12 @@ export default function App({ id, user }) {
                 </div>
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
+                <Button color="danger" variant="flat" onClick={onClose}>
                   Batal
                 </Button>
                 <Button
-                  color="primary"
-                  onPress={() => simpanButtonPress(form, onClose)}
+                  color="primary" variant="solid"
+                  onClick={() => simpanButtonPress(form, onClose)}
                 >
                   Simpan
                 </Button>

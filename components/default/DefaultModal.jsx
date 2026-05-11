@@ -55,7 +55,7 @@ export default function DefaultModal({
                 <Input
                   isRequired
                   type="text"
-                  variant="bordered"
+                  color="default" variant="bordered"
                   label={name}
                   placeholder={`Masukkan nama ${name}!`}
                   value={form.nama}
@@ -64,7 +64,7 @@ export default function DefaultModal({
               )}
               <Input
                 type="text"
-                variant="bordered"
+                color="default" variant="bordered"
                 label={"Keterangan"}
                 placeholder={`Masukkan keterangan!`}
                 value={form.keterangan}
@@ -75,10 +75,10 @@ export default function DefaultModal({
               {extraFields && extraFields(form, setForm)}
             </ModalBody>
             <ModalFooter>
-              <Button color="danger" variant="light" onPress={onClose}>
+              <Button color="danger" variant="flat" onClick={onClose}>
                 Batal
               </Button>
-              <Button color="primary" onPress={() => saveButtonPress(onClose)}>
+              <Button color="primary" variant="solid" onClick={() => saveButtonPress(onClose)}>
                 Simpan
               </Button>
             </ModalFooter>

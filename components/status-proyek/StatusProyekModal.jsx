@@ -21,7 +21,7 @@ const StatusProyekModal = ({ isOpen, onOpenChange, form, setForm, onSave }) => {
             <ModalBody>
               <Input
                 type="text"
-                variant="bordered"
+                color="default" variant="bordered"
                 label="Status"
                 placeholder="Masukkan status!"
                 value={form.nama}
@@ -33,7 +33,7 @@ const StatusProyekModal = ({ isOpen, onOpenChange, form, setForm, onSave }) => {
                 formatOptions={{
                   useGrouping: false,
                 }}
-                variant="bordered"
+                color="default" variant="bordered"
                 label="Progress"
                 placeholder="Masukkan progress!"
                 value={form.progress}
@@ -41,10 +41,10 @@ const StatusProyekModal = ({ isOpen, onOpenChange, form, setForm, onSave }) => {
               />
             </ModalBody>
             <ModalFooter>
-              <Button color="danger" variant="light" onPress={onClose}>
+              <Button color="danger" variant="flat" onClick={onClose}>
                 Batal
               </Button>
-              <Button color="primary" onPress={() => onSave(onClose)}>
+              <Button color="primary" variant="solid" onClick={() => onSave(onClose)}>
                 Simpan
               </Button>
             </ModalFooter>

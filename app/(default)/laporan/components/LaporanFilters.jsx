@@ -28,14 +28,14 @@ export default function LaporanFilters({
         title="Laporan"
         field="laporan"
         id="id_laporan"
-        variant="bordered"
+        color="default" variant="bordered"
         form={form}
         setForm={setForm}
       />
       <SelectPerusahaan
         form={form}
         setForm={setForm}
-        variant="bordered"
+        color="default" variant="bordered"
         disallowEmptySelection
       />
       <div className="rounded-xl border border-slate-300 bg-white px-4 py-3 md:col-span-2">
@@ -82,8 +82,8 @@ export default function LaporanFilters({
       />
       <div className="flex gap-2 md:col-span-2">
         <Button
-          color="danger"
-          onPress={() =>
+          color="danger" variant="solid"
+          onClick={() =>
             setForm((prev) => ({
               ...prev,
               startDate: null,
@@ -95,8 +95,8 @@ export default function LaporanFilters({
           Clear Date
         </Button>
         <Button
-          color="primary"
-          onPress={() =>
+          color="primary" variant="solid"
+          onClick={() =>
             setForm((prev) => ({
               ...prev,
               startDate: new Date(currentMonthStart),
@@ -108,15 +108,15 @@ export default function LaporanFilters({
           Current Month
         </Button>
         <Button
-          color="primary"
-          onPress={onGenerate}
+          color="primary" variant="solid"
+          onClick={onGenerate}
           isDisabled={isGenerateDisabled || isSameAsApplied}
         >
           Generate
         </Button>
         <Button
-          variant="bordered"
-          onPress={onRefresh}
+          color="default" variant="bordered"
+          onClick={onRefresh}
           isDisabled={!hasGeneratedReport || isRefreshing}
           isLoading={isRefreshing}
         >

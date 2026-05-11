@@ -109,11 +109,11 @@ export default function Invoice({
         <div>
           <Button
             isDisabled={!lengthPembayaran}
-            onPress={() => {
+            onClick={() => {
               setVersi(lengthPembayaran - 1);
               onOpen();
             }}
-            color="primary"
+            color="primary" variant="solid"
             className=""
           >
             Invoice
@@ -321,10 +321,10 @@ export default function Invoice({
                 </div>
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
+                <Button color="danger" variant="flat" onClick={onClose}>
                   Batal
                 </Button>
-                <Button onPress={handlePrintInvoice} color="primary">
+                <Button onClick={handlePrintInvoice} color="primary" variant="solid">
                   Cetak
                 </Button>
               </ModalFooter>

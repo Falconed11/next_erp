@@ -90,10 +90,10 @@ const StatusProyek = ({ user }) => {
             <div className="text-lg font-bold">Status Proyek</div>
             {isHighRole && (
               <Button
-                onPress={tambahPress}
-                variant="shadow"
+                onClick={tambahPress}
                 size="sm"
                 color="primary"
+                variant="solid"
               >
                 <span className="text-xl font-bold">
                   <AddIcon />
@@ -111,6 +111,7 @@ const StatusProyek = ({ user }) => {
                 showControls
                 showShadow
                 color="primary"
+                variant="solid"
                 page={page}
                 total={pages}
                 onChange={(page) => setPage(page)}

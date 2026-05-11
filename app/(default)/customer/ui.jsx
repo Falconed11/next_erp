@@ -235,7 +235,7 @@ export default function App({ user }) {
                       <TransferIcon />
                     </span>
                   </Tooltip>
-                  <Tooltip color="danger" content="Delete">
+                  <Tooltip color="danger" variant="solid" content="Delete">
                     <span
                       onClick={() => deleteButtonPress(data.id)}
                       className="text-lg text-danger cursor-pointer active:opacity-50"
@@ -326,7 +326,7 @@ export default function App({ user }) {
   return (
     <div className="flex flex-col">
       <div className="flex flex-row gap-2">
-        <Button color="primary" onPress={tambahButtonPress}>
+        <Button color="primary" variant="solid" onClick={tambahButtonPress}>
           Tambah
         </Button>
         {/* <div>
@@ -338,7 +338,7 @@ export default function App({ user }) {
           </Link>
         </div>
         <FileUploader onFileUpload={handleFileUpload} />
-        <Button color="primary" onPress={handleButtonUploadExcelPress}>
+        <Button color="primary" variant="solid" onClick={handleButtonUploadExcelPress}>
           Upload Excel
         </Button> */}
       </div>
@@ -364,7 +364,7 @@ export default function App({ user }) {
                 isCompact
                 showControls
                 showShadow
-                color="primary"
+                color="primary" variant="solid"
                 page={page}
                 total={pages}
                 onChange={(page) => setPage(page)}
@@ -412,7 +412,7 @@ export default function App({ user }) {
               <ModalBody>
                 {/* <Select
                   label="Swasta/Negri"
-                  variant="bordered"
+                  color="default" variant="bordered"
                   placeholder="Pilih swasta/negri!"
                   selectedKeys={form.isSwasta}
                   className="max-w-xs"
@@ -481,12 +481,12 @@ export default function App({ user }) {
                 /> */}
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
+                <Button color="danger" variant="flat" onClick={onClose}>
                   Batal
                 </Button>
                 <Button
-                  color="primary"
-                  onPress={() => saveButtonPress(onClose)}
+                  color="primary" variant="solid"
+                  onClick={() => saveButtonPress(onClose)}
                 >
                   Simpan
                 </Button>
@@ -530,7 +530,7 @@ export default function App({ user }) {
                 ))}
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
+                <Button color="danger" variant="flat" onClick={onClose}>
                   Tutup
                 </Button>
               </ModalFooter>

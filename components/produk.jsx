@@ -58,7 +58,7 @@ const FormProduct = ({ form, setForm, user }) => {
     <>
       <AutocompleteKategoriProduk form={form} setForm={setForm} />
       <Input
-        variant="bordered"
+        color="default" variant="bordered"
         type="text"
         label="Id"
         placeholder="Masukkan id!"
@@ -66,7 +66,7 @@ const FormProduct = ({ form, setForm, user }) => {
         onValueChange={(v) => updateForm(setForm, { id_kustom: v })}
       />
       <Input
-        variant="bordered"
+        color="default" variant="bordered"
         type="text"
         label="Nama"
         placeholder="Masukkan nama!"
@@ -75,7 +75,7 @@ const FormProduct = ({ form, setForm, user }) => {
       />
       <AutocompleteMerek form={form} setForm={setForm} />
       <Input
-        variant="bordered"
+        color="default" variant="bordered"
         type="text"
         label="Tipe"
         placeholder="Masukkan tipe!"
@@ -85,7 +85,7 @@ const FormProduct = ({ form, setForm, user }) => {
       {form.modalmode == "Tambah" && (
         <>
           <NumberInput
-            variant="bordered"
+            color="default" variant="bordered"
             hideStepper
             isWheelDisabled
             formatOptions={{
@@ -107,7 +107,7 @@ const FormProduct = ({ form, setForm, user }) => {
               />
               <AutocompleteVendor form={form} setForm={setForm} />
               <Textarea
-                variant="bordered"
+                color="default" variant="bordered"
                 isDisabled={
                   !form.stok || !form.vendor || form.id_vendor
                     ? true
@@ -124,7 +124,7 @@ const FormProduct = ({ form, setForm, user }) => {
         </>
       )}
       <Input
-        variant="bordered"
+        color="default" variant="bordered"
         type="text"
         label="Satuan"
         placeholder="Masukkan satuan!"
@@ -156,7 +156,7 @@ const FormProduct = ({ form, setForm, user }) => {
           {form.lunas == "0" && (
             <>
               <Input
-                variant="bordered"
+                color="default" variant="bordered"
                 type="number"
                 label="Terbayar"
                 placeholder="Masukkan nominal!"
@@ -174,7 +174,7 @@ const FormProduct = ({ form, setForm, user }) => {
         </>
       )}
       <Textarea
-        variant="bordered"
+        color="default" variant="bordered"
         label="Keterangan"
         labelPlacement="inside"
         placeholder="Masukkan keterangan! (Opsional)"
@@ -195,7 +195,7 @@ export const HargaGenerator = ({
   return (
     <>
       <NumberInput
-        variant="bordered"
+        color="default" variant="bordered"
         hideStepper
         isWheelDisabled
         formatOptions={{
@@ -210,7 +210,7 @@ export const HargaGenerator = ({
       {!hideJual && (
         <>
           <NumberInput
-            variant="bordered"
+            color="default" variant="bordered"
             hideStepper
             isWheelDisabled
             formatOptions={{
@@ -223,7 +223,7 @@ export const HargaGenerator = ({
             onValueChange={(val) => updateForm(setForm, { hargajual: val })}
           />
           <NumberInput
-            variant="bordered"
+            color="default" variant="bordered"
             hideStepper
             isWheelDisabled
             formatOptions={{
@@ -248,7 +248,7 @@ export const HargaGenerator = ({
             }
           />
           <NumberInput
-            variant="bordered"
+            color="default" variant="bordered"
             hideStepper
             isWheelDisabled
             formatOptions={{
@@ -407,10 +407,10 @@ export const ModalProdukMasuk = ({
               )}
             </ModalBody>
             <ModalFooter>
-              <Button color="danger" variant="light" onPress={onClose}>
+              <Button color="danger" variant="flat" onClick={onClose}>
                 Batal
               </Button>
-              <Button color="primary" onPress={() => onSimpanClick(onClose)}>
+              <Button color="primary" variant="solid" onClick={() => onSimpanClick(onClose)}>
                 Simpan
               </Button>
             </ModalFooter>

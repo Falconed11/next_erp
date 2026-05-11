@@ -165,8 +165,8 @@ export const RangeDate = ({
         <div className="justify-end flex">
           <Button
             type="submit"
-            color="primary"
-            // onPress={cariOnPress}
+            color="primary" variant="solid"
+            // onClick={cariOnPress}
             isDisabled={filter == current ? true : null}
           >
             Cari
@@ -214,12 +214,12 @@ export const RangeMonthPicker = ({ form, setForm }) => {
       />
       <div className="text-end">
         <Button
-          color="primary"
+          color="primary" variant="solid"
           isDisabled={
             startDate.getTime() === form.startDate?.getTime() &&
             endDate.getTime() === form.endDate?.getTime()
           }
-          onPress={() =>
+          onClick={() =>
             setForm((prev) => ({
               ...prev,
               startDate: startDate,
@@ -313,8 +313,8 @@ export function TemplateImport({
         </div>
         <FileUploader onFileUpload={handleFileUpload} />
         <Button
-          color="primary"
-          onPress={() => handleButtonUploadExcelPress(apiendpoint)}
+          color="primary" variant="solid"
+          onClick={() => handleButtonUploadExcelPress(apiendpoint)}
         >
           Upload Excel
         </Button>
@@ -400,8 +400,8 @@ export function TemplateImportV2({
         />
         {children}
         <Button
-          color="primary"
-          onPress={() => handleButtonUploadExcelPress(apiendpoint)}
+          color="primary" variant="solid"
+          onClick={() => handleButtonUploadExcelPress(apiendpoint)}
           isDisabled={isDisabled}
         >
           Upload Excel
@@ -427,7 +427,7 @@ export function TemplateImportV2({
                 ))}
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
+                <Button color="danger" variant="flat" onClick={onClose}>
                   Tutup
                 </Button>
               </ModalFooter>

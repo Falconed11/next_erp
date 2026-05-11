@@ -325,7 +325,7 @@ export default function App({ id_produk }) {
                 <MinIcon />
               </span>
             </Tooltip> */}
-            <Tooltip color="danger" content="Delete">
+            <Tooltip color="danger" variant="solid" content="Delete">
               <span
                 onClick={() => deleteButtonPress(data)}
                 className="text-lg text-danger cursor-pointer active:opacity-50"
@@ -445,7 +445,7 @@ export default function App({ id_produk }) {
         <div>Tanggal Harga: {getDateF(selectedProduk?.tanggalharga)}</div>
       </div>
       {/* <div className="flex flex-row gap-2">
-        <Button color="primary" onPress={tambahButtonPress}>
+        <Button color="primary" variant="solid" onClick={tambahButtonPress}>
           Tambah
         </Button>
         <div>
@@ -457,7 +457,7 @@ export default function App({ id_produk }) {
           </Link>
         </div>
         <FileUploader onFileUpload={handleFileUpload} />
-        <Button color="primary" onPress={handleButtonUploadExcelPress}>
+        <Button color="primary" variant="solid" onClick={handleButtonUploadExcelPress}>
           Upload Excel
         </Button>
       </div> */}
@@ -478,7 +478,7 @@ export default function App({ id_produk }) {
                 isCompact
                 showControls
                 showShadow
-                color="primary"
+                color="primary" variant="solid"
                 page={page}
                 total={pages}
                 onChange={(page) => setPage(page)}
@@ -648,7 +648,7 @@ const TabelProdukKeluar = ({ id_produk }) => {
                     <EditIcon />
                   </span>
                 </Tooltip>
-                <Tooltip color="danger" content="Delete">
+                <Tooltip color="danger" variant="solid" content="Delete">
                   <span
                     onClick={() => deleteButtonPress(data)}
                     className="text-lg text-danger cursor-pointer active:opacity-50"
@@ -760,7 +760,7 @@ const TabelProdukKeluar = ({ id_produk }) => {
                 isCompact
                 showControls
                 showShadow
-                color="primary"
+                color="primary" variant="solid"
                 page={page}
                 total={pages}
                 onChange={(page) => setPage(page)}
@@ -859,7 +859,7 @@ const TabelProdukKeluar = ({ id_produk }) => {
                 />
                 {/* <Autocomplete
                   label="Vendor"
-                  variant="bordered"
+                  color="default" variant="bordered"
                   defaultItems={vendor.data}
                   placeholder="Cari vendor"
                   className="max-w-xs"
@@ -895,12 +895,12 @@ const TabelProdukKeluar = ({ id_produk }) => {
                 /> */}
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
+                <Button color="danger" variant="flat" onClick={onClose}>
                   Batal
                 </Button>
                 <Button
-                  color="primary"
-                  onPress={() => saveButtonPress(onClose)}
+                  color="primary" variant="solid"
+                  onClick={() => saveButtonPress(onClose)}
                 >
                   Simpan
                 </Button>

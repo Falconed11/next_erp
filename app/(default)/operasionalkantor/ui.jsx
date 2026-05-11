@@ -255,7 +255,7 @@ export default function App({ user }) {
                 <EditIcon />
               </span>
             </Tooltip>
-            <Tooltip color="danger" content="Delete">
+            <Tooltip color="danger" variant="solid" content="Delete">
               <span
                 onClick={() => deleteButtonPress(data.id)}
                 className="text-lg text-danger cursor-pointer active:opacity-50"
@@ -319,7 +319,7 @@ export default function App({ user }) {
                 </Select>
               </div>
               {/* <div>
-              <Button color="primary" onClick={handleButtonExportToExcelPress}>
+              <Button color="primary" variant="solid" onClick={handleButtonExportToExcelPress}>
                 Export to Excel
               </Button>
             </div> */}
@@ -337,10 +337,10 @@ export default function App({ user }) {
                 </div>
                 <div className="flex flex-row gap-2 justify-end">
                   <Button
-                    onPress={() => {
+                    onClick={() => {
                       tambahButtonPress("POST");
                     }}
-                    color="primary"
+                    color="primary" variant="solid"
                     className="ml-2"
                   >
                     Tambah
@@ -361,9 +361,9 @@ export default function App({ user }) {
             </div>
             <FileUploader onFileUpload={handleFileUpload} />
             <Button
-              color="primary"
+              color="primary" variant="solid"
               className=""
-              onPress={handleButtonUploadExcelPress}
+              onClick={handleButtonUploadExcelPress}
             >
               Upload Excel
             </Button>
@@ -380,7 +380,7 @@ export default function App({ user }) {
                   isCompact
                   showControls
                   showShadow
-                  color="primary"
+                  color="primary" variant="solid"
                   page={page}
                   total={pages}
                   onChange={(page) => setPage(page)}
@@ -442,9 +442,8 @@ export default function App({ user }) {
               </ModalBody>
               <ModalFooter>
                 <Button
-                  color="danger"
-                  variant="light"
-                  onPress={() => {
+                  color="danger" variant="flat"
+                  onClick={() => {
                     setForm({});
                     onClose();
                   }}
@@ -452,8 +451,8 @@ export default function App({ user }) {
                   Batal
                 </Button>
                 <Button
-                  color="primary"
-                  onPress={() => {
+                  color="primary" variant="solid"
+                  onClick={() => {
                     tambahButtonPress("PUT");
                     onClose();
                   }}
@@ -483,7 +482,7 @@ export default function App({ user }) {
                 ))}
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
+                <Button color="danger" variant="flat" onClick={onClose}>
                   Tutup
                 </Button>
               </ModalFooter>

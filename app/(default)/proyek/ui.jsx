@@ -475,7 +475,7 @@ export default function App({
                 </span>
               </Tooltip> */}
               {["super", "admin"].includes(peran) ? (
-                <Tooltip color="danger" content="Delete">
+                <Tooltip color="danger" variant="solid" content="Delete">
                   <span
                     onClick={() => deleteButtonPress(data.id)}
                     className="text-lg text-danger cursor-pointer active:opacity-50"
@@ -677,8 +677,8 @@ export default function App({
           <Button
             variant="shadow"
             size="sm"
-            color="primary"
-            onPress={tambahButtonPress}
+            color="primary" variant="solid"
+            onClick={tambahButtonPress}
           >
             <span className="text-xl font-bold">
               <AddIcon />
@@ -688,8 +688,8 @@ export default function App({
           <Button
             variant="shadow"
             size="sm"
-            color="primary"
-            onPress={handlePrintProyek}
+            color="primary" variant="solid"
+            onClick={handlePrintProyek}
           >
             <span className="text-xl font-bold">
               <AddIcon />
@@ -743,6 +743,7 @@ export default function App({
                             label="Sales"
                             placeholder="Pilih sales"
                             selectedKeys={selectkaryawan}
+                            color="default"
                             variant="bordered"
                             onSelectionChange={(v) => {
                               setSelectKaryawan(v);
@@ -765,6 +766,7 @@ export default function App({
                             <Input
                               className="col-span-3"
                               type="text"
+                              color="default"
                               variant="bordered"
                               label="Filter"
                               placeholder="Masukkan nama atau klien"
@@ -774,6 +776,7 @@ export default function App({
                             <Select
                               className="col-span-2"
                               label="Filter By"
+                              color="default"
                               variant="bordered"
                               selectedKeys={new Set([filterBy])}
                               onSelectionChange={(keys) =>
@@ -1011,10 +1014,10 @@ export default function App({
                 </ShowHideComponent2>
                 <div className="flex gap-2">
                   <Button
-                    variant="shadow"
                     size="sm"
                     color="primary"
-                    onPress={tambahButtonPress}
+                    variant="solid"
+                    onClick={tambahButtonPress}
                   >
                     <span className="text-xl font-bold">
                       <AddIcon />
@@ -1022,10 +1025,10 @@ export default function App({
                     Tambah
                   </Button>
                   <Button
-                    variant="shadow"
                     size="sm"
                     color="primary"
-                    onPress={handlePrintProyek}
+                    variant="solid"
+                    onClick={handlePrintProyek}
                   >
                     Print
                   </Button>
@@ -1041,6 +1044,7 @@ export default function App({
                   showControls
                   showShadow
                   color="primary"
+                  variant="solid"
                   page={page}
                   total={pages}
                   onChange={(page) => setPage(page)}
@@ -1091,6 +1095,7 @@ export default function App({
               <ModalBody>
                 <Select
                   label="Status"
+                  color="default"
                   variant="bordered"
                   placeholder="Pilih status!"
                   disallowEmptySelection
@@ -1118,6 +1123,7 @@ export default function App({
                 {form.id_statusproyek == 1 && (
                   <Select
                     label="Perusahaan"
+                    color="default"
                     variant="bordered"
                     placeholder="Pilih perusahaan!"
                     selectedKeys={form.selectperusahaan}
@@ -1139,6 +1145,7 @@ export default function App({
                 )}
                 <Input
                   type="text"
+                  color="default"
                   variant="bordered"
                   label="Nama Proyek"
                   placeholder="Masukkan nama proyek!"
@@ -1151,6 +1158,7 @@ export default function App({
                 <AutocompleteCustomer form={form} setForm={setForm} />
                 <Select
                   label="S/N"
+                  color="default"
                   variant="bordered"
                   isDisabled={isCustomerSelected}
                   placeholder="Pilih swasta/negri!"
@@ -1177,6 +1185,7 @@ export default function App({
                 </Select>
                 <Input
                   type="text"
+                  color="default"
                   variant="bordered"
                   isDisabled={isCustomerSelected}
                   label="Kota"
@@ -1188,6 +1197,7 @@ export default function App({
                 />
                 <Textarea
                   type="text"
+                  color="default"
                   variant="bordered"
                   label="Alamat"
                   isDisabled={isCustomerSelected}
@@ -1198,6 +1208,7 @@ export default function App({
                   }
                 />
                 <Input
+                  color="default"
                   variant="bordered"
                   type="text"
                   label="Klien"
@@ -1209,6 +1220,7 @@ export default function App({
                 />
                 {form.id_statusproyek == 1 && (
                   <Input
+                    color="default"
                     variant="bordered"
                     type="text"
                     label="No PO"
@@ -1222,6 +1234,7 @@ export default function App({
                 <Select
                   isDisabled={isHighRole ? undefined : true}
                   label="Sales"
+                  color="default"
                   variant="bordered"
                   placeholder="Pilih sales!"
                   selectedKeys={form.selectkaryawan}
@@ -1264,7 +1277,7 @@ export default function App({
                       }
                     />
                     <Button
-                      onPress={() => {
+                      onClick={() => {
                         const now = new Date();
                         setForm((prev) => ({
                           ...prev,
@@ -1275,12 +1288,14 @@ export default function App({
                       className="ml-2"
                       size="sm"
                       color="primary"
+                      variant="solid"
                     >
                       Sekarang
                     </Button>
                   </div>
                 )}
                 <Textarea
+                  color="default"
                   variant="bordered"
                   label="Keterangan"
                   labelPlacement="inside"
@@ -1292,12 +1307,13 @@ export default function App({
                 />
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
+                <Button color="danger" variant="flat" onClick={onClose}>
                   Batal
                 </Button>
                 <Button
                   color="primary"
-                  onPress={() => saveButtonPress(onClose)}
+                  variant="solid"
+                  onClick={() => saveButtonPress(onClose)}
                 >
                   Simpan
                 </Button>
@@ -1324,7 +1340,7 @@ export default function App({
                 ))}
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
+                <Button color="danger" variant="flat" onClick={onClose}>
                   Tutup
                 </Button>
               </ModalFooter>

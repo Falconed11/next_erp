@@ -137,7 +137,7 @@ export const ModalJurnal = ({
                 <AutocompleteProyek form={form} setForm={setForm} />
                 {/* Keterangan */}
                 <Textarea
-                  variant="bordered"
+                  color="default" variant="bordered"
                   label={`Keterangan ( ${keterangan?.length || 0}/200 )`}
                   placeholder="Masukkan keterangan jurnal"
                   value={keterangan}
@@ -151,7 +151,7 @@ export const ModalJurnal = ({
                     <Button
                       isIconOnly
                       className="bg-blue-500 text-white"
-                      onPress={handleAddTransaksi}
+                      onClick={handleAddTransaksi}
                     >
                       <AddIcon />
                     </Button>
@@ -177,7 +177,7 @@ export const ModalJurnal = ({
                           index={index}
                         />
                         <DefaultNumberInput
-                          variant="bordered"
+                          color="default" variant="bordered"
                           label="Jumlah"
                           placeholder="Masukkan jumlah!"
                           value={trx.amount}
@@ -188,9 +188,8 @@ export const ModalJurnal = ({
                         <div className="grid items-end content-center">
                           <Button
                             isIconOnly
-                            color="danger"
-                            variant="light"
-                            onPress={() => handleRemoveTransaksi(index)}
+                            color="danger" variant="flat"
+                            onClick={() => handleRemoveTransaksi(index)}
                             className="text-xl"
                           >
                             <DeleteIcon />
@@ -259,12 +258,12 @@ export const ModalJurnal = ({
               </ModalBody>
             )}
             <ModalFooter>
-              <Button color="danger" onPress={onClose}>
+              <Button color="danger" variant="solid" onClick={onClose}>
                 Batal
               </Button>
               <Button
-                color="primary"
-                onPress={() => onSubmit(onClose)}
+                color="primary" variant="solid"
+                onClick={() => onSubmit(onClose)}
                 isDisabled={
                   totals.difference > 0.01 ||
                   !form.id_perusahaan ||

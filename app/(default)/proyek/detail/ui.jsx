@@ -490,7 +490,7 @@ export default function App({ id, versi, user }) {
                   link={`/produk?id=${data.id_produk || null}`}
                 />
                 {isAuthorized && (
-                  <Tooltip color="danger" content="Delete">
+                  <Tooltip color="danger" variant="solid" content="Delete">
                     <span
                       onClick={() => deleteButtonPress(data.id_keranjangproyek)}
                       className="text-lg text-danger cursor-pointer active:opacity-50"
@@ -964,7 +964,7 @@ export default function App({ id, versi, user }) {
                 isIconOnly
                 radius="full"
                 size="sm"
-                onPress={() => {
+                onClick={() => {
                   const encodedMessage = encodeURIComponent(fullPath);
                   const whatsappUrl = `https://wa.me/?text=${encodedMessage}`;
                   window.open(whatsappUrl, "_blank");
@@ -1073,7 +1073,7 @@ export default function App({ id, versi, user }) {
                   onValueChange={setInputPersenProvit}
                 />
                 <div>
-                  <Button type="submit" color="primary">
+                  <Button type="submit" color="primary" variant="solid">
                     Terapkan
                   </Button>
                 </div>
@@ -1110,7 +1110,7 @@ export default function App({ id, versi, user }) {
       {/* tombol fungsional */}
       <div className="flex flex-row gap-2 bg-background p-3 rounded-lg">
         {/* <div>
-          <Button onClick={handleButtonVersi} color="primary" className="mt-3">
+          <Button onClick={handleButtonVersi} color="primary" variant="solid" className="mt-3">
             Buat Versi Baru
           </Button>
         </div> */}
@@ -1119,8 +1119,8 @@ export default function App({ id, versi, user }) {
             {selectedStatusProyek != "deal" ? (
               <div>
                 <Button
-                  onPress={handleButtonSetAsDealClick}
-                  color="primary"
+                  onClick={handleButtonSetAsDealClick}
+                  color="primary" variant="solid"
                   className=""
                 >
                   Set as Deal
@@ -1129,8 +1129,8 @@ export default function App({ id, versi, user }) {
             ) : (
               <div>
                 <Button
-                  onPress={handleButtonCancelDealRejectClick}
-                  color="primary"
+                  onClick={handleButtonCancelDealRejectClick}
+                  color="primary" variant="solid"
                   className=""
                 >
                   Cancel Deal
@@ -1140,8 +1140,8 @@ export default function App({ id, versi, user }) {
             {selectedStatusProyek != "reject" ? (
               <div>
                 <Button
-                  onPress={handleButtonSetAsRejectClick}
-                  color="primary"
+                  onClick={handleButtonSetAsRejectClick}
+                  color="primary" variant="solid"
                   className=""
                 >
                   Set as Reject
@@ -1150,8 +1150,8 @@ export default function App({ id, versi, user }) {
             ) : (
               <div>
                 <Button
-                  onPress={handleButtonCancelDealRejectClick}
-                  color="primary"
+                  onClick={handleButtonCancelDealRejectClick}
+                  color="primary" variant="solid"
                   className=""
                 >
                   Cancel Reject
@@ -1161,7 +1161,7 @@ export default function App({ id, versi, user }) {
           </>
         )}
         <div>
-          <Button onPress={modal.penawaran.onOpen} color="primary" className="">
+          <Button onClick={modal.penawaran.onOpen} color="primary" variant="solid" className="">
             Penawaran
           </Button>
         </div>
@@ -1608,9 +1608,8 @@ export default function App({ id, versi, user }) {
               </ModalBody>
               <ModalFooter>
                 <Button
-                  color="danger"
-                  variant="light"
-                  onPress={() => {
+                  color="danger" variant="flat"
+                  onClick={() => {
                     setForm({});
                     onClose();
                   }}
@@ -1618,8 +1617,8 @@ export default function App({ id, versi, user }) {
                   Batal
                 </Button>
                 <Button
-                  color="primary"
-                  onPress={() => simpanButtonPress(form, onClose)}
+                  color="primary" variant="solid"
+                  onClick={() => simpanButtonPress(form, onClose)}
                 >
                   Simpan
                 </Button>
@@ -1862,10 +1861,10 @@ export default function App({ id, versi, user }) {
                 </div>
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
+                <Button color="danger" variant="flat" onClick={onClose}>
                   Tutup
                 </Button>
-                <Button onPress={handlePrintPenawaran} color="primary">
+                <Button onClick={handlePrintPenawaran} color="primary" variant="solid">
                   Cetak
                 </Button>
               </ModalFooter>

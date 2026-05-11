@@ -101,7 +101,7 @@ export default function App() {
                   <EditIcon />
                 </span>
               </Tooltip>
-              <Tooltip color="danger" content="Delete">
+              <Tooltip color="danger" variant="solid" content="Delete">
                 <span
                   onClick={() => deleteButtonPress(data.id)}
                   className="text-lg text-danger cursor-pointer active:opacity-50"
@@ -141,7 +141,7 @@ export default function App() {
 
   return (
     <div>
-      <Button onClick={tambahButtonPress} color="primary">
+      <Button onClick={tambahButtonPress} color="primary" variant="solid">
         Tambah
       </Button>
       <Table className="pt-3" aria-label="Example table with custom cells">
@@ -193,10 +193,10 @@ export default function App() {
                 />
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
+                <Button color="danger" variant="flat" onClick={onClose}>
                   Batal
                 </Button>
-                <Button color="primary" onPress={() => simpanButtonPress(form)}>
+                <Button color="primary" variant="solid" onClick={() => simpanButtonPress(form)}>
                   Simpan
                 </Button>
               </ModalFooter>
