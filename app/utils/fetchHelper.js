@@ -24,14 +24,14 @@ export const apiFetch = async (url, options = {}) => {
   //   throw new Error(data?.message || `HTTP ${res.status}: ${res.statusText}`);
   // }
 
-  if (!res.ok) {
-    let errorMessage = "An error occurred";
-    try {
-      const errorData = await res.json();
-      errorMessage = errorData?.message || errorMessage;
-    } catch {}
-    alert(errorMessage);
-  }
+  // if (!res.ok) {
+  //   let errorMessage = "An error occurred";
+  //   try {
+  //     const errorData = await res.json();
+  //     errorMessage = errorData?.message || errorMessage;
+  //   } catch {}
+  //   alert(errorMessage);
+  // }
 
   return res;
 };
