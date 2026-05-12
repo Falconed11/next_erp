@@ -47,11 +47,11 @@ const api_path = getApiPath();
 
 export default function App({ user }) {
   const sessUser = user;
-  const user = useClientFetch(
-    sessUser
-      ? `user?id=${sessUser.id}&peran=${sessUser.peran}&rank=${sessUser.rank}`
-      : null,
-  );
+  // const user = useClientFetch(
+  //   sessUser
+  //     ? `user?id=${sessUser.id}&peran=${sessUser.peran}&rank=${sessUser.rank}`
+  //     : null,
+  // );
   const karyawan = useClientFetch(`karyawan?id_statuskaryawan=1`);
   const peran = useClientFetch(
     sessUser ? `peran?peran=${sessUser.peran}&rank=${sessUser.rank}` : null,
@@ -81,7 +81,7 @@ export default function App({ user }) {
   };
   const deleteButtonPress = async (id) => {
     if (confirm("Hapus user?")) {
-      const json = await apiFetch(`${api_path}user`, {
+      const res = await apiFetch(`${api_path}user`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -89,13 +89,15 @@ export default function App({ user }) {
         },
         body: JSON.stringify({ id }),
       });
+      const json = await res.json();
+      if (!res.ok) return alert(json.message || "Delete failed");
       return alert(json.message);
     }
   };
   const simpanButtonPress = async (data, onClose) => {
     if (data.password != data.ulangipassword)
       return alert("Ulangi Password tidak sesuai");
-    const json = await apiFetch(`${api_path}user`, {
+    const res = await apiFetch(`${api_path}user`, {
       method,
       headers: {
         "Content-Type": "application/json",
@@ -103,6 +105,8 @@ export default function App({ user }) {
       },
       body: JSON.stringify({ ...data, srcperan: user?.peran }),
     });
+    const json = await res.json();
+    if (!res.ok) return alert(json.message || "Simpan failed");
     onClose();
     user.mutate();
   };
@@ -229,7 +233,8 @@ export default function App({ user }) {
                 ) : (
                   <Select
                     label="Peran"
-                    color="default" variant="bordered"
+                    color="default"
+                    variant="bordered"
                     disabled={
                       sessUser.rank < form.tempRank ||
                       form.modalmode == "Tambah"
@@ -264,7 +269,8 @@ export default function App({ user }) {
                 ) : (
                   <Select
                     label="Karyawan"
-                    color="default" variant="bordered"
+                    color="default"
+                    variant="bordered"
                     placeholder="Pilih karyawan!"
                     selectedKeys={
                       new Set(
@@ -342,7 +348,8 @@ export default function App({ user }) {
                   Batal
                 </Button>
                 <Button
-                  color="primary" variant="solid"
+                  color="primary"
+                  variant="solid"
                   onClick={() => simpanButtonPress(form, onClose)}
                 >
                   Simpan

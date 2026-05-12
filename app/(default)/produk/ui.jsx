@@ -679,7 +679,7 @@ export default function App({ id, user }) {
   // }, []);
   const classCompByRole = isHighRole ? "" : "hidden";
 
-  console.log(produk);
+  console.log(produk.data[0]);
   return (
     <div className="">
       <div className="flex flex-col gap-2">

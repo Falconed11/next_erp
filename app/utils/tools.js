@@ -18,10 +18,14 @@ export const updateSwitch = async (
   referenceData,
 ) => {
   if (switchValue === currentValue) return;
-  const json = await apiFetch(`${api_path}${apiEndPoint}`, {
+  const res = await apiFetch(`${api_path}${apiEndPoint}`, {
     method,
     body: JSON.stringify(data),
   });
+  if (!res.ok) {
+    const json = await res.json();
+    return alert(json.message || "Update failed");
+  }
   //return alert(json.message);
   referenceData.forEach((data) => data.mutate());
 };
@@ -37,7 +41,6 @@ export const capitalizeEachWord = (str = "") => {
 };
 export const renderQueryStates = (queries) => {
   for (const [name, data] of Object.entries(queries ?? {})) {
-    console.log(data);
     const { error } = data;
     if (error)
       return (

@@ -165,7 +165,8 @@ export const RangeDate = ({
         <div className="justify-end flex">
           <Button
             type="submit"
-            color="primary" variant="solid"
+            color="primary"
+            variant="solid"
             // onClick={cariOnPress}
             isDisabled={filter == current ? true : null}
           >
@@ -214,7 +215,8 @@ export const RangeMonthPicker = ({ form, setForm }) => {
       />
       <div className="text-end">
         <Button
-          color="primary" variant="solid"
+          color="primary"
+          variant="solid"
           isDisabled={
             startDate.getTime() === form.startDate?.getTime() &&
             endDate.getTime() === form.endDate?.getTime()
@@ -276,16 +278,14 @@ export function TemplateImport({
     if (json.length == 0) return alert("File belum dipilih");
     setIsLoading(1);
     setReportList([]);
-    try {
-      const json2 = await apiFetch(`${apiPath}${apiendpoint}`, {
-        method: "POST",
-        body: JSON.stringify({ customInputCode, json }),
-      });
-      setReportList(json2.result);
-      setJson([]);
-    } catch (error) {
-      alert(error.message || "Upload failed");
-    }
+    const res = await apiFetch(`${apiPath}${apiendpoint}`, {
+      method: "POST",
+      body: JSON.stringify({ customInputCode, json }),
+    });
+    const json2 = await res.json();
+    if (!res.ok) return alert(json2.message || "Upload failed");
+    setReportList(json2.result);
+    setJson([]);
     setIsLoading(0);
     report.onOpen();
   };
@@ -313,7 +313,8 @@ export function TemplateImport({
         </div>
         <FileUploader onFileUpload={handleFileUpload} />
         <Button
-          color="primary" variant="solid"
+          color="primary"
+          variant="solid"
           onClick={() => handleButtonUploadExcelPress(apiendpoint)}
         >
           Upload Excel
@@ -354,18 +355,18 @@ export function TemplateImportV2({
     if (json.length == 0) return alert("File belum dipilih");
     setIsLoading(1);
     setReportList([]);
-    try {
-      const json2 = await apiFetch(`${apiPath}${apiendpoint}`, {
-        method: "POST",
-        body: JSON.stringify({
-          customInputCode: customInputCode || getDateF(new Date()),
-          json,
-        }),
-      });
-      setReportList(json2.result);
-    } catch (error) {
-      alert(error.message || "Upload failed");
+    const res = await apiFetch(`${apiPath}${apiendpoint}`, {
+      method: "POST",
+      body: JSON.stringify({
+        customInputCode: customInputCode || getDateF(new Date()),
+        json,
+      }),
+    });
+    const json2 = await res.json();
+    if (!res.ok) {
+      return alert(json2.message || "Upload failed");
     }
+    setReportList(json2.result);
     setJson([]);
     setFile();
     setIsLoading(0);
@@ -400,7 +401,8 @@ export function TemplateImportV2({
         />
         {children}
         <Button
-          color="primary" variant="solid"
+          color="primary"
+          variant="solid"
           onClick={() => handleButtonUploadExcelPress(apiendpoint)}
           isDisabled={isDisabled}
         >

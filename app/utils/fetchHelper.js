@@ -13,16 +13,25 @@ export const apiFetch = async (url, options = {}) => {
     },
   });
 
-  let data;
-  try {
-    data = await res.json();
-  } catch {
-    data = null;
-  }
+  // let data;
+  // try {
+  //   data = await res.json();
+  // } catch {
+  //   data = null;
+  // }
+
+  // if (!res.ok) {
+  //   throw new Error(data?.message || `HTTP ${res.status}: ${res.statusText}`);
+  // }
 
   if (!res.ok) {
-    throw new Error(data?.message || `HTTP ${res.status}: ${res.statusText}`);
+    let errorMessage = "An error occurred";
+    try {
+      const errorData = await res.json();
+      errorMessage = errorData?.message || errorMessage;
+    } catch {}
+    alert(errorMessage);
   }
 
-  return data;
+  return res;
 };

@@ -13,11 +13,14 @@ export const updateSwitch = async (
   referenceData,
 ) => {
   if (switchValue === currentValue) return;
-  const json = await apiFetch(`${api_path}${apiEndPoint}`, {
+  const res = await apiFetch(`${api_path}${apiEndPoint}`, {
     method,
     body: JSON.stringify(data),
   });
-  //return alert(json.message);
+  if (!res.ok) {
+    const json = await res.json();
+    return alert(json.message || "Update failed");
+  }
   referenceData.forEach((data) => data.mutate());
 };
 

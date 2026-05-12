@@ -4,13 +4,13 @@ import { getDate } from "@/app/utils/date";
 import Harga from "@/components/harga";
 import { RangeDate } from "@/components/input";
 import "react-datepicker/dist/react-datepicker.css";
-import { capitalizeEachWord } from "@/app/utils/tools";
+import { capitalizeEachWord, renderQueryStates } from "@/app/utils/tools";
 import {
   useClientFetch,
   useClientFetchNoInterval,
 } from "@/hooks/useClientFetch";
 
-const OperasionalKantor = ({ startDate, endDate }) => {
+export const OperasionalKantor = ({ startDate, endDate }) => {
   const kategori = useClientFetchNoInterval("kategorioperasionalkantor");
   const [current, setCurrent] = useState({ startDate, endDate });
   const operasional = useClientFetchNoInterval(
@@ -56,7 +56,7 @@ const OperasionalKantor = ({ startDate, endDate }) => {
     </>
   );
 };
-const Penawaran = ({ start, end }) => {
+export const Penawaran = ({ start, end }) => {
   const [current, setCurrent] = useState({
     startDate: start,
     endDate: end,
@@ -76,14 +76,13 @@ const Penawaran = ({ start, end }) => {
     `sumPenawaran?startdate=${mulai}&enddate=${selesai}&versi=0`,
   );
 
-  if (totalPenawaran.error) return <div>failed to load</div>;
-  if (totalPenawaran.isLoading) return <div>loading...</div>;
-  if (totalPenawaranSwasta.error) return <div>failed to load</div>;
-  if (totalPenawaranSwasta.isLoading) return <div>loading...</div>;
-  if (totalPenawaranReject.error) return <div>failed to load</div>;
-  if (totalPenawaranReject.isLoading) return <div>loading...</div>;
-  if (totalPenawaranWaiting.error) return <div>failed to load</div>;
-  if (totalPenawaranWaiting.isLoading) return <div>loading...</div>;
+  const QueryState = renderQueryStates({
+    totalPenawaran,
+    totalPenawaranSwasta,
+    totalPenawaranReject,
+    totalPenawaranWaiting,
+  });
+  if (QueryState) return QueryState;
 
   const totalPenawaranNegri =
     totalPenawaran.data[0].total - totalPenawaranSwasta.data[0].total;
@@ -121,5 +120,3 @@ const Penawaran = ({ start, end }) => {
     </>
   );
 };
-
-export { Penawaran, OperasionalKantor };

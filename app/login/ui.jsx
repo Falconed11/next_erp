@@ -17,15 +17,13 @@ export default function App({ error, redirect }) {
     event.preventDefault();
     console.log("Login pressed", form);
 
-    try {
-      const data = await apiFetch(`/api/login`, {
-        method: "POST",
-        body: JSON.stringify(form),
-      });
-      router.push(redirect || "/");
-    } catch (error) {
-      alert(error.message || "Login failed");
-    }
+    const res = await apiFetch(`/api/login`, {
+      method: "POST",
+      body: JSON.stringify(form),
+    });
+    const data = await res.json();
+    if (!res.ok) return alert(data.message || "Login failed");
+    router.push(redirect || "/");
   };
 
   // console.log(form);

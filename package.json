@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@heroui/react": "^2.8.5",
+    "@internationalized/date": "^3.12.1",
     "@react-aria/i18n": "^3.12.12",
     "@tailwindcss/postcss": "^4.1.17",
     "browser-image-compression": "^2.0.2",

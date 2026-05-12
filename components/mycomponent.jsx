@@ -31,11 +31,13 @@ import {
 import { Link } from "@heroui/react";
 import { useCallback, useMemo, useState } from "react";
 import { AddIcon, DeleteIcon, EditIcon, EyeIcon } from "./icon";
-import { getDate, getDateFId } from "@/app/utils/date";
+import { dateMysqlToHeroUI, getDate, getDateFId } from "@/app/utils/date";
 import Harga from "./harga";
 import { TITLE_STYLE } from "@/app/utils/const";
 import { useClientFetch } from "@/hooks/useClientFetch";
 import { apiFetch } from "@/app/utils/fetchHelper";
+import { I18nProvider } from "@react-aria/i18n";
+import { parseDate } from "@internationalized/date";
 
 export const MyChip = ({ text, theme }) => {
   console.log(text, theme);
@@ -195,7 +197,7 @@ export const ToDoList = ({ user }) => {
   const [form, setForm] = useState({});
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const tambahButtonPress = async () => {
-    setForm({ mode: "Tambah" });
+    setForm({ mode: "Tambah", deadlinedate: getDate(new Date()) });
     onOpen();
   };
   const editButtonPress = (data) => {
@@ -313,6 +315,7 @@ export const ToDoList = ({ user }) => {
   ];
   const queryStates = renderQueryStates({ todolist, status });
   if (queryStates) return queryStates;
+  console.log(form);
   return (
     <>
       <Table
@@ -381,22 +384,18 @@ export const ToDoList = ({ user }) => {
                   value={form.keterangan}
                   onValueChange={(v) => setForm({ ...form, keterangan: v })}
                 />
-                <div className="bg-gray-100 p-3 rounded-lg">
-                  <div>Deadline</div>
-                  <DatePicker
-                    className="bg-white"
-                    placeholderText="Pilih tanggal"
-                    dateFormat="dd/MM/yyyy"
-                    selected={
-                      form.deadlinedate
-                        ? new Date(form.deadlinedate)
-                        : new Date()
-                    }
-                    onChange={(v) =>
-                      setForm({ ...form, deadlinedate: getDate(v) })
-                    }
-                  />
-                </div>
+                <MyDatePicker
+                  form={form}
+                  setForm={setForm}
+                  label="Deadline"
+                  // selected={
+                  //   form.deadlinedate ? new Date(form.deadlinedate) : new Date()
+                  // }
+                  // onChange={(v) =>
+                  //   setForm({ ...form, deadlinedate: getDate(v) })
+                  // }
+                  field="deadlinedate"
+                />
                 <Select
                   label="Status"
                   color="default"
@@ -693,29 +692,35 @@ export const FilterCard = ({ title, arrayContent = [], link }) => {
 };
 export const MyDatePicker = ({
   form,
-  label = "Tanggal",
   setForm,
+  label = "Tanggal",
   field = "tanggal",
   extraField = {},
   isDisabled = false,
-}) => (
-  <div className="w-full max-w-xl flex flex-row gap-4">
-    <DatePicker
-      isDisabled={isDisabled}
-      showMonthAndYearPickers
-      label={label}
-      color="default"
-      variant="bordered"
-      value={form[field]}
-      onChange={(val) =>
-        updateForm(setForm, {
-          [field]: val,
-          ...extraField,
-        })
-      }
-    />
-  </div>
-);
+}) => {
+  const [value, setValue] = useState(
+    form[field] ? parseDate(getDate(form[field])) : null,
+  );
+  return (
+    <I18nProvider locale="id-ID">
+      <DatePicker
+        isDisabled={isDisabled}
+        showMonthAndYearPickers
+        label={label}
+        color="default"
+        variant="bordered"
+        value={value}
+        onChange={(val) => {
+          setValue(val);
+          updateForm(setForm, {
+            [field]: val ? getDate(val) : null,
+            ...extraField,
+          });
+        }}
+      />
+    </I18nProvider>
+  );
+};
 export const MyCheckBox = ({
   isDisabled,
   form,

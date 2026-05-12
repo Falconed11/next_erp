@@ -13,6 +13,7 @@ import {
 import { NumberInput } from "@heroui/react";
 import { getApiPath } from "@/app/utils/apiconfig";
 import { RecapTable } from "./rekap";
+import { apiFetch } from "@/app/utils/fetchHelper";
 
 const api_path = getApiPath();
 
@@ -32,6 +33,7 @@ export default function Rekapitulasi({
   const [formPeralatan, setFormPeralatan] = useState({});
   const [formInstalasi, setFormInstalasi] = useState({});
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
   const editButtonPress = () => {
     setFormPeralatan({
       ...formPeralatan,
@@ -53,6 +55,7 @@ export default function Rekapitulasi({
     });
     onOpen();
   };
+
   const handleButtonSimpan = async (
     diskon,
     diskoninstalasi,
@@ -62,36 +65,25 @@ export default function Rekapitulasi({
   ) => {
     const isPresent = rekapitulasi.id;
     const method = isPresent ? "PUT" : "POST";
-    try {
-      const json = await apiFetch(`${api_path}rekapitulasiproyek`, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-          // 'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: JSON.stringify({
-          ...(isPresent
-            ? { id: rekapitulasi.id }
-            : { id_proyek: idProyek, versi }),
-          diskon,
-          diskoninstalasi,
-          pajak,
-        }),
-      });
-      const json = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        // Handle specific error messages if available
-        const message = json.message || `Error ${res.status}`;
-        alert(message);
-        return;
-      }
-      onClose();
-      // return alert(json.message);
-    } catch (err) {
-      alert("Network error or server not responding");
-      console.error(err);
+    const res = await apiFetch(`${api_path}rekapitulasiproyek`, {
+      method,
+      body: JSON.stringify({
+        ...(isPresent
+          ? { id: rekapitulasi.id }
+          : { id_proyek: idProyek, versi }),
+        diskon,
+        diskoninstalasi,
+        pajak,
+      }),
+    });
+    if (!res.ok) {
+      const json = await res.json();
+      return alert(json.message || "Simpan rekapitulasi gagal");
     }
+    onClose();
+    // return alert(json.message);
   };
+
   const modal = rekapitulasiTotal.modal;
   const jual = rekapitulasiTotal.jual;
   const diskon = formInstalasi.diskon + formPeralatan.diskon || 0;
@@ -122,7 +114,8 @@ export default function Rekapitulasi({
           <div className="text-right">
             <Button
               isDisabled={!isAuthorized}
-              color="primary" variant="solid"
+              color="primary"
+              variant="solid"
               onClick={editButtonPress}
             >
               Edit
@@ -181,7 +174,8 @@ export default function Rekapitulasi({
                   Batal
                 </Button>
                 <Button
-                  color="primary" variant="solid"
+                  color="primary"
+                  variant="solid"
                   onClick={() =>
                     handleButtonSimpan(
                       formPeralatan.diskon,

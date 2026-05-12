@@ -38,6 +38,8 @@ export default function DefaultModal({
     const res = await onSave({
       ...payload,
     });
+    if (!res.ok) return;
+    const json = await res.json();
     data.mutate();
     onSaveSuccess?.(json, payload);
     onClose();
@@ -55,7 +57,8 @@ export default function DefaultModal({
                 <Input
                   isRequired
                   type="text"
-                  color="default" variant="bordered"
+                  color="default"
+                  variant="bordered"
                   label={name}
                   placeholder={`Masukkan nama ${name}!`}
                   value={form.nama}
@@ -64,7 +67,8 @@ export default function DefaultModal({
               )}
               <Input
                 type="text"
-                color="default" variant="bordered"
+                color="default"
+                variant="bordered"
                 label={"Keterangan"}
                 placeholder={`Masukkan keterangan!`}
                 value={form.keterangan}
@@ -78,7 +82,11 @@ export default function DefaultModal({
               <Button color="danger" variant="flat" onClick={onClose}>
                 Batal
               </Button>
-              <Button color="primary" variant="solid" onClick={() => saveButtonPress(onClose)}>
+              <Button
+                color="primary"
+                variant="solid"
+                onClick={() => saveButtonPress(onClose)}
+              >
                 Simpan
               </Button>
             </ModalFooter>
