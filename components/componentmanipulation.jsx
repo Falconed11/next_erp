@@ -28,8 +28,8 @@ const ShowHideComponent = ({
         variant={variant}
         className={btnClassName}
         size={btnSize}
-        color="primary" variant="solid"
-        onClick={() => {
+        color="primary"
+        onPress={() => {
           setStat(stat == 0 ? 1 : 0);
         }}
       >
@@ -55,7 +55,8 @@ const ShowHideComponent2 = ({
     <div className="flex flex-col gap-2">
       <div>
         <Button
-          color="primary" variant="solid"
+          color="primary"
+          variant="solid"
           onClick={() => {
             setIsOpen(!isOpen);
           }}
