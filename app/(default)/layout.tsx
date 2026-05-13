@@ -1,5 +1,3 @@
-import Nav from "@/components/nav";
-import User from "@/components/user";
 import { highRoles } from "@/app/utils/roles";
 import { RiDashboard2Line } from "react-icons/ri";
 import { AiOutlineProduct } from "react-icons/ai";
@@ -12,8 +10,8 @@ import { HiOutlineOfficeBuilding, HiOutlineUserGroup } from "react-icons/hi";
 import { TbDeviceDesktopAnalytics } from "react-icons/tb";
 import { FaRegUser } from "react-icons/fa";
 import { LiaToolsSolid } from "react-icons/lia";
-import { Spinner } from "@heroui/react";
 import { getUser } from "../utils/user";
+import MainNav from "./main-nav";
 
 export default async function RootLayout({
   children,
@@ -28,11 +26,13 @@ export default async function RootLayout({
   const isHighRole = highRoles.includes(user.peran);
   const links = [
     { href: "/", name: "Dashboard", icon: <RiDashboard2Line /> },
+    // aktivitas
     {
       href: "/aktivitas",
       name: "Aktivitas",
       icon: <BusinessProgressBarIcon />,
     },
+    // produk
     {
       href: "/produk",
       name: "Produk",
@@ -52,6 +52,7 @@ export default async function RootLayout({
         },
       ],
     },
+    // proyek
     {
       href: "/proyek",
       name: "Proyek",
@@ -87,6 +88,7 @@ export default async function RootLayout({
         : {}),
       icon: <VscGithubProject />,
     },
+    // operasional kantor
     ...(highRoles.includes(user.peran)
       ? [
           {
@@ -96,6 +98,7 @@ export default async function RootLayout({
           },
         ]
       : []),
+    // customer
     {
       href: "/customer",
       name: "Customer",
@@ -119,8 +122,10 @@ export default async function RootLayout({
           }
         : {}),
     },
+    // vendor, bank, karyawan, coa, transaksi, laporan, perusahaan
     ...([...highRoles, "admin"].includes(user.peran)
       ? [
+          // vendor
           {
             href: "/vendor",
             name: "Vendor",
@@ -130,6 +135,7 @@ export default async function RootLayout({
               { key: "vendor-jenis", name: "Vendor Jenis" },
             ],
           },
+          // bank
           {
             href: "/bank",
             name: "Bank",
@@ -143,6 +149,7 @@ export default async function RootLayout({
                 }
               : {}),
           },
+          // karyawan
           {
             href: "/karyawan",
             name: "Karyawan",
@@ -158,6 +165,7 @@ export default async function RootLayout({
               },
             ],
           },
+          // coa
           {
             href: "/coa",
             name: "COA",
@@ -179,21 +187,27 @@ export default async function RootLayout({
                 key: "coa-filter",
                 name: "COA Filter",
               },
-              {
-                key: "peristiwa",
-                name: "Peristiwa",
-              },
-              {
-                key: "peristiwa-coa-map",
-                name: "Peristiwa COA Map",
-              },
+              ...(user.peran == "super"
+                ? [
+                    {
+                      key: "peristiwa",
+                      name: "Peristiwa",
+                    },
+                    {
+                      key: "peristiwa-coa-map",
+                      name: "Peristiwa COA Map",
+                    },
+                  ]
+                : []),
             ],
           },
+          // transaksi
           {
             href: "/transaksi",
             name: "Transaksi",
             icon: <TbDeviceDesktopAnalytics />,
           },
+          // laporan
           {
             href: "/laporan",
             name: "Laporan",
@@ -245,6 +259,7 @@ export default async function RootLayout({
               },
             ],
           },
+          // perusahaan
           {
             href: "/perusahaan",
             name: "Perusahaan",
@@ -252,6 +267,7 @@ export default async function RootLayout({
           },
         ]
       : []),
+    // user, alat
     ...(user.peran == "super"
       ? [
           { href: "/user", name: "User", icon: <FaRegUser /> },
@@ -260,30 +276,8 @@ export default async function RootLayout({
       : []),
   ];
   return (
-    <section className="inline-flex- flex flex-col gap-3">
-      <div></div>
-      <div className="bg-black- w-screen sticky left-0">
-        <div className="bg-red-500- mx-3">
-          <div className="grid grid-cols-2 py-2 mr-3 rounded-lg bg-background ">
-            <div className="basis-3/4-">
-              <div className="p-3 font-bold text-xl">ERP</div>
-            </div>
-            {/* <div className="basis-1/4- flex flex-row-reverse"> */}
-            <div className="text-right">
-              <div className="px-3">
-                <User user={user} />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="flex flex-row gap-3">
-        <div></div>
-        <div className={"sticky top-3"}>
-          <Nav navLinks={links} className="" />
-        </div>
-        <div>{children}</div>
-      </div>
-    </section>
+    <MainNav links={links} user={user}>
+      {children}
+    </MainNav>
   );
 }

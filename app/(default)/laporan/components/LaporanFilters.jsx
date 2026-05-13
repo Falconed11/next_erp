@@ -28,19 +28,21 @@ export default function LaporanFilters({
         title="Laporan"
         field="laporan"
         id="id_laporan"
-        color="default" variant="bordered"
+        color="default"
+        variant="bordered"
         form={form}
         setForm={setForm}
       />
       <SelectPerusahaan
         form={form}
         setForm={setForm}
-        color="default" variant="bordered"
+        color="default"
+        variant="bordered"
         disallowEmptySelection
       />
       <div className="rounded-xl border border-slate-300 bg-white px-4 py-3 md:col-span-2">
         <RadioGroup
-          label="Tipe Report"
+          label="Tipe Laporan"
           orientation="horizontal"
           value={form.reportType}
           onValueChange={(reportType) =>
@@ -54,8 +56,8 @@ export default function LaporanFilters({
             }))
           }
         >
-          <Radio value="simple">Simple Report</Radio>
-          <Radio value="full">Full Report</Radio>
+          <Radio value="simple">Laporan Periode</Radio>
+          <Radio value="full">Laporan Akumulasi</Radio>
         </RadioGroup>
         {form.reportType === "full" && form.startDate == null ? (
           <div className="mt-2 text-sm text-danger">
@@ -82,7 +84,8 @@ export default function LaporanFilters({
       />
       <div className="flex gap-2 md:col-span-2">
         <Button
-          color="danger" variant="solid"
+          color="danger"
+          variant="solid"
           onClick={() =>
             setForm((prev) => ({
               ...prev,
@@ -95,7 +98,8 @@ export default function LaporanFilters({
           Clear Date
         </Button>
         <Button
-          color="primary" variant="solid"
+          color="primary"
+          variant="solid"
           onClick={() =>
             setForm((prev) => ({
               ...prev,
@@ -108,14 +112,16 @@ export default function LaporanFilters({
           Current Month
         </Button>
         <Button
-          color="primary" variant="solid"
+          color="primary"
+          variant="solid"
           onClick={onGenerate}
           isDisabled={isGenerateDisabled || isSameAsApplied}
         >
           Generate
         </Button>
         <Button
-          color="default" variant="bordered"
+          color="default"
+          variant="bordered"
           onClick={onRefresh}
           isDisabled={!hasGeneratedReport || isRefreshing}
           isLoading={isRefreshing}

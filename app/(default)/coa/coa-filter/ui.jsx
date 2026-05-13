@@ -28,7 +28,7 @@ import {
 import DefaultModal from "@/components/default/DefaultModal";
 import { useState } from "react";
 import { useSWRConfig } from "swr";
-import CoaNavigation from "@/components/coa/CoaNavigation";
+import CoaNavigation from "@/app/(default)/coa/components/CoaNavigation";
 
 export default function App({ user }) {
   const sessionUser = user;
@@ -85,7 +85,6 @@ export default function App({ user }) {
   return (
     <>
       <div className="flex flex-col gap-2">
-        <CoaNavigation />
         <TableWithActiveStatus
           endPoint={COA_FILTER_ENDPOINT}
           rowsPerPage={10}
@@ -135,6 +134,7 @@ export default function App({ user }) {
               </Tooltip>
             </div>
           )}
+          user={user}
         />
       </div>
       {viewMode === "add" ? (
@@ -180,6 +180,7 @@ export default function App({ user }) {
                   };
                 }}
                 extraDataBeforeAdd={{ id_coa_filter: form.id_coa_filter }}
+                user={user}
               />
             </ModalBody>
           </ModalContent>

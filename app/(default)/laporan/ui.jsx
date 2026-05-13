@@ -16,7 +16,6 @@ import {
 
 export default function App() {
   const [form, setForm] = useState(createInitialReportForm);
-  console.log(form);
   const [appliedForm, setAppliedForm] = useState(createInitialReportForm);
   const [lastAction, setLastAction] = useState(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -94,6 +93,13 @@ export default function App() {
     }
   };
 
+  // console.log({
+  //   laporanTree: laporanTree.data?.data,
+  //   reportTree,
+  //   reportSummary,
+  // });
+  const { startDate, endDate } = form;
+  console.log(form);
   return (
     <div className="flex gap-2">
       <div className="mb-6 gap-3 rounded-xl border bg-white p-4 md:grid-cols-2">
@@ -117,7 +123,9 @@ export default function App() {
         <header className="mb-8 border-b-2 border-slate-800 pb-4">
           <h1 className="text-3xl font-extrabold text-slate-800">Laporan</h1>
           <p className="text-slate-500 italic">
-            Customizable Administrative Report
+            {/* Customizable Administrative Report */}
+            {startDate && `Dari: ${startDate.toLocaleDateString()} `}
+            {endDate && `Sampai: ${endDate.toLocaleDateString()}`}
           </p>
         </header>
 

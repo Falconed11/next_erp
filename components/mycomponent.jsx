@@ -504,11 +504,11 @@ export const StatusToDoList = () => {
                 <EditIcon />
               </span>
             </Tooltip>
-            <LinkOpenNewTab
+            {/* <LinkOpenNewTab
               content={"Detail Produk"}
               icon={<EyeIcon />}
               link={`/produk?id=${data.id_produk || null}`}
-            />
+            /> */}
             <Tooltip color="danger" variant="solid" content="Delete">
               <span
                 onClick={() => deleteButtonPress(data)}

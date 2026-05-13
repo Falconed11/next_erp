@@ -21,8 +21,10 @@ export default function App({ error, redirect }) {
       method: "POST",
       body: JSON.stringify(form),
     });
-    const data = await res.json();
-    if (!res.ok) return alert(data.message || "Login failed");
+    if (!res.ok) {
+      const data = await res.json();
+      return alert(data.message || "Login failed");
+    }
     router.push(redirect || "/");
   };
 

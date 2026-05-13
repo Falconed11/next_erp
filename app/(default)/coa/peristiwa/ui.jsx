@@ -8,14 +8,13 @@ import {
 } from "@/services/coa/peristiwa.service";
 import Link from "next/link";
 import { Button } from "@heroui/react";
-import CoaNavigation from "@/components/coa/CoaNavigation";
+import CoaNavigation from "@/app/(default)/coa/components/CoaNavigation";
 
 export default function App({ user }) {
   const queryStates = renderQueryStates({});
   if (queryStates) return queryStates;
   return (
     <div className="flex flex-col gap-2">
-      <CoaNavigation />
       <TableWithActiveStatus
         endPoint={PERISTIWA_ENDPOINT}
         rowsPerPage={10}

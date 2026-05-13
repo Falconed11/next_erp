@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useMemo, useEffect } from "react";
+import { useState } from "react";
 import {
   Table,
   TableHeader,
@@ -7,26 +7,11 @@ import {
   TableBody,
   TableRow,
   TableCell,
-  Button,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
   useDisclosure,
-  Input,
-  Textarea,
-  Tooltip,
   Pagination,
-  Spinner,
-  Autocomplete,
-  AutocompleteItem,
-  Select,
 } from "@heroui/react";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
 import { useClientFetch } from "@/hooks/useClientFetch";
-import { getDate, getDateF, getDateFId } from "@/app/utils/date";
+import { getDate, getDateFId } from "@/app/utils/date";
 import {
   TRANSAKSI_ENDPOINT,
   saveTransaksi,
@@ -34,19 +19,15 @@ import {
 } from "@/services/transaksi.service";
 import {
   highRoleCheck,
-  key2set,
   renderQueryStates,
   rolesCheck,
-  set2key,
-  updateForm,
 } from "@/app/utils/tools";
 import {
   TableHeaderWithAddButton,
   OpenBlueLinkInNewTab,
 } from "@/components/mycomponent";
 import { renderDefaultTableCell } from "@/components/default/DefaultTable";
-import Harga, { NumberComp } from "@/components/harga";
-import { API_PATH } from "@/app/utils/apiconfig";
+import { NumberComp } from "@/components/harga";
 import { useTransaksiColumns } from "@/hooks/useTransaksi.hooks";
 import { ModalJurnal } from "@/components/transaksi/transaksi";
 import { fetchJurnalById } from "@/services/transaksi/jurnal.service";
@@ -54,7 +35,7 @@ import { fetchJurnalById } from "@/services/transaksi/jurnal.service";
 export default function TransaksiUI({ user }) {
   const sessionUser = user;
   const [page, setPage] = useState(1);
-  const rowsPerPage = 25;
+  const rowsPerPage = 10;
   const offset = (page - 1) * rowsPerPage;
   const [form, setForm] = useState({
     tanggal: "",

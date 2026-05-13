@@ -7,6 +7,7 @@ export default function ReportTreeSection({
   reportSummary,
   reportTree,
   showModifier = false,
+  data = {},
 }) {
   return (
     <div className="space-y-4">

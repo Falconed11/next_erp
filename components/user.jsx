@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { capitalizeEachWord } from "@/app/utils/tools";
 import { apiFetch } from "@/app/utils/fetchHelper";
 
-export default function App({ user }) {
+export default function User({ user }) {
   // const status = user.user.status;
   const router = useRouter();
   const handleLogout = async () => {

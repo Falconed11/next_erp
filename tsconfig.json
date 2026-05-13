@@ -29,7 +29,7 @@
     ".next/types/**/*.ts",
     "app/produk/ui.jsx",
     "components/icon.js",
-    "components/nav.jsx",
+    "components/navigation.jsx",
     "app/proyek/detail/page.jsx",
     ".next/dev/types/**/*.ts"
   ],

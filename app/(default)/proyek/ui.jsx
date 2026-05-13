@@ -782,9 +782,15 @@ export default function App({
                               onSelectionChange={(keys) =>
                                 setFilterBy(Array.from(keys)[0])
                               }
+                              classNames={{ popoverContent: "w-auto" }}
+                              disallowEmptySelection
                             >
-                              <SelectItem key="nama">Nama Proyek</SelectItem>
-                              <SelectItem key="klien">Klien</SelectItem>
+                              {[
+                                { key: "nama", label: "Nama Proyek" },
+                                { key: "klien", label: "Klien" },
+                              ].map((o) => (
+                                <SelectItem key={o.key}>{o.label}</SelectItem>
+                              ))}
                             </Select>
                           </div>
                           <FilterHidden

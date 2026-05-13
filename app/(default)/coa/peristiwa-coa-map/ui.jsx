@@ -11,14 +11,13 @@ import { TableWithActiveStatus } from "@/components/default/DefaultTable";
 import { Input } from "@heroui/react";
 import Link from "next/link";
 import { Button } from "@heroui/react";
-import CoaNavigation from "@/components/coa/CoaNavigation";
+import CoaNavigation from "@/app/(default)/coa/components/CoaNavigation";
 
 export default function App({ user }) {
   const queryStates = renderQueryStates({});
   if (queryStates) return queryStates;
   return (
     <div className="flex flex-col gap-2">
-      <CoaNavigation />
       <TableWithActiveStatus
         endPoint={PERISTIWA_COA_MAP_ENDPOINT}
         rowsPerPage={10}
