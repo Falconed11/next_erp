@@ -8,21 +8,23 @@ export async function POST(req: NextRequest) {
   const url = `${API_PATH}login`;
 
   try {
-    const backendRes = await fetch(url, {
+    const res = await fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ username, password }),
     });
-    const data = await backendRes.json();
-    if (!backendRes.ok) {
+    const data = await res.json();
+    console.log(data.token);
+    if (!res.ok) {
       console.error("Login failed:", data.message || "Unknown error");
       return NextResponse.json(
         { message: data.message || "Login failed" },
-        { status: backendRes.status },
+        { status: res.status },
       );
     }
+    console.log("Login successful");
     const response = NextResponse.json({ message: "Login success" });
     response.cookies.set("token", data.token, {
       httpOnly: true,

@@ -14,6 +14,7 @@ const allowedDevOrigins = [
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   allowedDevOrigins,
+  // basePath: process.env.BASE_PATH,
   images: {
     remotePatterns: [
       {
