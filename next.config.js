@@ -7,9 +7,13 @@
 
 // module.exports = nextConfig;
 
+const allowedDevOrigins = [
+  ...(process.env.ALLOWED_DEV_ORIGINS ? [process.env.ALLOWED_DEV_ORIGINS] : []),
+];
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  allowedDevOrigins: [process.env.ALLOWED_DEV_ORIGINS],
+  allowedDevOrigins,
   images: {
     remotePatterns: [
       {
