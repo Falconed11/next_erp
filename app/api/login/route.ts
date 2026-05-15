@@ -17,6 +17,7 @@ export async function POST(req: NextRequest) {
     });
     const data = await backendRes.json();
     if (!backendRes.ok) {
+      console.error("Login failed:", data.message || "Unknown error");
       return NextResponse.json(
         { message: data.message || "Login failed" },
         { status: backendRes.status },
@@ -25,8 +26,8 @@ export async function POST(req: NextRequest) {
     const response = NextResponse.json({ message: "Login success" });
     response.cookies.set("token", data.token, {
       httpOnly: true,
-      secure: true,
-      sameSite: "none",
+      secure: false,
+      sameSite: "lax",
       path: "/",
     });
 
