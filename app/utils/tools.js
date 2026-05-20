@@ -41,15 +41,23 @@ export const capitalizeEachWord = (str = "") => {
 };
 export const renderQueryStates = (queries) => {
   for (const [name, data] of Object.entries(queries ?? {})) {
-    const { error } = data;
+    const { error, isLoading, data: fetchedData } = data;
+    const { success, message } = fetchedData ?? {};
     if (error)
       return (
         <div>
           Failed to load {name} {error.message}
         </div>
       );
-    if (data.isLoading) return <div>Loading {name}...</div>;
+    if (isLoading) return <div>Loading {name}...</div>;
+    if (success === false)
+      return (
+        <div>
+          Fetch failed {name} {message}
+        </div>
+      );
   }
+  return null;
 };
 export const useDebounce = (value, delay = 1000) => {
   const [debounced, setDebounced] = useState(value);

@@ -8,14 +8,16 @@ export const tableClassNames = {
   tr: "",
   base: "",
 };
-export const buildTableClassNames = ({ customTd, sWrapper }) => ({
+export const buildTableClassNames = ({
+  customTd = "",
+  sWrapper = "",
+  ...rest
+}) => ({
   wrapper: sWrapper,
   table: "border-collapse",
   //   thead: " bg-transparent [&>tr:last-child]:hidden",
-  th: "",
   td: `py-0 align-top ${customTd}`,
-  tr: "",
-  base: "",
+  ...rest,
 });
 export const styleActionButton =
   "text-lg text-default-400 cursor-pointer active:opacity-50";

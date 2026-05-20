@@ -18,10 +18,8 @@ export const OperasionalKantor = ({ startDate, endDate }) => {
       current.endDate,
     )}`,
   );
-  if (kategori.error) return <div>failed to load</div>;
-  if (kategori.isLoading) return <div>loading...</div>;
-  if (operasional.error) return <div>failed to load</div>;
-  if (operasional.isLoading) return <div>loading...</div>;
+  const QueryState = renderQueryStates({ kategori, operasional });
+  if (QueryState) return QueryState;
   const totalOperasional = operasional.data.reduce((total, v) => {
     return (total += v.biaya ? parseInt(v.biaya) : 0);
   }, 0);

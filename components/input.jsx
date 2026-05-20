@@ -2,6 +2,7 @@ import { useCallback, useState } from "react";
 import * as XLSX from "xlsx";
 import { useDropzone } from "react-dropzone";
 import {
+  Input,
   Button,
   useDisclosure,
   Modal,
@@ -14,7 +15,6 @@ import {
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import Link from "next/link";
-import { Input, Textarea } from "@heroui/react";
 import { getDate, excelToJSDate, getDateF } from "@/app/utils/date";
 import { getApiPath } from "@/app/utils/apiconfig";
 import { SelectPerusahaan } from "./perusahaan/perusahaan";
@@ -261,6 +261,7 @@ export function TemplateImport({
   setIsLoading,
   formatLink,
 }) {
+  const [hovered, setHovered] = useState(false);
   formatLink = formatLink ?? "";
   const [customInputCode, setCustomInputCode] = useState([]);
   const [json, setJson] = useState([]);
@@ -291,36 +292,53 @@ export function TemplateImport({
   };
 
   return (
-    <div className=" border bg-white rounded-lg p-2">
-      {name}
-      <div className="flex gap-2">
-        <div>
-          <Link
-            className="bg-primary text-white p-2 rounded-lg inline-block"
-            href={formatLink}
-          >
-            Download Format
-          </Link>
+    <Tooltip
+      showArrow={true}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      closeDelay={200}
+      content={
+        <div className="flex flex-col gap-2 py-2">
+          {name}
+          <div className="flex gap-2">
+            <div>
+              <Link
+                className="bg-primary text-white p-2 rounded-lg inline-block"
+                href={formatLink}
+              >
+                Download Format
+              </Link>
+            </div>
+            <div>
+              <Input
+                size="sm"
+                type="text"
+                label="Kode Input"
+                placeholder="Masukkan kode input!"
+                value={customInputCode}
+                onValueChange={setCustomInputCode}
+              />
+            </div>
+            <FileUploader onFileUpload={handleFileUpload} />
+            <Button
+              color="primary"
+              variant="solid"
+              onPress={() => handleButtonUploadExcelPress(apiendpoint)}
+            >
+              Upload Excel
+            </Button>
+          </div>
         </div>
-        <div>
-          <Input
-            type="text"
-            label="Kode Input"
-            placeholder="Masukkan kode input!"
-            value={customInputCode}
-            onValueChange={setCustomInputCode}
-          />
-        </div>
-        <FileUploader onFileUpload={handleFileUpload} />
-        <Button
-          color="primary"
-          variant="solid"
-          onClick={() => handleButtonUploadExcelPress(apiendpoint)}
-        >
-          Upload Excel
-        </Button>
+      }
+    >
+      <div
+        className="bg-primary p-2 rounded-lg text-white"
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+      >
+        Import {hovered ? "v" : ">"}
       </div>
-    </div>
+    </Tooltip>
   );
 }
 export function TemplateImportV2({

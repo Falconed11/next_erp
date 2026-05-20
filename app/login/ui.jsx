@@ -21,12 +21,12 @@ export default function App({ error, redirect }) {
       method: "POST",
       body: JSON.stringify(form),
     });
-    console.log(await res.json());
+    const data = await res.json();
+    console.log(data);
     if (!res.ok) {
-      const data = await res.json();
       return alert(data.message || "Login failed");
     }
-    // router.push(redirect || "/");
+    router.push(redirect || "/");
   };
 
   // console.log(form);

@@ -100,6 +100,7 @@ import { apiFetch } from "@/app/utils/fetchHelper";
 import { patchProduk } from "@/services/produk/produk.service";
 import { CalendarDate, today } from "@internationalized/date";
 import { number2Nominal } from "@/app/utils/number";
+import { buildTableClassNames, tableClassNames } from "@/app/utils/style";
 
 const apiPath = getApiPath();
 
@@ -681,121 +682,152 @@ export default function App({ id, user }) {
 
   console.log(produk.data[0]);
   return (
-    <div className="">
-      <div className="flex flex-col gap-2">
-        <div className="flex gap-2">
-          {isHighRole && (
-            <Button color="primary" variant="solid" onClick={tambahButtonPress}>
-              Tambah
-            </Button>
-          )}
-          <div className="flex flex-row gap-2">
-            <Button color="primary" variant="solid" onClick={exportStok}>
-              Export Stok
-            </Button>
-          </div>
-        </div>
-        <AuthorizationComponent
-          roles={["super", "admin"]}
-          user={sessUser}
-          component={
-            <>
-              <div>
-                <TemplateImport
-                  report={report}
-                  setReportList={setReportList}
-                  name={"Import Produk"}
-                  apiendpoint={"importproduk"}
-                  isLoading={isLoading}
-                  setIsLoading={setIsLoading}
-                  formatLink={"/produk.xlsx"}
+    <div className="flex flex-col gap-2">
+      {true && (
+        // <div className="w-3/4">
+        <Table
+          fullWidth={false}
+          isStriped
+          className={`p-3 w-3/4 bg-white rounded-xl overflow-x-auto overscroll-x-auto`}
+          classNames={buildTableClassNames({
+            sWrapper:
+              "p-0 h-120 bg-transparent rounded-none shadow-none overflow-x-auto",
+            base: "w-[500]px",
+          })}
+          aria-label="Example table with custom cells"
+          topContentPlacement="outside"
+          topContent={
+            <div className="flex flex-col gap-2">
+              <div className="flex gap-2">
+                {/* tambah produk */}
+                {isHighRole && (
+                  <Button
+                    color="primary"
+                    variant="solid"
+                    onClick={tambahButtonPress}
+                  >
+                    Tambah
+                  </Button>
+                )}
+                {/* export stok */}
+                <div className="flex flex-row gap-2">
+                  <Button color="primary" variant="solid" onClick={exportStok}>
+                    Export Stok
+                  </Button>
+                </div>
+                {/* import produk */}
+                <AuthorizationComponent
+                  roles={["super", "admin"]}
+                  user={sessUser}
+                  component={
+                    <TemplateImport
+                      report={report}
+                      setReportList={setReportList}
+                      name={"Import Produk"}
+                      apiendpoint={"importproduk"}
+                      isLoading={isLoading}
+                      setIsLoading={setIsLoading}
+                      formatLink={"/produk.xlsx"}
+                    />
+                  }
                 />
               </div>
-            </>
-          }
-        />
-      </div>
-      <Table
-        isStriped
-        className="pt-3"
-        aria-label="Example table with custom cells"
-        topContent={
-          <>
-            <FilterProduk
-              id={filterId}
-              setId={setFilterId}
-              nama={nama}
-              setNama={setNama}
-              selectKategori={selectKategori}
-              setSelectKategori={setSelectKategori}
-              page={page}
-              setPage={setPage}
-              isReadyStock={isReadyStock}
-              setIsReadyStock={setIsReadyStock}
-              kategori={kategori.data}
-              isShowInactive={isShowInactive}
-              setIsShowInactive={setIsShowInactive}
-            />
-            {/* <div className="flex flex-row gap-2">
-              <Button color="primary" variant="solid" onClick={handleButtonExportToExcelPress}>
-                Export to Excel
-              </Button>
-            </div> */}
-            <div>
-              {id && (
-                <FilterCard
-                  arrayContent={[{ label: "Id", value: id }]}
-                  link="produk"
-                  title="Produk"
-                />
-              )}
-            </div>
-          </>
-        }
-        bottomContent={
-          pages > 0 ? (
-            <div className="flex w-full justify-center">
-              <Pagination
-                isCompact
-                showControls
-                showShadow
-                color="primary"
-                variant="solid"
+              <FilterProduk
+                id={filterId}
+                setId={setFilterId}
+                nama={nama}
+                setNama={setNama}
+                selectKategori={selectKategori}
+                setSelectKategori={setSelectKategori}
                 page={page}
-                total={pages}
-                onChange={(page) => setPage(page)}
+                setPage={setPage}
+                isReadyStock={isReadyStock}
+                setIsReadyStock={setIsReadyStock}
+                kategori={kategori.data}
+                isShowInactive={isShowInactive}
+                setIsShowInactive={setIsShowInactive}
               />
+              {/* <div className="flex flex-row gap-2">
+                <Button
+                  color="primary"
+                  variant="solid"
+                  onClick={handleButtonExportToExcelPress}
+                >
+                  Export to Excel
+                </Button>
+              </div> */}
+              <div>
+                {id && (
+                  <FilterCard
+                    arrayContent={[{ label: "Id", value: id }]}
+                    link="produk"
+                    title="Produk"
+                  />
+                )}
+              </div>
             </div>
-          ) : null
-        }
-      >
-        <TableHeader columns={col}>
-          {(column) => (
-            <TableColumn
-              key={column.key}
-              align={column.key === "actions" ? "center" : "start"}
-            >
-              {column.label}
-            </TableColumn>
-          )}
-        </TableHeader>
-        <TableBody
-          items={
-            filteredData ? filteredData.slice(offset, offset + rowsPerPage) : []
           }
-          loadingContent={"Loading..."}
-          emptyContent={"Kosong"}
-          loadingState={loadingState}
+          bottomContentPlacement="outside"
+          bottomContent={
+            <div className="bg-red-200-">
+              {pages > 0 ? (
+                <div className="flex w-full justify-center">
+                  <Pagination
+                    isCompact
+                    showControls
+                    showShadow
+                    color="primary"
+                    variant="solid"
+                    page={page}
+                    total={pages}
+                    onChange={(page) => setPage(page)}
+                  />
+                </div>
+              ) : null}
+            </div>
+          }
         >
-          {(item) => (
-            <TableRow className={item.aktif ? "" : `bg-red-200`} key={item.id}>
-              {(columnKey) => (
-                <TableCell>{renderCell(item, columnKey)}</TableCell>
-              )}
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+          <TableHeader columns={col}>
+            {(column) => {
+              const { key, label } = column;
+              return (
+                <TableColumn
+                  key={key}
+                  align={key === "actions" ? "center" : "start"}
+                >
+                  {label}
+                </TableColumn>
+              );
+            }}
+          </TableHeader>
+          <TableBody
+            items={
+              filteredData
+                ? filteredData.slice(offset, offset + rowsPerPage)
+                : []
+            }
+            loadingContent={"Loading..."}
+            emptyContent={"Kosong"}
+            loadingState={loadingState}
+          >
+            {(item) => (
+              <TableRow
+                className={` ${item.aktif ? "" : `bg-red-200`}`}
+                key={item.id}
+              >
+                {(columnKey) => (
+                  <TableCell
+                    className={`${columnKey === "keterangan" ? "" : `whitespace-nowrap`}`}
+                  >
+                    {renderCell(item, columnKey)}
+                  </TableCell>
+                )}
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+        // </div>
+      )}
       {/* Tambah Edit Produk */}
       <Modal
         isOpen={isOpen}
