@@ -10,6 +10,7 @@ import {
   Button,
   Checkbox,
   DatePicker,
+  DateRangePicker,
   Input,
   Modal,
   ModalBody,
@@ -37,7 +38,7 @@ import { TITLE_STYLE } from "@/app/utils/const";
 import { useClientFetch } from "@/hooks/useClientFetch";
 import { apiFetch } from "@/app/utils/fetchHelper";
 import { I18nProvider } from "@react-aria/i18n";
-import { parseDate } from "@internationalized/date";
+import { getLocalTimeZone, parseDate, today } from "@internationalized/date";
 
 export const MyChip = ({ text, theme }) => {
   console.log(text, theme);
@@ -646,17 +647,25 @@ export const MyAddButton = ({ onPress }) => {
 export const TableTitle = ({ children }) => (
   <div className={TITLE_STYLE}>{children}</div>
 );
-export const TableHeaderWithAddButton = ({ title, onPress, isHighRole }) => (
+export const TableHeaderWithAddButton = ({
+  extraButton = <></>,
+  title,
+  onPress,
+  isHighRole,
+}) => (
   <div className="flex justify-between items-center">
     <TableTitle>{title}</TableTitle>
-    {isHighRole && (
-      <Button onClick={onPress} variant="shadow" size="sm" color="primary">
-        <span className="text-xl font-bold">
-          <AddIcon />
-        </span>
-        Tambah
-      </Button>
-    )}
+    <div className="flex gap-2">
+      {extraButton}
+      {isHighRole && (
+        <Button onPress={onPress} variant="shadow" size="sm" color="primary">
+          <span className="text-xl font-bold">
+            <AddIcon />
+          </span>
+          Tambah
+        </Button>
+      )}
+    </div>
   </div>
 );
 /**
@@ -689,7 +698,42 @@ export const FilterCard = ({ title, arrayContent = [], link }) => {
     </Badge>
   );
 };
+export const MyDateRangePicker = ({
+  form,
+  setForm,
+  label = "Rentang Tanggal",
+  fieldStart = "from",
+  fieldEnd = "to",
+  extraField = {},
+  isDisabled = false,
+}) => {
+  const [value, setValue] = useState({
+    start: form[fieldStart] ? parseDate(getDate(form[fieldStart])) : null,
+    end: form[fieldEnd] ? parseDate(getDate(form[fieldEnd])) : null,
+  });
+  return (
+    <I18nProvider locale="id-ID">
+      <DateRangePicker
+        isDisabled={isDisabled}
+        showMonthAndYearPickers
+        label={label}
+        maxValue={today(getLocalTimeZone())}
+        value={value}
+        onChange={(val) => {
+          setValue(val);
+          updateForm(setForm, {
+            [fieldStart]: val?.start ? getDate(val.start) : null,
+            [fieldEnd]: val?.end ? getDate(val.end) : null,
+            ...extraField,
+          });
+        }}
+      />
+    </I18nProvider>
+  );
+};
 export const MyDatePicker = ({
+  minValue,
+  maxValue,
   form,
   setForm,
   label = "Tanggal",
@@ -697,12 +741,15 @@ export const MyDatePicker = ({
   extraField = {},
   isDisabled = false,
 }) => {
-  const [value, setValue] = useState(
-    form[field] ? parseDate(getDate(form[field])) : null,
-  );
+  const mysqldate2heroUI = (date) => (date ? parseDate(getDate(date)) : null);
+  const [value, setValue] = useState(mysqldate2heroUI(form[field]));
+  if (minValue) minValue = mysqldate2heroUI(minValue);
+  if (maxValue) maxValue = mysqldate2heroUI(maxValue);
   return (
     <I18nProvider locale="id-ID">
       <DatePicker
+        minValue={minValue}
+        maxValue={maxValue}
         isDisabled={isDisabled}
         showMonthAndYearPickers
         label={label}
@@ -718,6 +765,38 @@ export const MyDatePicker = ({
         }}
       />
     </I18nProvider>
+  );
+};
+export const MyMinMaxDatePicker = ({
+  form,
+  setForm,
+  labelStart = "Dari",
+  labelEnd = "Sampai",
+  fieldStart = "from",
+  fieldEnd = "to",
+  extraFieldStart = {},
+  extraFieldEnd = {},
+}) => {
+  const { [fieldStart]: from, [fieldEnd]: to } = form;
+  return (
+    <>
+      <MyDatePicker
+        maxValue={to}
+        form={form}
+        setForm={setForm}
+        label={labelStart}
+        field={fieldStart}
+        extraField={extraFieldStart}
+      />
+      <MyDatePicker
+        minValue={from}
+        form={form}
+        setForm={setForm}
+        label={labelEnd}
+        field={fieldEnd}
+        extraField={extraFieldEnd}
+      />
+    </>
   );
 };
 export const MyCheckBox = ({
