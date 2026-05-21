@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { Input, Button, Form } from "@heroui/react";
+import { Input, Button, Form, Spinner } from "@heroui/react";
 import Link from "next/link";
 import { EyeFilledIcon, EyeSlashFilledIcon } from "../../components/icon";
 import { apiFetch } from "../utils/fetchHelper";
@@ -11,19 +11,21 @@ export default function App({ error, redirect }) {
   const router = useRouter();
   const [isVisible, setIsVisible] = React.useState(false);
   const [form, setForm] = useState({ username: "", password: "" });
+  const [isLoading, setIsLoading] = useState(false);
 
   const toggleVisibility = () => setIsVisible(!isVisible);
+
   const handleLogin = async (event) => {
     event.preventDefault();
-    console.log("Login pressed", form);
+    setIsLoading(true);
 
     const res = await apiFetch(`/api/login`, {
       method: "POST",
       body: JSON.stringify(form),
     });
     const data = await res.json();
-    console.log(data);
     if (!res.ok) {
+      setIsLoading(false);
       return alert(data.message || "Login failed");
     }
     router.push(redirect || "/");
@@ -77,9 +79,13 @@ export default function App({ error, redirect }) {
             />
           </div>
           <div className="flex flex-row-reverse">
-            <Button type="submit" color="primary" variant="solid">
-              Login
-            </Button>
+            {isLoading ? (
+              <Spinner />
+            ) : (
+              <Button type="submit" color="primary" variant="solid">
+                Login
+              </Button>
+            )}
           </div>
         </div>
       </Form>

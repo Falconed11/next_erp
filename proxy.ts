@@ -26,13 +26,21 @@ export default function proxy(req: NextRequest) {
   }
 
   try {
-    const user = verify(token, process.env.JWT_SECRET!);
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      console.error("JWT_SECRET is not defined in environment variables");
+      throw new Error("Server configuration error");
+    }
+    const user = verify(token, secret);
     if (!user) {
-      console.log("Invalid token, redirecting to login");
+      console.error("Invalid token, redirecting to login");
       return redirectToLogin(req, "invalid_token");
     }
   } catch (err) {
-    console.log("Error occurred while verifying token, redirecting to login");
+    console.error(
+      `Error occurred while verifying token, redirecting to login`,
+      err,
+    );
     return redirectToLogin(req, "verification_failed");
   }
 

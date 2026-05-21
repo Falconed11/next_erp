@@ -315,7 +315,6 @@ export const ToDoList = ({ user }) => {
   ];
   const queryStates = renderQueryStates({ todolist, status });
   if (queryStates) return queryStates;
-  console.log(form);
   return (
     <>
       <Table

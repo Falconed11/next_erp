@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { API_PATH } from "@/app/utils/apiconfig";
+import { sign } from "jsonwebtoken";
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
@@ -16,7 +17,7 @@ export async function POST(req: NextRequest) {
       body: JSON.stringify({ username, password }),
     });
     const data = await res.json();
-    console.log(data.token);
+    console.log(data);
     if (!res.ok) {
       console.error("Login failed:", data.message || "Unknown error");
       return NextResponse.json(
@@ -24,14 +25,27 @@ export async function POST(req: NextRequest) {
         { status: res.status },
       );
     }
-    console.log("Login successful");
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      console.error("JWT_SECRET is not defined in environment variables");
+      return NextResponse.json(
+        { message: "Server configuration error" },
+        { status: 500 },
+      );
+    }
+    const token = sign(data.user, secret, {
+      expiresIn: 8 * 60 * 60 - 60,
+    });
+    console.log("Logged in successfully");
     const response = NextResponse.json({ message: "Login success" });
-    response.cookies.set("token", data.token, {
+    const cookiesOptions = {
       httpOnly: true,
       secure: false,
       sameSite: "lax",
       path: "/",
-    });
+    } as const;
+    response.cookies.set("expressToken", data.token, cookiesOptions);
+    response.cookies.set("token", token, cookiesOptions);
 
     return response;
   } catch (fetchErr) {
