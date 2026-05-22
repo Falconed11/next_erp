@@ -11,4 +11,6 @@ export const deleteJurnal = (id) => {
   return defaultDelete(JURNAL_ENDPOINT, id);
 };
 export const fetchJurnalById = (id) =>
-  fetch(id ? `${API_PATH}${TRANSAKSI_ENDPOINT}/${id}` : null);
+  fetch(id ? `${API_PATH}${TRANSAKSI_ENDPOINT}/${id}` : null, {
+    credentials: "include",
+  });

@@ -747,23 +747,36 @@ export const MyDatePicker = ({
   if (maxValue) maxValue = mysqldate2heroUI(maxValue);
   return (
     <I18nProvider locale="id-ID">
-      <DatePicker
-        minValue={minValue}
-        maxValue={maxValue}
-        isDisabled={isDisabled}
-        showMonthAndYearPickers
-        label={label}
-        color="default"
-        variant="bordered"
-        value={value}
-        onChange={(val) => {
-          setValue(val);
-          updateForm(setForm, {
-            [field]: val ? getDate(val) : null,
-            ...extraField,
-          });
-        }}
-      />
+      <div className="flex gap-2">
+        <DatePicker
+          minValue={minValue}
+          maxValue={maxValue}
+          isDisabled={isDisabled}
+          showMonthAndYearPickers
+          label={label}
+          color="default"
+          variant="bordered"
+          value={value}
+          onChange={(val) => {
+            setValue(val);
+            updateForm(setForm, {
+              [field]: val ? getDate(val) : null,
+              ...extraField,
+            });
+          }}
+        />
+        <div className="flex items-center justify-center">
+          <div
+            className="cursor-pointer bg-danger text-white rounded-full py-1 px-2 flex items-center justify-center"
+            onClick={() => {
+              setValue(null);
+              updateForm(setForm, { [field]: null, ...extraField });
+            }}
+          >
+            X
+          </div>
+        </div>
+      </div>
     </I18nProvider>
   );
 };
@@ -778,10 +791,11 @@ export const MyMinMaxDatePicker = ({
   extraFieldEnd = {},
 }) => {
   const { [fieldStart]: from, [fieldEnd]: to } = form;
+  const currentTime = today(getLocalTimeZone());
   return (
     <>
       <MyDatePicker
-        maxValue={to}
+        maxValue={to || currentTime}
         form={form}
         setForm={setForm}
         label={labelStart}
@@ -790,6 +804,7 @@ export const MyMinMaxDatePicker = ({
       />
       <MyDatePicker
         minValue={from}
+        maxValue={currentTime}
         form={form}
         setForm={setForm}
         label={labelEnd}

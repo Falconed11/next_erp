@@ -64,6 +64,7 @@ export function useDefaultColumnsV2(
   isHighRole,
   extraColumns = [],
   disableNama = false,
+  isShowAuditFields = true,
 ) {
   return useMemo(
     () => [
@@ -72,11 +73,15 @@ export function useDefaultColumnsV2(
       ...(!disableNama ? [{ key: "nama", label: "Nama" }] : []),
       ...extraColumns,
       { key: "keterangan", label: "Keterangan" },
-      { key: "created_at", label: "Dibuat" },
-      { key: "created_by", label: "Pembuat" },
-      { key: "updated_at", label: "Diubah" },
-      { key: "updated_by", label: "Pengubah" },
+      ...(isShowAuditFields
+        ? [
+            { key: "created_at", label: "Dibuat" },
+            { key: "created_by", label: "Pembuat" },
+            { key: "updated_at", label: "Diubah" },
+            { key: "updated_by", label: "Pengubah" },
+          ]
+        : []),
     ],
-    [isHighRole, disableNama, customId],
+    [isHighRole, disableNama, customId, isShowAuditFields, extraColumns],
   );
 }

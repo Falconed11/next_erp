@@ -15,6 +15,7 @@ import {
   PopoverContent,
   Button,
   Input,
+  Checkbox,
 } from "@heroui/react";
 import { useClientFetch } from "@/hooks/useClientFetch";
 import { getDate, getDateFId } from "@/app/utils/date";
@@ -45,6 +46,7 @@ import { buildTableClassNames } from "@/app/utils/style";
 import { SelectPerusahaan } from "@/components/perusahaan/perusahaan";
 import { AutocompleteProyek } from "@/components/proyek/proyek";
 import { AutocompleteCoa } from "@/components/coa/coa";
+import { AutocompleteCustomer } from "@/components/myautocomplete";
 
 export default function TransaksiUI({ user }) {
   const sessionUser = user;
@@ -62,37 +64,45 @@ export default function TransaksiUI({ user }) {
 
   const [filter, setFilter] = useState({});
   const debouncedJurnal = useDebounce(filter.jurnal, 500);
+  const [isShowAuditFields, setIsShowAuditFields] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   const params = [
-    ...(debouncedJurnal ? [`jurnal=${debouncedJurnal}`] : []),
+    ...(debouncedJurnal
+      ? [
+          `jurnal=${encodeURIComponent(JSON.stringify({ value: `%${debouncedJurnal}%`, operator: "like" }))}`,
+        ]
+      : []),
     ...(filter.from ? [`from=${filter.from}`] : []),
     ...(filter.to ? [`to=${filter.to}`] : []),
     ...(filter.id_coa ? [`id_coa=${filter.id_coa}`] : []),
     ...(filter.id_perusahaan ? [`id_perusahaan=${filter.id_perusahaan}`] : []),
     ...(filter.id_proyek ? [`id_proyek=${filter.id_proyek}`] : []),
+    ...(filter.id_instansi ? [`id_instansi=${filter.id_instansi}`] : []),
   ].join("&");
-
   const transaksiData = useClientFetch(
     `${TRANSAKSI_ENDPOINT}?limit=${rowsPerPage}&offset=${offset}&${params}`,
   );
+
   const handleEditForm = async (data) => {
     onOpen();
     setIsLoading(true);
     const jurnal = await fetchJurnalById(data.id_jurnal);
-    const res = await jurnal.json();
-    setForm({ ...res.data, method: "PATCH" });
+    const dataJurnal = await jurnal.json();
+    setForm({ ...dataJurnal.data, method: "PATCH" });
     setIsLoading(false);
   };
+
   const isAuthorized =
     highRoleCheck(sessionUser?.role) ||
     rolesCheck(["admin"], sessionUser?.peran);
-  const columns = useTransaksiColumns(isAuthorized);
+  const columns = useTransaksiColumns(isAuthorized, isShowAuditFields);
 
   const loadingState = transaksiData?.isLoading ? "loading" : "idle";
   const queryState = renderQueryStates({});
   if (queryState) return queryState;
+
   const pages = Math.ceil(transaksiData?.data?.data?.[0]?.total / rowsPerPage);
   const handleOpenForm = () => {
     setForm({
@@ -160,7 +170,7 @@ export default function TransaksiUI({ user }) {
         ),
     };
   };
-  console.log(filter);
+  // console.log(filter);
   return (
     <div className="">
       <ModalJurnal
@@ -176,7 +186,8 @@ export default function TransaksiUI({ user }) {
         isStriped
         className="w-400 bg-white p-3 rounded-xl"
         classNames={buildTableClassNames({
-          sWrapper: "h-150 bg-transparent border-none shadow-none p-0",
+          sWrapper:
+            "h-150 bg-transparent border-none shadow-none p-0 overflow-x-auto",
           base: "",
         })}
         aria-label="Jurnal Transaksi Table"
@@ -189,7 +200,7 @@ export default function TransaksiUI({ user }) {
               title="Jurnal Transaksi"
               onPress={handleOpenForm}
             />
-            <div>
+            <div className="flex gap-2">
               <Popover shouldCloseOnScroll={false}>
                 <PopoverTrigger>
                   <Button color="primary" size="md">
@@ -211,10 +222,17 @@ export default function TransaksiUI({ user }) {
                     {/* <MyDateRangePicker form={filter} setForm={setFilter} /> */}
                     <SelectPerusahaan form={filter} setForm={setFilter} />
                     <AutocompleteProyek form={filter} setForm={setFilter} />
+                    <AutocompleteCustomer form={filter} setForm={setFilter} />
                     <AutocompleteCoa form={filter} setForm={setFilter} />
                   </div>
                 </PopoverContent>
               </Popover>
+              <Checkbox
+                isSelected={isShowAuditFields}
+                onValueChange={setIsShowAuditFields}
+              >
+                Show Audit Fields
+              </Checkbox>
             </div>
           </>
         }
@@ -238,7 +256,7 @@ export default function TransaksiUI({ user }) {
             <TableColumn
               key={column.key}
               align={column.key === "aksi" ? "center" : "start"}
-              allowsSorting
+              // allowsSorting
             >
               {column.label}
             </TableColumn>
@@ -259,6 +277,7 @@ export default function TransaksiUI({ user }) {
                       ? "right"
                       : "start"
                   }
+                  className={"whitespace-nowrap"}
                 >
                   {renderDefaultTableCell({
                     data: item,
