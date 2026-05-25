@@ -7,10 +7,10 @@
 
 // module.exports = nextConfig;
 
-const allowedDevOrigins = [
-  ...(process.env.ALLOWED_DEV_ORIGINS ? [process.env.ALLOWED_DEV_ORIGINS] : []),
-];
-
+const allowedDevOrigins = process.env.ALLOWED_DEV_ORIGINS
+  ? process.env.ALLOWED_DEV_ORIGINS.split(",")
+  : [];
+console.log("Allowed development origins:", allowedDevOrigins);
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   allowedDevOrigins,
@@ -25,6 +25,14 @@ const nextConfig = {
       },
     ],
   },
+  async rewrites() {
+    return [
+      {
+        source: "/api/express/:path*",
+        destination: "http://127.0.0.1:3001/api/:path*",
+      },
+    ];
+  },
 };
 
-module.exports = nextConfig;
+export default nextConfig;

@@ -6,7 +6,8 @@ export async function POST(req: NextRequest) {
   const body = await req.json();
   const { username, password } = body;
 
-  const url = `${API_PATH}login`;
+  const url = `${process.env.EXPRESS_PATH}/api/login`;
+  console.log("Attempting to log in with URL:", url);
 
   try {
     const res = await fetch(url, {
@@ -17,7 +18,7 @@ export async function POST(req: NextRequest) {
       body: JSON.stringify({ username, password }),
     });
     const data = await res.json();
-    console.log(data);
+    // console.log(data);
     if (!res.ok) {
       console.error("Login failed:", data.message || "Unknown error");
       return NextResponse.json(

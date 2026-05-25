@@ -4,6 +4,7 @@ import { verify } from "jsonwebtoken";
 export function createLoginRedirectUrl(req: NextRequest, error: string) {
   const requestedPath = `${req.nextUrl.pathname}${req.nextUrl.search}`;
   const redirectParam = encodeURIComponent(requestedPath);
+
   return new URL(`/login?error=${error}&redirect=${redirectParam}`, req.url);
 }
 
@@ -11,42 +12,42 @@ export function redirectToLogin(req: NextRequest, error: string) {
   return NextResponse.redirect(createLoginRedirectUrl(req, error));
 }
 
-export default function proxy(req: NextRequest) {
+export default function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  if (pathname.startsWith("/api") || pathname === "/login") {
+  // 1. Identify the IP using Next.js built-in helper or standard headers
+  const ip = req.headers.get("x-forwarded-for") || "127.0.0.1";
+  // 2. Log it (or send it to your logging service)
+  console.log(`[Incoming Request] IP: ${ip} | Path: ${req.nextUrl.pathname}`);
+
+  // Public routes
+  if (pathname.startsWith("/api") || pathname.startsWith("/login")) {
     return NextResponse.next();
   }
 
   const token = req.cookies.get("token")?.value;
 
   if (!token) {
-    console.log("No token found, redirecting to login");
     return redirectToLogin(req, "unauthorized");
   }
 
   try {
     const secret = process.env.JWT_SECRET;
+
     if (!secret) {
-      console.error("JWT_SECRET is not defined in environment variables");
-      throw new Error("Server configuration error");
+      throw new Error("JWT_SECRET missing");
     }
-    const user = verify(token, secret);
-    if (!user) {
-      console.error("Invalid token, redirecting to login");
-      return redirectToLogin(req, "invalid_token");
-    }
+
+    verify(token, secret);
+
+    return NextResponse.next();
   } catch (err) {
-    console.error(
-      `Error occurred while verifying token, redirecting to login`,
-      err,
-    );
+    console.error("JWT verification failed:", err);
+
     return redirectToLogin(req, "verification_failed");
   }
-
-  return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+  matcher: ["/((?!api|_next|favicon.ico|.*\\..*).*)"],
 };

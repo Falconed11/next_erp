@@ -19,14 +19,21 @@ export default function App({ error, redirect }) {
     event.preventDefault();
     setIsLoading(true);
 
-    const res = await apiFetch(`/api/login`, {
-      method: "POST",
-      body: JSON.stringify(form),
-    });
-    const data = await res.json();
-    if (!res.ok) {
+    console.log("Signing in ...");
+    try {
+      const res = await apiFetch(`/api/login`, {
+        method: "POST",
+        body: JSON.stringify(form),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setIsLoading(false);
+        return alert(data.message || "Login failed");
+      }
+    } catch (err) {
+      console.error(err);
       setIsLoading(false);
-      return alert(data.message || "Login failed");
+      return alert("An error occurred while logging in.");
     }
     router.push(redirect || "/");
   };
