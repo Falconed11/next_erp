@@ -21,7 +21,13 @@ export default function middleware(req: NextRequest) {
   console.log(`[Incoming Request] IP: ${ip} | Path: ${req.nextUrl.pathname}`);
 
   // Public routes
-  if (pathname.startsWith("/api") || pathname.startsWith("/login")) {
+  console.log(`Checking access for path: ${pathname}`);
+  if (
+    pathname.startsWith("/api") ||
+    pathname.startsWith("/login") ||
+    pathname.startsWith("/_next") ||
+    pathname === "/"
+  ) {
     return NextResponse.next();
   }
 

@@ -4,7 +4,7 @@ import { Penawaran, OperasionalKantor } from "@/components/laporan";
 import { StatusToDoList, ToDoList } from "@/components/mycomponent";
 
 import "react-datepicker/dist/react-datepicker.css";
-import { highRoleCheck, renderQueryStates } from "../utils/tools";
+import { highRoleCheck, renderQueryStates } from "../../utils/tools";
 
 export default function App({ user }) {
   const sessionuser = user;

@@ -35,7 +35,7 @@ export default function App({ error, redirect }) {
       setIsLoading(false);
       return alert("An error occurred while logging in.");
     }
-    router.push(redirect || "/");
+    router.push(redirect || "/dashboard");
   };
 
   // console.log(form);
@@ -85,13 +85,23 @@ export default function App({ error, redirect }) {
               onValueChange={(val) => updateForm(setForm, { password: val })}
             />
           </div>
-          <div className="flex flex-row-reverse">
+          <div className="flex flex-row-reverse gap-2 items-end">
             {isLoading ? (
               <Spinner />
             ) : (
-              <Button type="submit" color="primary" variant="solid">
-                Login
-              </Button>
+              <>
+                <Button type="submit" color="primary" variant="solid" size="sm">
+                  Login
+                </Button>
+                <div>
+                  <Link
+                    href="/"
+                    className="self-start text-sm text-primary underline"
+                  >
+                    Landing Page
+                  </Link>
+                </div>
+              </>
             )}
           </div>
         </div>

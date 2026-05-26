@@ -25,7 +25,7 @@ export default async function RootLayout({
   }
   const isHighRole = highRoles.includes(user.peran);
   const links = [
-    { href: "/", name: "Dashboard", icon: <RiDashboard2Line /> },
+    { href: "/dashboard", name: "Dashboard", icon: <RiDashboard2Line /> },
     // aktivitas
     {
       href: "/aktivitas",
