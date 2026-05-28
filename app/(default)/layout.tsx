@@ -3,9 +3,9 @@ import { RiDashboard2Line } from "react-icons/ri";
 import { AiOutlineProduct } from "react-icons/ai";
 import { BusinessProgressBarIcon } from "@/components/icon";
 import { VscGithubProject } from "react-icons/vsc";
-import { BsBank, BsHouseGear } from "react-icons/bs";
+import { BsBank, BsHouseGear, BsJournal } from "react-icons/bs";
 import { LuBookUser } from "react-icons/lu";
-import { MdOutlineFactory } from "react-icons/md";
+import { MdOutlineAccountTree, MdOutlineFactory } from "react-icons/md";
 import { HiOutlineOfficeBuilding, HiOutlineUserGroup } from "react-icons/hi";
 import { TbDeviceDesktopAnalytics } from "react-icons/tb";
 import { FaRegUser } from "react-icons/fa";
@@ -169,7 +169,7 @@ export default async function RootLayout({
           {
             href: "/coa",
             name: "COA",
-            icon: <TbDeviceDesktopAnalytics />,
+            icon: <MdOutlineAccountTree />,
             dropdown: [
               {
                 key: "coa-type",
@@ -205,7 +205,7 @@ export default async function RootLayout({
           {
             href: "/transaksi",
             name: "Transaksi",
-            icon: <TbDeviceDesktopAnalytics />,
+            icon: <BsJournal />,
           },
           // laporan
           {
@@ -215,13 +215,13 @@ export default async function RootLayout({
             dropdown: [
               {
                 key: "data",
-                name: "Laporan",
+                name: "Laporan Keuangan",
               },
               {
                 key: "laporan",
-                name: "Template",
+                name: "Template Laporan Keuangan",
               },
-              ...(user.peran == "super"
+              ...([...highRoles, "admin"].includes(user.peran)
                 ? [
                     {
                       key: "biaya-produksi",
@@ -231,24 +231,24 @@ export default async function RootLayout({
                       key: "proyek",
                       name: "Proyek",
                     },
-                    {
-                      key: "operasional-kantor",
-                      name: "Operasional Kantor",
-                    },
-                    {
-                      key: "labarugi",
-                      name: "Laba Rugi",
-                    },
-                    {
-                      key: "perubahan-modal",
-                      name: "Perubahan Modal",
-                    },
+                    // {
+                    //   key: "operasional-kantor",
+                    //   name: "Operasional Kantor",
+                    // },
+                    // {
+                    //   key: "labarugi",
+                    //   name: "Laba Rugi",
+                    // },
+                    // {
+                    //   key: "perubahan-modal",
+                    //   name: "Perubahan Modal",
+                    // },
                   ]
                 : []),
-              {
-                key: "omset",
-                name: "Omset",
-              },
+              // {
+              //   key: "omset",
+              //   name: "Omset",
+              // },
               {
                 key: "stok",
                 name: "Stok",

@@ -13,7 +13,7 @@ import { SelectJenisProyek } from "@/components/jenis-proyek/jenisproyek";
 import { SelectJenisInstansi } from "@/components/jenis-instansi/jenisinstansi";
 import { SelectGolonganInstansi } from "@/components/golongan-instansi/golonganinstansi";
 
-export default function App() {
+export default function App({ user }) {
   const [form, setForm] = useState({
     startDate: new Date(),
     endDate: new Date(),
@@ -38,6 +38,7 @@ export default function App() {
         jenisinstansi={form.id_jenisinstansi}
         golonganinstansi={form.id_golonganinstansi}
         perusahaan={form.id_perusahaan}
+        user={user}
       />
     </div>
   );

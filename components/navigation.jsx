@@ -25,10 +25,11 @@ export default function Navigation({ navLinks, className }) {
     document.title = title;
   }, [title]);
 
-  const queryStates = renderQueryStates({ proyek });
-  if (queryStates) return queryStates;
+  // const queryStates = renderQueryStates({ proyek });
+  // if (queryStates) return queryStates;
 
-  const numberProgressNoOffer = proyek.data.length;
+  const numberProgressNoOffer = proyek?.data?.length;
+  const isLoading = proyek?.isLoading;
 
   const getActivePathStatus = (href) =>
     (pathname === "/" && href === "/") || parts[0] === splitPath(href)[0];
@@ -101,9 +102,9 @@ export default function Navigation({ navLinks, className }) {
           }
           return (
             <li key={link.name} className="relative">
-              <div className={`${baseClass} ${activeClass} p-2`}>
+              <div className={`${baseClass} ${activeClass}`}>
                 <Link
-                  className="text-black items-center flex gap-2"
+                  className="text-black items-center flex gap-2 p-2"
                   href={link.href}
                 >
                   <LiContent>
