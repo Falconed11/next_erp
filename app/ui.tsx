@@ -1,5 +1,7 @@
 "use client";
 
+// Reusable RunningText component
+import React from "react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -19,70 +21,79 @@ import {
   FaStar,
   FaChevronDown,
   FaTiktok,
+  FaChevronLeft,
+  FaChevronRight,
 } from "react-icons/fa";
 // import { motion } from "framer-motion"; // Uncomment if using Framer Motion
-
+import type { User } from "./utils/user";
+import { Button, Card, CardBody, Pagination, Tab, Tabs } from "@heroui/react";
+import Image from "next/image";
+import { highRoleCheck } from "./utils/tools";
+import { IconType } from "react-icons";
+type LandingPageProps = {
+  user?: User | null;
+};
 // Editable: Company name and navigation links
 const NAV_LINKS = [
-  { label: "Home", href: "#hero" },
-  { label: "Services", href: "#services" },
-  { label: "Why Us", href: "#whyus" },
-  { label: "Portfolio", href: "#portfolio" },
-  { label: "Testimonials", href: "#testimonials" },
-  { label: "Process", href: "#process" },
-  { label: "Contact", href: "#contact" },
+  { label: "Beranda", href: "#hero" },
+  { label: "Layanan", href: "#services" },
+  { label: "Kenapa Kami", href: "#whyus" },
+  { label: "Portofolio", href: "#portfolio" },
+  { label: "Testimoni", href: "#testimonials" },
+  { label: "Proses", href: "#process" },
+  { label: "Kontak", href: "#contact" },
   { label: "ERP", href: "/dashboard" },
 ];
 
 const SERVICES = [
   {
     icon: <FaTools className="text-3xl text-primary" />,
-    title: "Service One",
-    desc: "Short dummy description for service one.",
+    title: "Layanan Satu",
+    desc: "Deskripsi singkat untuk layanan satu.",
   },
   {
     icon: <FaTools className="text-3xl text-primary" />,
-    title: "Service Two",
-    desc: "Short dummy description for service two.",
+    title: "Layanan Dua",
+    desc: "Deskripsi singkat untuk layanan dua.",
   },
   {
     icon: <FaTools className="text-3xl text-primary" />,
-    title: "Service Three",
-    desc: "Short dummy description for service three.",
+    title: "Layanan Tiga",
+    desc: "Deskripsi singkat untuk layanan tiga.",
   },
   {
     icon: <FaTools className="text-3xl text-primary" />,
-    title: "Service Four",
-    desc: "Short dummy description for service four.",
+    title: "Layanan Empat",
+    desc: "Deskripsi singkat untuk layanan empat.",
   },
   {
     icon: <FaTools className="text-3xl text-primary" />,
-    title: "Service Five",
-    desc: "Short dummy description for service five.",
+    title: "Layanan Lima",
+    desc: "Deskripsi singkat untuk layanan lima.",
   },
   {
     icon: <FaTools className="text-3xl text-primary" />,
-    title: "Service Six",
-    desc: "Short dummy description for service six.",
+    title: "Layanan Enam",
+    desc: "Deskripsi singkat untuk layanan enam.",
   },
 ];
 
 const FEATURES = [
   {
     icon: <FaUsers className="text-xl text-primary" />,
-    title: "Professional Team",
+    title: "Tim Profesional",
   },
   {
     icon: <FaClock className="text-xl text-primary" />,
-    title: "Fast Installation",
+    title: "Instalasi Cepat",
   },
   {
     icon: <FaShieldAlt className="text-xl text-primary" />,
-    title: "Warranty & Support",
+    title: "Garansi & Dukungan",
   },
   {
     icon: <FaCheckCircle className="text-xl text-primary" />,
-    title: "Quality Assurance",
+    title: "Jaminan Kualitas",
   },
 ];
 
@@ -99,25 +110,28 @@ const TESTIMONIALS = [
   {
     name: "John Doe",
     avatar: "https://placehold.co/64x64",
-    text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin ac neque nec urna.",
+    text: "Pelayanan sangat memuaskan dan profesional. Proses instalasi berjalan lancar.",
   },
   {
     name: "Jane Smith",
     avatar: "https://placehold.co/64x64",
-    text: "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+    text: "Tim sangat responsif dan hasil pekerjaan rapi. Sangat direkomendasikan!",
   },
   {
     name: "Alex Johnson",
     avatar: "https://placehold.co/64x64",
-    text: "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi.",
+    text: "Harga bersaing dan kualitas terbaik. Saya puas dengan hasilnya.",
   },
 ];
 
 const PROCESS_STEPS = [
-  { title: "Consultation", desc: "Discuss your needs with our team." },
-  { title: "Planning", desc: "We design a tailored installation plan." },
-  { title: "Installation", desc: "Our experts perform the installation." },
-  { title: "Handover", desc: "Project completion and support." },
+  { title: "Konsultasi", desc: "Diskusikan kebutuhan Anda dengan tim kami." },
+  {
+    title: "Perencanaan",
+    desc: "Kami merancang rencana instalasi yang sesuai.",
+  },
+  { title: "Instalasi", desc: "Tim ahli kami melakukan instalasi." },
+  { title: "Serah Terima", desc: "Penyelesaian proyek dan dukungan." },
 ];
 
 const SOCIAL_MEDIA_ICONS: Record<string, IconType> = {
@@ -127,30 +141,40 @@ const SOCIAL_MEDIA_ICONS: Record<string, IconType> = {
   tiktok: FaTiktok,
 };
 
-import type { User } from "./utils/user";
-import { Button, Card, CardBody, Pagination, Tab, Tabs } from "@heroui/react";
-import Image from "next/image";
-import { highRoleCheck } from "./utils/tools";
-import { IconType } from "react-icons";
-type LandingPageProps = {
-  user?: User | null;
-};
-
 export default function LandingPage({ user }: LandingPageProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const carouselWidth = 900; // Adjust based on your design
-  const carouselHeight = 600; // Adjust based on your design
+  // Responsive carousel width: wider on desktop
+  const isClient = typeof window !== "undefined";
+  const [carouselWidth, setCarouselWidth] = useState(600);
+  const carouselHeight = 500;
+  useEffect(() => {
+    if (!isClient) return;
+    function handleResize() {
+      if (window.innerWidth >= 1536) {
+        setCarouselWidth(1400);
+      } else if (window.innerWidth >= 1280) {
+        setCarouselWidth(1100);
+      } else if (window.innerWidth >= 1024) {
+        setCarouselWidth(900);
+      } else {
+        setCarouselWidth(600);
+      }
+    }
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [isClient]);
   const colorPagination = "primary";
   const IMAGES = [
     {
-      src: `https://placehold.co/${carouselWidth}x${carouselHeight}?text=1+Image`,
+      src: "/sample-banner-2.png",
       alt: "Installation Service Hero",
     },
     {
-      src: `https://placehold.co/${carouselWidth}x${carouselHeight}?text=2+Image`,
+      src: "/sample-banner.png", // Replace with your actual image path
       alt: "Installation Service Hero",
     },
     {
@@ -194,7 +218,17 @@ export default function LandingPage({ user }: LandingPageProps) {
         <header className="sticky top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur border-b border-gray-200 dark:border-gray-800 shadow-sm transition-all w-full">
           <nav className="w-full flex items-center justify-between px-4 py-3">
             <div className="flex items-center gap-2">
-              {/* Editable: Company Logo/Name */}
+              {/* Logo image, replace src with your own */}
+              <span className="inline-block w-8 h-8 mr-1">
+                <Image
+                  src="https://placehold.co/40x40?text=Logo"
+                  alt="InstallCo Logo"
+                  width={40}
+                  height={40}
+                  className="object-contain w-8 h-8"
+                  unoptimized
+                />
+              </span>
               <span className="font-bold text-xl text-primary">InstallCo</span>
             </div>
             <div className="hidden md:flex gap-6">
@@ -252,19 +286,27 @@ export default function LandingPage({ user }: LandingPageProps) {
           )}
         </header>
 
+        {/* Running text after header */}
+        <RunningText
+          text="⚠️ Laman sedang dalam proses perbaikan ... ⚠️"
+          speed={80}
+          color="#eab308"
+          stopOnHover={true}
+        />
+
         {/* Hero Section */}
         <section
           id="hero"
-          className="flex flex-col-reverse md:flex-row items-center justify-between- w-full px-4 py-4 gap-8"
+          className="flex flex-col-reverse md:flex-row items-center justify-between- w-full px-4 py-4 gap-8-"
         >
           <div className="flex-1 flex flex-col gap-6">
             {/* Editable: Headline, description, CTA */}
             <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white leading-tight">
-              Professional Installation Services
+              Jasa Instalasi Profesional
             </h1>
             <p className="text-lg text-gray-600 dark:text-gray-300 max-w-xl">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-              Pellentesque efficitur, urna eu facilisis.
+              Kami menyediakan layanan instalasi profesional untuk berbagai
+              kebutuhan Anda. Kepuasan dan kualitas adalah prioritas kami.
             </p>
             <div className="flex gap-4 mt-2">
               <Button
@@ -276,7 +318,7 @@ export default function LandingPage({ user }: LandingPageProps) {
                   });
                 }}
               >
-                Get a Quote
+                Dapatkan Penawaran
               </Button>
               <Button
                 size="lg"
@@ -288,70 +330,82 @@ export default function LandingPage({ user }: LandingPageProps) {
                   });
                 }}
               >
-                Our Services
+                Layanan Kami
               </Button>
             </div>
           </div>
-          <div className="flex-1 flex justify-center items-center h-100 relative overflow-hidden">
+          <div className="flex-1 md:flex sm:flex sm:flex-col sm:gap-2 justify-center items-center h-100 relative overflow-hidden">
             {" "}
             {/* 👈 Added overflow-hidden */}
             {/* Carousel Track */}
             <div
-              className="flex transition-transform duration-500 gap-2- ease-in-out w-full max-w-md"
-              style={{ transform: `translateX(-${(currentPage - 1) * 100}%)` }} // 👈 Moves the track left/right
+              className="flex transition-transform duration-500 gap-2- ease-in-out w-full max-w-md md:max-w-2xl lg:max-w-4xl xl:max-w-6xl"
+              style={{
+                transform: `translateX(-${(currentPage - 1) * 100}%)`,
+                maxWidth: carouselWidth,
+              }}
             >
               {IMAGES.map((img, index) => (
                 <div
                   key={index}
                   className="w-full flex-shrink-0 flex justify-center"
                 >
-                  <Image
-                    unoptimized
-                    src={img.src}
-                    alt={img.alt}
-                    className="rounded-xl shadow-lg w-full object-cover"
-                    width={carouselWidth}
-                    height={carouselHeight}
-                  />
+                  <div
+                    className="rounded-xl shadow-lg w-full h-full flex items-center justify-center bg-white dark:bg-gray-900"
+                    style={{
+                      maxWidth: carouselWidth,
+                      maxHeight: carouselHeight,
+                      aspectRatio: `${carouselWidth} / ${carouselHeight}`,
+                    }}
+                  >
+                    <Image
+                      unoptimized
+                      src={img.src}
+                      alt={img.alt}
+                      className="w-full h-full object-contain"
+                      width={carouselWidth}
+                      height={carouselHeight}
+                    />
+                  </div>
                 </div>
               ))}
             </div>
             {/* Controls Container */}
-            <div className="flex gap-5 absolute bottom-4 opacity-50 hover:opacity-100 transition-opacity z-10">
-              <div>
-                <Button
-                  color={colorPagination}
-                  size="sm"
-                  variant="flat"
-                  onPress={() =>
-                    setCurrentPage((prev) =>
-                      prev > 1 ? prev - 1 : IMAGES_LENGTH,
-                    )
-                  }
-                >
-                  Previous
-                </Button>
-              </div>
+            <div className="flex items-center justify-between w-full md:absolute md:bottom-4 md:left-0 px-4 md:opacity-30 hover:opacity-100 transition-opacity z-10">
+              <Button
+                color={colorPagination}
+                size="sm"
+                variant="flat"
+                onPress={() =>
+                  setCurrentPage((prev) =>
+                    prev > 1 ? prev - 1 : IMAGES_LENGTH,
+                  )
+                }
+                aria-label="Sebelumnya"
+                className="rounded-full"
+              >
+                <FaChevronLeft size={20} />
+              </Button>
               <Pagination
                 color={colorPagination}
                 page={currentPage}
                 total={IMAGES_LENGTH}
                 onChange={setCurrentPage}
               />
-              <div>
-                <Button
-                  color={colorPagination}
-                  size="sm"
-                  variant="flat"
-                  onPress={() =>
-                    setCurrentPage((prev) =>
-                      prev < IMAGES_LENGTH ? prev + 1 : 1,
-                    )
-                  }
-                >
-                  Next
-                </Button>
-              </div>
+              <Button
+                color={colorPagination}
+                size="sm"
+                variant="flat"
+                onPress={() =>
+                  setCurrentPage((prev) =>
+                    prev < IMAGES_LENGTH ? prev + 1 : 1,
+                  )
+                }
+                aria-label="Berikutnya"
+                className="rounded-full"
+              >
+                <FaChevronRight size={20} />
+              </Button>
             </div>
           </div>
         </section>
@@ -359,7 +413,7 @@ export default function LandingPage({ user }: LandingPageProps) {
         {/* Services Section */}
         <section id="services" className="w-full px-4 py-16">
           <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-10">
-            Our Services
+            Layanan Kami
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
             {SERVICES.map((service, i) => (
@@ -383,7 +437,7 @@ export default function LandingPage({ user }: LandingPageProps) {
         {/* Why Choose Us Section */}
         <section id="whyus" className="w-full px-4 py-16">
           <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-10">
-            Why Choose Us
+            Kenapa Memilih Kami
           </h2>
           <div className="flex flex-wrap justify-center gap-8">
             {FEATURES.map((feature, i) => (
@@ -404,7 +458,7 @@ export default function LandingPage({ user }: LandingPageProps) {
         {/* Portfolio Section */}
         <section id="portfolio" className="w-full px-4 py-16">
           <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-10">
-            Our Projects
+            Proyek Kami
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             {PORTFOLIO_IMAGES.map((img, i) => (
@@ -420,7 +474,7 @@ export default function LandingPage({ user }: LandingPageProps) {
                 />
                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
                   <span className="text-white text-lg font-semibold">
-                    Project {i + 1}
+                    Proyek {i + 1}
                   </span>
                 </div>
               </div>
@@ -431,7 +485,7 @@ export default function LandingPage({ user }: LandingPageProps) {
         {/* Testimonials Section */}
         <section id="testimonials" className="w-full px-4 py-16">
           <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-10">
-            Testimonials
+            Testimoni
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {TESTIMONIALS.map((t, i) => (
@@ -464,7 +518,7 @@ export default function LandingPage({ user }: LandingPageProps) {
         {/* Process Section */}
         <section id="process" className="w-full px-4 py-16">
           <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-10">
-            How It Works
+            Cara Kerja Kami
           </h2>
           <div className="flex flex-col md:flex-row justify-center items-center gap-8">
             {PROCESS_STEPS.map((step, i) => (
@@ -496,17 +550,17 @@ export default function LandingPage({ user }: LandingPageProps) {
             <div className="flex-1">
               {/* Editable: CTA Banner text */}
               <h3 className="text-2xl md:text-3xl font-bold text-white mb-2">
-                Ready to start your installation?
+                Siap memulai instalasi Anda?
               </h3>
               <p className="text-white text-lg">
-                Contact us today for a free consultation and quote.
+                Hubungi kami hari ini untuk konsultasi dan penawaran gratis.
               </p>
             </div>
             <a
               href="#contact"
               className="px-8 py-4 bg-white text-primary rounded-lg font-semibold shadow hover:bg-primary/10 transition"
             >
-              Contact Us
+              Hubungi Kami
             </a>
           </div>
         </section>
@@ -520,7 +574,7 @@ export default function LandingPage({ user }: LandingPageProps) {
             <div>
               {/* Editable: Company info */}
               <h4 className="text-xl font-bold mb-2">InstallCo</h4>
-              <p className="text-gray-400 mb-2">1234 Main St, City, Country</p>
+              <p className="text-gray-400 mb-2">Jl. Utama 1234, Kota, Negara</p>
               <div className="flex items-center gap-2 mb-2">
                 <FaPhone className="text-primary" /> <span>+1 234 567 890</span>
               </div>
@@ -530,7 +584,7 @@ export default function LandingPage({ user }: LandingPageProps) {
               </div>
             </div>
             <div>
-              <h5 className="font-semibold mb-2">Navigation</h5>
+              <h5 className="font-semibold mb-2">Navigasi</h5>
               <ul className="space-y-1">
                 {NAV_LINKS.map((link) => (
                   <li key={link.href}>
@@ -546,7 +600,7 @@ export default function LandingPage({ user }: LandingPageProps) {
               </ul>
             </div>
             <div>
-              <h5 className="font-semibold mb-2">Follow Us</h5>
+              <h5 className="font-semibold mb-2">Ikuti Kami</h5>
               <div className="flex gap-4">
                 {[
                   { href: "#", site: "facebook" },
@@ -568,20 +622,20 @@ export default function LandingPage({ user }: LandingPageProps) {
               </div>
             </div>
             <div>
-              <h5 className="font-semibold mb-2">Contact</h5>
+              <h5 className="font-semibold mb-2">Kontak</h5>
               <form className="flex flex-col gap-2">
                 <input
                   type="text"
-                  placeholder="Your Name"
+                  placeholder="Nama Anda"
                   className="px-3 py-2 rounded bg-gray-800 text-white placeholder-gray-400"
                 />
                 <input
                   type="email"
-                  placeholder="Your Email"
+                  placeholder="Email Anda"
                   className="px-3 py-2 rounded bg-gray-800 text-white placeholder-gray-400"
                 />
                 <textarea
-                  placeholder="Your Message"
+                  placeholder="Pesan Anda"
                   className="px-3 py-2 rounded bg-gray-800 text-white placeholder-gray-400"
                   rows={2}
                 ></textarea>
@@ -589,13 +643,14 @@ export default function LandingPage({ user }: LandingPageProps) {
                   type="submit"
                   className="bg-primary text-white rounded px-4 py-2 font-semibold hover:bg-primary-dark transition"
                 >
-                  Send
+                  Kirim
                 </button>
               </form>
             </div>
           </div>
           <div className="text-center text-gray-500 mt-8 text-sm">
-            © {new Date().getFullYear()} InstallCo. All rights reserved.
+            © {new Date().getFullYear()} InstallCo. Seluruh hak cipta
+            dilindungi.
           </div>
         </footer>
       </div>
@@ -632,6 +687,73 @@ export default function LandingPage({ user }: LandingPageProps) {
         animation: fade-in-down 0.5s cubic-bezier(0.4,0,0.2,1) both;
       }
       */}
+    </div>
+  );
+}
+
+type RunningTextProps = {
+  text: string;
+  speed?: number; // pixels per second
+  color?: string;
+  stopOnHover?: boolean;
+  className?: string;
+};
+
+export function RunningText({
+  text,
+  speed = 80, // default 80px/s
+  color = "#2563eb",
+  stopOnHover = false,
+  className = "",
+}: RunningTextProps) {
+  const [isPaused, setIsPaused] = React.useState(false);
+  const textRef = React.useRef<HTMLDivElement>(null);
+  const [textWidth, setTextWidth] = React.useState(0);
+
+  React.useEffect(() => {
+    if (textRef.current) {
+      setTextWidth(textRef.current.offsetWidth);
+    }
+  }, [text]);
+
+  // Animation duration based on text width and speed
+  const duration = textWidth > 0 ? textWidth / speed : 10;
+
+  return (
+    <div
+      className={`overflow-hidden w-full bg-white dark:bg-gray-900 border-b border-primary/20 ${className}`}
+      style={{ height: 36 }}
+      onMouseEnter={() => stopOnHover && setIsPaused(true)}
+      onMouseLeave={() => stopOnHover && setIsPaused(false)}
+    >
+      <div
+        ref={textRef}
+        style={{
+          display: "inline-block",
+          whiteSpace: "nowrap",
+          color,
+          fontWeight: 600,
+          fontSize: 18,
+          paddingLeft: "100%",
+          animationName: "running-text",
+          animationDuration: `${duration}s`,
+          animationTimingFunction: "linear",
+          animationIterationCount: "infinite",
+          animationPlayState: isPaused ? "paused" : "running",
+        }}
+      >
+        {text}
+      </div>
+      <style jsx>{`
+        @keyframes running-text {
+          0% {
+            transform: translateX(0);
+          }
+          100% {
+            transform: translateX(-100%);
+          }
+        }
+      `}</style>
     </div>
   );
 }
