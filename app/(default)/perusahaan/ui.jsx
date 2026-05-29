@@ -64,6 +64,7 @@ export default function App({ user }) {
           body: JSON.stringify({ id }),
         });
         alert(json.message);
+        perusahaan.mutate();
       } catch (error) {
         alert(error.message || "Delete failed");
       }
@@ -71,20 +72,19 @@ export default function App({ user }) {
   };
   const simpanButtonPress = async (data) => {
     const formData = new FormData();
-    Object.entries(data).forEach(([key, value]) => {
-      if (key !== "newLogo") formData.append(key, value);
-    });
-    formData.append("file", data.newLogo);
+    const { newLogo, ...rest } = data;
+    Object.entries(rest).forEach(([key, value]) => formData.append(key, value));
+    if (newLogo) formData.append("file", newLogo);
     try {
       await apiFetch(`${api_path}perusahaan`, {
         method,
         body: formData,
       });
       perusahaan.mutate();
+      modal.perusahaan.onClose();
     } catch (error) {
       alert(error.message || "Save failed");
     }
-    modal.perusahaan.onClose();
     // return alert(json.message);
   };
   const renderCell = {
@@ -167,7 +167,7 @@ export default function App({ user }) {
   console.log(form);
   return (
     <div>
-      <Button onClick={tambahButtonPress} color="primary" variant="solid">
+      <Button onPress={tambahButtonPress} color="primary" variant="solid">
         Tambah
       </Button>
       <Table className="pt-3" aria-label="Example table with custom cells">
@@ -254,7 +254,11 @@ export default function App({ user }) {
                 <Button color="danger" variant="flat" onClick={onClose}>
                   Batal
                 </Button>
-                <Button color="primary" variant="solid" onClick={() => simpanButtonPress(form)}>
+                <Button
+                  color="primary"
+                  variant="solid"
+                  onPress={() => simpanButtonPress(form)}
+                >
                   Simpan
                 </Button>
               </ModalFooter>

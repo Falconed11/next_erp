@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   FaTools,
@@ -18,6 +18,7 @@ import {
   FaCheckCircle,
   FaStar,
   FaChevronDown,
+  FaTiktok,
 } from "react-icons/fa";
 // import { motion } from "framer-motion"; // Uncomment if using Framer Motion
 
@@ -119,7 +120,18 @@ const PROCESS_STEPS = [
   { title: "Handover", desc: "Project completion and support." },
 ];
 
+const SOCIAL_MEDIA_ICONS: Record<string, IconType> = {
+  facebook: FaFacebook,
+  twitter: FaTwitter,
+  instagram: FaInstagram,
+  tiktok: FaTiktok,
+};
+
 import type { User } from "./utils/user";
+import { Button, Card, CardBody, Pagination, Tab, Tabs } from "@heroui/react";
+import Image from "next/image";
+import { highRoleCheck } from "./utils/tools";
+import { IconType } from "react-icons";
 type LandingPageProps = {
   user?: User | null;
 };
@@ -127,6 +139,37 @@ type LandingPageProps = {
 export default function LandingPage({ user }: LandingPageProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const carouselWidth = 900; // Adjust based on your design
+  const carouselHeight = 600; // Adjust based on your design
+  const colorPagination = "primary";
+  const IMAGES = [
+    {
+      src: `https://placehold.co/${carouselWidth}x${carouselHeight}?text=1+Image`,
+      alt: "Installation Service Hero",
+    },
+    {
+      src: `https://placehold.co/${carouselWidth}x${carouselHeight}?text=2+Image`,
+      alt: "Installation Service Hero",
+    },
+    {
+      src: `https://placehold.co/${carouselWidth}x${carouselHeight}?text=3+Image`,
+      alt: "Installation Service Hero",
+    },
+  ];
+  const IMAGES_LENGTH = IMAGES.length;
+  const carouselInterval = 8 * 1000;
+  useEffect(() => {
+    // 1. Set up the interval
+    const intervalId = setInterval(() => {
+      // Always use the functional updater form when relying on previous state
+      setCurrentPage((prev) => (prev < IMAGES_LENGTH ? prev + 1 : 1));
+    }, carouselInterval);
+
+    // 2. Clean up the interval when the component unmounts
+    return () => clearInterval(intervalId);
+  }, [currentPage]); // Empty dependency array ensures this runs only once on mount
 
   // Navigation handler: smooth scroll for hash, router for internal path
   const router = useRouter();
@@ -142,6 +185,7 @@ export default function LandingPage({ user }: LandingPageProps) {
       document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
     }
   };
+  const isHighRole = highRoleCheck(user?.peran);
 
   return (
     <div className={darkMode ? "dark" : ""}>
@@ -211,7 +255,7 @@ export default function LandingPage({ user }: LandingPageProps) {
         {/* Hero Section */}
         <section
           id="hero"
-          className="flex flex-col-reverse md:flex-row items-center justify-between w-full px-4 py-16 gap-8"
+          className="flex flex-col-reverse md:flex-row items-center justify-between- w-full px-4 py-4 gap-8"
         >
           <div className="flex-1 flex flex-col gap-6">
             {/* Editable: Headline, description, CTA */}
@@ -223,27 +267,92 @@ export default function LandingPage({ user }: LandingPageProps) {
               Pellentesque efficitur, urna eu facilisis.
             </p>
             <div className="flex gap-4 mt-2">
-              <a
-                href="#contact"
-                className="px-6 py-3 bg-primary text-white rounded-lg shadow hover:bg-primary-dark transition font-semibold"
+              <Button
+                size="lg"
+                color="primary"
+                onPress={() => {
+                  document.querySelector("#contact")?.scrollIntoView({
+                    behavior: "smooth",
+                  });
+                }}
               >
                 Get a Quote
-              </a>
-              <a
-                href="#services"
-                className="px-6 py-3 bg-white dark:bg-gray-800 text-primary border border-primary rounded-lg shadow hover:bg-primary/10 transition font-semibold"
+              </Button>
+              <Button
+                size="lg"
+                color="primary"
+                variant="bordered"
+                onPress={() => {
+                  document.querySelector("#services")?.scrollIntoView({
+                    behavior: "smooth",
+                  });
+                }}
               >
                 Our Services
-              </a>
+              </Button>
             </div>
           </div>
-          <div className="flex-1 flex justify-center items-center">
-            {/* Editable: Hero image */}
-            <img
-              src="https://placehold.co/500x400?text=Hero+Image"
-              alt="Installation Service Hero"
-              className="rounded-xl shadow-lg w-full max-w-md object-cover animate-fade-in"
-            />
+          <div className="flex-1 flex justify-center items-center h-100 relative overflow-hidden">
+            {" "}
+            {/* 👈 Added overflow-hidden */}
+            {/* Carousel Track */}
+            <div
+              className="flex transition-transform duration-500 gap-2- ease-in-out w-full max-w-md"
+              style={{ transform: `translateX(-${(currentPage - 1) * 100}%)` }} // 👈 Moves the track left/right
+            >
+              {IMAGES.map((img, index) => (
+                <div
+                  key={index}
+                  className="w-full flex-shrink-0 flex justify-center"
+                >
+                  <Image
+                    unoptimized
+                    src={img.src}
+                    alt={img.alt}
+                    className="rounded-xl shadow-lg w-full object-cover"
+                    width={carouselWidth}
+                    height={carouselHeight}
+                  />
+                </div>
+              ))}
+            </div>
+            {/* Controls Container */}
+            <div className="flex gap-5 absolute bottom-4 opacity-50 hover:opacity-100 transition-opacity z-10">
+              <div>
+                <Button
+                  color={colorPagination}
+                  size="sm"
+                  variant="flat"
+                  onPress={() =>
+                    setCurrentPage((prev) =>
+                      prev > 1 ? prev - 1 : IMAGES_LENGTH,
+                    )
+                  }
+                >
+                  Previous
+                </Button>
+              </div>
+              <Pagination
+                color={colorPagination}
+                page={currentPage}
+                total={IMAGES_LENGTH}
+                onChange={setCurrentPage}
+              />
+              <div>
+                <Button
+                  color={colorPagination}
+                  size="sm"
+                  variant="flat"
+                  onPress={() =>
+                    setCurrentPage((prev) =>
+                      prev < IMAGES_LENGTH ? prev + 1 : 1,
+                    )
+                  }
+                >
+                  Next
+                </Button>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -280,11 +389,11 @@ export default function LandingPage({ user }: LandingPageProps) {
             {FEATURES.map((feature, i) => (
               <div
                 key={i}
-                className="flex items-center gap-4 bg-white dark:bg-gray-800 rounded-lg shadow p-4 min-w-[220px] animate-fade-in-up"
+                className="flex items-center justify-center gap-4 bg-white dark:bg-gray-800 rounded-lg shadow p-4 min-w-[220px] animate-fade-in-up"
               >
-                {feature.icon}
+                {/* {feature.icon} */}
                 {/* Editable: Feature title */}
-                <span className="text-lg font-medium text-gray-900 dark:text-white">
+                <span className="text-lg font-medium re text-gray-900 dark:text-white">
                   {feature.title}
                 </span>
               </div>
@@ -439,15 +548,23 @@ export default function LandingPage({ user }: LandingPageProps) {
             <div>
               <h5 className="font-semibold mb-2">Follow Us</h5>
               <div className="flex gap-4">
-                <a href="#" className="hover:text-primary">
-                  <FaFacebook size={20} />
-                </a>
-                <a href="#" className="hover:text-primary">
-                  <FaTwitter size={20} />
-                </a>
-                <a href="#" className="hover:text-primary">
-                  <FaInstagram size={20} />
-                </a>
+                {[
+                  { href: "#", site: "facebook" },
+                  { href: "#", site: "twitter" },
+                  { href: "#", site: "instagram" },
+                  { href: "#", site: "tiktok" },
+                ].map(({ href, site }, i) => {
+                  const Icon = SOCIAL_MEDIA_ICONS[site];
+                  return (
+                    <a
+                      key={i}
+                      href={href}
+                      className="hover:text-primary transition-colors"
+                    >
+                      <Icon size={20} />
+                    </a>
+                  );
+                })}
               </div>
             </div>
             <div>

@@ -23,6 +23,10 @@ const nextConfig = {
         port: process.env.EXPRESS_PORT,
         pathname: "/logo/**",
       },
+      {
+        protocol: "https", // use https if your Express is behind SSL
+        hostname: "placehold.co",
+      },
     ],
   },
   async rewrites() {
