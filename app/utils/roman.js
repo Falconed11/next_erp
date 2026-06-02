@@ -1,4 +1,4 @@
-const convertToRoman = (num) => {
+export const convertToRoman = (num) => {
   if (num <= 0 || num > 3999) {
     return "Invalid number for Roman numeral conversion";
   }
@@ -26,4 +26,3 @@ const convertToRoman = (num) => {
   }
   return result;
 };
-module.exports = { convertToRoman };

@@ -244,7 +244,7 @@ export default function LandingPage({ user }: LandingPageProps) {
               ))}
             </div>
             <button
-              className="md:hidden p-2 rounded text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
+              className="md:hidden p-2 rounded text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
               onClick={() => setMenuOpen(!menuOpen)}
               aria-label="Toggle menu"
             >
@@ -252,7 +252,7 @@ export default function LandingPage({ user }: LandingPageProps) {
             </button>
             {/* Dark/Light mode toggle */}
             <button
-              className="ml-4 p-2 rounded text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
+              className="cursor-pointer ml-4 p-2 rounded text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
               onClick={() => setDarkMode(!darkMode)}
               aria-label="Toggle dark mode"
             >
@@ -387,6 +387,7 @@ export default function LandingPage({ user }: LandingPageProps) {
                 <FaChevronLeft size={20} />
               </Button>
               <Pagination
+                className="cursor-pointer"
                 color={colorPagination}
                 page={currentPage}
                 total={IMAGES_LENGTH}
@@ -663,29 +664,6 @@ export default function LandingPage({ user }: LandingPageProps) {
           },
         },
       },
-      */}
-      {/* Animations: add to globals.css
-      @keyframes fade-in-up {
-        0% { opacity: 0; transform: translateY(20px); }
-        100% { opacity: 1; transform: translateY(0); }
-      }
-      .animate-fade-in-up {
-        animation: fade-in-up 0.7s cubic-bezier(0.4,0,0.2,1) both;
-      }
-      @keyframes fade-in {
-        0% { opacity: 0; }
-        100% { opacity: 1; }
-      }
-      .animate-fade-in {
-        animation: fade-in 1s cubic-bezier(0.4,0,0.2,1) both;
-      }
-      @keyframes fade-in-down {
-        0% { opacity: 0; transform: translateY(-20px); }
-        100% { opacity: 1; transform: translateY(0); }
-      }
-      .animate-fade-in-down {
-        animation: fade-in-down 0.5s cubic-bezier(0.4,0,0.2,1) both;
-      }
       */}
     </div>
   );

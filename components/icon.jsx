@@ -2,7 +2,7 @@
 // https://react-icons.github.io/react-icons/
 import React from "react";
 
-const AddIcon = (props) => {
+export const AddIcon = (props) => {
   return (
     <svg
       viewBox="0 0 512 512"
@@ -22,7 +22,7 @@ const AddIcon = (props) => {
     </svg>
   );
 };
-const BusinessProgressBarIcon = (props) => (
+export const BusinessProgressBarIcon = (props) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 14 14"
@@ -39,7 +39,7 @@ const BusinessProgressBarIcon = (props) => (
     ></path>
   </svg>
 );
-const UserIcon = (props) => (
+export const UserIcon = (props) => (
   <svg
     viewBox="0 0 1024 1024"
     fill="currentColor"
@@ -50,7 +50,7 @@ const UserIcon = (props) => (
     <path d="M858.5 763.6a374 374 0 00-80.6-119.5 375.63 375.63 0 00-119.5-80.6c-.4-.2-.8-.3-1.2-.5C719.5 518 760 444.7 760 362c0-137-111-248-248-248S264 225 264 362c0 82.7 40.5 156 102.8 201.1-.4.2-.8.3-1.2.5-44.8 18.9-85 46-119.5 80.6a375.63 375.63 0 00-80.6 119.5A371.7 371.7 0 00136 901.8a8 8 0 008 8.2h60c4.4 0 7.9-3.5 8-7.8 2-77.2 33-149.5 87.8-204.3 56.7-56.7 132-87.9 212.2-87.9s155.5 31.2 212.2 87.9C779 752.7 810 825 812 902.2c.1 4.4 3.6 7.8 8 7.8h60a8 8 0 008-8.2c-1-47.8-10.9-94.3-29.5-138.2zM512 534c-45.9 0-89.1-17.9-121.6-50.4S340 407.9 340 362c0-45.9 17.9-89.1 50.4-121.6S466.1 190 512 190s89.1 17.9 121.6 50.4S684 316.1 684 362c0 45.9-17.9 89.1-50.4 121.6S557.9 534 512 534Z" />
   </svg>
 );
-const EditIcon = (props) => (
+export const EditIcon = (props) => (
   <svg
     aria-hidden="true"
     fill="none"
@@ -87,7 +87,7 @@ const EditIcon = (props) => (
     />
   </svg>
 );
-const DeleteIcon = (props) => (
+export const DeleteIcon = (props) => (
   <svg
     aria-hidden="true"
     fill="none"
@@ -135,7 +135,7 @@ const DeleteIcon = (props) => (
     />
   </svg>
 );
-const EyeIcon = (props) => (
+export const EyeIcon = (props) => (
   <svg
     aria-hidden="true"
     fill="none"
@@ -162,7 +162,7 @@ const EyeIcon = (props) => (
     />
   </svg>
 );
-const EyeFilledIcon = (props) => (
+export const EyeFilledIcon = (props) => (
   <svg
     aria-hidden="true"
     fill="none"
@@ -183,7 +183,7 @@ const EyeFilledIcon = (props) => (
     />
   </svg>
 );
-const EyeSlashFilledIcon = (props) => (
+export const EyeSlashFilledIcon = (props) => (
   <svg
     aria-hidden="true"
     fill="none"
@@ -216,7 +216,7 @@ const EyeSlashFilledIcon = (props) => (
     />
   </svg>
 );
-const IconScaleBalanced = (props) => {
+export const IconScaleBalanced = (props) => {
   return (
     <svg
       viewBox="0 0 640 512"
@@ -229,7 +229,7 @@ const IconScaleBalanced = (props) => {
     </svg>
   );
 };
-const NoteIcon = (props) => {
+export const NoteIcon = (props) => {
   return (
     <svg fill="none" viewBox="0 0 24 24" height="1em" width="1em" {...props}>
       <path
@@ -245,7 +245,7 @@ const NoteIcon = (props) => {
     </svg>
   );
 };
-const ReportMoneyIcon = (props) => {
+export const ReportMoneyIcon = (props) => {
   return (
     <svg
       fill="none"
@@ -265,7 +265,7 @@ const ReportMoneyIcon = (props) => {
     </svg>
   );
 };
-const PrinterIcon = (props) => {
+export const PrinterIcon = (props) => {
   return (
     <svg
       viewBox="0 0 1024 1024"
@@ -279,7 +279,7 @@ const PrinterIcon = (props) => {
   );
 };
 
-const TransferIcon = (props) => {
+export const TransferIcon = (props) => {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -293,7 +293,7 @@ const TransferIcon = (props) => {
   );
 };
 
-const FileExportIcon = (props) => {
+export const FileExportIcon = (props) => {
   return (
     <svg
       fill="none"
@@ -313,7 +313,7 @@ const FileExportIcon = (props) => {
   );
 };
 
-const MinIcon = (props) => {
+export const MinIcon = (props) => {
   return (
     <svg
       viewBox="0 0 580 1000"
@@ -327,7 +327,7 @@ const MinIcon = (props) => {
   );
 };
 
-const DangerTriangleBrokenIcon = (props) => {
+export const DangerTriangleBrokenIcon = (props) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -349,7 +349,7 @@ const DangerTriangleBrokenIcon = (props) => {
   );
 };
 
-const WAIcon = (props) => {
+export const WAIcon = (props) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -363,34 +363,3 @@ const WAIcon = (props) => {
     </svg>
   );
 };
-
-export {
-  AddIcon,
-  BusinessProgressBarIcon,
-  EditIcon,
-  DeleteIcon,
-  EyeIcon,
-  UserIcon,
-  EyeFilledIcon,
-  EyeSlashFilledIcon,
-  IconScaleBalanced,
-  NoteIcon,
-  ReportMoneyIcon,
-  PrinterIcon,
-  TransferIcon,
-  FileExportIcon,
-  MinIcon,
-  DangerTriangleBrokenIcon,
-  WAIcon,
-};
-
-// module.exports = {
-//   AddIcon,
-//   EditIcon,
-//   DeleteIcon,
-//   EyeIcon,
-//   UserIcon,
-//   EyeFilledIcon,
-//   EyeSlashFilledIcon,
-//   IconScaleBalanced,
-// };
