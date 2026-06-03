@@ -69,6 +69,7 @@ export default function App({ user }) {
 
   return (
     <div className="flex gap-4 items-start">
+      {/* tabel */}
       <div className="flex-1- min-w-0">
         <TableWithActiveStatus
           endPoint={LAPORAN_ENDPOINT}
@@ -79,9 +80,6 @@ export default function App({ user }) {
           onSaveSuccess={handleSaveSuccess}
           extraFields={(form, setForm) => (
             <>
-              <AutocompleteLaporan form={form} setForm={setForm} />
-              <AutocompleteCoaFilter form={form} setForm={setForm} />
-              <AutocompleteCoa form={form} setForm={setForm} />
               <DefaultSelect
                 options={[
                   { id: 1, nama: 1 },
@@ -95,12 +93,6 @@ export default function App({ user }) {
               />
             </>
           )}
-          extraColumns={[
-            { key: "parent", label: "Parent" },
-            { key: "coa_filter", label: "COA Filter" },
-            { key: "coa", label: "COA" },
-            { key: "modifier", label: "Modifier" },
-          ]}
           renderActionButton={(data) => (
             <Tooltip content="Show Tree">
               <span
@@ -114,6 +106,7 @@ export default function App({ user }) {
           user={user}
         />
       </div>
+      {/* tree preview */}
       <div className="w-full- max-w-3xl rounded-xl border bg-white p-4">
         <div className="mb-4 border-b border-slate-200 pb-3">
           <h2 className="text-xl font-bold text-slate-800">Tree Preview</h2>

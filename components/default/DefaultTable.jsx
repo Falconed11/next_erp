@@ -143,7 +143,6 @@ export const DefaultTable = ({
 
   const id_karyawan = sessUser.id_karyawan;
   const pages = Math.ceil(items[0]?.total / rowsPerPage);
-  console.log(form);
   return (
     <>
       <Table

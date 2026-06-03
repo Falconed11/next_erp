@@ -34,7 +34,8 @@ export const AutocompleteCoaType = (props) => {
   });
   return component;
 };
-export const AutocompleteCoaSubtype = ({ id_coa_type, ...props }) => {
+export const AutocompleteCoaSubtype = ({ form, ...props }) => {
+  const { id_coa_type } = form;
   const { component } = useAutocompleteField({
     endpoint: `${COA_SUBTYPE_ENDPOINT}?aktif=1${id_coa_type ? `&id_coa_type=${id_coa_type}` : ""}`,
     title: "Sub Tipe COA",
@@ -43,6 +44,7 @@ export const AutocompleteCoaSubtype = ({ id_coa_type, ...props }) => {
     key: id_coa_type,
     disableCustomValue: true,
     disableSelectOnChange: true,
+    form,
     getCustomLabel: (item) => `${item.nama} | ${item.coa_type}`,
     getCustomValue: (item) => `${item.nama} | ${item.coa_type}`,
     ...props,

@@ -145,7 +145,7 @@ export const AutocompleteWithCustomValue = ({
     <Autocomplete
       // isVirtualized={false}
       popoverProps={{ shouldCloseOnScroll: false }}
-      className={className}
+      className={`${isDisabled ? "opacity-50" : ""} ${className}`}
       classNames={{
         popoverContent: "text-nowrap w-300",
       }}
