@@ -21,13 +21,15 @@ import {
 } from "@heroui/react";
 import { useState } from "react";
 import { IoMdAdd } from "react-icons/io";
+import { saveLaporanRelation } from "@/services/laporan/laporan-relation.service";
 
 export default function ReportTreeSection({
   reportType,
   reportSummary,
   reportTree,
   showModifier = false,
-  data = {},
+  onRelationSaved,
+  user,
 }) {
   return (
     <div className="space-y-4">
@@ -39,13 +41,21 @@ export default function ReportTreeSection({
           key={rootNode.id}
           node={rootNode}
           showModifier={showModifier}
+          onRelationSaved={onRelationSaved}
+          user={user}
         />
       ))}
     </div>
   );
 }
 
-const ReportRow = ({ node, depth = 0, showModifier = false }) => {
+const ReportRow = ({
+  node,
+  depth = 0,
+  showModifier = false,
+  onRelationSaved,
+  user,
+}) => {
   const hasChildren = node.children && node.children.length > 0;
   const modifierText =
     showModifier && node.modifier != null
@@ -70,7 +80,11 @@ const ReportRow = ({ node, depth = 0, showModifier = false }) => {
           </span>
         </div>
         <div className="content-center">
-          <AddRelation node={node} />
+          <AddRelation
+            node={node}
+            onRelationSaved={onRelationSaved}
+            user={user}
+          />
         </div>
       </div>
 
@@ -82,12 +96,43 @@ const ReportRow = ({ node, depth = 0, showModifier = false }) => {
               node={child}
               depth={depth + 1}
               showModifier={showModifier}
+              onRelationSaved={onRelationSaved}
+              user={user}
             />
           ))}
         </div>
       )}
     </div>
   );
+};
+
+const saveRelationWithSession = async ({
+  form,
+  user,
+  onRelationSaved,
+  onClose,
+}) => {
+  if (!form.method) {
+    return alert("Metode simpan tidak ditentukan.");
+  }
+
+  const sessIdKaryawan = user?.id_karyawan;
+  if (!sessIdKaryawan) {
+    return alert("Session user tidak tersedia.");
+  }
+
+  const res = await saveLaporanRelation({
+    ...form,
+    sessIdKaryawan,
+  });
+  const json = await res.json();
+
+  if (!res.ok) {
+    return alert(json?.message || "Gagal menyimpan relasi!");
+  }
+
+  onClose();
+  onRelationSaved?.();
 };
 
 const FullReportSummary = ({ summary }) => {
@@ -113,14 +158,23 @@ const FullReportSummary = ({ summary }) => {
   );
 };
 
-const AddRelation = ({ node }) => {
+const AddRelation = ({ node, onRelationSaved, user }) => {
   const { id: idParent } = node;
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [form, setForm] = useState({});
-  console.log("Form Data:", form);
   const { id_child, id_coa_filter, id_coa_type, id_coa_subtype, id_coa } = form;
   const isCoaSelected = id_coa_type || id_coa_subtype || id_coa;
   const isCoaDisabled = id_child || id_coa_filter;
+
+  const handleSave = async (onClose) => {
+    await saveRelationWithSession({
+      form,
+      user,
+      onRelationSaved,
+      onClose,
+    });
+  };
+
   return (
     <>
       <Button
@@ -175,8 +229,8 @@ const AddRelation = ({ node }) => {
                 <Button color="danger" variant="light" onPress={onClose}>
                   Close
                 </Button>
-                <Button color="primary" onPress={onClose}>
-                  Action
+                <Button color="primary" onPress={() => handleSave(onClose)}>
+                  Simpan
                 </Button>
               </ModalFooter>
             </>

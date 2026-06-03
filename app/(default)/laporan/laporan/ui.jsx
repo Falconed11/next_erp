@@ -66,6 +66,7 @@ export default function App({ user }) {
     }
     await treePreview.mutate();
   };
+  console.log({ data: treePreview?.data?.data, previewTree, previewSummary });
 
   return (
     <div className="flex gap-4 items-start">
@@ -137,6 +138,8 @@ export default function App({ user }) {
               reportSummary={previewSummary}
               reportTree={previewTree}
               showModifier
+              onRelationSaved={treePreview.mutate}
+              user={user}
             />
           </>
         )}
