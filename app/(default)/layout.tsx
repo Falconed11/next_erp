@@ -187,6 +187,10 @@ export default async function RootLayout({
                 key: "coa-filter",
                 name: "COA Filter",
               },
+              {
+                key: "laporan-relation",
+                name: "Laporan Relation",
+              },
               ...(user.peran == "super"
                 ? [
                     {

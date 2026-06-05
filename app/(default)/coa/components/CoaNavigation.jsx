@@ -12,6 +12,7 @@ export default function CoaNavigation({
     { href: "/coa/coa-subtype", label: "COA Subtype" },
     { href: "/coa", label: "COA" },
     { href: "/coa/coa-filter", label: "COA Filter" },
+    { href: "/coa/laporan-relation", label: "Laporan Relation" },
     ...(user.peran == "super"
       ? [
           { href: "/coa/peristiwa", label: "Peristiwa" },

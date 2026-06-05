@@ -1,6 +1,11 @@
 import { EditIcon, DeleteIcon } from "@/components/icon";
 import {
+  Button,
+  Input,
   Pagination,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   Table,
   TableBody,
   TableCell,
@@ -15,10 +20,16 @@ import {
   highRoleCheck,
   renderQueryStates,
   sortItems,
+  useDebounce,
 } from "@/app/utils/tools";
-import { getDateFId, getTime } from "@/app/utils/date";
+import {
+  isDateColumn,
+  renderDateTimeComp,
+  getDateColumnSortValue,
+} from "@/app/utils/dateColumns";
+import columnHandlers from "@/app/utils/columnHandlers";
 import { TableHeaderWithAddButton, TableTitle } from "../mycomponent";
-import { useDefaultColumns, useDefaultFetch } from "@/hooks/useDefault";
+import { useDefaultColumnsV2, useDefaultFetch } from "@/hooks/useDefault";
 import { useMemo, useState } from "react";
 import DefaultModal from "./DefaultModal";
 import { renderFilterActive } from "@/app/utils/render";
@@ -33,8 +44,20 @@ export const renderDefaultTableCell = ({
   addExtraColumnHandlers = () => ({}),
 }) => {
   const cellValue = data?.[columnKey];
-  const renderDateTimeComp = (date) => `${getDateFId(date)} ${getTime(date)}`;
-  const columnHandlers = {
+  const extraHandlers =
+    (typeof addExtraColumnHandlers === "function"
+      ? addExtraColumnHandlers(data, cellValue)
+      : {}) || {};
+
+  // Handler precedence: extraHandlers (from caller) -> default columnHandlers -> fallback
+  const handler = extraHandlers[columnKey] ?? columnHandlers[columnKey];
+
+  if (typeof handler === "function") return handler(cellValue, data);
+  if (handler && typeof handler.render === "function")
+    return handler.render(cellValue, data);
+
+  // fallback: default behavior
+  const defaultColumnFallbacks = {
     nama: () => capitalizeEachWord(cellValue),
     lastupdate: () => renderDateTimeComp(cellValue || data.updated_at),
     creationdate: () => renderDateTimeComp(cellValue || data.created_at),
@@ -61,10 +84,12 @@ export const renderDefaultTableCell = ({
         </Tooltip>
       </div>
     ),
-    ...addExtraColumnHandlers(data, cellValue),
   };
-  const renderFn = columnHandlers[columnKey];
-  return typeof renderFn === "function" ? renderFn() : cellValue;
+
+  if (defaultColumnFallbacks[columnKey])
+    return defaultColumnFallbacks[columnKey]();
+
+  return cellValue;
 };
 
 export const DefaultTable = ({
@@ -74,6 +99,7 @@ export const DefaultTable = ({
   onSave,
   name,
   extraFields,
+  filterFields,
   extraColumns,
   enableActiveStatus,
   renderActionButton,
@@ -88,28 +114,78 @@ export const DefaultTable = ({
   isRemoveAddButton = false,
   extraDataBeforeAdd = {},
   user,
+  autoFilter = true,
+  filterDebounceMs,
 }) => {
   const sessUser = user;
 
   const [form, setForm] = useState({});
   const [page, setPage] = useState(1);
   const [isShowInactive, setIsShowInactive] = useState(false);
+  const [isShowAuditFields, setIsShowAuditFields] = useState(false);
   const [sortDescriptor, setSortDescriptor] = useState(customSort);
   const offset = (page - 1) * rowsPerPage;
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
+  const [filterForm, setFilterForm] = useState({});
+  const debouncedFilters = useDebounce(filterForm, filterDebounceMs);
+  const activeFilterCount = Object.values(filterForm).filter(
+    (value) =>
+      value !== undefined && value !== null && String(value).trim() !== "",
+  ).length;
+
+  const buildParamsFromFilters = (filtersObj) => {
+    const paramsArr = [];
+    for (const [k, v] of Object.entries(filtersObj || {})) {
+      if (v === undefined || v === null) continue;
+      const str = String(v).trim();
+      if (!str) continue;
+      paramsArr.push(`${encodeURIComponent(k)}=${encodeURIComponent(str)}`);
+    }
+    return paramsArr.join("&");
+  };
+
+  const params = buildParamsFromFilters(debouncedFilters);
+  const filterString = `${isShowInactive ? "" : "&aktif=1"}${params ? `&${params}` : ""}`;
 
   const data = useDefaultFetch({
     endPoint: endPoint,
     limit: rowsPerPage,
     offset,
-    filter: `${isShowInactive ? "" : "&aktif=1"}`,
+    filter: filterString,
   });
   const items = data?.data?.data;
   const mutate = data?.mutate;
 
   const sortedItems = useMemo(
-    () => sortItems(items || [], sortDescriptor),
-    [items, sortDescriptor],
+    () =>
+      sortItems(items || [], sortDescriptor, (item, column) => {
+        const extraHandlers =
+          typeof addExtraColumnHandlers === "function"
+            ? addExtraColumnHandlers(item, item[column])
+            : {};
+
+        const extrah = extraHandlers?.[column];
+        if (typeof extrah === "function") return extrah();
+        if (extrah && typeof extrah.sortValue === "function")
+          return extrah.sortValue(item);
+
+        const def = columnHandlers?.[column];
+        if (def && typeof def.sortValue === "function")
+          return def.sortValue(item);
+
+        if (column === "nama") {
+          const value = capitalizeEachWord(item[column]);
+          return typeof value === "string" ? value.toLowerCase() : value;
+        }
+
+        if (isDateColumn(column)) {
+          return getDateColumnSortValue(item, column);
+        }
+
+        return item[column];
+      }),
+    [items, sortDescriptor, addExtraColumnHandlers],
   );
 
   const loadingState = data.isLoading ? "loading" : "idle";
@@ -124,6 +200,7 @@ export const DefaultTable = ({
   const editButtonPress = (data) => {
     setForm({
       ...data,
+      nama: data?.nama ? data.nama : "",
       method: "PATCH",
       modalmode: "Edit",
     });
@@ -137,12 +214,18 @@ export const DefaultTable = ({
     }
   };
   const isHighRole = highRoleCheck(sessUser?.rank);
-  const columns = useDefaultColumns(isHighRole, extraColumns, disableNama);
-  const QueryState = renderQueryStates({ data });
+  const columns = useDefaultColumnsV2(
+    undefined,
+    isHighRole,
+    extraColumns,
+    disableNama,
+    isShowAuditFields,
+  );
+  const QueryState = renderQueryStates({});
   if (QueryState) return QueryState;
 
   const id_karyawan = sessUser.id_karyawan;
-  const pages = Math.ceil(items[0]?.total / rowsPerPage);
+  const pages = Math.ceil((items?.[0]?.total || 0) / rowsPerPage);
   return (
     <>
       <Table
@@ -156,6 +239,61 @@ export const DefaultTable = ({
         onSortChange={setSortDescriptor}
         topContent={
           <>
+            <div className="mb-2 flex flex-wrap items-center gap-2">
+              {autoFilter && (
+                <Popover shouldCloseOnScroll={false}>
+                  <PopoverTrigger>
+                    <Button color="primary" size="sm">
+                      Filter
+                      {activeFilterCount > 0 ? ` (${activeFilterCount})` : ""}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent>
+                    <div className="p-3 flex flex-col gap-3 min-w-[300px]">
+                      {!disableNama && (
+                        <Input
+                          label="Nama"
+                          placeholder="Cari nama"
+                          variant="bordered"
+                          value={filterForm.nama || ""}
+                          onValueChange={(val) => {
+                            setPage(1);
+                            setFilterForm((prev) => ({ ...prev, nama: val }));
+                          }}
+                        />
+                      )}
+                      <Input
+                        label="Keterangan"
+                        placeholder="Cari keterangan"
+                        variant="bordered"
+                        value={filterForm.keterangan || ""}
+                        onValueChange={(val) => {
+                          setPage(1);
+                          setFilterForm((prev) => ({
+                            ...prev,
+                            keterangan: val,
+                          }));
+                        }}
+                      />
+                      {filterFields && (
+                        <div className="flex flex-col gap-3">
+                          {typeof filterFields === "function"
+                            ? filterFields(filterForm, setFilterForm)
+                            : filterFields}
+                        </div>
+                      )}
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              )}
+              <Button
+                color={isShowAuditFields ? "secondary" : "default"}
+                size="sm"
+                onPress={() => setIsShowAuditFields((prev) => !prev)}
+              >
+                {isShowAuditFields ? "Hide Audit" : "Show Audit"}
+              </Button>
+            </div>
             {isRemoveAddButton ? (
               <TableTitle>{name}</TableTitle>
             ) : (
@@ -201,7 +339,7 @@ export const DefaultTable = ({
           )}
         </TableHeader>
         <TableBody
-          items={sortedItems}
+          items={sortedItems || []}
           loadingContent={"Loading..."}
           emptyContent={"Kosong"}
           loadingState={loadingState}
@@ -262,6 +400,7 @@ export const TableWithActiveStatus = ({
   onSave,
   renderActionButton,
   extraFields,
+  filterFields,
   extraColumns,
   disableNama = false,
   addExtraColumnHandlers,
@@ -270,6 +409,7 @@ export const TableWithActiveStatus = ({
   isRemoveAddButton = false,
   extraDataBeforeAdd,
   user,
+  autoFilter,
 }) => (
   <DefaultTable
     endPoint={endPoint}
@@ -279,6 +419,7 @@ export const TableWithActiveStatus = ({
     onSave={onSave}
     renderActionButton={renderActionButton}
     extraFields={extraFields}
+    filterFields={filterFields}
     extraColumns={extraColumns}
     enableActiveStatus
     disableNama={disableNama}
@@ -288,5 +429,6 @@ export const TableWithActiveStatus = ({
     isRemoveAddButton={isRemoveAddButton}
     extraDataBeforeAdd={extraDataBeforeAdd}
     user={user}
+    autoFilter={autoFilter}
   />
 );

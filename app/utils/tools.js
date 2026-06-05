@@ -105,13 +105,17 @@ export const buildURLPathQuery = (path = "", params = { sample: "test" }) => {
   const query = new URLSearchParams(cleanData).toString();
   return `${path}?${query}`;
 };
-export const sortItems = (items = [], sortDescriptor = {}) => {
+export const sortItems = (
+  items = [],
+  sortDescriptor = {},
+  getSortValue = (item, column) => item[column],
+) => {
   const itemsArray = [...items];
   const { column = "id", direction = "ascending" } = sortDescriptor;
 
   itemsArray.sort((a, b) => {
-    let first = a[column];
-    let second = b[column];
+    let first = getSortValue(a, column);
+    let second = getSortValue(b, column);
 
     const cmp =
       (first ?? "") < (second ?? "")

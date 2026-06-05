@@ -138,6 +138,7 @@ export default function App({ user }) {
               reportSummary={previewSummary}
               reportTree={previewTree}
               showModifier
+              isTemplate
               onRelationSaved={treePreview.mutate}
               user={user}
             />

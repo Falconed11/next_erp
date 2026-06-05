@@ -19,9 +19,17 @@ import {
   ModalHeader,
   useDisclosure,
 } from "@heroui/react";
-import { useState } from "react";
-import { IoMdAdd } from "react-icons/io";
-import { saveLaporanRelation } from "@/services/laporan/laporan-relation.service";
+import { useState, useRef, useEffect } from "react";
+import {
+  IoMdAdd,
+  IoMdTrash,
+  IoIosArrowForward,
+  IoIosArrowDown,
+} from "react-icons/io";
+import {
+  saveLaporanRelation,
+  deleteLaporanRelation,
+} from "@/services/laporan/laporan-relation.service";
 
 export default function ReportTreeSection({
   reportType,
@@ -29,6 +37,7 @@ export default function ReportTreeSection({
   reportTree,
   showModifier = false,
   onRelationSaved,
+  isTemplate = false,
   user,
 }) {
   return (
@@ -42,6 +51,7 @@ export default function ReportTreeSection({
           node={rootNode}
           showModifier={showModifier}
           onRelationSaved={onRelationSaved}
+          isTemplate={isTemplate}
           user={user}
         />
       ))}
@@ -53,10 +63,30 @@ const ReportRow = ({
   node,
   depth = 0,
   showModifier = false,
+  isTemplate = false,
   onRelationSaved,
   user,
 }) => {
   const hasChildren = node.children && node.children.length > 0;
+  const [isOpen, setIsOpen] = useState(true);
+  const contentRef = useRef(null);
+  const [maxHeight, setMaxHeight] = useState(isOpen ? undefined : "0px");
+
+  useEffect(() => {
+    const el = contentRef.current;
+    if (!el) return;
+
+    if (isOpen) {
+      // expand to content's scrollHeight, then clear restriction after transition
+      const sh = el.scrollHeight;
+      setMaxHeight(`${sh}px`);
+    } else {
+      // collapse: set to current height then to 0 to animate
+      const sh = el.scrollHeight;
+      setMaxHeight(`${sh}px`);
+      requestAnimationFrame(() => setMaxHeight("0px"));
+    }
+  }, [isOpen, node.children]);
   const modifierText =
     showModifier && node.modifier != null
       ? ` (${+node.modifier > 0 ? "+" : "-"})`
@@ -66,30 +96,77 @@ const ReportRow = ({
     <div className={`flex flex-col ${depth > 0 ? "mt-2" : "mt-4"}`}>
       <div className="flex gap-2">
         <div
-          className={`flex justify-between items-center p-3 rounded-t-lg border-b
+          className={`flex justify-between items-center p-3 gap-2 rounded-t-lg border-b
           ${hasChildren ? "bg-slate-100 font-bold" : "bg-white font-medium"}
           ${depth === 0 ? "border-l-4 shadow-sm" : "border-l-2 border-l-slate-300"}
         `}
         >
-          <span className="text-slate-700">
-            {node.nama}
-            {modifierText}
-          </span>
+          <div className="flex items-center gap-2">
+            {hasChildren ? (
+              <button
+                type="button"
+                onClick={() => setIsOpen((s) => !s)}
+                aria-label={isOpen ? "Collapse" : "Expand"}
+                className="text-slate-600 cursor-pointer hover:bg-slate-300 p-1 rounded-full"
+              >
+                {isOpen ? <IoIosArrowDown /> : <IoIosArrowForward />}
+              </button>
+            ) : (
+              <span className="w-5" />
+            )}
+            <span className="text-slate-700">
+              {node.nama}
+              {node.level ? modifierText : null}
+            </span>
+          </div>
           <span className="text-slate-900">
             <Harga harga={node.total_balance} />
           </span>
         </div>
-        <div className="content-center">
-          <AddRelation
-            node={node}
-            onRelationSaved={onRelationSaved}
-            user={user}
-          />
-        </div>
+        {isTemplate && (
+          <div className="flex items-center gap-2">
+            <AddRelation
+              node={node}
+              onRelationSaved={onRelationSaved}
+              user={user}
+            />
+            {node.id_laporan_relation && (
+              <Button
+                color="danger"
+                variant="ghost"
+                size="sm"
+                onPress={async () => {
+                  if (!confirm("Hapus relasi ini?")) return;
+                  const res = await deleteLaporanRelation(
+                    node.id_laporan_relation,
+                  );
+                  const json = await res.json();
+                  if (!res.ok)
+                    return alert(json?.message || "Gagal menghapus relasi!");
+                  onRelationSaved?.();
+                }}
+              >
+                <IoMdTrash />
+              </Button>
+            )}
+          </div>
+        )}
       </div>
 
       {hasChildren && (
-        <div className="border-l border-r border-b border-slate-200 rounded-b-lg bg-slate-50/30 pl-2 pb-2 shadow-inner">
+        <div
+          ref={contentRef}
+          onTransitionEnd={(e) => {
+            if (e.propertyName === "max-height" && isOpen) {
+              setMaxHeight(undefined);
+            }
+          }}
+          style={{
+            maxHeight: maxHeight === undefined ? undefined : maxHeight,
+            transition: "max-height 220ms ease",
+          }}
+          className="border-l border-r border-b border-slate-200 rounded-b-lg bg-slate-50/30 pl-2 pb-2 shadow-inner overflow-hidden"
+        >
           {node.children.map((child) => (
             <ReportRow
               key={child.id}
@@ -97,6 +174,7 @@ const ReportRow = ({
               depth={depth + 1}
               showModifier={showModifier}
               onRelationSaved={onRelationSaved}
+              isTemplate={isTemplate}
               user={user}
             />
           ))}
@@ -108,6 +186,7 @@ const ReportRow = ({
 
 const saveRelationWithSession = async ({
   form,
+  setForm,
   user,
   onRelationSaved,
   onClose,
@@ -130,7 +209,7 @@ const saveRelationWithSession = async ({
   if (!res.ok) {
     return alert(json?.message || "Gagal menyimpan relasi!");
   }
-
+  setForm({});
   onClose();
   onRelationSaved?.();
 };
@@ -159,7 +238,7 @@ const FullReportSummary = ({ summary }) => {
 };
 
 const AddRelation = ({ node, onRelationSaved, user }) => {
-  const { id: idParent } = node;
+  const { id: idParent, node_type } = node;
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [form, setForm] = useState({});
   const { id_child, id_coa_filter, id_coa_type, id_coa_subtype, id_coa } = form;
@@ -169,6 +248,7 @@ const AddRelation = ({ node, onRelationSaved, user }) => {
   const handleSave = async (onClose) => {
     await saveRelationWithSession({
       form,
+      setForm,
       user,
       onRelationSaved,
       onClose,
@@ -177,16 +257,20 @@ const AddRelation = ({ node, onRelationSaved, user }) => {
 
   return (
     <>
-      <Button
-        onPress={() => {
-          updateForm(setForm, { method: "POST", id_parent: idParent });
-          onOpen();
-        }}
-        color="primary"
-        size="sm"
-      >
-        <IoMdAdd /> Tambah
-      </Button>
+      {node_type == "laporan" && (
+        <Button
+          onPress={() => {
+            updateForm(setForm, { method: "POST", id_parent: idParent });
+            onOpen();
+          }}
+          color="primary"
+          variant="ghost"
+          size="sm"
+          className=""
+        >
+          <IoMdAdd className="p-0" />
+        </Button>
+      )}
       <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
         <ModalContent>
           {(onClose) => (
