@@ -66,7 +66,8 @@ export default function App({ user }) {
     }
     await treePreview.mutate();
   };
-  console.log({ data: treePreview?.data?.data, previewTree, previewSummary });
+  // console.log({ data: treePreview?.data?.data, previewTree, previewSummary });
+  console.log(treePreview);
 
   return (
     <div className="flex gap-4 items-start">
