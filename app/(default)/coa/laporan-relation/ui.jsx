@@ -7,7 +7,10 @@ import {
   AutocompleteCoaSubtype,
   AutocompleteCoaType,
 } from "@/components/coa/coa";
-import { AutocompleteLaporan } from "@/components/laporan/laporan";
+import {
+  AutocompleteLaporan,
+  LaporanRelationForm,
+} from "@/components/laporan/laporan";
 import {
   deleteLaporanRelation,
   LAPORAN_RELATION_ENDPOINT,
@@ -21,59 +24,6 @@ export default function App({ user }) {
   const CustomDivider = () => (
     <Divider orientation="horizontal" className="bg-primary" />
   );
-  const LaporanRelationForm = ({ form, setForm, isFilter }) => {
-    const isLaporanSelected = form.id_child;
-    const isCoasSelected = form.coa || form.coa_subtype || form.coa_type;
-    return (
-      <>
-        <DefaultSelect
-          options={[
-            { id: 1, nama: "+1" },
-            { id: -1, nama: "-1" },
-          ]}
-          fieldName="modifier"
-          label="Modifier"
-          placeholder="Pilih modifier"
-          form={form}
-          setForm={setForm}
-          disallowEmptySelection={!isFilter}
-        />
-        <AutocompleteLaporan
-          form={form}
-          setForm={setForm}
-          title="Parent"
-          field="parent"
-          id="id_parent"
-          disallowEmptySelection={!isFilter}
-        />
-        <CustomDivider />
-        <AutocompleteLaporan
-          form={form}
-          setForm={setForm}
-          title="Child"
-          field="child"
-          id="id_child"
-          isDisabled={isCoasSelected}
-        />
-        <CustomDivider />
-        <AutocompleteCoaType
-          form={form}
-          setForm={setForm}
-          isDisabled={isLaporanSelected}
-        />
-        <AutocompleteCoaSubtype
-          form={form}
-          setForm={setForm}
-          isDisabled={isLaporanSelected}
-        />
-        <AutocompleteCoa
-          form={form}
-          setForm={setForm}
-          isDisabled={isLaporanSelected}
-        />
-      </>
-    );
-  };
 
   return (
     <div className="flex flex-col gap-2">
@@ -84,11 +34,15 @@ export default function App({ user }) {
         onDelete={deleteLaporanRelation}
         onSave={saveLaporanRelation}
         // disableNama
-        extraFields={(form, setForm) => (
-          <LaporanRelationForm form={form} setForm={setForm} isFilter={false} />
-        )}
-        filterFields={(form, setForm) => (
-          <LaporanRelationForm form={form} setForm={setForm} isFilter={true} />
+        // extraFields={(form, setForm) => (
+        //   <LaporanRelationForm form={form} setForm={setForm} isFilter={false} />
+        // )}
+        extraFields={(form, setForm, isFilter) => (
+          <LaporanRelationForm
+            form={form}
+            setForm={setForm}
+            isFilter={isFilter}
+          />
         )}
         extraColumns={[
           { key: "modifier", label: "Modifier" },

@@ -42,39 +42,55 @@ export const buildReportTree = (response) => {
   const { tree: rows } = normalizeReportResponse(response);
   if (!Array.isArray(rows)) return [];
 
-  const normalizedRows = rows.map((row, index) => ({
-    ...row,
-    id: row.id,
-    id_parent: row.id_parent,
-    nama: row.nama,
-    level: row.level ?? 0,
-    total_balance: Number(row.total_balance ?? 0),
-    orderIndex: index,
-  }));
+  const normalizedRows = rows.map((row, index) => {
+    const path = row.path ?? String(row.id);
+    const pathSegments = String(path)
+      .split(",")
+      .map((segment) => segment.trim())
+      .filter(Boolean);
+    const parentPath =
+      pathSegments.length > 1 ? pathSegments.slice(0, -1).join(",") : null;
+
+    return {
+      ...row,
+      id: row.id,
+      id_parent: row.id_parent,
+      nama: row.nama,
+      level: row.level ?? 0,
+      total_balance: Number(row.total_balance ?? 0),
+      orderIndex: index,
+      path,
+      parentPath,
+    };
+  });
 
   const availableIds = new Set(normalizedRows.map((row) => row.id));
 
   const childrenByParent = normalizedRows.reduce((acc, row) => {
-    const key = row.id_parent ?? "root";
+    const key = row.parentPath ?? row.id_parent ?? "root";
     if (!acc.has(key)) acc.set(key, []);
     acc.get(key).push(row);
     return acc;
   }, new Map());
 
-  const buildTree = (parentId) =>
-    (childrenByParent.get(parentId) ?? [])
+  const buildTree = (parentKey) =>
+    (childrenByParent.get(parentKey) ?? [])
       .sort((a, b) => a.orderIndex - b.orderIndex)
       .map((row) => ({
         ...row,
-        children: buildTree(row.id),
+        children: buildTree(row.path),
       }));
 
   return normalizedRows
-    .filter((row) => row.id_parent == null || !availableIds.has(row.id_parent))
+    .filter(
+      (row) =>
+        row.parentPath == null &&
+        (row.id_parent == null || !availableIds.has(row.id_parent)),
+    )
     .sort((a, b) => a.orderIndex - b.orderIndex)
     .map((row) => ({
       ...row,
-      children: buildTree(row.id),
+      children: buildTree(row.path),
     }));
 };
 

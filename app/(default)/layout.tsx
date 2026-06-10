@@ -183,10 +183,10 @@ export default async function RootLayout({
                 key: "data",
                 name: "COA",
               },
-              {
-                key: "coa-filter",
-                name: "COA Filter",
-              },
+              // {
+              //   key: "coa-filter",
+              //   name: "COA Filter",
+              // },
               {
                 key: "laporan-relation",
                 name: "Laporan Relation",
@@ -219,11 +219,11 @@ export default async function RootLayout({
             dropdown: [
               {
                 key: "data",
-                name: "Laporan Keuangan",
+                name: "Keuangan",
               },
               {
-                key: "laporan",
-                name: "Template Laporan Keuangan",
+                key: "template-keuangan",
+                name: "Template Keuangan",
               },
               ...([...highRoles, "admin"].includes(user.peran)
                 ? [

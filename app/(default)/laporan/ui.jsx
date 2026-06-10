@@ -99,7 +99,6 @@ export default function App() {
   //   reportSummary,
   // });
   const { startDate, endDate } = form;
-  console.log(form);
   return (
     <div className="flex gap-2">
       <div className="mb-6 gap-3 rounded-xl border bg-white p-4 md:grid-cols-2">

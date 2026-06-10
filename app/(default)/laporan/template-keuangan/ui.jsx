@@ -14,7 +14,7 @@ import {
   patchLaporan,
 } from "@/services/laporan/laporan.service";
 import DefaultSelect from "@/components/default/DefaultSelect";
-import { Tooltip } from "@heroui/react";
+import { form, Tooltip } from "@heroui/react";
 import { useMemo, useState } from "react";
 import ReportTreeSection from "../components/ReportTreeSection";
 import {
@@ -67,7 +67,7 @@ export default function App({ user }) {
     await treePreview.mutate();
   };
   // console.log({ data: treePreview?.data?.data, previewTree, previewSummary });
-  console.log(treePreview);
+  // console.log(previewTree);
 
   return (
     <div className="flex gap-4 items-start">
@@ -80,21 +80,23 @@ export default function App({ user }) {
           onDelete={deleteLaporan}
           onSave={patchLaporan}
           onSaveSuccess={handleSaveSuccess}
-          extraFields={(form, setForm) => (
-            <>
-              <DefaultSelect
-                options={[
-                  { id: 1, nama: 1 },
-                  { id: -1, nama: -1 },
-                ]}
-                form={form}
-                setForm={setForm}
-                label="Modifier"
-                placeholder="Pilih modifier!"
-                fieldName="modifier"
-              />
-            </>
+          extraFields={(form, setForm, isFilter) => (
+            <DefaultSelect
+              disallowEmptySelection={!isFilter}
+              fieldName="isReport"
+              form={form}
+              setForm={setForm}
+              label="Tipe"
+              options={[
+                { id: 0, nama: "Bagian" },
+                { id: 1, nama: "Laporan" },
+              ]}
+            />
           )}
+          extraColumns={[{ key: "isReport", label: "Tipe" }]}
+          addExtraColumnHandlers={(data, cellValue) => ({
+            isReport: () => (cellValue == 1 ? "Laporan" : "Bagian"),
+          })}
           renderActionButton={(data) => (
             <Tooltip content="Show Tree">
               <span

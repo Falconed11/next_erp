@@ -179,6 +179,7 @@ export default function App({ id, user }) {
   const tambahButtonPress = async ({ selectProduk, selectKaryawan, form }) => {
     // if (select.size == 0) return alert("Produk belum dipilih.");
     if (!form.id_karyawan) return alert("Karyawan belum dipilih");
+    if (!form.jumlah) return alert("Jumlah belum diisi");
     if (form.isSelected && form.stok < form.jumlah)
       return alert("Jumlah melebihi stok.");
     let res;
@@ -213,6 +214,9 @@ export default function App({ id, user }) {
         }),
       });
     }
+    const json = await res.json();
+    if (!res.ok)
+      return alert(json?.message || "Gagal menambahkan pengeluaran!");
     setForm((prev) => ({
       id_karyawan: prev.id_karyawan,
       startdate: prev.startdate,
@@ -222,6 +226,7 @@ export default function App({ id, user }) {
   };
   const simpanButtonPress = async (data, onClose) => {
     // return console.log({ form, id });
+    if (!data.jumlah) return alert("Jumlah belum diisi.");
     let res;
     if (data.id_produkkeluar) {
       if (data.stok + data.oldJumlah < data.jumlah)
@@ -257,6 +262,9 @@ export default function App({ id, user }) {
           // harga: data.hargajual,
         }),
       });
+    const json = await res.json();
+    console.log(res);
+    if (!res.ok) return alert(json?.message || "Gagal menyimpan data!");
     updateDataPengeluaran();
     setForm({});
     onClose();
@@ -598,7 +606,6 @@ export default function App({ id, user }) {
     );
   const provit = omset - biayaProduksi;
   const variant = "bordered";
-  console.log("cek");
   return (
     <div className="flex flex-col gap-2 w-full-">
       <div className="flex gap-2">
@@ -702,7 +709,8 @@ export default function App({ id, user }) {
                     onPress={() => {
                       tambahButtonPressPembayaran(formPembayaran);
                     }}
-                    color="primary" variant="solid"
+                    color="primary"
+                    variant="solid"
                     className="ml-2"
                   >
                     Tambah
@@ -851,14 +859,15 @@ export default function App({ id, user }) {
               <div className="text-right">
                 <Button
                   isDisabled={!form.id_produk}
-                  onClick={() => {
+                  onPress={() => {
                     tambahButtonPress({
                       selectProduk,
                       selectKaryawan,
                       form,
                     });
                   }}
-                  color="primary" variant="solid"
+                  color="primary"
+                  variant="solid"
                   className="ml-2"
                 >
                   Tambah
@@ -1024,8 +1033,9 @@ export default function App({ id, user }) {
                   Batal
                 </Button>
                 <Button
-                  color="primary" variant="solid"
-                  onClick={() => simpanButtonPress(form, onClose)}
+                  color="primary"
+                  variant="solid"
+                  onPress={() => simpanButtonPress(form, onClose)}
                 >
                   Simpan
                 </Button>
@@ -1057,7 +1067,8 @@ export default function App({ id, user }) {
               </ModalBody>
               <ModalFooter>
                 <Button
-                  color="danger" variant="flat"
+                  color="danger"
+                  variant="flat"
                   onClick={() => {
                     const startdate = new Date();
                     setFormPembayaran({
@@ -1073,7 +1084,8 @@ export default function App({ id, user }) {
                   Batal
                 </Button>
                 <Button
-                  color="primary" variant="solid"
+                  color="primary"
+                  variant="solid"
                   onClick={() =>
                     simpanButtonPressPembayaran(formPembayaran, onClose)
                   }
@@ -1115,8 +1127,14 @@ export default function App({ id, user }) {
                 <Button color="danger" variant="flat" onClick={onClose}>
                   Tutup
                 </Button>
-                <Button color="primary" variant="solid">Cetak</Button>
-                <Button onClick={handlePrintNota} color="primary" variant="solid">
+                <Button color="primary" variant="solid">
+                  Cetak
+                </Button>
+                <Button
+                  onClick={handlePrintNota}
+                  color="primary"
+                  variant="solid"
+                >
                   React to Print
                 </Button>
               </ModalFooter>

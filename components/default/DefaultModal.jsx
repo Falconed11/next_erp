@@ -8,7 +8,9 @@ import {
   ModalContent,
   ModalFooter,
   ModalHeader,
+  Spinner,
 } from "@heroui/react";
+import { useEffect } from "react";
 
 export default function DefaultModal({
   data = { mutate: () => {} },
@@ -23,6 +25,8 @@ export default function DefaultModal({
   disableNama = false,
   onSaveSuccess,
   user,
+  isRequiredNama = true,
+  isLoading = false,
 }) {
   const sessUser = user;
   const { id_karyawan: sessIdKaryawan } = sessUser;
@@ -44,48 +48,60 @@ export default function DefaultModal({
     onSaveSuccess?.(json, payload);
     onClose();
   };
+  useEffect(() => {
+    console.log({ form });
+  }, [form]);
   return (
     <Modal isOpen={isOpen} onOpenChange={onOpenChange} scrollBehavior="inside">
       <ModalContent>
         {(onClose) => (
           <>
             <ModalHeader className="flex flex-col gap-1">
-              {form.title} {name}
+              {form.method == "POST" ? "Tambah" : "Edit"} {name}
             </ModalHeader>
             <ModalBody>
-              {!disableNama && (
-                <Input
-                  isRequired
-                  type="text"
-                  color="default"
-                  variant="bordered"
-                  label={name}
-                  placeholder={`Masukkan nama ${name}!`}
-                  value={form.nama}
-                  onValueChange={(val) => updateForm(setForm, { nama: val })}
-                />
+              {isLoading ? (
+                <Spinner />
+              ) : (
+                <>
+                  {!disableNama && (
+                    <Input
+                      isRequired={isRequiredNama}
+                      type="text"
+                      color="default"
+                      variant="bordered"
+                      label={name}
+                      placeholder={`Masukkan nama ${name}!`}
+                      value={form.nama}
+                      onValueChange={(val) =>
+                        updateForm(setForm, { nama: val })
+                      }
+                    />
+                  )}
+                  <Input
+                    type="text"
+                    color="default"
+                    variant="bordered"
+                    label={"Keterangan"}
+                    placeholder={`Masukkan keterangan!`}
+                    value={form.keterangan}
+                    onValueChange={(val) =>
+                      updateForm(setForm, { keterangan: val })
+                    }
+                  />
+                  {extraFields && extraFields(form, setForm)}
+                </>
               )}
-              <Input
-                type="text"
-                color="default"
-                variant="bordered"
-                label={"Keterangan"}
-                placeholder={`Masukkan keterangan!`}
-                value={form.keterangan}
-                onValueChange={(val) =>
-                  updateForm(setForm, { keterangan: val })
-                }
-              />
-              {extraFields && extraFields(form, setForm)}
             </ModalBody>
             <ModalFooter>
               <Button color="danger" variant="flat" onClick={onClose}>
                 Batal
               </Button>
               <Button
+                isLoading={isLoading}
                 color="primary"
                 variant="solid"
-                onClick={() => saveButtonPress(onClose)}
+                onPress={() => saveButtonPress(onClose)}
               >
                 Simpan
               </Button>

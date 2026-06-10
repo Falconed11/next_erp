@@ -39,6 +39,7 @@ export default function DefaultSelect({
       className={className}
       selectedKeys={selectedKeys}
       onSelectionChange={onSelectionChange}
+      isClearable={!disallowEmptySelection}
     >
       {data.map((item) => (
         <SelectItem

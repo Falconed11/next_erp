@@ -1,35 +1,24 @@
 "use client";
 
-import { updateForm } from "@/app/utils/tools";
-import {
-  AutocompleteCoa,
-  AutocompleteCoaFilter,
-  AutocompleteCoaSubtype,
-  AutocompleteCoaType,
-} from "@/components/coa/coa";
 import Harga from "@/components/harga";
-import { AutocompleteLaporan } from "@/components/laporan/laporan";
-import {
-  Button,
-  Divider,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  useDisclosure,
-} from "@heroui/react";
+import { Button, Divider, useDisclosure } from "@heroui/react";
 import { useState, useRef, useEffect } from "react";
 import {
-  IoMdAdd,
   IoMdTrash,
   IoIosArrowForward,
   IoIosArrowDown,
+  IoMdCreate,
+  IoMdAdd,
 } from "react-icons/io";
 import {
-  saveLaporanRelation,
   deleteLaporanRelation,
+  getLaporanRelation,
+  saveLaporanRelation,
 } from "@/services/laporan/laporan-relation.service";
+import { LaporanRelationForm } from "@/components/laporan/laporan";
+import DefaultModal from "@/components/default/DefaultModal";
+import { useDefaultFetch } from "@/hooks/useDefault";
+import { apiFetch } from "@/app/utils/fetchHelper";
 
 export default function ReportTreeSection({
   reportType,
@@ -47,7 +36,7 @@ export default function ReportTreeSection({
       ) : null}
       {reportTree.map((rootNode) => (
         <ReportRow
-          key={rootNode.id}
+          key={rootNode.path}
           node={rootNode}
           showModifier={showModifier}
           onRelationSaved={onRelationSaved}
@@ -67,8 +56,9 @@ const ReportRow = ({
   onRelationSaved,
   user,
 }) => {
+  const isLaporanLeaf = !node.children?.[0]?.id_laporan_relation;
   const hasChildren = node.children && node.children.length > 0;
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(isLaporanLeaf ? false : true);
   const contentRef = useRef(null);
   const [maxHeight, setMaxHeight] = useState(isOpen ? undefined : "0px");
 
@@ -87,6 +77,7 @@ const ReportRow = ({
       requestAnimationFrame(() => setMaxHeight("0px"));
     }
   }, [isOpen, node.children]);
+
   const modifierText =
     showModifier && node.modifier != null
       ? ` (${+node.modifier > 0 ? "+" : "-"})`
@@ -125,7 +116,7 @@ const ReportRow = ({
         </div>
         {isTemplate && (
           <div className="flex items-center gap-2">
-            <AddRelation
+            <LaporanRelationModal
               node={node}
               onRelationSaved={onRelationSaved}
               user={user}
@@ -169,7 +160,7 @@ const ReportRow = ({
         >
           {node.children.map((child) => (
             <ReportRow
-              key={child.id}
+              key={child.path}
               node={child}
               depth={depth + 1}
               showModifier={showModifier}
@@ -184,35 +175,141 @@ const ReportRow = ({
   );
 };
 
-const saveRelationWithSession = async ({
-  form,
-  setForm,
-  user,
-  onRelationSaved,
-  onClose,
-}) => {
-  if (!form.method) {
-    return alert("Metode simpan tidak ditentukan.");
-  }
+function LaporanRelationModal({ node, onRelationSaved, user }) {
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const [form, setForm] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+  const action = form.method === "PATCH" ? "Edit" : "Tambah";
 
-  const sessIdKaryawan = user?.id_karyawan;
-  if (!sessIdKaryawan) {
-    return alert("Session user tidak tersedia.");
-  }
+  const openAdd = () => {
+    setForm({
+      method: "POST",
+      parent: node.nama,
+      id_parent: node.id_laporan,
+    });
+    onOpen();
+  };
 
-  const res = await saveLaporanRelation({
-    ...form,
-    sessIdKaryawan,
-  });
-  const json = await res.json();
+  // const openEdit = async () => {
+  //   if (!node.id_laporan_relation) return;
 
-  if (!res.ok) {
-    return alert(json?.message || "Gagal menyimpan relasi!");
-  }
-  setForm({});
-  onClose();
-  onRelationSaved?.();
-};
+  //   setIsLoading(true);
+  //   onOpen();
+
+  //   try {
+  //     const res = await getLaporanRelation(node.id_laporan_relation);
+  //     const json = await res.json();
+  //     if (!res.ok) throw new Error(json?.message || "Gagal memuat relasi!");
+
+  //     const data = json?.data ?? json;
+  //     setForm({
+  //       ...normalizeRelationData(data),
+  //       method: "PATCH",
+  //       id: node.id_laporan_relation,
+  //     });
+  //   } catch (error) {
+  //     alert(error.message || "Gagal memuat relasi!");
+  //     onOpenChange(false);
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
+
+  const openEdit = async () => {
+    setIsLoading(true);
+    onOpen();
+    const res = await getLaporanRelation(node.id_laporan_relation);
+    const json = await res.json();
+    if (!res.ok) {
+      alert(json?.message || "Gagal memuat relasi!");
+      return;
+    }
+    const { data } = json || {};
+    // console.log(data);
+    setForm({ ...data, method: "PATCH" });
+    setIsLoading(false);
+  };
+
+  // useEffect(() => {
+  //   console.log(form);
+  // }, [form]);
+
+  return (
+    <>
+      {node.id_laporan && (
+        <Button onPress={openAdd} color="primary" variant="ghost" size="sm">
+          <IoMdAdd className="p-0" />
+        </Button>
+      )}
+      {node.id_laporan_relation && (
+        <Button onPress={openEdit} color="secondary" variant="ghost" size="sm">
+          <IoMdCreate className="p-0" />
+        </Button>
+      )}
+      <DefaultModal
+        extraFields={(form, setForm) => (
+          <LaporanRelationForm
+            form={form}
+            setForm={setForm}
+            isDisabledLaporan
+          />
+        )}
+        form={form}
+        setForm={setForm}
+        id_karyawan={user.id_karyawan}
+        name="Relasi Laporan"
+        user={user}
+        data={{ mutate: onRelationSaved }}
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        onSave={saveLaporanRelation}
+        isRequiredNama={false}
+        isLoading={isLoading}
+      />
+      {/* <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">
+                {action} Relasi
+              </ModalHeader>
+              <ModalBody>
+                <div className="mb-4">Simpul : {node.nama}</div>
+                {isLoading ? (
+                  <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-center text-slate-600">
+                    Loading relasi...
+                  </div>
+                ) : (
+                  <LaporanRelationForm form={form} setForm={setForm} />
+                )}
+              </ModalBody>
+              <ModalFooter>
+                <Button
+                  color="danger"
+                  variant="light"
+                  onPress={() => {
+                    onClose();
+                    setForm(initialForm);
+                  }}
+                  disabled={isLoading}
+                >
+                  Close
+                </Button>
+                <Button
+                  color="primary"
+                  onPress={() => handleSave(onClose)}
+                  disabled={isLoading}
+                >
+                  Simpan
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal> */}
+    </>
+  );
+}
 
 const FullReportSummary = ({ summary }) => {
   const summaryItems = [
@@ -234,93 +331,5 @@ const FullReportSummary = ({ summary }) => {
         </div>
       ))}
     </div>
-  );
-};
-
-const AddRelation = ({ node, onRelationSaved, user }) => {
-  const { id: idParent, node_type } = node;
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const [form, setForm] = useState({});
-  const { id_child, id_coa_filter, id_coa_type, id_coa_subtype, id_coa } = form;
-  const isCoaSelected = id_coa_type || id_coa_subtype || id_coa;
-  const isCoaDisabled = id_child || id_coa_filter;
-
-  const handleSave = async (onClose) => {
-    await saveRelationWithSession({
-      form,
-      setForm,
-      user,
-      onRelationSaved,
-      onClose,
-    });
-  };
-
-  return (
-    <>
-      {node_type == "laporan" && (
-        <Button
-          onPress={() => {
-            updateForm(setForm, { method: "POST", id_parent: idParent });
-            onOpen();
-          }}
-          color="primary"
-          variant="ghost"
-          size="sm"
-          className=""
-        >
-          <IoMdAdd className="p-0" />
-        </Button>
-      )}
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
-        <ModalContent>
-          {(onClose) => (
-            <>
-              <ModalHeader className="flex flex-col gap-1">
-                {form.method === "POST" ? "Tambah" : "Edit"} Relasi
-              </ModalHeader>
-              <ModalBody>
-                <div>Simpul : {node.nama}</div>
-                <AutocompleteLaporan
-                  form={form}
-                  setForm={setForm}
-                  id="id_child"
-                  isDisabled={id_coa_filter || isCoaSelected}
-                />
-                <Divider orientation="horizontal" />
-                <AutocompleteCoaFilter
-                  form={form}
-                  setForm={setForm}
-                  isDisabled={id_child || isCoaSelected}
-                />
-                <Divider orientation="horizontal" />
-                <AutocompleteCoaType
-                  form={form}
-                  setForm={setForm}
-                  isDisabled={isCoaDisabled}
-                />
-                <AutocompleteCoaSubtype
-                  form={form}
-                  setForm={setForm}
-                  isDisabled={isCoaDisabled}
-                />
-                <AutocompleteCoa
-                  form={form}
-                  setForm={setForm}
-                  isDisabled={isCoaDisabled}
-                />
-              </ModalBody>
-              <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
-                  Close
-                </Button>
-                <Button color="primary" onPress={() => handleSave(onClose)}>
-                  Simpan
-                </Button>
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
-      </Modal>
-    </>
   );
 };

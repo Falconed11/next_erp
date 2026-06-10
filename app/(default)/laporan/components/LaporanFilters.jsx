@@ -32,6 +32,7 @@ export default function LaporanFilters({
         variant="bordered"
         form={form}
         setForm={setForm}
+        isLaporanOnly
       />
       <SelectPerusahaan
         form={form}

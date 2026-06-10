@@ -1,5 +1,6 @@
 import { EditIcon, DeleteIcon } from "@/components/icon";
 import {
+  Badge,
   Button,
   Input,
   Pagination,
@@ -99,7 +100,6 @@ export const DefaultTable = ({
   onSave,
   name,
   extraFields,
-  filterFields,
   extraColumns,
   enableActiveStatus,
   renderActionButton,
@@ -140,7 +140,9 @@ export const DefaultTable = ({
       if (v === undefined || v === null) continue;
       const str = String(v).trim();
       if (!str) continue;
-      paramsArr.push(`${encodeURIComponent(k)}=${encodeURIComponent(str)}`);
+      paramsArr.push(
+        `${encodeURIComponent(k)}=${encodeURIComponent(k === "nama" ? JSON.stringify({ value: `%${str}%`, operator: "like" }) : str)}`,
+      );
     }
     return paramsArr.join("&");
   };
@@ -209,6 +211,8 @@ export const DefaultTable = ({
   const deleteButtonPress = async (id) => {
     if (confirm(`Hapus ${name}?`)) {
       const res = await onDelete(id);
+      const json = await res.json();
+      if (!res.ok) return alert(json.message || "Delete failed");
       mutate();
       setPage(1);
     }
@@ -242,12 +246,20 @@ export const DefaultTable = ({
             <div className="mb-2 flex flex-wrap items-center gap-2">
               {autoFilter && (
                 <Popover shouldCloseOnScroll={false}>
-                  <PopoverTrigger>
-                    <Button color="primary" size="sm">
-                      Filter
-                      {activeFilterCount > 0 ? ` (${activeFilterCount})` : ""}
-                    </Button>
-                  </PopoverTrigger>
+                  <Badge
+                    isInvisible={!activeFilterCount}
+                    color="danger"
+                    className="text-white border-none cursor-pointer hover:bg-red-400"
+                    content="X"
+                    onClick={() => setFilterForm({})}
+                  >
+                    <PopoverTrigger>
+                      <Button color="primary" size="sm">
+                        Filter
+                        {activeFilterCount > 0 ? ` (${activeFilterCount})` : ""}
+                      </Button>
+                    </PopoverTrigger>
+                  </Badge>
                   <PopoverContent>
                     <div className="p-3 flex flex-col gap-3 min-w-[300px]">
                       {!disableNama && (
@@ -275,11 +287,11 @@ export const DefaultTable = ({
                           }));
                         }}
                       />
-                      {filterFields && (
+                      {extraFields && (
                         <div className="flex flex-col gap-3">
-                          {typeof filterFields === "function"
-                            ? filterFields(filterForm, setFilterForm)
-                            : filterFields}
+                          {typeof extraFields === "function"
+                            ? extraFields(filterForm, setFilterForm, true)
+                            : extraFields}
                         </div>
                       )}
                     </div>
