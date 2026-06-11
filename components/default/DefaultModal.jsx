@@ -39,14 +39,17 @@ export default function DefaultModal({
         ? { authorid_karyawan: id_karyawan, created_by: id_karyawan }
         : { updated_by: id_karyawan }),
     };
-    const res = await onSave({
-      ...payload,
-    });
-    const json = await res.json();
-    if (!res.ok) return alert(json?.message || "Gagal menyimpan data!");
-    data.mutate();
-    onSaveSuccess?.(json, payload);
-    onClose();
+    try {
+      const res = await onSave({
+        ...payload,
+      });
+      const json = await res.json();
+      data.mutate();
+      onSaveSuccess?.(json, payload);
+      onClose();
+    } catch (error) {
+      alert(error?.message || "Gagal menyimpan data!");
+    }
   };
   useEffect(() => {
     console.log({ form });

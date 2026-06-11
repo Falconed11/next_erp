@@ -128,10 +128,6 @@ export default function TransaksiUI({ user }) {
         id: form.method === "PATCH" ? form.id : undefined,
         sessIdKaryawan: sessionUser?.id_karyawan,
       });
-      if (!res.ok) {
-        alert(json.message || "Gagal menyimpan transaksi");
-        return;
-      }
       transaksiData.mutate();
       onClose();
     } catch (error) {
@@ -144,10 +140,6 @@ export default function TransaksiUI({ user }) {
 
     try {
       const res = await deleteTransaksi(id_jurnal);
-      if (!res.ok) {
-        alert(json.message || "Gagal menghapus");
-        return;
-      }
       transaksiData.mutate();
       alert("Jurnal berhasil dihapus");
     } catch (error) {

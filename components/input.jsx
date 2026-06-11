@@ -279,16 +279,20 @@ export function TemplateImport({
     if (json.length == 0) return alert("File belum dipilih");
     setIsLoading(1);
     setReportList([]);
-    const res = await apiFetch(`${apiPath}${apiendpoint}`, {
-      method: "POST",
-      body: JSON.stringify({ customInputCode, json }),
-    });
-    const json2 = await res.json();
-    if (!res.ok) return alert(json2.message || "Upload failed");
-    setReportList(json2.result);
-    setJson([]);
-    setIsLoading(0);
-    report.onOpen();
+    try {
+      const res = await apiFetch(`${apiPath}${apiendpoint}`, {
+        method: "POST",
+        body: JSON.stringify({ customInputCode, json }),
+      });
+      const json2 = await res.json();
+      setReportList(json2.result);
+      setJson([]);
+      setIsLoading(0);
+      report.onOpen();
+    } catch (err) {
+      alert(err.message || "Upload failed");
+      setIsLoading(0);
+    }
   };
 
   return (
@@ -373,22 +377,24 @@ export function TemplateImportV2({
     if (json.length == 0) return alert("File belum dipilih");
     setIsLoading(1);
     setReportList([]);
-    const res = await apiFetch(`${apiPath}${apiendpoint}`, {
-      method: "POST",
-      body: JSON.stringify({
-        customInputCode: customInputCode || getDateF(new Date()),
-        json,
-      }),
-    });
-    const json2 = await res.json();
-    if (!res.ok) {
-      return alert(json2.message || "Upload failed");
+    try {
+      const res = await apiFetch(`${apiPath}${apiendpoint}`, {
+        method: "POST",
+        body: JSON.stringify({
+          customInputCode: customInputCode || getDateF(new Date()),
+          json,
+        }),
+      });
+      const json2 = await res.json();
+      setReportList(json2.result);
+      setJson([]);
+      setFile();
+      setIsLoading(0);
+      onOpen();
+    } catch (err) {
+      alert(err.message || "Upload failed");
+      setIsLoading(0);
     }
-    setReportList(json2.result);
-    setJson([]);
-    setFile();
-    setIsLoading(0);
-    onOpen();
   };
 
   return (

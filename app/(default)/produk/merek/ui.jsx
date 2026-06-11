@@ -50,7 +50,7 @@ import { FileUploader } from "@/components/input";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useClientFetch } from "@/hooks/useClientFetch";
-import { apiFetch } from "@/app/utils/fetchHelper";
+import {} from "@/app/utils/fetchHelper";
 
 const apiPath = getApiPath();
 
@@ -63,34 +63,40 @@ export default function App() {
 
   const saveButtonPress = async (onClose) => {
     // if (form.isSwasta.size == 0) return alert("Swasta/Negri belum diisi");
-    const json = await apiFetch(`${apiPath}merek`, {
-      method: form.method,
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify(form),
-    });
-    merek.mutate();
-    onClose();
-    //return alert(json.message);
+    try {
+      const json = await apiFetch(`${apiPath}merek`, {
+        method: form.method,
+        headers: {
+          "Content-Type": "application/json",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify(form),
+      });
+      merek.mutate();
+      onClose();
+    } catch (error) {
+      alert(error.message || "An error occurred while saving merek.");
+    }
   };
   const saveTransferButtonPress = async (onClose) => {
     // if (form.isSwasta.size == 0) return alert("Swasta/Negri belum diisi");
-    const json = await apiFetch(`${apiPath}transfermerek`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify({
-        currentId: form.currentId,
-        targetId: form.targetId,
-      }),
-    });
-    merek.mutate();
-    onClose();
-    //return alert(json.message);
+    try {
+      const json = await apiFetch(`${apiPath}transfermerek`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify({
+          currentId: form.currentId,
+          targetId: form.targetId,
+        }),
+      });
+      merek.mutate();
+      onClose();
+    } catch (error) {
+      alert(error.message || "An error occurred while transferring merek.");
+    }
   };
   const tambahButtonPress = () => {
     setForm({
@@ -119,16 +125,20 @@ export default function App() {
   };
   const deleteButtonPress = async (id) => {
     if (confirm("Hapus merek?")) {
-      const json = await apiFetch(`${apiPath}merek`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          // 'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: JSON.stringify({ id }),
-      });
-      // return alert(await res.json().then((json) => json.message));
-      merek.mutate();
+      try {
+        const json = await apiFetch(`${apiPath}merek`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: JSON.stringify({ id }),
+        });
+        // return alert(await res.json().then((json) => json.message));
+        merek.mutate();
+      } catch (error) {
+        alert(error.message || "An error occurred while deleting merek.");
+      }
     }
   };
 
@@ -325,7 +335,8 @@ export default function App() {
                 isCompact
                 showControls
                 showShadow
-                color="primary" variant="solid"
+                color="primary"
+                variant="solid"
                 page={page}
                 total={pages}
                 onChange={(page) => setPage(page)}
@@ -411,7 +422,8 @@ export default function App() {
                   Batal
                 </Button>
                 <Button
-                  color="primary" variant="solid"
+                  color="primary"
+                  variant="solid"
                   onClick={() => saveButtonPress(onClose)}
                 >
                   Simpan
@@ -443,7 +455,8 @@ export default function App() {
                 />
                 <Select
                   label="Targer merek"
-                  color="default" variant="bordered"
+                  color="default"
+                  variant="bordered"
                   placeholder="Pilih target merek"
                   selectedKeys={form.selectedId}
                   className="max-w-xs"
@@ -478,13 +491,15 @@ export default function App() {
               </ModalBody>
               <ModalFooter>
                 <Button
-                  color="danger" variant="flat"
+                  color="danger"
+                  variant="flat"
                   onClick={transfer.onClose}
                 >
                   Batal
                 </Button>
                 <Button
-                  color="primary" variant="solid"
+                  color="primary"
+                  variant="solid"
                   onClick={() => saveTransferButtonPress(transfer.onClose)}
                 >
                   Simpan

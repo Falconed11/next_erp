@@ -13,15 +13,15 @@ export const updateSwitch = async (
   referenceData,
 ) => {
   if (switchValue === currentValue) return;
-  const res = await apiFetch(`${api_path}${apiEndPoint}`, {
-    method,
-    body: JSON.stringify(data),
-  });
-  if (!res.ok) {
-    const json = await res.json();
-    return alert(json.message || "Update failed");
+  try {
+    const res = await apiFetch(`${api_path}${apiEndPoint}`, {
+      method,
+      body: JSON.stringify(data),
+    });
+    referenceData.forEach((data) => data.mutate());
+  } catch (error) {
+    alert(error?.message || "Gagal memperbarui data!");
   }
-  referenceData.forEach((data) => data.mutate());
 };
 
 export const LIST_SWASTA_NEGRI = [

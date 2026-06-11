@@ -210,11 +210,14 @@ export const DefaultTable = ({
   };
   const deleteButtonPress = async (id) => {
     if (confirm(`Hapus ${name}?`)) {
-      const res = await onDelete(id);
-      const json = await res.json();
-      if (!res.ok) return alert(json.message || "Delete failed");
-      mutate();
-      setPage(1);
+      try {
+        const res = await onDelete(id);
+        const json = await res.json();
+        mutate();
+        setPage(1);
+      } catch (error) {
+        alert(error?.message || `Gagal menghapus ${name}!`);
+      }
     }
   };
   const isHighRole = highRoleCheck(sessUser?.rank);
@@ -243,69 +246,6 @@ export const DefaultTable = ({
         onSortChange={setSortDescriptor}
         topContent={
           <>
-            <div className="mb-2 flex flex-wrap items-center gap-2">
-              {autoFilter && (
-                <Popover shouldCloseOnScroll={false}>
-                  <Badge
-                    isInvisible={!activeFilterCount}
-                    color="danger"
-                    className="text-white border-none cursor-pointer hover:bg-red-400"
-                    content="X"
-                    onClick={() => setFilterForm({})}
-                  >
-                    <PopoverTrigger>
-                      <Button color="primary" size="sm">
-                        Filter
-                        {activeFilterCount > 0 ? ` (${activeFilterCount})` : ""}
-                      </Button>
-                    </PopoverTrigger>
-                  </Badge>
-                  <PopoverContent>
-                    <div className="p-3 flex flex-col gap-3 min-w-[300px]">
-                      {!disableNama && (
-                        <Input
-                          label="Nama"
-                          placeholder="Cari nama"
-                          variant="bordered"
-                          value={filterForm.nama || ""}
-                          onValueChange={(val) => {
-                            setPage(1);
-                            setFilterForm((prev) => ({ ...prev, nama: val }));
-                          }}
-                        />
-                      )}
-                      <Input
-                        label="Keterangan"
-                        placeholder="Cari keterangan"
-                        variant="bordered"
-                        value={filterForm.keterangan || ""}
-                        onValueChange={(val) => {
-                          setPage(1);
-                          setFilterForm((prev) => ({
-                            ...prev,
-                            keterangan: val,
-                          }));
-                        }}
-                      />
-                      {extraFields && (
-                        <div className="flex flex-col gap-3">
-                          {typeof extraFields === "function"
-                            ? extraFields(filterForm, setFilterForm, true)
-                            : extraFields}
-                        </div>
-                      )}
-                    </div>
-                  </PopoverContent>
-                </Popover>
-              )}
-              <Button
-                color={isShowAuditFields ? "secondary" : "default"}
-                size="sm"
-                onPress={() => setIsShowAuditFields((prev) => !prev)}
-              >
-                {isShowAuditFields ? "Hide Audit" : "Show Audit"}
-              </Button>
-            </div>
             {isRemoveAddButton ? (
               <TableTitle>{name}</TableTitle>
             ) : (
@@ -313,6 +253,74 @@ export const DefaultTable = ({
                 title={name}
                 isHighRole={isHighRole}
                 onPress={tambahButtonPress}
+                extraButton={
+                  <>
+                    <Popover shouldCloseOnScroll={false}>
+                      <Badge
+                        isInvisible={!activeFilterCount}
+                        color="danger"
+                        className="text-white border-none cursor-pointer hover:bg-red-400"
+                        content="X"
+                        onClick={() => setFilterForm({})}
+                      >
+                        <PopoverTrigger>
+                          <Button color="primary" size="sm">
+                            Filter
+                            {activeFilterCount > 0
+                              ? ` (${activeFilterCount})`
+                              : ""}
+                          </Button>
+                        </PopoverTrigger>
+                      </Badge>
+                      <PopoverContent>
+                        <div className="p-3 flex flex-col gap-3 min-w-[300px]">
+                          {!disableNama && (
+                            <Input
+                              label="Nama"
+                              placeholder="Cari nama"
+                              variant="bordered"
+                              value={filterForm.nama || ""}
+                              onValueChange={(val) => {
+                                setPage(1);
+                                setFilterForm((prev) => ({
+                                  ...prev,
+                                  nama: val,
+                                }));
+                              }}
+                            />
+                          )}
+                          <Input
+                            label="Keterangan"
+                            placeholder="Cari keterangan"
+                            variant="bordered"
+                            value={filterForm.keterangan || ""}
+                            onValueChange={(val) => {
+                              setPage(1);
+                              setFilterForm((prev) => ({
+                                ...prev,
+                                keterangan: val,
+                              }));
+                            }}
+                          />
+                          {extraFields && (
+                            <div className="flex flex-col gap-3">
+                              {typeof extraFields === "function"
+                                ? extraFields(filterForm, setFilterForm, true)
+                                : extraFields}
+                            </div>
+                          )}
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                    <Button
+                      color={isShowAuditFields ? "secondary" : "default"}
+                      size="sm"
+                      onPress={() => setIsShowAuditFields((prev) => !prev)}
+                    >
+                      {isShowAuditFields ? "Hide Audit" : "Show Audit"}
+                    </Button>
+                  </>
+                }
               />
             )}
             {enableActiveStatus && (

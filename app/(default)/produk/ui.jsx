@@ -187,7 +187,7 @@ export default function App({ id, user }) {
     )
       return alert("Jika mengisi stok maka vendor wajib dipilih!");
     try {
-      await apiFetch(`${apiPath}produk`, {
+      const res = await apiFetch(`${apiPath}produk`, {
         method,
         body: JSON.stringify({
           ...form,
@@ -200,6 +200,7 @@ export default function App({ id, user }) {
             : { tanggal: form.tanggalHarga }),
         }),
       });
+      const json = await res.json();
       produk.mutate();
       onClose();
     } catch (error) {
@@ -238,7 +239,7 @@ export default function App({ id, user }) {
       id_merek: data.id_merek,
       vendor: data.nvendor,
       id_vendor: data.id_vendor,
-      tanggalHarga: dateMysqlToHeroUI(getDate(data.tanggal)),
+      tanggalHarga: getDate(data.tanggal),
     };
     setForm(newForm);
     setMethod("PUT");
@@ -557,6 +558,14 @@ export default function App({ id, user }) {
   }, [filteredData?.length, rowsPerPage]);
   const loadingState = produk.isLoading ? "loading" : "idle";
   const offset = (page - 1) * rowsPerPage;
+
+  useEffect(() => {
+    console.log(form);
+  }, [form]);
+  useEffect(() => {
+    console.log(produk?.data?.[0]);
+  }, [produk?.data?.[0]]);
+
   const queryStates = renderQueryStates({
     produk,
     merek,
@@ -680,7 +689,6 @@ export default function App({ id, user }) {
   // }, []);
   const classCompByRole = isHighRole ? "" : "hidden";
 
-  console.log(produk.data[0]);
   return (
     <div className="flex flex-col gap-2">
       {true && (

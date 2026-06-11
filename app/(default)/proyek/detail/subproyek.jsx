@@ -31,52 +31,59 @@ export default function SubProyek({ id, selectedProyek, isAuthorized }) {
 
   const tambahSubProyekButtonPress = async () => {
     if (!form.namaSubProyek) return alert("Silahkan masukkan nama sub proyek!");
-    const json = await apiFetch(`${api_path}subproyek`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify({
-        id_proyek: id,
-        nama: form.namaSubProyek,
-      }),
-    });
-    subProyek.mutate();
-    setForm({ namaSubProyek: "" });
+    try {
+      const json = await apiFetch(`${api_path}subproyek`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify({
+          id_proyek: id,
+          nama: form.namaSubProyek,
+        }),
+      });
+      subProyek.mutate();
+      setForm({ namaSubProyek: "" });
+    } catch (error) {
+      alert(error.message || "An error occurred while adding sub proyek.");
+    }
   };
   const editButtonPress = (data, onOpen) => {
     setForm(data);
     modal.onOpen();
   };
   const simpanButtonPress = async (data, onClose) => {
-    const json = await apiFetch(`${api_path}subproyek`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify(data),
-    });
-    subProyek.mutate();
-    onClose();
-  };
-  const deleteButtonPress = async (data) => {
-    if (confirm(`Hapus sub proyek ${data.nama}?`)) {
+    try {
       const json = await apiFetch(`${api_path}subproyek`, {
-        method: "DELETE",
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
           // 'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: JSON.stringify({ id: data.id }),
+        body: JSON.stringify(data),
       });
-      if (res.status == 400)
-        return alert(
-          `Gagal menghapus. Sub proyek masih terikat pada tabel produk atau instalasi. ` +
-            json.message,
-        );
       subProyek.mutate();
+      onClose();
+    } catch (error) {
+      alert(error.message || "An error occurred while saving sub proyek.");
+    }
+  };
+  const deleteButtonPress = async (data) => {
+    if (confirm(`Hapus sub proyek ${data.nama}?`)) {
+      try {
+        const res = await apiFetch(`${api_path}subproyek`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: JSON.stringify({ id: data.id }),
+        });
+        subProyek.mutate();
+      } catch (error) {
+        alert(error.message || "An error occurred while deleting sub proyek.");
+      }
     }
   };
 
@@ -110,7 +117,8 @@ export default function SubProyek({ id, selectedProyek, isAuthorized }) {
               onClick={() => {
                 tambahSubProyekButtonPress();
               }}
-              color="primary" variant="solid"
+              color="primary"
+              variant="solid"
             >
               Tambah
             </Button>
@@ -175,7 +183,8 @@ export default function SubProyek({ id, selectedProyek, isAuthorized }) {
               </ModalBody>
               <ModalFooter>
                 <Button
-                  color="danger" variant="flat"
+                  color="danger"
+                  variant="flat"
                   onClick={() => {
                     setForm({ nama: "" });
                     onClose();
@@ -184,7 +193,8 @@ export default function SubProyek({ id, selectedProyek, isAuthorized }) {
                   Batal
                 </Button>
                 <Button
-                  color="primary" variant="solid"
+                  color="primary"
+                  variant="solid"
                   onClick={() => simpanButtonPress(form, onClose)}
                 >
                   Simpan

@@ -62,33 +62,44 @@ export default function App() {
 
   const saveButtonPress = async (onClose) => {
     // if (form.isSwasta.size == 0) return alert("Swasta/Negri belum diisi");
-    const json = await apiFetch(`${apiPath}kategoriproduk`, {
-      method: form.method,
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify(form),
-    });
-    kategoriproduk.mutate();
-    onClose();
-    //return alert(json.message);
+    try {
+      const json = await apiFetch(`${apiPath}kategoriproduk`, {
+        method: form.method,
+        headers: {
+          "Content-Type": "application/json",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify(form),
+      });
+      kategoriproduk.mutate();
+      onClose();
+    } catch (error) {
+      return alert(
+        error.message || "An error occurred while saving kategori produk.",
+      );
+    }
   };
   const saveTransferButtonPress = async (onClose) => {
     // if (form.isSwasta.size == 0) return alert("Swasta/Negri belum diisi");
-    const json = await apiFetch(`${apiPath}transferkategoriproduk`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify({
-        currentId: form.currentId,
-        targetId: form.targetId,
-      }),
-    });
-    onClose();
-    //return alert(json.message);
+    try {
+      const json = await apiFetch(`${apiPath}transferkategoriproduk`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify({
+          currentId: form.currentId,
+          targetId: form.targetId,
+        }),
+      });
+      onClose();
+    } catch (error) {
+      return alert(
+        error.message ||
+          "An error occurred while transferring kategori produk.",
+      );
+    }
   };
   const tambahButtonPress = () => {
     setForm({
@@ -117,16 +128,22 @@ export default function App() {
   };
   const deleteButtonPress = async (id) => {
     if (confirm("Hapus kategoriproduk?")) {
-      const json = await apiFetch(`${apiPath}kategoriproduk`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          // 'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: JSON.stringify({ id }),
-      });
-      // return alert(await res.json().then((json) => json.message));
-      kategoriproduk.mutate();
+      try {
+        const json = await apiFetch(`${apiPath}kategoriproduk`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: JSON.stringify({ id }),
+        });
+        // return alert(await res.json().then((json) => json.message));
+        kategoriproduk.mutate();
+      } catch (error) {
+        alert(
+          error.message || "An error occurred while deleting kategori produk.",
+        );
+      }
     }
   };
 
@@ -315,7 +332,8 @@ export default function App() {
                 isCompact
                 showControls
                 showShadow
-                color="primary" variant="solid"
+                color="primary"
+                variant="solid"
                 page={page}
                 total={pages}
                 onChange={(page) => setPage(page)}
@@ -405,7 +423,8 @@ export default function App() {
                   Batal
                 </Button>
                 <Button
-                  color="primary" variant="solid"
+                  color="primary"
+                  variant="solid"
                   onClick={() => saveButtonPress(onClose)}
                 >
                   Simpan
@@ -437,7 +456,8 @@ export default function App() {
                 />
                 <Select
                   label="Target Kategori Produk"
-                  color="default" variant="bordered"
+                  color="default"
+                  variant="bordered"
                   placeholder="Pilih target kategori produk"
                   selectedKeys={form.selectedId}
                   className="max-w-xs"
@@ -472,13 +492,15 @@ export default function App() {
               </ModalBody>
               <ModalFooter>
                 <Button
-                  color="danger" variant="flat"
+                  color="danger"
+                  variant="flat"
                   onClick={transfer.onClose}
                 >
                   Batal
                 </Button>
                 <Button
-                  color="primary" variant="solid"
+                  color="primary"
+                  variant="solid"
                   onClick={() => saveTransferButtonPress(transfer.onClose)}
                 >
                   Simpan

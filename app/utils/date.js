@@ -23,6 +23,8 @@ export const dateHeroUIToMysql = (value) => {
   return formatted;
 };
 export const dateMysqlToHeroUI = (value) => {
+  console.log("value: ", value);
+  if (!value) return null;
   return parseDate(value);
 };
 

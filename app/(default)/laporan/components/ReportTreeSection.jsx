@@ -128,13 +128,15 @@ const ReportRow = ({
                 size="sm"
                 onPress={async () => {
                   if (!confirm("Hapus relasi ini?")) return;
-                  const res = await deleteLaporanRelation(
-                    node.id_laporan_relation,
-                  );
-                  const json = await res.json();
-                  if (!res.ok)
-                    return alert(json?.message || "Gagal menghapus relasi!");
-                  onRelationSaved?.();
+                  try {
+                    const res = await deleteLaporanRelation(
+                      node.id_laporan_relation,
+                    );
+                    const json = await res.json();
+                    onRelationSaved?.();
+                  } catch (err) {
+                    alert(err?.message || "Gagal menghapus relasi!");
+                  }
                 }}
               >
                 <IoMdTrash />
@@ -190,44 +192,20 @@ function LaporanRelationModal({ node, onRelationSaved, user }) {
     onOpen();
   };
 
-  // const openEdit = async () => {
-  //   if (!node.id_laporan_relation) return;
-
-  //   setIsLoading(true);
-  //   onOpen();
-
-  //   try {
-  //     const res = await getLaporanRelation(node.id_laporan_relation);
-  //     const json = await res.json();
-  //     if (!res.ok) throw new Error(json?.message || "Gagal memuat relasi!");
-
-  //     const data = json?.data ?? json;
-  //     setForm({
-  //       ...normalizeRelationData(data),
-  //       method: "PATCH",
-  //       id: node.id_laporan_relation,
-  //     });
-  //   } catch (error) {
-  //     alert(error.message || "Gagal memuat relasi!");
-  //     onOpenChange(false);
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
-
   const openEdit = async () => {
     setIsLoading(true);
     onOpen();
-    const res = await getLaporanRelation(node.id_laporan_relation);
-    const json = await res.json();
-    if (!res.ok) {
-      alert(json?.message || "Gagal memuat relasi!");
-      return;
+    try {
+      const res = await getLaporanRelation(node.id_laporan_relation);
+      const json = await res.json();
+      const { data } = json || {};
+      // console.log(data);
+      setForm({ ...data, method: "PATCH" });
+      setIsLoading(false);
+    } catch (error) {
+      alert(error.message || "Gagal memuat relasi!");
+      onOpenChange(false);
     }
-    const { data } = json || {};
-    // console.log(data);
-    setForm({ ...data, method: "PATCH" });
-    setIsLoading(false);
   };
 
   // useEffect(() => {

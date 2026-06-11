@@ -52,29 +52,35 @@ export default function App() {
   };
   const deleteButtonPress = async (id) => {
     if (confirm("Hapus statuskaryawan?")) {
+      try {
+        const json = await apiFetch(`${API_PATH}statuskaryawan`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: JSON.stringify({ id }),
+        });
+      } catch (error) {
+        return alert(error.message || "error");
+      }
+    }
+  };
+  const simpanButtonPress = async (data, onClose) => {
+    try {
       const json = await apiFetch(`${API_PATH}statuskaryawan`, {
-        method: "DELETE",
+        method,
         headers: {
           "Content-Type": "application/json",
           // 'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: JSON.stringify({ id }),
+        body: JSON.stringify(data),
       });
-      // return alert(json.message);
+      statuskaryawan.mutate();
+      onClose();
+    } catch (error) {
+      alert(error.message || "Gagal menyimpan data!");
     }
-  };
-  const simpanButtonPress = async (data, onClose) => {
-    const json = await apiFetch(`${API_PATH}statuskaryawan`, {
-      method,
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify(data),
-    });
-    statuskaryawan.mutate();
-    onClose();
-    // return alert(json.message);
   };
 
   const handleFileUpload = (jsonData) => {
@@ -260,7 +266,8 @@ export default function App() {
                   Batal
                 </Button>
                 <Button
-                  color="primary" variant="solid"
+                  color="primary"
+                  variant="solid"
                   onClick={() => simpanButtonPress(form, onClose)}
                 >
                   Simpan

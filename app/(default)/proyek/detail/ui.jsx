@@ -42,13 +42,7 @@ import {
 } from "@heroui/react";
 import { useReactToPrint } from "react-to-print";
 import { getApiPath } from "@/app/utils/apiconfig";
-import {
-  dateHeroUIToMysql,
-  dateMysqlToHeroUI,
-  getDate,
-  getDateF,
-  getDateFId,
-} from "@/app/utils/date";
+import { getDate, getDateFId } from "@/app/utils/date";
 import { invoice, penawaran } from "@/app/utils/formatid";
 import { removePrefixIfMatchIgnoreCase } from "@/app/utils/stringmanipulation";
 import Harga from "@/components/harga";
@@ -169,163 +163,200 @@ export default function App({ id, versi, user }) {
         data.temphargamodal,
         data.harga,
       ),
-      tanggalHarga: dateMysqlToHeroUI(getDate(data.tanggal)),
+      tanggalHarga: getDate(data.tanggal),
     });
     modal.produk.onOpen();
   };
   const deleteButtonPress = async (id) => {
     if (confirm("Hapus produk?")) {
-      const json = await apiFetch(`${api_path}keranjangproyek`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          // 'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: JSON.stringify({ id }),
-      });
-      mutateKeranjang();
-      return;
-      // return alert(json.message);
+      try {
+        const json = await apiFetch(`${api_path}keranjangproyek`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: JSON.stringify({ id }),
+        });
+        mutateKeranjang();
+        return;
+      } catch (error) {
+        console.error("Error occurred while deleting:", error);
+        alert(error.message || "An error occurred while deleting.");
+      }
     }
   };
   const handleButtonVersi = async () => {
-    let res = await apiFetch(`${api_path}versibarukeranjangproyek`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify({
-        id_proyek: id,
-        versi: selectedVersion,
-        // harga: data.hargajual,
-      }),
-    });
-    let json = await res.json();
-    res = await apiFetch(`${api_path}versibarurekapitulasiproyek`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify({
-        id_proyek: id,
-        versi: selectedVersion,
-        // harga: data.hargajual,
-      }),
-    });
-    json = await res.json();
-    const newVersion =
-      versiKeranjangProyek.data.reduce((acc, v) => {
-        const versi = v.versi;
-        return versi > acc ? versi : acc;
-      }, 0) + 1;
-    router.push(`/proyek/detail?id=${id}&versi=${newVersion}`);
-    setSelectVersi(new Set([String(newVersion)]));
-    // return alert(json.message);
-  };
-  const simpanButtonPress = async (data, onClose) => {
-    // if (data.jumlah <= 0) return alert("Jumlah belum diisi");
-    const json = await apiFetch(`${api_path}keranjangproyek`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify({
-        ...data,
-        hargamodal: data.temphargamodal,
-        tanggal: dateHeroUIToMysql(data.tanggalHarga),
-      }),
-    });
-    mutateKeranjang();
-    onClose();
-  };
-  const terapkanButtonPress = async (e) => {
-    e.preventDefault();
-    if (!confirm("Anda yakin untuk merubah seluruh harga jual?")) return;
-    if (inputPersenProvit < 0) return alert("Persen provit tidak valid.");
-    // if (data.jumlah <= 0) return alert("Jumlah belum diisi");
-    const json = await apiFetch(
-      `${api_path}keranjangproyekupdatehargabypersenprovit`,
-      {
-        method: "PUT",
+    try {
+      let res = await apiFetch(`${api_path}versibarukeranjangproyek`, {
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
           // 'Content-Type': 'application/x-www-form-urlencoded',
         },
         body: JSON.stringify({
           id_proyek: id,
-          persenProvit: inputPersenProvit,
+          versi: selectedVersion,
+          // harga: data.hargajual,
         }),
-      },
-    );
-    if (res.status >= 400 && res.status < 500) return alert(json.message);
-    return alert(json.message);
+      });
+      let json = await res.json();
+      res = await apiFetch(`${api_path}versibarurekapitulasiproyek`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify({
+          id_proyek: id,
+          versi: selectedVersion,
+          // harga: data.hargajual,
+        }),
+      });
+      json = await res.json();
+      const newVersion =
+        versiKeranjangProyek.data.reduce((acc, v) => {
+          const versi = v.versi;
+          return versi > acc ? versi : acc;
+        }, 0) + 1;
+      router.push(`/proyek/detail?id=${id}&versi=${newVersion}`);
+      setSelectVersi(new Set([String(newVersion)]));
+      // return alert(json.message);
+    } catch (error) {
+      alert(error.message || "An error occurred while creating new version.");
+    }
+  };
+  const simpanButtonPress = async (data, onClose) => {
+    // if (data.jumlah <= 0) return alert("Jumlah belum diisi");
+    try {
+      const json = await apiFetch(`${api_path}keranjangproyek`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify({
+          ...data,
+          hargamodal: data.temphargamodal,
+          tanggal: data.tanggalHarga,
+        }),
+      });
+      mutateKeranjang();
+      onClose();
+    } catch (error) {
+      console.error("Error occurred while saving:", error);
+      alert(error.message || "An error occurred while saving.");
+    }
+  };
+  const terapkanButtonPress = async (e) => {
+    e.preventDefault();
+    if (!confirm("Anda yakin untuk merubah seluruh harga jual?")) return;
+    if (inputPersenProvit < 0) return alert("Persen provit tidak valid.");
+    // if (data.jumlah <= 0) return alert("Jumlah belum diisi");
+    try {
+      const res = await apiFetch(
+        `${api_path}keranjangproyekupdatehargabypersenprovit`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: JSON.stringify({
+            id_proyek: id,
+            persenProvit: inputPersenProvit,
+          }),
+        },
+      );
+      const json = await res.json();
+      alert(json.message || "Harga berhasil diperbarui.");
+    } catch (error) {
+      alert(error.message || "An error occurred while updating prices.");
+    }
   };
   const handleButtonSimpanJenisProyek = async (data, onClose) => {
     const method = rekapitulasiProyek.data.length == 0 ? "POST" : "PUT";
-    const json = await apiFetch(`${api_path}jenisproyek`, {
-      method,
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify({
-        jenis_proyek: data,
-        id: selectedRekapitulasiProyek ? selectedRekapitulasiProyek.id : null,
-        id_proyek: id,
-        versi: selectedVersion,
-      }),
-    });
-    onClose();
-    // return alert(json.message);
+    try {
+      const json = await apiFetch(`${api_path}jenisproyek`, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify({
+          jenis_proyek: data,
+          id: selectedRekapitulasiProyek ? selectedRekapitulasiProyek.id : null,
+          id_proyek: id,
+          versi: selectedVersion,
+        }),
+      });
+      onClose();
+      // return alert(json.message);
+    } catch (error) {
+      alert(error.message || "An error occurred while saving project type.");
+    }
   };
   const handleButtonSetAsDealClick = async () => {
-    const json = await apiFetch(`${api_path}proyek`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify({
-        id,
-        versi: selectedVersion,
-        tanggal: getDate(new Date()),
-        id_statusproyek: 2,
-      }),
-    });
-    proyek.mutate();
+    try {
+      const json = await apiFetch(`${api_path}proyek`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify({
+          id,
+          versi: selectedVersion,
+          tanggal: getDate(new Date()),
+          id_statusproyek: 2,
+        }),
+      });
+      proyek.mutate();
+    } catch (error) {
+      alert(
+        error.message || "An error occurred while setting project as deal.",
+      );
+    }
   };
   const handleButtonSetAsRejectClick = async () => {
-    const json = await apiFetch(`${api_path}proyek`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify({
-        id,
-        versi: -1,
-        id_statusproyek: -1,
-      }),
-    });
-    proyek.mutate();
+    try {
+      const json = await apiFetch(`${api_path}proyek`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify({
+          id,
+          versi: -1,
+          id_statusproyek: -1,
+        }),
+      });
+      proyek.mutate();
+    } catch (error) {
+      alert(error.message || "An error occurred while rejecting project.");
+    }
   };
   const handleButtonCancelDealRejectClick = async () => {
-    const json = await apiFetch(`${api_path}proyek`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify({
-        id,
-        versi: 0,
-        id_statusproyek: 1,
-      }),
-    });
-    proyek.mutate();
+    try {
+      const json = await apiFetch(`${api_path}proyek`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify({
+          id,
+          versi: 0,
+          id_statusproyek: 1,
+        }),
+      });
+      proyek.mutate();
+    } catch (error) {
+      alert(
+        error.message || "An error occurred while canceling deal/rejection.",
+      );
+    }
   };
   const selectedProyek = proyek?.data?.[0];
   const isHighRole = highRoleCheck(sessUser?.rank);
@@ -1120,7 +1151,8 @@ export default function App({ id, versi, user }) {
               <div>
                 <Button
                   onClick={handleButtonSetAsDealClick}
-                  color="primary" variant="solid"
+                  color="primary"
+                  variant="solid"
                   className=""
                 >
                   Set as Deal
@@ -1130,7 +1162,8 @@ export default function App({ id, versi, user }) {
               <div>
                 <Button
                   onClick={handleButtonCancelDealRejectClick}
-                  color="primary" variant="solid"
+                  color="primary"
+                  variant="solid"
                   className=""
                 >
                   Cancel Deal
@@ -1141,7 +1174,8 @@ export default function App({ id, versi, user }) {
               <div>
                 <Button
                   onClick={handleButtonSetAsRejectClick}
-                  color="primary" variant="solid"
+                  color="primary"
+                  variant="solid"
                   className=""
                 >
                   Set as Reject
@@ -1151,7 +1185,8 @@ export default function App({ id, versi, user }) {
               <div>
                 <Button
                   onClick={handleButtonCancelDealRejectClick}
-                  color="primary" variant="solid"
+                  color="primary"
+                  variant="solid"
                   className=""
                 >
                   Cancel Reject
@@ -1161,7 +1196,12 @@ export default function App({ id, versi, user }) {
           </>
         )}
         <div>
-          <Button onClick={modal.penawaran.onOpen} color="primary" variant="solid" className="">
+          <Button
+            onClick={modal.penawaran.onOpen}
+            color="primary"
+            variant="solid"
+            className=""
+          >
             Penawaran
           </Button>
         </div>
@@ -1608,7 +1648,8 @@ export default function App({ id, versi, user }) {
               </ModalBody>
               <ModalFooter>
                 <Button
-                  color="danger" variant="flat"
+                  color="danger"
+                  variant="flat"
                   onClick={() => {
                     setForm({});
                     onClose();
@@ -1617,7 +1658,8 @@ export default function App({ id, versi, user }) {
                   Batal
                 </Button>
                 <Button
-                  color="primary" variant="solid"
+                  color="primary"
+                  variant="solid"
                   onClick={() => simpanButtonPress(form, onClose)}
                 >
                   Simpan
@@ -1864,7 +1906,11 @@ export default function App({ id, versi, user }) {
                 <Button color="danger" variant="flat" onClick={onClose}>
                   Tutup
                 </Button>
-                <Button onClick={handlePrintPenawaran} color="primary" variant="solid">
+                <Button
+                  onClick={handlePrintPenawaran}
+                  color="primary"
+                  variant="solid"
+                >
                   Cetak
                 </Button>
               </ModalFooter>

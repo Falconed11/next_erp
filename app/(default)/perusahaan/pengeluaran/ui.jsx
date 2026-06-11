@@ -77,27 +77,39 @@ export default function App() {
   };
   const deleteButtonPress = async (id) => {
     if (confirm("Hapus produk?")) {
-      const json = await apiFetch(`${api_path}pengeluaranperusahaan`, {
-        method: "DELETE",
+      try {
+        const json = await apiFetch(`${api_path}pengeluaranperusahaan`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: JSON.stringify({ id }),
+        });
+      } catch (error) {
+        alert(
+          error.message ||
+            "An error occurred while deleting pengeluaran perusahaan.",
+        );
+      }
+    }
+  };
+  const simpanButtonPress = async (data) => {
+    try {
+      const res = await apiFetch(`${api_path}pengeluaranperusahaan`, {
+        method,
         headers: {
           "Content-Type": "application/json",
           // 'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: JSON.stringify({ id }),
+        body: JSON.stringify(data),
       });
-      return alert(json.message);
+    } catch (error) {
+      return alert(
+        error.message ||
+          `An error occurred while ${form.modalmode === "Tambah" ? "adding" : "updating"} pengeluaran perusahaan.`,
+      );
     }
-  };
-  const simpanButtonPress = async (data) => {
-    const json = await apiFetch(`${api_path}pengeluaranperusahaan`, {
-      method,
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify(data),
-    });
-    return alert(json.message);
   };
   const renderCell = {
     pengeluaranperusahaan: React.useCallback((data, columnKey) => {
@@ -290,7 +302,11 @@ export default function App() {
                 <Button color="danger" variant="flat" onClick={onClose}>
                   Batal
                 </Button>
-                <Button color="primary" variant="solid" onClick={() => simpanButtonPress(form)}>
+                <Button
+                  color="primary"
+                  variant="solid"
+                  onClick={() => simpanButtonPress(form)}
+                >
                   Simpan
                 </Button>
               </ModalFooter>

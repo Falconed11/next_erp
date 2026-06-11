@@ -81,34 +81,40 @@ export default function App({ user }) {
   };
   const deleteButtonPress = async (id) => {
     if (confirm("Hapus user?")) {
-      const res = await apiFetch(`${api_path}user`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          // 'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: JSON.stringify({ id }),
-      });
-      const json = await res.json();
-      if (!res.ok) return alert(json.message || "Delete failed");
-      return alert(json.message);
+      try {
+        const res = await apiFetch(`${api_path}user`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: JSON.stringify({ id }),
+        });
+        const json = await res.json();
+        return alert(json.message);
+      } catch (error) {
+        alert(error.message || "Gagal menghapus user!");
+      }
     }
   };
   const simpanButtonPress = async (data, onClose) => {
     if (data.password != data.ulangipassword)
       return alert("Ulangi Password tidak sesuai");
-    const res = await apiFetch(`${api_path}user`, {
-      method,
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify({ ...data, srcperan: user?.peran }),
-    });
-    const json = await res.json();
-    if (!res.ok) return alert(json.message || "Simpan failed");
-    onClose();
-    user.mutate();
+    try {
+      const res = await apiFetch(`${api_path}user`, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify({ ...data, srcperan: user?.peran }),
+      });
+      const json = await res.json();
+      onClose();
+      user.mutate();
+    } catch (error) {
+      alert(error.message || "Gagal menyimpan user!");
+    }
   };
   const renderCell = {
     user: React.useCallback((data, columnKey) => {

@@ -169,23 +169,28 @@ export default function App({ user }) {
       return alert(
         "Perusahaan, Kategori, Biaya, dan Metode Pembayaran wajib diisi.",
       );
-    const json = await apiFetch(`${apiPath}operasionalkantor`, {
-      method,
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify({
-        ...form,
-        id_kategorioperasionalkantor: set2key(
-          form.id_kategorioperasionalkantor,
-        ),
-        id_karyawan: sessUser?.id_karyawan,
-      }),
-    });
-    setForm({});
-    operasionalkantor.mutate();
-    // return alert(json.message);
+    try {
+      const json = await apiFetch(`${apiPath}operasionalkantor`, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify({
+          ...form,
+          id_kategorioperasionalkantor: set2key(
+            form.id_kategorioperasionalkantor,
+          ),
+          id_karyawan: sessUser?.id_karyawan,
+        }),
+      });
+      setForm({});
+      operasionalkantor.mutate();
+    } catch (error) {
+      alert(
+        error.message || "An error occurred while saving operasional kantor.",
+      );
+    }
   };
   const editButtonPress = (data) => {
     const startdate = new Date(data.tanggal);
@@ -203,15 +208,21 @@ export default function App({ user }) {
   };
   const deleteButtonPress = async (id) => {
     if (confirm("Hapus operasinal kantor?")) {
-      const json = await apiFetch(`${apiPath}operasionalkantor`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          // 'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: JSON.stringify({ id }),
-      });
-      // return alert(await res.json().then((json) => json.message));
+      try {
+        const json = await apiFetch(`${apiPath}operasionalkantor`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: JSON.stringify({ id }),
+        });
+      } catch (error) {
+        alert(
+          error.message ||
+            "An error occurred while deleting operasional kantor.",
+        );
+      }
     }
   };
   const renderCell = useCallback((data, columnKey) => {
@@ -340,7 +351,8 @@ export default function App({ user }) {
                     onClick={() => {
                       tambahButtonPress("POST");
                     }}
-                    color="primary" variant="solid"
+                    color="primary"
+                    variant="solid"
                     className="ml-2"
                   >
                     Tambah
@@ -380,7 +392,8 @@ export default function App({ user }) {
                   isCompact
                   showControls
                   showShadow
-                  color="primary" variant="solid"
+                  color="primary"
+                  variant="solid"
                   page={page}
                   total={pages}
                   onChange={(page) => setPage(page)}
@@ -442,7 +455,8 @@ export default function App({ user }) {
               </ModalBody>
               <ModalFooter>
                 <Button
-                  color="danger" variant="flat"
+                  color="danger"
+                  variant="flat"
                   onClick={() => {
                     setForm({});
                     onClose();
@@ -451,7 +465,8 @@ export default function App({ user }) {
                   Batal
                 </Button>
                 <Button
-                  color="primary" variant="solid"
+                  color="primary"
+                  variant="solid"
                   onClick={() => {
                     tambahButtonPress("PUT");
                     onClose();

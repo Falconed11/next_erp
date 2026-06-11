@@ -149,31 +149,35 @@ export default function App({ id, user }) {
   };
   const deleteButtonPress = async (data) => {
     if (confirm(`Hapus pengeluaran proyek: ${data.nama}?`)) {
-      if (data.id_produkkeluar == null) {
-        const json = await apiFetch(`${api_path}pengeluaranproyek`, {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            // 'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          body: JSON.stringify({ id: data.id_pengeluaranproyek }),
-        });
-      } else {
-        const json = await apiFetch(`${api_path}produkkeluar`, {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            // 'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          body: JSON.stringify({
-            ...data,
-            id: data.id_produkkeluar,
-            metodepengeluaran: "proyek",
-            id_produk: data.id,
-          }),
-        });
+      try {
+        if (data.id_produkkeluar == null) {
+          const json = await apiFetch(`${api_path}pengeluaranproyek`, {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+              // 'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: JSON.stringify({ id: data.id_pengeluaranproyek }),
+          });
+        } else {
+          const json = await apiFetch(`${api_path}produkkeluar`, {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+              // 'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: JSON.stringify({
+              ...data,
+              id: data.id_produkkeluar,
+              metodepengeluaran: "proyek",
+              id_produk: data.id,
+            }),
+          });
+        }
+        pengeluaranproyek.mutate();
+      } catch (error) {
+        alert(error.message || "Gagal menghapus pengeluaran!");
       }
-      pengeluaranproyek.mutate();
     }
   };
   const tambahButtonPress = async ({ selectProduk, selectKaryawan, form }) => {
@@ -184,91 +188,93 @@ export default function App({ id, user }) {
       return alert("Jumlah melebihi stok.");
     let res;
     const keteranganpengeluaranproyek = form.keteranganpengeluaranproyek;
-    if (form.isSelected) {
-      res = await apiFetch(`${api_path}produkkeluar`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          // 'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: JSON.stringify({
-          ...form,
-          id_proyek: id,
-          tanggal: form.startdate ? getDate(form.startdate) : "",
-          keterangan: keteranganpengeluaranproyek,
-        }),
-      });
-    } else {
-      res = await apiFetch(`${api_path}pengeluaranproyek`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          // 'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: JSON.stringify({
-          ...form,
-          id_proyek: id,
-          // id_vendor: form.selectVendor,
-          tanggal: form.startdate ? getDate(form.startdate) : "",
-          keterangan: keteranganpengeluaranproyek,
-        }),
-      });
+    try {
+      if (form.isSelected) {
+        res = await apiFetch(`${api_path}produkkeluar`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: JSON.stringify({
+            ...form,
+            id_proyek: id,
+            tanggal: form.startdate ? getDate(form.startdate) : "",
+            keterangan: keteranganpengeluaranproyek,
+          }),
+        });
+      } else {
+        res = await apiFetch(`${api_path}pengeluaranproyek`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: JSON.stringify({
+            ...form,
+            id_proyek: id,
+            // id_vendor: form.selectVendor,
+            tanggal: form.startdate ? getDate(form.startdate) : "",
+            keterangan: keteranganpengeluaranproyek,
+          }),
+        });
+      }
+      const json = await res.json();
+      setForm((prev) => ({
+        id_karyawan: prev.id_karyawan,
+        startdate: prev.startdate,
+      }));
+      updateDataPengeluaran();
+    } catch (error) {
+      alert(error.message || "Gagal menambahkan pengeluaran!");
     }
-    const json = await res.json();
-    if (!res.ok)
-      return alert(json?.message || "Gagal menambahkan pengeluaran!");
-    setForm((prev) => ({
-      id_karyawan: prev.id_karyawan,
-      startdate: prev.startdate,
-    }));
-    updateDataPengeluaran();
-    // return alert(json.message);
   };
   const simpanButtonPress = async (data, onClose) => {
     // return console.log({ form, id });
     if (!data.jumlah) return alert("Jumlah belum diisi.");
     let res;
-    if (data.id_produkkeluar) {
-      if (data.stok + data.oldJumlah < data.jumlah)
-        return alert("Jumlah melebihi batas maksimal.");
-      res = await apiFetch(`${api_path}produkkeluar`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          // 'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: JSON.stringify({
-          ...data,
-          id: data.id_produkkeluar,
-          metodepengeluaran: "proyek",
-          id_produk: data.id,
-          id_proyek: id,
-          // id_produk: form.selectProduk,
-          // id_karyawan: selectKaryawan ?? 0,
-          tanggal: data.startdate ? getDate(data.startdate) : "",
-        }),
-      });
-    } else
-      res = await apiFetch(`${api_path}pengeluaranproyek`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          // 'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: JSON.stringify({
-          ...data,
-          id: data.id_pengeluaranproyek,
-          tanggal: getDate(new Date(data.startdate)),
-          // harga: data.hargajual,
-        }),
-      });
-    const json = await res.json();
-    console.log(res);
-    if (!res.ok) return alert(json?.message || "Gagal menyimpan data!");
-    updateDataPengeluaran();
-    setForm({});
-    onClose();
-    // console.log(json.message);
+    try {
+      if (data.id_produkkeluar) {
+        if (data.stok + data.oldJumlah < data.jumlah)
+          return alert("Jumlah melebihi batas maksimal.");
+        res = await apiFetch(`${api_path}produkkeluar`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: JSON.stringify({
+            ...data,
+            id: data.id_produkkeluar,
+            metodepengeluaran: "proyek",
+            id_produk: data.id,
+            id_proyek: id,
+            // id_produk: form.selectProduk,
+            // id_karyawan: selectKaryawan ?? 0,
+            tanggal: data.startdate ? getDate(data.startdate) : "",
+          }),
+        });
+      } else
+        res = await apiFetch(`${api_path}pengeluaranproyek`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: JSON.stringify({
+            ...data,
+            id: data.id_pengeluaranproyek,
+            tanggal: getDate(new Date(data.startdate)),
+            // harga: data.hargajual,
+          }),
+        });
+      const json = await res.json();
+      updateDataPengeluaran();
+      setForm({});
+      onClose();
+    } catch (error) {
+      alert(error.message || "Gagal menyimpan data!");
+    }
   };
 
   const editButtonPressPembayaran = (data) => {
@@ -285,58 +291,69 @@ export default function App({ id, user }) {
   };
   const deleteButtonPressPembayaran = async (id) => {
     if (confirm("Hapus pembayaran?")) {
-      const json = await apiFetch(`${api_path}pembayaranproyek`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          // 'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: JSON.stringify({ id }),
-      });
-      // return alert(json.message);
-      pembayaranproyek.mutate();
-      pembayaranProyek.mutate();
+      try {
+        const json = await apiFetch(`${api_path}pembayaranproyek`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: JSON.stringify({ id }),
+        });
+        // return alert(json.message);
+        pembayaranproyek.mutate();
+        pembayaranProyek.mutate();
+      } catch (error) {
+        return alert(error.message || "Error");
+      }
     }
   };
   const tambahButtonPressPembayaran = async (form) => {
     // if (select.size == 0) return alert("Produk belum dipilih.");
-    const json = await apiFetch(`${api_path}pembayaranproyek`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify({
-        ...form,
-        id_proyek: id,
-      }),
-    });
-    setFormPembayaran({
-      ...formPembayaran,
-      nominal: 0,
-    });
-    pembayaranproyek.mutate();
-    pembayaranProyek.mutate();
+    try {
+      const json = await apiFetch(`${api_path}pembayaranproyek`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify({
+          ...form,
+          id_proyek: id,
+        }),
+      });
+      setFormPembayaran({
+        ...formPembayaran,
+        nominal: 0,
+      });
+      pembayaranproyek.mutate();
+      pembayaranProyek.mutate();
+    } catch (error) {
+      alert(error.message || "Gagal menambahkan pembayaran!");
+    }
   };
   const simpanButtonPressPembayaran = async (data, onClose) => {
-    const json = await apiFetch(`${api_path}pembayaranproyek`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify(data),
-    });
-    const startdate = new Date();
-    setFormPembayaran({
-      selectMetodePembayaran: new Set([String(data.id_metodepembayaran)]),
-      tanggal: getDate(startdate),
-      startdate,
-    });
-    pembayaranproyek.mutate();
-    pembayaranProyek.mutate();
-    onClose();
-    // return alert(json.message);
+    try {
+      const json = await apiFetch(`${api_path}pembayaranproyek`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify(data),
+      });
+      const startdate = new Date();
+      setFormPembayaran({
+        selectMetodePembayaran: new Set([String(data.id_metodepembayaran)]),
+        tanggal: getDate(startdate),
+        startdate,
+      });
+      pembayaranproyek.mutate();
+      pembayaranProyek.mutate();
+      onClose();
+    } catch (error) {
+      return alert(error.message || "Error");
+    }
   };
   const selectedProyek = proyek?.data?.[0];
   const isHighRole = highRoleCheck(sessUser?.rank);

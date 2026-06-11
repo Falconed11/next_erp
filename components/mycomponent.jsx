@@ -30,7 +30,7 @@ import {
   useDisclosure,
 } from "@heroui/react";
 import { Link } from "@heroui/react";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AddIcon, DeleteIcon, EditIcon, EyeIcon } from "./icon";
 import { dateMysqlToHeroUI, getDate, getDateFId } from "@/app/utils/date";
 import Harga from "./harga";
@@ -649,6 +649,7 @@ export const TableTitle = ({ children }) => (
 );
 export const TableHeaderWithAddButton = ({
   extraButton = <></>,
+  isHideAddButton = false,
   title,
   onPress,
   isHighRole,
@@ -657,7 +658,7 @@ export const TableHeaderWithAddButton = ({
     <TableTitle>{title}</TableTitle>
     <div className="flex gap-2">
       {extraButton}
-      {isHighRole && (
+      {!isHideAddButton && isHighRole && (
         <Button onPress={onPress} variant="shadow" size="sm" color="primary">
           <span className="text-xl font-bold">
             <AddIcon />
@@ -741,8 +742,10 @@ export const MyDatePicker = ({
   extraField = {},
   isDisabled = false,
 }) => {
-  const mysqldate2heroUI = (date) => (date ? parseDate(getDate(date)) : null);
-  const [value, setValue] = useState(mysqldate2heroUI(form[field]));
+  const [value, setValue] = useState();
+  useEffect(() => {
+    setValue(dateMysqlToHeroUI(getDate(form[field] || null)));
+  }, []);
   if (minValue) minValue = mysqldate2heroUI(minValue);
   if (maxValue) maxValue = mysqldate2heroUI(maxValue);
   return (

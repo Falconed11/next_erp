@@ -62,32 +62,41 @@ export default function App() {
 
   const saveButtonPress = async (onClose) => {
     // if (form.isSwasta.size == 0) return alert("Swasta/Negri belum diisi");
-    const json = await apiFetch(`${apiPath}kategoriproyek`, {
-      method: form.method,
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify(form),
-    });
-    onClose();
-    //return alert(json.message);
+    try {
+      const res = await apiFetch(`${apiPath}kategoriproyek`, {
+        method: form.method,
+        headers: {
+          "Content-Type": "application/json",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify(form),
+      });
+      onClose();
+    } catch (error) {
+      alert(error.message || "An error occurred while saving kategori proyek.");
+    }
   };
   const saveTransferButtonPress = async (onClose) => {
     // if (form.isSwasta.size == 0) return alert("Swasta/Negri belum diisi");
-    const json = await apiFetch(`${apiPath}transferkategoriproyek`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify({
-        currentId: form.currentId,
-        targetId: form.targetId,
-      }),
-    });
-    onClose();
-    //return alert(json.message);
+    try {
+      const res = await apiFetch(`${apiPath}transferkategoriproyek`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify({
+          currentId: form.currentId,
+          targetId: form.targetId,
+        }),
+      });
+      onClose();
+    } catch (error) {
+      alert(
+        error.message ||
+          "An error occurred while transferring kategori proyek.",
+      );
+    }
   };
   const tambahButtonPress = () => {
     setForm({
@@ -115,15 +124,20 @@ export default function App() {
   };
   const deleteButtonPress = async (id) => {
     if (confirm("Hapus kategori proyek?")) {
-      const json = await apiFetch(`${apiPath}kategoriproyek`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          // 'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: JSON.stringify({ id }),
-      });
-      // return alert(await res.json().then((json) => json.message));
+      try {
+        const res = await apiFetch(`${apiPath}kategoriproyek`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: JSON.stringify({ id }),
+        });
+      } catch (error) {
+        alert(
+          error.message || "An error occurred while deleting kategori proyek.",
+        );
+      }
     }
   };
 
@@ -285,7 +299,11 @@ export default function App() {
           </Link>
         </div>
         <FileUploader onFileUpload={handleFileUpload} />
-        <Button color="primary" variant="solid" onClick={handleButtonUploadExcelPress}>
+        <Button
+          color="primary"
+          variant="solid"
+          onClick={handleButtonUploadExcelPress}
+        >
           Upload Excel
         </Button>
       </div>
@@ -301,7 +319,8 @@ export default function App() {
                 isCompact
                 showControls
                 showShadow
-                color="primary" variant="solid"
+                color="primary"
+                variant="solid"
                 page={page}
                 total={pages}
                 onChange={(page) => setPage(page)}
@@ -390,7 +409,8 @@ export default function App() {
                   Batal
                 </Button>
                 <Button
-                  color="primary" variant="solid"
+                  color="primary"
+                  variant="solid"
                   onClick={() => saveButtonPress(onClose)}
                 >
                   Simpan
@@ -422,7 +442,8 @@ export default function App() {
                 />
                 <Select
                   label="Targer kategoriproyek"
-                  color="default" variant="bordered"
+                  color="default"
+                  variant="bordered"
                   placeholder="Pilih target kategoriproyek"
                   selectedKeys={form.selectedId}
                   className="max-w-xs"
@@ -457,13 +478,15 @@ export default function App() {
               </ModalBody>
               <ModalFooter>
                 <Button
-                  color="danger" variant="flat"
+                  color="danger"
+                  variant="flat"
                   onClick={transfer.onClose}
                 >
                   Batal
                 </Button>
                 <Button
-                  color="primary" variant="solid"
+                  color="primary"
+                  variant="solid"
                   onClick={() => saveTransferButtonPress(transfer.onClose)}
                 >
                   Simpan

@@ -107,7 +107,6 @@ export default function LaporanRelationModal({ node, onRelationSaved, user }) {
     try {
       const res = await getLaporanRelation(node.id_laporan_relation);
       const json = await res.json();
-      if (!res.ok) throw new Error(json?.message || "Gagal memuat relasi!");
 
       const data = json?.data ?? json;
       setForm({
@@ -140,7 +139,6 @@ export default function LaporanRelationModal({ node, onRelationSaved, user }) {
         sessIdKaryawan,
       });
       const json = await res.json();
-      if (!res.ok) return alert(json?.message || "Gagal menyimpan relasi!");
 
       setForm(initialForm);
       onClose();

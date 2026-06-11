@@ -61,16 +61,19 @@ export default function App() {
   const rowsPerPage = 25;
 
   const saveButtonPress = async (onClose) => {
-    const json = await apiFetch(`${apiPath}nota`, {
-      method,
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify(form),
-    });
-    onClose();
-    // return alert(json.message);
+    try {
+      const json = await apiFetch(`${apiPath}nota`, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify(form),
+      });
+      onClose();
+    } catch (error) {
+      alert(error.message || "An error occurred while saving nota.");
+    }
   };
   const tambahButtonPress = () => {
     setForm({
@@ -99,15 +102,18 @@ export default function App() {
   };
   const deleteButtonPress = async (id) => {
     if (confirm("Hapus proyek?")) {
-      const json = await apiFetch(`${apiPath}nota`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          // 'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: JSON.stringify({ id }),
-      });
-      // return alert(await res.json().then((json) => json.message));
+      try {
+        const json = await apiFetch(`${apiPath}nota`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: JSON.stringify({ id }),
+        });
+      } catch (error) {
+        alert(error.message || "An error occurred while deleting nota.");
+      }
     }
   };
   const renderCell = React.useCallback((data, columnKey) => {
@@ -209,7 +215,8 @@ export default function App() {
                 isCompact
                 showControls
                 showShadow
-                color="primary" variant="solid"
+                color="primary"
+                variant="solid"
                 page={page}
                 total={pages}
                 onChange={(page) => setPage(page)}
@@ -284,7 +291,8 @@ export default function App() {
                 </div>
                 <Select
                   label="Karyawan"
-                  color="default" variant="bordered"
+                  color="default"
+                  variant="bordered"
                   placeholder="Pilih karyawan!"
                   selectedKeys={form.selectkaryawan}
                   className="max-w-xs"
@@ -308,7 +316,8 @@ export default function App() {
                   Batal
                 </Button>
                 <Button
-                  color="primary" variant="solid"
+                  color="primary"
+                  variant="solid"
                   onClick={() => saveButtonPress(onClose)}
                 >
                   Simpan

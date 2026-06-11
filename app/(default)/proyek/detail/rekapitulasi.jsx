@@ -65,23 +65,22 @@ export default function Rekapitulasi({
   ) => {
     const isPresent = rekapitulasi.id;
     const method = isPresent ? "PUT" : "POST";
-    const res = await apiFetch(`${api_path}rekapitulasiproyek`, {
-      method,
-      body: JSON.stringify({
-        ...(isPresent
-          ? { id: rekapitulasi.id }
-          : { id_proyek: idProyek, versi }),
-        diskon,
-        diskoninstalasi,
-        pajak,
-      }),
-    });
-    if (!res.ok) {
-      const json = await res.json();
-      return alert(json.message || "Simpan rekapitulasi gagal");
+    try {
+      const res = await apiFetch(`${api_path}rekapitulasiproyek`, {
+        method,
+        body: JSON.stringify({
+          ...(isPresent
+            ? { id: rekapitulasi.id }
+            : { id_proyek: idProyek, versi }),
+          diskon,
+          diskoninstalasi,
+          pajak,
+        }),
+      });
+      onClose();
+    } catch (err) {
+      alert(err.message || "Simpan rekapitulasi gagal");
     }
-    onClose();
-    // return alert(json.message);
   };
 
   const modal = rekapitulasiTotal.modal;

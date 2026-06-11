@@ -26,14 +26,13 @@ export default function App({ error, redirect }) {
         body: JSON.stringify(form),
       });
       const data = await res.json();
-      if (!res.ok) {
-        setIsLoading(false);
-        return alert(data.message || "Login failed");
-      }
     } catch (err) {
-      console.error(err);
+      console.log(
+        "Err: ",
+        err.message || "An error occurred while logging in.",
+      );
       setIsLoading(false);
-      return alert("An error occurred while logging in.");
+      return alert(err.message || "An error occurred while logging in.");
     }
     router.push(redirect || "/dashboard");
   };
@@ -86,23 +85,23 @@ export default function App({ error, redirect }) {
             />
           </div>
           <div className="flex flex-row-reverse gap-2 items-end">
-            {isLoading ? (
-              <Spinner />
-            ) : (
-              <>
-                <Button type="submit" color="primary" variant="solid" size="sm">
-                  Login
-                </Button>
-                <div>
-                  <Link
-                    href="/"
-                    className="self-start text-sm text-primary underline"
-                  >
-                    Landing Page
-                  </Link>
-                </div>
-              </>
-            )}
+            <Button
+              type="submit"
+              color="primary"
+              variant="solid"
+              size="sm"
+              isLoading={isLoading}
+            >
+              Login
+            </Button>
+            <div>
+              <Link
+                href="/"
+                className="self-start text-sm text-primary underline"
+              >
+                Landing Page
+              </Link>
+            </div>
           </div>
         </div>
       </Form>

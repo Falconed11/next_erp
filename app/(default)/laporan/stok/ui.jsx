@@ -104,16 +104,19 @@ export default function App({ id_produk, user }) {
       return alert(
         `Jumlah tidak boleh kurang dari produk keluar. (Min ${form.keluar})`,
       );
-    const json = await apiFetch(`${apiPath}produkmasuk`, {
-      method: form.method,
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify(form),
-    });
-    onClose();
-    // return alert(json.message);
+    try {
+      const json = await apiFetch(`${apiPath}produkmasuk`, {
+        method: form.method,
+        headers: {
+          "Content-Type": "application/json",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify(form),
+      });
+      onClose();
+    } catch (error) {
+      alert(error.message || "An error occurred while saving the product.");
+    }
   };
   const tambahButtonPress = () => {
     setForm({
@@ -161,19 +164,22 @@ export default function App({ id_produk, user }) {
     if (data.keluar > 0)
       return alert("Tidak dapat menghapus. Data keluar tidak kosong.");
     if (confirm("Hapus produk masuk?")) {
-      const json = await apiFetch(`${apiPath}produkmasuk`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          // 'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: JSON.stringify({
-          id: data.id,
-          id_produk: data.id_produk,
-          jumlah: data.jumlah,
-        }),
-      });
-      // return alert(await res.json().then((json) => json.message));
+      try {
+        const json = await apiFetch(`${apiPath}produkmasuk`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: JSON.stringify({
+            id: data.id,
+            id_produk: data.id_produk,
+            jumlah: data.jumlah,
+          }),
+        });
+      } catch (error) {
+        alert(error.message || "An error occurred while deleting the product.");
+      }
     }
   };
 
@@ -245,16 +251,19 @@ export default function App({ id_produk, user }) {
   const onSimpanClick = async (onClose) => {
     // if (form.nama == "" || !form.selectKategori.size > 0)
     //   return alert("Nama, dan Kategori wajib diisi!");
-    const json = await apiFetch(`${apiPath}produkmasuk`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify(form),
-    });
-    onClose();
-    // return alert(json.message);
+    try {
+      const json = await apiFetch(`${apiPath}produkmasuk`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify(form),
+      });
+      onClose();
+    } catch (error) {
+      alert(error.message || "An error occurred while saving the product.");
+    }
   };
 
   const renderCell = React.useCallback((data, columnKey) => {
@@ -505,7 +514,11 @@ export default function App({ id_produk, user }) {
       </div> */}
       {/* Table Laporan Stok */}
       <div className="flex gap-2">
-        <Button onClick={handlePrintLaporanStok} color="primary" variant="solid">
+        <Button
+          onClick={handlePrintLaporanStok}
+          color="primary"
+          variant="solid"
+        >
           Cetak
         </Button>
         <Button
@@ -538,7 +551,8 @@ export default function App({ id_produk, user }) {
               `Laporan Stok_${getDate(date)}_${getTime(date)}_${user.peran}`,
             );
           }}
-          color="primary" variant="solid"
+          color="primary"
+          variant="solid"
         >
           Export
         </Button>
@@ -674,7 +688,8 @@ export default function App({ id_produk, user }) {
                 />
                 <Autocomplete
                   label="Vendor"
-                  color="default" variant="bordered"
+                  color="default"
+                  variant="bordered"
                   defaultItems={vendor.data}
                   placeholder="Cari vendor"
                   className="max-w-xs"
@@ -760,7 +775,8 @@ export default function App({ id_produk, user }) {
                   Batal
                 </Button>
                 <Button
-                  color="primary" variant="solid"
+                  color="primary"
+                  variant="solid"
                   onClick={() => saveButtonPress(onClose)}
                 >
                   Simpan

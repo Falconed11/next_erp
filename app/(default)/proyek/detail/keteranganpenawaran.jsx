@@ -30,20 +30,24 @@ export default function KeteranganPenawaran({
   const simpanButtonPress = async (data, onClose) => {
     // if (data.jumlah <= 0) return alert("Jumlah belum diisi");
     if (!data.keterangan) return alert("Keterangan belum diisi.");
-    const json = await apiFetch(`${API_PATH}keteranganpenawaran`, {
-      method: data.mode == "Tambah" ? "POST" : "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify({
-        ...data,
-      }),
-    });
-    mutate();
-    onClose();
-    // console.log(json.message);
-    //return alert(json.message);
+    try {
+      const json = await apiFetch(`${API_PATH}keteranganpenawaran`, {
+        method: data.mode == "Tambah" ? "POST" : "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify({
+          ...data,
+        }),
+      });
+      mutate();
+      onClose();
+    } catch (error) {
+      alert(
+        error.message || "An error occurred while saving keterangan penawaran.",
+      );
+    }
   };
 
   const renderCell = useCallback(
@@ -58,24 +62,28 @@ export default function KeteranganPenawaran({
               isSelected={isChecked}
               onValueChange={async (v) => {
                 if (v === isChecked) return;
-                const json = await apiFetch(
-                  `${API_PATH}proyek_keteranganpenawaran`,
-                  {
-                    method: v ? "POST" : "DELETE",
-                    headers: {
-                      "Content-Type": "application/json",
-                      // 'Content-Type': 'application/x-www-form-urlencoded',
+                try {
+                  const res = await apiFetch(
+                    `${API_PATH}proyek_keteranganpenawaran`,
+                    {
+                      method: v ? "POST" : "DELETE",
+                      headers: {
+                        "Content-Type": "application/json",
+                        // 'Content-Type': 'application/x-www-form-urlencoded',
+                      },
+                      body: JSON.stringify({
+                        idProyek,
+                        idKeteranganPenawaran: data.id,
+                      }),
                     },
-                    body: JSON.stringify({
-                      idProyek,
-                      idKeteranganPenawaran: data.id,
-                    }),
-                  },
-                );
-                // if (res.status == 400) console.log(json.message);
-                // console.log(json.message);
-                //return alert(json.message);
-                mutate();
+                  );
+                  mutate();
+                } catch (error) {
+                  alert(
+                    error.message ||
+                      "An error occurred while updating the status of keterangan penawaran.",
+                  );
+                }
               }}
             ></Checkbox>
           );
@@ -103,20 +111,26 @@ export default function KeteranganPenawaran({
                   onClick={async () => {
                     if (confirm("Hapus keterangan?")) {
                       console.log(data.id);
-                      const json = await apiFetch(
-                        `${API_PATH}keteranganpenawaran`,
-                        {
-                          method: "DELETE",
-                          headers: {
-                            "Content-Type": "application/json",
-                            // 'Content-Type': 'application/x-www-form-urlencoded',
+                      try {
+                        const json = await apiFetch(
+                          `${API_PATH}keteranganpenawaran`,
+                          {
+                            method: "DELETE",
+                            headers: {
+                              "Content-Type": "application/json",
+                              // 'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: JSON.stringify({ id: data.id }),
                           },
-                          body: JSON.stringify({ id: data.id }),
-                        },
-                      );
-                      mutate();
-                      return;
-                      // return alert(json.message);
+                        );
+                        mutate();
+                        return;
+                      } catch (error) {
+                        return alert(
+                          error.message ||
+                            "An error occurred while deleting keterangan penawaran.",
+                        );
+                      }
                     }
                   }}
                   className="text-lg text-danger cursor-pointer active:opacity-50"
@@ -160,7 +174,8 @@ export default function KeteranganPenawaran({
         topContent={
           <div>
             <Button
-              color="primary" variant="solid"
+              color="primary"
+              variant="solid"
               onClick={() => {
                 setForm({ ...form, mode: "Tambah" });
                 onOpen();
@@ -222,7 +237,8 @@ export default function KeteranganPenawaran({
                   Batal
                 </Button>
                 <Button
-                  color="primary" variant="solid"
+                  color="primary"
+                  variant="solid"
                   onClick={() => simpanButtonPress(form, onClose)}
                 >
                   Simpan

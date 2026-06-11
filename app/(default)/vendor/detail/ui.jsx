@@ -112,26 +112,28 @@ export default function App({ id, user }) {
 
   const tambahButtonPress = async (form, setForm) => {
     if (form.selectProduk.size == 0) return alert("Silahkan pilih produk");
-    const json = await apiFetch(`${api_path}keranjangproyek`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify({
-        id_proyek: id,
-        id_subproyek: form.selectSubProyek?.values().next().value ?? 0,
-        id_produk: form.selectProduk,
-        jumlah: form.jumlah,
-        harga: form.harga,
-        instalasi: form.instalasi,
-        hargakustom: form.hargakustom,
-        versi,
-      }),
-    });
-    setForm({ jumlah: "", harga: "" });
-    // console.log(json.message);
-    // return alert(json.message);
+    try {
+      const json = await apiFetch(`${api_path}keranjangproyek`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify({
+          id_proyek: id,
+          id_subproyek: form.selectSubProyek?.values().next().value ?? 0,
+          id_produk: form.selectProduk,
+          jumlah: form.jumlah,
+          harga: form.harga,
+          instalasi: form.instalasi,
+          hargakustom: form.hargakustom,
+          versi,
+        }),
+      });
+      setForm({ jumlah: "", harga: "" });
+    } catch (error) {
+      alert(error.message || "Gagal menambahkan produk ke keranjang proyek.");
+    }
   };
   const editButtonPress = (data) => {
     setForm({
@@ -145,33 +147,38 @@ export default function App({ id, user }) {
   };
   const deleteButtonPress = async (id) => {
     if (confirm("Hapus produk?")) {
+      try {
+        const json = await apiFetch(`${api_path}keranjangproyek`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: JSON.stringify({ id }),
+        });
+        return;
+      } catch (error) {
+        alert(error.message || "Gagal menghapus produk dari keranjang proyek.");
+      }
+    }
+  };
+  const simpanButtonPress = async (data, onClose) => {
+    try {
       const json = await apiFetch(`${api_path}keranjangproyek`, {
-        method: "DELETE",
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
           // 'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: JSON.stringify({ id }),
+        body: JSON.stringify({
+          ...data,
+          id_subproyek: form.selectSubProyek?.values().next().value ?? 0,
+        }),
       });
-      return;
-      // return alert(json.message);
+      onClose();
+    } catch (error) {
+      alert(error.message || "Gagal menyimpan perubahan produk.");
     }
-  };
-  const simpanButtonPress = async (data, onClose) => {
-    const json = await apiFetch(`${api_path}keranjangproyek`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify({
-        ...data,
-        id_subproyek: form.selectSubProyek?.values().next().value ?? 0,
-      }),
-    });
-    onClose();
-    // console.log(json.message);
-    //return alert(json.message);
   };
   const handleButtonEdit = () => {
     // setFormRekapitulasi({
@@ -384,7 +391,8 @@ export default function App({ id, user }) {
                   isCompact
                   showControls
                   showShadow
-                  color="primary" variant="solid"
+                  color="primary"
+                  variant="solid"
                   page={page}
                   total={pages}
                   onChange={(page) => setPage(page)}
@@ -543,7 +551,8 @@ export default function App({ id, user }) {
                   Batal
                 </Button>
                 <Button
-                  color="primary" variant="solid"
+                  color="primary"
+                  variant="solid"
                   onClick={() => simpanButtonPress(form, onClose)}
                 >
                   Simpan

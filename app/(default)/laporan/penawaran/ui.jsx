@@ -76,16 +76,19 @@ export default function App({ id_instansi, user }) {
 
   const saveButtonPress = async (onClose) => {
     // if (form.isSwasta.size == 0) return alert("Swasta/Negri belum diisi");
-    const json = await apiFetch(`${apiPath}proyek`, {
-      method,
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify(form),
-    });
-    onClose();
-    //return alert(json.message);
+    try {
+      const json = await apiFetch(`${apiPath}proyek`, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify(form),
+      });
+      onClose();
+    } catch (error) {
+      alert(error.message || "An error occurred while saving the project.");
+    }
   };
   const tambahButtonPress = () => {
     setForm({
@@ -128,15 +131,18 @@ export default function App({ id_instansi, user }) {
   };
   const deleteButtonPress = async (id) => {
     if (confirm("Hapus proyek?")) {
-      const json = await apiFetch(`${apiPath}proyek`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          // 'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: JSON.stringify({ id }),
-      });
-      // return alert(await res.json().then((json) => json.message));
+      try {
+        const json = await apiFetch(`${apiPath}proyek`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: JSON.stringify({ id }),
+        });
+      } catch (error) {
+        alert(error.message || "An error occurred while deleting the project.");
+      }
     }
   };
 

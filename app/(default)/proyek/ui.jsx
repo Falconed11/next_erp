@@ -223,10 +223,6 @@ export default function App({
     if (!confirm("Duplicate this proyek?")) return;
     try {
       const res = await duplicateProyek(id);
-      if (!res.ok) {
-        alert(json.message || "Gagal menduplikasi proyek");
-        return;
-      }
       proyek.mutate();
       alert("Proyek berhasil diduplikasi");
     } catch (error) {

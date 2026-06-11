@@ -103,17 +103,22 @@ export default function App({ id_produk }) {
       return alert(
         `Jumlah tidak boleh kurang dari produk keluar. (Min ${form.keluar})`,
       );
-    const json = await apiFetch(`${apiPath}produkmasuk`, {
-      method: form.method,
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify(form),
-    });
-    produkmasuk.mutate();
-    onClose();
-    // return alert(json.message);
+    try {
+      const json = await apiFetch(`${apiPath}produkmasuk`, {
+        method: form.method,
+        headers: {
+          "Content-Type": "application/json",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify(form),
+      });
+      produkmasuk.mutate();
+      onClose();
+    } catch (error) {
+      return alert(
+        error.message || "An error occurred while saving produk masuk.",
+      );
+    }
   };
   const tambahButtonPress = () => {
     setForm({
@@ -164,19 +169,25 @@ export default function App({ id_produk }) {
     if (data.keluar > 0)
       return alert("Tidak dapat menghapus. Data keluar tidak kosong.");
     if (confirm("Hapus produk masuk?")) {
-      const json = await apiFetch(`${apiPath}produkmasuk`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          // 'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: JSON.stringify({
-          id: data.id,
-          id_produk: data.id_produk,
-          jumlah: data.jumlah,
-        }),
-      });
-      produkmasuk.mutate();
+      try {
+        const json = await apiFetch(`${apiPath}produkmasuk`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: JSON.stringify({
+            id: data.id,
+            id_produk: data.id_produk,
+            jumlah: data.jumlah,
+          }),
+        });
+        produkmasuk.mutate();
+      } catch (error) {
+        return alert(
+          error.message || "An error occurred while deleting produk masuk.",
+        );
+      }
     }
   };
 
@@ -244,20 +255,6 @@ export default function App({ id_produk }) {
       lunas: "1",
     });
     modal.masuk.onOpen();
-  };
-  const onSimpanClick = async (onClose) => {
-    // if (form.nama == "" || !form.selectKategori.size > 0)
-    //   return alert("Nama, dan Kategori wajib diisi!");
-    const json = await apiFetch(`${apiPath}produkmasuk`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify(form),
-    });
-    onClose();
-    // return alert(json.message);
   };
 
   const renderCell = React.useCallback((data, columnKey) => {
@@ -478,7 +475,8 @@ export default function App({ id_produk }) {
                 isCompact
                 showControls
                 showShadow
-                color="primary" variant="solid"
+                color="primary"
+                variant="solid"
                 page={page}
                 total={pages}
                 onChange={(page) => setPage(page)}
@@ -547,7 +545,8 @@ const TabelProdukKeluar = ({ id_produk }) => {
     //   return alert("Nama, dan Kategori wajib diisi!");
     if (form.selectMetodePengeluaran?.size == 0)
       return alert(`Metode pengeluaran belum diisi.`);
-    const json = await apiFetch(`${apiPath}produkkeluar`, {
+    const json = await (`${apiPath}produkkeluar`,
+    {
       method: form.method,
       headers: {
         "Content-Type": "application/json",
@@ -560,7 +559,8 @@ const TabelProdukKeluar = ({ id_produk }) => {
   };
   const deleteButtonPress = async (data) => {
     if (confirm("Hapus produk keluar?")) {
-      const json = await apiFetch(`${apiPath}produkkeluar`, {
+      const json = await (`${apiPath}produkkeluar`,
+      {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -760,7 +760,8 @@ const TabelProdukKeluar = ({ id_produk }) => {
                 isCompact
                 showControls
                 showShadow
-                color="primary" variant="solid"
+                color="primary"
+                variant="solid"
                 page={page}
                 total={pages}
                 onChange={(page) => setPage(page)}
@@ -899,7 +900,8 @@ const TabelProdukKeluar = ({ id_produk }) => {
                   Batal
                 </Button>
                 <Button
-                  color="primary" variant="solid"
+                  color="primary"
+                  variant="solid"
                   onClick={() => saveButtonPress(onClose)}
                 >
                   Simpan

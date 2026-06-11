@@ -74,55 +74,63 @@ export default function App({ id }) {
   };
   const deleteButtonPress = async (id) => {
     if (confirm("Hapus produk?")) {
-      const json = await apiFetch(`${api_path}keranjangnota`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          // 'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: JSON.stringify({ id }),
-      });
-      return;
-      // return alert(json.message);
+      try {
+        const json = await apiFetch(`${api_path}keranjangnota`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: JSON.stringify({ id }),
+        });
+        return;
+      } catch (error) {
+        return alert(error.message || "error");
+      }
     }
   };
   const tambahButtonPress = async (form) => {
     console.log(form);
     if (!form.selectProduk) return alert("Silahkan pilih produk");
     if (form.jumlah <= 0 || !form.jumlah) return alert("Jumlah belum diisi");
-    const json = await apiFetch(`${api_path}keranjangnota`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify({
-        id_nota: id,
-        id_produk: form.selectProduk,
-        jumlah: form.jumlah,
-        harga: form.harga,
-      }),
-    });
-    setForm({ selectProduk: "", jumlah: "", harga: "" });
-    // return alert(json.message);
+    try {
+      const json = await apiFetch(`${api_path}keranjangnota`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify({
+          id_nota: id,
+          id_produk: form.selectProduk,
+          jumlah: form.jumlah,
+          harga: form.harga,
+        }),
+      });
+      setForm({ selectProduk: "", jumlah: "", harga: "" });
+    } catch (error) {
+      alert(error.message || "An error occurred while adding product to nota.");
+    }
   };
   const simpanButtonPress = async (data, onClose) => {
-    const json = await apiFetch(`${api_path}keranjangnota`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify({
-        id: data.id_keranjangnota,
-        jumlah: data.jumlah,
-        harga: data.harga,
-        // harga: data.hargajual,
-      }),
-    });
-    onClose();
-    console.log(json.message);
-    //return alert(json.message);
+    try {
+      const json = await apiFetch(`${api_path}keranjangnota`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify({
+          id: data.id_keranjangnota,
+          jumlah: data.jumlah,
+          harga: data.harga,
+          // harga: data.hargajual,
+        }),
+      });
+      onClose();
+    } catch (error) {
+      alert(error.message || "An error occurred while saving product changes.");
+    }
   };
   const renderCell = {
     keranjangnota: React.useCallback((data, columnKey) => {
@@ -342,7 +350,12 @@ export default function App({ id }) {
       {/* tombol print */}
       <div className="flex flex-row gap-2">
         <div>
-          <Button onClick={modal.nota.onOpen} color="primary" variant="solid" className="mt-3">
+          <Button
+            onClick={modal.nota.onOpen}
+            color="primary"
+            variant="solid"
+            className="mt-3"
+          >
             Nota
           </Button>
         </div>
@@ -362,7 +375,11 @@ export default function App({ id }) {
               disableVendor
             />
             <div>
-              <Button color="primary" variant="solid" onClick={() => tambahButtonPress(form)}>
+              <Button
+                color="primary"
+                variant="solid"
+                onClick={() => tambahButtonPress(form)}
+              >
                 Tambah
               </Button>
             </div>
@@ -459,7 +476,8 @@ export default function App({ id }) {
                   Batal
                 </Button>
                 <Button
-                  color="primary" variant="solid"
+                  color="primary"
+                  variant="solid"
                   onClick={() => simpanButtonPress(form, onClose)}
                 >
                   Simpan
@@ -566,8 +584,14 @@ export default function App({ id }) {
                 <Button color="danger" variant="flat" onClick={onClose}>
                   Tutup
                 </Button>
-                <Button color="primary" variant="solid">Cetak</Button>
-                <Button onClick={handlePrintNota} color="primary" variant="solid">
+                <Button color="primary" variant="solid">
+                  Cetak
+                </Button>
+                <Button
+                  onClick={handlePrintNota}
+                  color="primary"
+                  variant="solid"
+                >
                   React to Print
                 </Button>
               </ModalFooter>

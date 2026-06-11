@@ -138,15 +138,19 @@ export default function App({ user }) {
   const deleteButtonPress = async (id) => {
     if (confirm("Hapus metode pembayaran?")) {
       // setIsLoading(true);
-      const json = await apiFetch(`${apiPath}metodepembayaran`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          // 'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: JSON.stringify({ id }),
-      });
-      metodepembayaran.mutate();
+      try {
+        const json = await apiFetch(`${apiPath}metodepembayaran`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: JSON.stringify({ id }),
+        });
+        metodepembayaran.mutate();
+      } catch (error) {
+        return alert(error.message || "Error");
+      }
     }
   };
 
@@ -425,7 +429,8 @@ export default function App({ user }) {
                 <SelectPerusahaan form={form} setForm={setForm} />
                 <Select
                   label="Bank"
-                  color="default" variant="bordered"
+                  color="default"
+                  variant="bordered"
                   placeholder="Pilih perusahaan!"
                   selectedKeys={form.selectbank}
                   className="max-w-xs"
@@ -498,7 +503,8 @@ export default function App({ user }) {
                   Batal
                 </Button>
                 <Button
-                  color="primary" variant="solid"
+                  color="primary"
+                  variant="solid"
                   onClick={() => saveButtonPress(onClose)}
                 >
                   Simpan
@@ -530,7 +536,8 @@ export default function App({ user }) {
                 />
                 <Select
                   label="Targer metodepembayaran"
-                  color="default" variant="bordered"
+                  color="default"
+                  variant="bordered"
                   placeholder="Pilih target metodepembayaran"
                   selectedKeys={form.selectedBank}
                   className="max-w-xs"
@@ -565,13 +572,15 @@ export default function App({ user }) {
               </ModalBody>
               <ModalFooter>
                 <Button
-                  color="danger" variant="flat"
+                  color="danger"
+                  variant="flat"
                   onClick={transfer.onClose}
                 >
                   Batal
                 </Button>
                 <Button
-                  color="primary" variant="solid"
+                  color="primary"
+                  variant="solid"
                   onClick={() => saveTransferButtonPress(transfer.onClose)}
                 >
                   Simpan
@@ -618,15 +627,19 @@ const Bank = ({ bank, user }) => {
   const onSubmit = async (e, onClose) => {
     e.preventDefault();
     // if (form.isSwasta.size == 0) return alert("Swasta/Negri belum diisi");
-    const json = await apiFetch(`${apiPath}bank`, {
-      method: form.method,
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify(form),
-    });
-    onClose();
+    try {
+      const json = await apiFetch(`${apiPath}bank`, {
+        method: form.method,
+        headers: {
+          "Content-Type": "application/json",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify(form),
+      });
+      onClose();
+    } catch (error) {
+      return alert(error.message || "Error");
+    }
     //return alert(json.message);
   };
   const tambahButtonPress = () => {
@@ -649,14 +662,18 @@ const Bank = ({ bank, user }) => {
   };
   const deleteButtonPress = async (id) => {
     if (confirm("Hapus bank?")) {
-      const json = await apiFetch(`${apiPath}bank`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          // 'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: JSON.stringify({ id }),
-      });
+      try {
+        const json = await apiFetch(`${apiPath}bank`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: JSON.stringify({ id }),
+        });
+      } catch (error) {
+        return alert(error.message || "error");
+      }
       // return alert(await res.json().then((json) => json.message));
     }
   };

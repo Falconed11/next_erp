@@ -17,7 +17,7 @@ import { useClientFetch } from "@/hooks/useClientFetch";
 import { apiFetch } from "@/app/utils/fetchHelper";
 import { API_PATH } from "@/app/utils/apiconfig";
 import { MyCheckBox, MyDatePicker } from "../mycomponent";
-import { dateHeroUIToMysql } from "@/app/utils/date";
+import { dateHeroUIToMysql, getDate } from "@/app/utils/date";
 
 export const TambahProdukPenawaran = ({
   title = "",
@@ -30,31 +30,37 @@ export const TambahProdukPenawaran = ({
 }) => {
   const sessUser = user;
   const rank = sessUser?.rank;
-  const [form, setForm] = useState({});
+  ``;
+  const fieldTanggal = "tanggalHarga";
+  const [form, setForm] = useState({ [fieldTanggal]: getDate(new Date()) });
   const tambahButtonPress = async () => {
     const jumlah = form.jumlah;
     if (!form.selectProduk && !form.produk)
       return alert("Silahkan pilih produk");
     if (!jumlah) return alert("Jumlah belum diisi");
     const { tanggalHarga } = form;
-    const json = await apiFetch(`${API_PATH}keranjangproyek`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify({
-        ...form,
-        id_proyek: idProyek,
-        versi,
-        stok: 0, //
-        instalasi,
-        tanggal: tanggalHarga ? dateHeroUIToMysql(tanggalHarga) : null,
-      }),
-    });
-    const newForm = { namakustom: "" };
-    setForm(newForm);
-    mutateKeranjang();
+    try {
+      const json = await apiFetch(`${API_PATH}keranjangproyek`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify({
+          ...form,
+          id_proyek: idProyek,
+          versi,
+          stok: 0, //
+          instalasi,
+          tanggal: tanggalHarga ? tanggalHarga : null,
+        }),
+      });
+      const newForm = { namakustom: "" };
+      setForm(newForm);
+      mutateKeranjang();
+    } catch (error) {
+      alert(error?.message || "Gagal menambahkan produk ke keranjang!");
+    }
   };
   const hideComponent = isHighRole ? "" : "hidden";
   const defStyleFormWidth = "w-2/12-";
@@ -123,7 +129,7 @@ export const TambahProdukPenawaran = ({
                 <MyDatePicker
                   form={form}
                   setForm={setForm}
-                  field="tanggalHarga"
+                  field={fieldTanggal}
                   label="Tanggal Harga"
                 />
               )}

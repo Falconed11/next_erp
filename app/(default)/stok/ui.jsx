@@ -50,15 +50,18 @@ export default function App({ id_proyek }) {
   const saveButtonPress = async () => {
     // if (form.nama == "" || form.kategori == "")
     //   return alert("Nama, dan Kategori harus diisi!");
-    const json = await apiFetch(`${apiPath}stok`, {
-      method,
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify(form),
-    });
-    return alert(json.message);
+    try {
+      const res = await apiFetch(`${apiPath}stok`, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify(form),
+      });
+    } catch (error) {
+      return alert(error.message || "An error occurred while saving stok.");
+    }
   };
   const tambahButtonPress = () => {
     setForm({
@@ -104,15 +107,18 @@ export default function App({ id_proyek }) {
   };
   const deleteButtonPress = async (id) => {
     if (confirm("Hapus product?")) {
-      const json = await apiFetch(`${apiPath}stok`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          // 'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: JSON.stringify({ id }),
-      });
-      return alert(await res.json().then((json) => json.message));
+      try {
+        const res = await apiFetch(`${apiPath}stok`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: JSON.stringify({ id }),
+        });
+      } catch (error) {
+        return alert(error.message || "An error occurred while deleting stok.");
+      }
     }
   };
   const renderCell = React.useCallback((data, columnKey) => {
@@ -428,7 +434,11 @@ export default function App({ id_proyek }) {
                 <Button color="danger" variant="flat" onClick={onClose}>
                   Batal
                 </Button>
-                <Button color="primary" variant="solid" onClick={saveButtonPress}>
+                <Button
+                  color="primary"
+                  variant="solid"
+                  onClick={saveButtonPress}
+                >
                   Simpan
                 </Button>
               </ModalFooter>
@@ -468,15 +478,20 @@ export default function App({ id_proyek }) {
 
 function TambahButton({ id_proyek, id_stok }) {
   const tambahButtonPress = async () => {
-    const json = await apiFetch(`${apiPath}keranjangproyek`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify({ id_proyek, id_stok }),
-    });
-    return alert(json.message);
+    try {
+      const json = await apiFetch(`${apiPath}keranjangproyek`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify({ id_proyek, id_stok }),
+      });
+    } catch (error) {
+      return alert(
+        error.message || "An error occurred while adding to keranjang proyek.",
+      );
+    }
   };
   if (id_proyek)
     return (
@@ -499,7 +514,9 @@ function KembaliButton({ id_proyek }) {
     return (
       <>
         <Link href={`/proyek/detail?id=${id_proyek}`}>
-          <Button color="primary" variant="solid">Kembalik ke Proyek {"==>"}</Button>
+          <Button color="primary" variant="solid">
+            Kembalik ke Proyek {"==>"}
+          </Button>
         </Link>
       </>
     );

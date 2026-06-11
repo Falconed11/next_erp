@@ -119,7 +119,8 @@ export default function SuratJalan({ id_proyek, versi, isAuthorized }) {
   return (
     <>
       <Button
-        color="primary" variant="solid"
+        color="primary"
+        variant="solid"
         onClick={() => {
           setForm({
             alamatsuratjalan: selectedProyek.alamatsuratjalan,
@@ -148,7 +149,8 @@ export default function SuratJalan({ id_proyek, versi, isAuthorized }) {
                     <div className="flex gap-2">
                       <Textarea
                         type="text"
-                        color="default" variant="bordered"
+                        color="default"
+                        variant="bordered"
                         className=""
                         label="Alamat"
                         placeholder="Masukkan alamat!"
@@ -177,7 +179,8 @@ export default function SuratJalan({ id_proyek, versi, isAuthorized }) {
                     <div className="flex gap-2 justify-end">
                       <div>
                         <Button
-                          color="primary" variant="solid"
+                          color="primary"
+                          variant="solid"
                           onClick={() => {
                             setForm({
                               alamatsuratjalan: selectedProyek.alamatsuratjalan,
@@ -191,17 +194,28 @@ export default function SuratJalan({ id_proyek, versi, isAuthorized }) {
                       </div>
                       <div>
                         <Button
-                          color="primary" variant="solid"
-                          onClick={async () => {
-                            const json = await apiFetch(`${apiPath}proyek`, {
-                              method: "PUT",
-                              headers: {
-                                "Content-Type": "application/json",
-                                // 'Content-Type': 'application/x-www-form-urlencoded',
-                              },
-                              body: JSON.stringify({ ...form, id: id_proyek }),
-                            });
-                            proyek.mutate();
+                          color="primary"
+                          variant="solid"
+                          onPress={async () => {
+                            try {
+                              const json = await apiFetch(`${apiPath}proyek`, {
+                                method: "PUT",
+                                headers: {
+                                  "Content-Type": "application/json",
+                                  // 'Content-Type': 'application/x-www-form-urlencoded',
+                                },
+                                body: JSON.stringify({
+                                  ...form,
+                                  id: id_proyek,
+                                }),
+                              });
+                              proyek.mutate();
+                            } catch (error) {
+                              alert(
+                                error.message ||
+                                  "An error occurred while saving surat jalan details.",
+                              );
+                            }
                           }}
                         >
                           Update
@@ -349,7 +363,8 @@ export default function SuratJalan({ id_proyek, versi, isAuthorized }) {
               </ModalBody>
               <ModalFooter>
                 <Button
-                  color="danger" variant="flat"
+                  color="danger"
+                  variant="flat"
                   onClick={() => {
                     setForm({});
                     onClose();
@@ -357,7 +372,11 @@ export default function SuratJalan({ id_proyek, versi, isAuthorized }) {
                 >
                   Tutup
                 </Button>
-                <Button color="primary" variant="solid" onClick={handlePrintInvoice}>
+                <Button
+                  color="primary"
+                  variant="solid"
+                  onClick={handlePrintInvoice}
+                >
                   Cetak
                 </Button>
               </ModalFooter>

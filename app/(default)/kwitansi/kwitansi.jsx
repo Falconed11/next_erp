@@ -96,16 +96,19 @@ export default function App() {
       return alert("Keterangan guna membayar maksimal 150 huruf!");
     if (form.nominal.length > 15)
       return alert("Nominal uang sebanyak maksimal 15 digit!");
-    const json = await apiFetch(`${apiPath}kwitansi`, {
-      method,
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify(form),
-    });
-    onClose();
-    // return alert(json.message);
+    try {
+      const json = await apiFetch(`${apiPath}kwitansi`, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify(form),
+      });
+      onClose();
+    } catch (error) {
+      alert(error.message || "Gagal menyimpan kwitansi!");
+    }
   };
   const printButtonPress = (data) => {
     setForm(data);
@@ -138,15 +141,18 @@ export default function App() {
   };
   const deleteButtonPress = async (id) => {
     if (confirm("Hapus kwitansi?")) {
-      const json = await apiFetch(`${apiPath}kwitansi`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          // 'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: JSON.stringify({ id }),
-      });
-      // return alert(await res.json().then((json) => json.message));
+      try {
+        const json = await apiFetch(`${apiPath}kwitansi`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: JSON.stringify({ id }),
+        });
+      } catch (error) {
+        alert(error.message || "Gagal menghapus kwitansi!");
+      }
     }
   };
   const renderCell = React.useCallback((data, columnKey) => {
@@ -265,7 +271,8 @@ export default function App() {
                 isCompact
                 showControls
                 showShadow
-                color="primary" variant="solid"
+                color="primary"
+                variant="solid"
                 page={page}
                 total={pages}
                 onChange={(page) => setPage(page)}
@@ -348,7 +355,8 @@ export default function App() {
                 />
                 <Select
                   label="Karyawan"
-                  color="default" variant="bordered"
+                  color="default"
+                  variant="bordered"
                   placeholder="Pilih karyawan!"
                   selectedKeys={form.selectkaryawan}
                   className="max-w-xs"
@@ -378,7 +386,8 @@ export default function App() {
                   Batal
                 </Button>
                 <Button
-                  color="primary" variant="solid"
+                  color="primary"
+                  variant="solid"
                   onClick={() => saveButtonPress(onClose)}
                 >
                   Simpan
@@ -463,7 +472,11 @@ export default function App() {
                 <Button color="danger" variant="flat" onClick={onClose}>
                   Tutup
                 </Button>
-                <Button onClick={handlePrintKwitansi} color="primary" variant="solid">
+                <Button
+                  onClick={handlePrintKwitansi}
+                  color="primary"
+                  variant="solid"
+                >
                   Cetak
                 </Button>
               </ModalFooter>

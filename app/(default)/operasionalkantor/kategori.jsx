@@ -41,30 +41,42 @@ export default function App({ sessionuser }) {
   const queries = { kategorioperasionalkantor };
   const saveButtonPress = async (onClose) => {
     // if (form.isSwasta.size == 0) return alert("Swasta/Negri belum diisi");
-    const json = await apiFetch(`${apiPath}kategorioperasionalkantor`, {
-      method: form.method,
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify({ ...form, lastuser: sessionuser.id_karyawan }),
-    });
-    kategorioperasionalkantor.mutate();
-    onClose();
-    //return alert(json.message);
+    try {
+      const json = await apiFetch(`${apiPath}kategorioperasionalkantor`, {
+        method: form.method,
+        headers: {
+          "Content-Type": "application/json",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify({ ...form, lastuser: sessionuser.id_karyawan }),
+      });
+      kategorioperasionalkantor.mutate();
+      onClose();
+    } catch (error) {
+      alert(
+        error.message ||
+          "An error occurred while saving kategori operasional kantor.",
+      );
+    }
   };
   const onSave = async (onClose) => {
-    const json = await apiFetch(`${apiPath}transferoperasionalkantor`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify({ id, newId }),
-    });
-    console.log(json);
-    kategorioperasionalkantor.mutate();
-    onClose();
+    try {
+      const json = await apiFetch(`${apiPath}transferoperasionalkantor`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify({ id, newId }),
+      });
+      kategorioperasionalkantor.mutate();
+      onClose();
+    } catch (error) {
+      alert(
+        error.message ||
+          "An error occurred while transferring kategori operasional kantor.",
+      );
+    }
   };
   const tambahButtonPress = () => {
     setForm({
@@ -93,16 +105,22 @@ export default function App({ sessionuser }) {
   };
   const deleteButtonPress = async (id, nama) => {
     if (confirm(`Hapus kategori id: ${id}, nama: ${nama}?`)) {
-      const json = await apiFetch(`${apiPath}kategorioperasionalkantor`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          // 'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: JSON.stringify({ id }),
-      });
-      kategorioperasionalkantor.mutate();
-      // return alert(await res.json().then((json) => json.message));
+      try {
+        const json = await apiFetch(`${apiPath}kategorioperasionalkantor`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: JSON.stringify({ id }),
+        });
+        kategorioperasionalkantor.mutate();
+      } catch (error) {
+        alert(
+          error.message ||
+            "An error occurred while deleting kategori operasional kantor.",
+        );
+      }
     }
   };
   const renderCell = useCallback((data, columnKey) => {
@@ -261,7 +279,8 @@ export default function App({ sessionuser }) {
                   Batal
                 </Button>
                 <Button
-                  color="primary" variant="solid"
+                  color="primary"
+                  variant="solid"
                   onClick={() => saveButtonPress(onClose)}
                 >
                   Simpan

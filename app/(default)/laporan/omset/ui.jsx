@@ -73,16 +73,19 @@ export default function App() {
 
   const saveButtonPress = async (onClose) => {
     if (form.isSwasta.size == 0) return alert("Swasta/Negri belum diisi");
-    const json = await apiFetch(`${apiPath}proyek`, {
-      method,
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify(form),
-    });
-    onClose();
-    //return alert(json.message);
+    try {
+      const json = await apiFetch(`${apiPath}proyek`, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify(form),
+      });
+      onClose();
+    } catch (error) {
+      alert(error.message || "Gagal menyimpan proyek!");
+    }
   };
   const tambahButtonPress = () => {
     setForm({
@@ -124,15 +127,18 @@ export default function App() {
   };
   const deleteButtonPress = async (id) => {
     if (confirm("Hapus proyek?")) {
-      const json = await apiFetch(`${apiPath}proyek`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          // 'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: JSON.stringify({ id }),
-      });
-      // return alert(await res.json().then((json) => json.message));
+      try {
+        const json = await apiFetch(`${apiPath}proyek`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: JSON.stringify({ id }),
+        });
+      } catch (error) {
+        alert(error.message || "Gagal menghapus proyek!");
+      }
     }
   };
 
@@ -441,7 +447,8 @@ export default function App() {
               <ModalBody>
                 <Select
                   label="Perusahaan"
-                  color="default" variant="bordered"
+                  color="default"
+                  variant="bordered"
                   placeholder="Pilih omset!"
                   selectedKeys={form.selectperusahaan}
                   className="max-w-xs"
@@ -461,7 +468,8 @@ export default function App() {
                 </Select>
                 <Select
                   label="Swasta/Negri"
-                  color="default" variant="bordered"
+                  color="default"
+                  variant="bordered"
                   placeholder="Pilih swasta/negri!"
                   selectedKeys={form.isSwasta}
                   className="max-w-xs"
@@ -481,7 +489,8 @@ export default function App() {
                 </Select>
                 <Select
                   label="Kategori Proyek"
-                  color="default" variant="bordered"
+                  color="default"
+                  variant="bordered"
                   placeholder="Pilih kategori proyek!"
                   selectedKeys={form.selectkategoriproyek}
                   className="max-w-xs"
@@ -515,7 +524,8 @@ export default function App() {
                 />
                 <Select
                   label="Customer"
-                  color="default" variant="bordered"
+                  color="default"
+                  variant="bordered"
                   placeholder="Pilih customer!"
                   selectedKeys={form.selectcustomer}
                   className="max-w-xs"
@@ -542,7 +552,8 @@ export default function App() {
                 />
                 <Select
                   label="Sales"
-                  color="default" variant="bordered"
+                  color="default"
+                  variant="bordered"
                   placeholder="Pilih sales!"
                   selectedKeys={form.selectkaryawan}
                   className="max-w-xs"
@@ -605,7 +616,8 @@ export default function App() {
                   Batal
                 </Button>
                 <Button
-                  color="primary" variant="solid"
+                  color="primary"
+                  variant="solid"
                   onClick={() => saveButtonPress(onClose)}
                 >
                   Simpan

@@ -79,36 +79,46 @@ export default function UI() {
   };
   const deleteButtonPress = async (id) => {
     if (confirm("Hapus produk?")) {
-      const json = await apiFetch(`${api_path}pengeluaranproyek`, {
-        method: "DELETE",
+      try {
+        const res = await apiFetch(`${api_path}pengeluaranproyek`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: JSON.stringify({ id }),
+        });
+      } catch (error) {
+        alert(
+          error.message ||
+            "An error occurred while deleting pengeluaran proyek.",
+        );
+      }
+    }
+  };
+  const simpanButtonPress = async (data, onClose) => {
+    try {
+      const res = await apiFetch(`${api_path}pengeluaranproyek`, {
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
           // 'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: JSON.stringify({ id }),
+        body: JSON.stringify({
+          ...data,
+          id: data.id_pengeluaranproyek,
+          keterangan: data.keterangan ? data.keterangan : "",
+          status: data.status ? data.status : "",
+          tanggal: getDate(new Date(data.startdate)),
+          // harga: data.hargajual,
+        }),
       });
-      // return alert(json.message);
+      onClose();
+    } catch (error) {
+      alert(
+        error.message || "An error occurred while saving pengeluaran proyek.",
+      );
     }
-  };
-  const simpanButtonPress = async (data, onClose) => {
-    const json = await apiFetch(`${api_path}pengeluaranproyek`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify({
-        ...data,
-        id: data.id_pengeluaranproyek,
-        keterangan: data.keterangan ? data.keterangan : "",
-        status: data.status ? data.status : "",
-        tanggal: getDate(new Date(data.startdate)),
-        // harga: data.hargajual,
-      }),
-    });
-    onClose();
-    // console.log(json.message);
-    // return alert(json.message);
   };
 
   const handleFileUpload = (jsonData) => {
@@ -380,7 +390,8 @@ export default function UI() {
                 isCompact
                 showControls
                 showShadow
-                color="primary" variant="solid"
+                color="primary"
+                variant="solid"
                 page={page}
                 total={pages}
                 onChange={(page) => setPage(page)}
@@ -504,7 +515,8 @@ export default function UI() {
                   Batal
                 </Button>
                 <Button
-                  color="primary" variant="solid"
+                  color="primary"
+                  variant="solid"
                   onClick={() => simpanButtonPress(form, onClose)}
                 >
                   Simpan
