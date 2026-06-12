@@ -1,4 +1,4 @@
-import { EditIcon, DeleteIcon } from "@/components/icon";
+import { EditIcon, DeleteIcon } from "@/components/my/icon";
 import {
   Pagination,
   Table,
@@ -16,7 +16,7 @@ import {
   renderQueryStates,
 } from "@/app/utils/tools";
 import { getDateFId, getTime } from "@/app/utils/date";
-import { TableHeaderWithAddButton } from "../mycomponent";
+import { TableHeaderWithAddButton } from "../my/mycomponent";
 import { useState } from "react";
 import { TransferBankModal } from "@/components/transfer-bank/TransferBankModal";
 import {
@@ -24,7 +24,7 @@ import {
   useTransferBankFetch,
 } from "@/hooks/transfer-bank.hooks";
 import { tableClassNames } from "@/app/utils/style";
-import { NumberComp } from "../harga";
+import { NumberComp } from "../my/harga";
 
 export const renderTransferBankTableCell = ({
   data,

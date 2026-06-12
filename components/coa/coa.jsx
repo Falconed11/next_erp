@@ -3,7 +3,7 @@ import { COA_SUBTYPE_ENDPOINT } from "@/services/coa/coa-subtype.service";
 import { COA_ENDPOINT } from "@/services/coa/coa.service";
 import { COA_FILTER_ENDPOINT } from "@/services/coa/coa-filter.service";
 import DefaultSelect from "../default/DefaultSelect";
-import { useAutocompleteField } from "../myautocomplete";
+import { useAutocompleteField } from "../my/myautocomplete";
 import { useEffect, useState } from "react";
 import { updateForm, updateNestedForm } from "@/app/utils/tools";
 

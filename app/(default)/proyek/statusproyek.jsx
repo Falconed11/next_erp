@@ -5,8 +5,8 @@ import {
   highRoleCheck,
   renderQueryStates,
 } from "@/app/utils/tools";
-import Harga from "@/components/harga";
-import { AddIcon, DeleteIcon, EditIcon } from "@/components/icon";
+import Harga from "@/components/my/harga";
+import { AddIcon, DeleteIcon, EditIcon } from "@/components/my/icon";
 import {
   Button,
   Input,

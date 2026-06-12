@@ -38,7 +38,7 @@ import {
   NoteIcon,
   ReportMoneyIcon,
   TransferIcon,
-} from "../../../components/icon";
+} from "../../../components/my/icon";
 import { SelectVendorJenis } from "@/components/vendor/vendor";
 import {
   getCurFirstLastDay,
@@ -46,12 +46,12 @@ import {
   getDate,
   getDateF,
 } from "@/app/utils/date";
-import Harga from "@/components/harga";
-import { LinkOpenNewTab } from "@/components/mycomponent";
-import { FileUploader } from "@/components/input";
+import Harga from "@/components/my/harga";
+import { LinkOpenNewTab } from "@/components/my/mycomponent";
+import { FileUploader } from "@/components/my/input";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import ModalTransferData from "@/components/modaltransferdata";
+import ModalTransferData from "@/components/my/modaltransferdata";
 import { useClientFetch } from "@/hooks/useClientFetch";
 import { apiFetch } from "@/app/utils/fetchHelper";
 
@@ -325,7 +325,8 @@ export default function App({ user }) {
             <div>Filter</div>
             <div className="flex gap-2 flex-wrap">
               <Input
-                color="default" variant="bordered"
+                color="default"
+                variant="bordered"
                 label="Nama"
                 placeholder="Masukkan nama!"
                 value={value}
@@ -335,7 +336,8 @@ export default function App({ user }) {
                 form={filterVendorJenis}
                 setForm={setFilterVendorJenis}
                 className="max-w-xs"
-                color="default" variant="bordered"
+                color="default"
+                variant="bordered"
               />
             </div>
           </>
@@ -347,7 +349,8 @@ export default function App({ user }) {
                 isCompact
                 showControls
                 showShadow
-                color="primary" variant="solid"
+                color="primary"
+                variant="solid"
                 page={page}
                 total={pages}
                 onChange={(page) => setPage(page)}
@@ -431,7 +434,8 @@ export default function App({ user }) {
                   form={form}
                   setForm={setForm}
                   className="max-w-xs"
-                  color="default" variant="bordered"
+                  color="default"
+                  variant="bordered"
                 />
                 {/* <Textarea
                   label="Keterangan"
@@ -446,7 +450,8 @@ export default function App({ user }) {
                   Batal
                 </Button>
                 <Button
-                  color="primary" variant="solid"
+                  color="primary"
+                  variant="solid"
                   onClick={() => saveButtonPress(onClose)}
                 >
                   Simpan

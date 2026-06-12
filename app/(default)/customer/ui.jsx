@@ -36,7 +36,7 @@ import {
   NoteIcon,
   ReportMoneyIcon,
   TransferIcon,
-} from "@/components/icon";
+} from "@/components/my/icon";
 import {
   getCurFirstLastDay,
   excelToJSDate,
@@ -44,14 +44,17 @@ import {
   getDateF,
 } from "@/app/utils/date";
 import { LIST_SWASTA_NEGRI } from "@/app/utils/const";
-import Harga from "@/components/harga";
+import Harga from "@/components/my/harga";
 import "react-datepicker/dist/react-datepicker.css";
-import { LinkOpenNewTab, OpenBlueLinkInNewTab } from "@/components/mycomponent";
-import ModalTransferData from "@/components/modaltransferdata";
+import {
+  LinkOpenNewTab,
+  OpenBlueLinkInNewTab,
+} from "@/components/my/mycomponent";
+import ModalTransferData from "@/components/my/modaltransferdata";
 import {
   AutocompleteGolonganInstansi,
   AutocompleteJenisInstansi,
-} from "@/components/myautocomplete";
+} from "@/components/my/myautocomplete";
 import { key2set } from "@/app/utils/tools";
 import { useClientFetch } from "@/hooks/useClientFetch";
 import { apiFetch } from "@/app/utils/fetchHelper";
@@ -364,7 +367,8 @@ export default function App({ user }) {
                 isCompact
                 showControls
                 showShadow
-                color="primary" variant="solid"
+                color="primary"
+                variant="solid"
                 page={page}
                 total={pages}
                 onChange={(page) => setPage(page)}
@@ -485,7 +489,8 @@ export default function App({ user }) {
                   Batal
                 </Button>
                 <Button
-                  color="primary" variant="solid"
+                  color="primary"
+                  variant="solid"
                   onClick={() => saveButtonPress(onClose)}
                 >
                   Simpan

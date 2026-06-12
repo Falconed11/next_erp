@@ -1,9 +1,9 @@
 "use client";
 import { useState } from "react";
-import { Input, NumberInput } from "@heroui/react";
+import { Divider, Input, NumberInput } from "@heroui/react";
 import { Checkbox } from "@heroui/react";
 import { getApiPath } from "@/app/utils/apiconfig";
-import Harga from "@/components/harga";
+import Harga from "@/components/my/harga";
 import { highRoleCheck, renderQueryStates } from "@/app/utils/tools";
 import {
   AutocompleteKategoriProduk,
@@ -12,7 +12,7 @@ import {
   AutocompleteVendor,
 } from "./myautocomplete";
 import { useClientFetch } from "@/hooks/useClientFetch";
-import { MyCheckBox } from "./mycomponent";
+import { ConditionalWrapper, MyCheckBox } from "./mycomponent";
 
 const api_path = getApiPath();
 
@@ -29,6 +29,8 @@ export default function TambahProduk({
   disableCustomValue,
   user,
 }) {
+  const isCreateNewProduct = !!(!form.id_produk && form.produk);
+  const isFilterActive = !!(form.id_kategori || form.id_merek);
   const { id_kategori: idKategori, id_merek: idMerek } = form;
   const sessUser = user;
   const [nama, setNama] = useState("");
@@ -48,15 +50,6 @@ export default function TambahProduk({
   if (form.jumlah > form.stok && form.isSelected)
     errorsJumlah.push("Stok tidak cukup");
 
-  // let data = produk.data;
-  // const lowerNama = nama.toLowerCase();
-  // data = data.filter((row) =>
-  //   ["nama", "nmerek", "tipe", "id", "keterangan"].some((key) =>
-  //     (row[key] ?? "").toString().toLowerCase().includes(lowerNama)
-  //   )
-  // );
-  // data = data.slice(0, 20);
-
   let fvendor = vendor.data;
   fvendor = fvendor.filter((row) =>
     row.nama.toLowerCase().includes(sVendor.toLowerCase()),
@@ -73,19 +66,33 @@ export default function TambahProduk({
       // className={`flex flex-wrap gap-3 ${className}`}
       className={`flex flex-col gap-2 ${className}`}
     >
-      <AutocompleteKategoriProduk
-        disableCustomValue={disableCustomValue}
-        form={form}
-        setForm={setForm}
-        className={defStyleFormWidth}
-      />
-      <AutocompleteMerek
-        disableCustomValue={disableCustomValue}
-        isDisabled={isProdukSelected}
-        form={form}
-        setForm={setForm}
-        className={defStyleFormWidth}
-      />
+      <ConditionalWrapper
+        condition={!isProdukSelected && !isCreateNewProduct}
+        wrapper={(children) => (
+          <div className="border border-primary flex flex-col gap-2 p-2 rounded-lg mt-3 relative">
+            <div className="absolute -inset-y-3">
+              <div className="text-primary bg-white px-1">Filter Produk</div>
+            </div>
+            {children}
+          </div>
+        )}
+      >
+        <AutocompleteKategoriProduk
+          disableCustomValue={disableCustomValue}
+          form={form}
+          setForm={setForm}
+          className={defStyleFormWidth}
+          disallowEmptySelection={isCreateNewProduct}
+        />
+        <AutocompleteMerek
+          disableCustomValue={disableCustomValue}
+          isDisabled={isProdukSelected}
+          form={form}
+          setForm={setForm}
+          className={defStyleFormWidth}
+          disallowEmptySelection={isCreateNewProduct}
+        />
+      </ConditionalWrapper>
       <AutocompleteProduk
         disableCustomValue={disableCustomValue}
         id_kategori={idKategori}
@@ -93,12 +100,22 @@ export default function TambahProduk({
         form={form}
         setForm={setForm}
         className={defStyleFormWidth}
+        disallowEmptySelection
+        listboxTopContent={
+          isFilterActive ? (
+            <div className="text-primary text-lg sticky top-0 text-opacity-100 opacity-100">
+              * Menampilkan produk berdasarkan filter:
+            </div>
+          ) : null
+        }
       />
+      {/* tipe */}
       <Input
+        isRequired={isCreateNewProduct}
         variant={variant}
         type="text"
         value={form.tipe || ""}
-        isDisabled={isProdukSelected}
+        isDisabled={isProdukSelected || !form.produk}
         label="Tipe"
         placeholder="Masukkan tipe!"
         className={defStyleFormWidth}
@@ -109,11 +126,12 @@ export default function TambahProduk({
           })
         }
       />
+      {/* id */}
       <Input
         variant={variant}
         type="text"
         value={form.id_kustom || ""}
-        isDisabled={isProdukSelected}
+        isDisabled={isProdukSelected || !form.produk}
         label="Id"
         placeholder="Masukkan id!"
         className={defStyleFormWidth}
@@ -173,6 +191,7 @@ export default function TambahProduk({
       )}
       {/* jumlah */}
       <NumberInput
+        isRequired
         variant={variant}
         hideStepper
         isWheelDisabled
@@ -195,6 +214,8 @@ export default function TambahProduk({
       {/* satuan */}
       {!form.id_produk && (
         <Input
+          isDisabled={!form.produk}
+          isRequired={isCreateNewProduct}
           // isDisabled={isProdukSelected}
           variant={variant}
           value={form.satuan || ""}

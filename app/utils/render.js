@@ -1,4 +1,4 @@
-import { UpdateActiveStatus } from "@/components/input";
+import { UpdateActiveStatus } from "@/components/my/input";
 
 export const renderFilterActive = (data, mutate, onFetch, user) => (
   <UpdateActiveStatus

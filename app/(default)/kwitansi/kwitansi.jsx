@@ -40,7 +40,7 @@ import {
   UserIcon,
   PrinterIcon,
   NoteIcon,
-} from "@/components/icon";
+} from "@/components/my/icon";
 import { useClientFetch } from "@/hooks/useClientFetch";
 import { apiFetch } from "@/app/utils/fetchHelper";
 import date, {
@@ -50,9 +50,9 @@ import date, {
   getDateFId,
 } from "@/app/utils/date";
 import number from "@/app/utils/number";
-import Harga from "@/components/harga";
-import { RangeDate } from "@/components/input";
-import { SVTHeader, BKSHeader } from "@/components/mycomponent";
+import Harga from "@/components/my/harga";
+import { RangeDate } from "@/components/my/input";
+import { SVTHeader, BKSHeader } from "@/components/my/mycomponent";
 import Image from "next/image";
 import logoBks from "@/public/logo-bks.jpeg";
 import logoSvt from "@/public/logo-svt.jpeg";

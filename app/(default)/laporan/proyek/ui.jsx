@@ -6,7 +6,7 @@ import {
   getFirstDayOfMonth,
   getFirstDayOfNextMonth,
 } from "@/app/utils/date";
-import { CompanyPeriodeReportPicker } from "@/components/input";
+import { CompanyPeriodeReportPicker } from "@/components/my/input";
 import { useState } from "react";
 import { TableProyek } from "@/components/proyek/proyek";
 import { SelectJenisProyek } from "@/components/jenis-proyek/jenisproyek";

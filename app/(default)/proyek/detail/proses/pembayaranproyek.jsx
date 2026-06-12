@@ -8,7 +8,7 @@ import {
   Textarea,
 } from "@heroui/react";
 import { getDate } from "@/app/utils/date";
-import Harga from "@/components/harga";
+import Harga from "@/components/my/harga";
 import { getApiPath } from "@/app/utils/apiconfig";
 import { key2set, set2key } from "@/app/utils/tools";
 import SelectMetodePembayaran from "@/components/metode-pembayaran/SelectMetodePembayaran";
@@ -59,7 +59,8 @@ export default function PembayaranProyek({
         endContent={
           <Button
             isDisabled={!piutang}
-            color="primary" variant="solid"
+            color="primary"
+            variant="solid"
             size="sm"
             onClick={() => setForm((prev) => ({ ...prev, nominal: piutang }))}
           >

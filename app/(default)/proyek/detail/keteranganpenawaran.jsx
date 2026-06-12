@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { Button, Checkbox, Input, Tooltip } from "@heroui/react";
-import { EditIcon, DeleteIcon } from "@/components/icon";
+import { EditIcon, DeleteIcon } from "@/components/my/icon";
 import {
   Table,
   TableHeader,

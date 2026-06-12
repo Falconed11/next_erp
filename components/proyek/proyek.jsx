@@ -11,7 +11,7 @@ import {
   useDisclosure,
 } from "@heroui/react";
 import { highRoleCheck, renderQueryStates, sortItems } from "@/app/utils/tools";
-import { NumberComp } from "../harga";
+import { NumberComp } from "../my/harga";
 import { LIST_SWASTA_NEGRI } from "@/app/utils/const";
 import {
   useGetMonthlyReportByPeriode,
@@ -19,9 +19,9 @@ import {
 } from "@/hooks/proyek.hooks";
 import { tableClassName, tableClassNames } from "@/app/utils/style";
 import { useMemo, useState } from "react";
-import { OpenBlueLinkInNewTab } from "../mycomponent";
+import { OpenBlueLinkInNewTab } from "../my/mycomponent";
 import { number2Nominal } from "@/app/utils/number";
-import { useAutocompleteField } from "../myautocomplete";
+import { useAutocompleteField } from "../my/myautocomplete";
 import { PROYEK_ENDPOINT } from "@/services/proyek.service";
 
 export const renderTableCellProyek = ({ data, columnKey }) => {

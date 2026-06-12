@@ -24,7 +24,7 @@ import {
   EyeIcon,
   UserIcon,
   NoteIcon,
-} from "@/components/icon";
+} from "@/components/my/icon";
 import {
   Modal,
   ModalContent,
@@ -36,10 +36,10 @@ import {
 import { useReactToPrint } from "react-to-print";
 import { getApiPath } from "@/app/utils/apiconfig";
 import { getDateF, getDateFId, getDate, getTime } from "@/app/utils/date";
-import Harga from "@/components/harga";
-import DetailProyek from "@/components/detailproyek";
-import TambahProduk from "@/components/tambahproduk";
-import SelectStatusProyek from "@/components/selectstatusproyek";
+import Harga from "@/components/my/harga";
+import DetailProyek from "@/components/my/detailproyek";
+import TambahProduk from "@/components/my/tambahproduk";
+import SelectStatusProyek from "@/components/my/selectstatusproyek";
 import { Button } from "@heroui/react";
 import { Input } from "@heroui/react";
 import { Divider } from "@heroui/react";
@@ -50,10 +50,10 @@ import Image from "next/image";
 import logo from "@/public/logofinal.jpg";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { NavLinkNewTab, LinkOpenNewTab } from "@/components/mycomponent";
+import { NavLinkNewTab, LinkOpenNewTab } from "@/components/my/mycomponent";
 import { highRoleCheck, key2set, set2key } from "@/app/utils/tools";
-import { AutocompleteCustomer } from "@/components/myautocomplete";
-import { RangeDate } from "@/components/input";
+import { AutocompleteCustomer } from "@/components/my/myautocomplete";
+import { RangeDate } from "@/components/my/input";
 import { LIST_SWASTA_NEGRI } from "@/app/utils/const";
 import { useClientFetch } from "@/hooks/useClientFetch";
 import { apiFetch } from "@/app/utils/fetchHelper";
@@ -325,7 +325,8 @@ export default function App({ id, curDate, user }) {
       <div className="flex gap-2">
         <div>
           <Button
-            color="primary" variant="solid"
+            color="primary"
+            variant="solid"
             onClick={() => {
               setForm({ tanggal: new Date(), method: "POST" });
               modal.aktivitassales.onOpen();
@@ -351,7 +352,8 @@ export default function App({ id, curDate, user }) {
             </div>
             {isHighRole && (
               <Select
-                color="default" variant="bordered"
+                color="default"
+                variant="bordered"
                 label="Pilih Karyawan"
                 placeholder="Pilih karyawan!"
                 selectedKeys={selectKaryawan}
@@ -373,7 +375,8 @@ export default function App({ id, curDate, user }) {
                 isCompact
                 showControls
                 showShadow
-                color="primary" variant="solid"
+                color="primary"
+                variant="solid"
                 page={page}
                 total={pages}
                 onChange={(page) => setPage(page)}
@@ -458,7 +461,8 @@ export default function App({ id, curDate, user }) {
                 {form.method == "PUT" && (
                   <Input
                     isDisabled
-                    color="default" variant="bordered"
+                    color="default"
+                    variant="bordered"
                     type="text"
                     label="Tanggal"
                     value={getDateFId(form.tanggal)}
@@ -467,7 +471,8 @@ export default function App({ id, curDate, user }) {
                 <AutocompleteCustomer form={form} setForm={setForm} />
                 <Select
                   isDisabled={isInstansiSelectedOrEmpty}
-                  color="default" variant="bordered"
+                  color="default"
+                  variant="bordered"
                   label="Pilih Swasta/Negri"
                   placeholder="Pilih S/N!"
                   selectedKeys={key2set(form.swasta)}
@@ -483,7 +488,8 @@ export default function App({ id, curDate, user }) {
                 </Select>
                 <Input
                   isDisabled={isInstansiSelectedOrEmpty}
-                  color="default" variant="bordered"
+                  color="default"
+                  variant="bordered"
                   type="text"
                   label="Kota"
                   placeholder="Masukkan kota!"
@@ -494,7 +500,8 @@ export default function App({ id, curDate, user }) {
                 />
                 <Textarea
                   isDisabled={isInstansiSelectedOrEmpty}
-                  color="default" variant="bordered"
+                  color="default"
+                  variant="bordered"
                   type="text"
                   label="Alamat"
                   placeholder="Masukkan alamat!"
@@ -504,7 +511,8 @@ export default function App({ id, curDate, user }) {
                   }}
                 />
                 <Textarea
-                  color="default" variant="bordered"
+                  color="default"
+                  variant="bordered"
                   value={form.aktivitas}
                   label="Aktivitas"
                   placeholder="Masukkan aktivitas!"
@@ -517,7 +525,8 @@ export default function App({ id, curDate, user }) {
                   }
                 />
                 <Textarea
-                  color="default" variant="bordered"
+                  color="default"
+                  variant="bordered"
                   value={form.catatan}
                   label="Catatan"
                   placeholder="Masukkan catatan!"
@@ -532,7 +541,8 @@ export default function App({ id, curDate, user }) {
                 {form.method == "PUT" && (
                   <>
                     <Input
-                      color="default" variant="bordered"
+                      color="default"
+                      variant="bordered"
                       type="text"
                       label="PIC"
                       placeholder="Masukkan PIC"
@@ -567,7 +577,8 @@ export default function App({ id, curDate, user }) {
                   Batal
                 </Button>
                 <Button
-                  color="primary" variant="solid"
+                  color="primary"
+                  variant="solid"
                   onClick={() => simpanButtonPress(form, onClose)}
                 >
                   Simpan

@@ -19,7 +19,7 @@ import {
   DeleteIcon,
   EyeIcon,
   UserIcon,
-} from "../../../../components/icon";
+} from "../../../../components/my/icon";
 import {
   Modal,
   ModalContent,

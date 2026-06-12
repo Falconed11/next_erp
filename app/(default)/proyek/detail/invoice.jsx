@@ -34,9 +34,9 @@ import {
   CompanyHeader,
   OpenBlueLinkInNewTab,
   SVTHeader,
-} from "@/components/mycomponent";
-import { EditIcon, DeleteIcon } from "@/components/icon";
-import Harga from "@/components/harga";
+} from "@/components/my/mycomponent";
+import { EditIcon, DeleteIcon } from "@/components/my/icon";
+import Harga from "@/components/my/harga";
 import Image from "next/image";
 import { RecapTable } from "./rekap";
 import { useClientFetch } from "@/hooks/useClientFetch";
@@ -113,7 +113,8 @@ export default function Invoice({
               setVersi(lengthPembayaran - 1);
               onOpen();
             }}
-            color="primary" variant="solid"
+            color="primary"
+            variant="solid"
             className=""
           >
             Invoice
@@ -324,7 +325,11 @@ export default function Invoice({
                 <Button color="danger" variant="flat" onClick={onClose}>
                   Batal
                 </Button>
-                <Button onClick={handlePrintInvoice} color="primary" variant="solid">
+                <Button
+                  onClick={handlePrintInvoice}
+                  color="primary"
+                  variant="solid"
+                >
                   Cetak
                 </Button>
               </ModalFooter>

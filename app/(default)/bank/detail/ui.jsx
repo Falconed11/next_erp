@@ -21,7 +21,7 @@ import {
   DeleteIcon,
   EyeIcon,
   UserIcon,
-} from "@/components/icon";
+} from "@/components/my/icon";
 import {
   Modal,
   ModalContent,
@@ -37,8 +37,8 @@ import {
   getDateFId,
   getCurFirstLastDay,
 } from "@/app/utils/date";
-import { MyChip } from "@/components/mycomponent";
-import Harga from "@/components/harga";
+import { MyChip } from "@/components/my/mycomponent";
+import Harga from "@/components/my/harga";
 import { Button } from "@heroui/react";
 import { Input } from "@heroui/react";
 import { Divider } from "@heroui/react";
@@ -51,8 +51,8 @@ import logoBks from "@/public/logo-bks.jpeg";
 import logoSvt from "@/public/logo-svt.jpeg";
 import { useRouter } from "next/navigation";
 import { v4 as uuidv4 } from "uuid";
-import { FilterProduk } from "@/components/filter";
-import { RangeDate } from "@/components/input";
+import { FilterProduk } from "@/components/my/filter";
+import { RangeDate } from "@/components/my/input";
 import { useClientFetch } from "@/hooks/useClientFetch";
 import { apiFetch } from "@/app/utils/fetchHelper";
 

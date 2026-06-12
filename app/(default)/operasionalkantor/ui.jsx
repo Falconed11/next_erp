@@ -36,16 +36,16 @@ import {
   DeleteIcon,
   EyeIcon,
   UserIcon,
-} from "../../../components/icon";
-import { FileUploader } from "@/components/input";
+} from "../../../components/my/icon";
+import { FileUploader } from "@/components/my/input";
 import {
   getDate,
   getDateF,
   getCurFirstLastDay,
   excelToJSDate,
 } from "@/app/utils/date";
-import Harga from "@/components/harga";
-import { RangeDate } from "@/components/input";
+import Harga from "@/components/my/harga";
+import { RangeDate } from "@/components/my/input";
 import Kategori from "./kategori";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";

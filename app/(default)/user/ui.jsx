@@ -19,7 +19,7 @@ import {
   DeleteIcon,
   EyeIcon,
   UserIcon,
-} from "@/components/icon";
+} from "@/components/my/icon";
 import {
   Modal,
   ModalContent,
@@ -41,7 +41,7 @@ import {
 } from "@/app/utils/tools";
 import { useClientFetch } from "@/hooks/useClientFetch";
 import { apiFetch } from "@/app/utils/fetchHelper";
-import { TableHeaderWithAddButton } from "@/components/mycomponent";
+import { TableHeaderWithAddButton } from "@/components/my/mycomponent";
 
 const api_path = getApiPath();
 

@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Input, Button, Form, Spinner } from "@heroui/react";
 import Link from "next/link";
-import { EyeFilledIcon, EyeSlashFilledIcon } from "../../components/icon";
+import { EyeFilledIcon, EyeSlashFilledIcon } from "../../components/my/icon";
 import { apiFetch } from "../utils/fetchHelper";
 import { useRouter } from "next/navigation";
 import { updateForm } from "../utils/tools";

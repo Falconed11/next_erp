@@ -14,12 +14,12 @@ import {
   Tooltip,
 } from "@heroui/react";
 import { getDate } from "@/app/utils/date";
-import Harga from "@/components/harga";
+import Harga from "@/components/my/harga";
 import { getApiPath } from "@/app/utils/apiconfig";
 import { key2set, set2key, renderQueryStates } from "@/app/utils/tools";
 import { useCallback } from "react";
-import { AddIcon, DeleteIcon, EditIcon } from "@/components/icon";
-import { OpenBlueLinkInNewTab } from "@/components/mycomponent";
+import { AddIcon, DeleteIcon, EditIcon } from "@/components/my/icon";
+import { OpenBlueLinkInNewTab } from "@/components/my/mycomponent";
 import { useClientFetch } from "@/hooks/useClientFetch";
 const apiPath = getApiPath();
 

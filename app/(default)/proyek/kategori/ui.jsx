@@ -38,15 +38,15 @@ import {
   NoteIcon,
   ReportMoneyIcon,
   TransferIcon,
-} from "@/components/icon";
+} from "@/components/my/icon";
 import {
   getCurFirstLastDay,
   excelToJSDate,
   getDate,
   getDateF,
 } from "@/app/utils/date";
-import Harga from "@/components/harga";
-import { FileUploader } from "@/components/input";
+import Harga from "@/components/my/harga";
+import { FileUploader } from "@/components/my/input";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useClientFetch } from "@/hooks/useClientFetch";

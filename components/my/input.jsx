@@ -17,7 +17,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import Link from "next/link";
 import { getDate, excelToJSDate, getDateF } from "@/app/utils/date";
 import { getApiPath } from "@/app/utils/apiconfig";
-import { SelectPerusahaan } from "./perusahaan/perusahaan";
+import { SelectPerusahaan } from "../perusahaan/perusahaan";
 import { GoEye, GoEyeClosed } from "react-icons/go";
 import { styleActionButton } from "@/app/utils/style";
 import { apiFetch } from "@/app/utils/fetchHelper";

@@ -20,7 +20,7 @@ import {
   DeleteIcon,
   EyeIcon,
   UserIcon,
-} from "@/components/icon";
+} from "@/components/my/icon";
 import {
   Modal,
   ModalContent,
@@ -32,14 +32,17 @@ import {
 import { useReactToPrint } from "react-to-print";
 import { getApiPath } from "@/app/utils/apiconfig";
 import { getDateF, getDateFId, getDate } from "@/app/utils/date";
-import Harga from "@/components/harga";
-import TambahProduk from "@/components/tambahproduk";
+import Harga from "@/components/my/harga";
+import TambahProduk from "@/components/my/tambahproduk";
 import { Button } from "@heroui/react";
 import { Input } from "@heroui/react";
 import { Select, SelectItem } from "@heroui/react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { NavLinkNewTab, OpenBlueLinkInNewTab } from "@/components/mycomponent";
+import {
+  NavLinkNewTab,
+  OpenBlueLinkInNewTab,
+} from "@/components/my/mycomponent";
 import PembayaranProyek from "./pembayaranproyek";
 import ProdukMenunggu from "./produkmenunggu";
 import { countPercentProvit, countRecapitulation } from "@/app/utils/formula";
@@ -52,7 +55,7 @@ import {
 import {
   ShowHideComponent,
   ShowHideComponent2,
-} from "@/components/componentmanipulation";
+} from "@/components/my/componentmanipulation";
 import { useClientFetch } from "@/hooks/useClientFetch";
 import { apiFetch } from "@/app/utils/fetchHelper";
 import {

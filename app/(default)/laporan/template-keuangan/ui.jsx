@@ -5,7 +5,7 @@ import { renderQueryStates } from "@/app/utils/tools";
 import { AutocompleteCoa, AutocompleteCoaFilter } from "@/components/coa/coa";
 import { AutocompleteLaporan } from "@/components/laporan/laporan";
 import { TableWithActiveStatus } from "@/components/default/DefaultTable";
-import { EyeIcon } from "@/components/icon";
+import { EyeIcon } from "@/components/my/icon";
 import { useDefaultFetch } from "@/hooks/useDefault";
 import {
   deleteLaporan,

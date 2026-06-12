@@ -1,4 +1,4 @@
-import { EditIcon, DeleteIcon } from "@/components/icon";
+import { EditIcon, DeleteIcon } from "@/components/my/icon";
 import {
   Badge,
   Button,
@@ -29,12 +29,12 @@ import {
   getDateColumnSortValue,
 } from "@/app/utils/dateColumns";
 import columnHandlers from "@/app/utils/columnHandlers";
-import { TableHeaderWithAddButton, TableTitle } from "../mycomponent";
+import { TableHeaderWithAddButton, TableTitle } from "../my/mycomponent";
 import { useDefaultColumnsV2, useDefaultFetch } from "@/hooks/useDefault";
 import { useMemo, useState } from "react";
 import DefaultModal from "./DefaultModal";
 import { renderFilterActive } from "@/app/utils/render";
-import { FilterActive } from "../filter";
+import { FilterActive } from "../my/filter";
 
 export const renderDefaultTableCell = ({
   data,

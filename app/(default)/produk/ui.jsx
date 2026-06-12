@@ -40,7 +40,7 @@ import {
   UserIcon,
   MinIcon,
   TransferIcon,
-} from "@/components/icon";
+} from "@/components/my/icon";
 import {
   Modal,
   ModalContent,
@@ -50,9 +50,9 @@ import {
   useDisclosure,
 } from "@heroui/react";
 import { RadioGroup, Radio } from "@heroui/react";
-import Harga from "@/components/harga";
-import { TemplateImport, UpdateActiveStatus } from "@/components/input";
-import { FilterProduk } from "@/components/filter";
+import Harga from "@/components/my/harga";
+import { TemplateImport, UpdateActiveStatus } from "@/components/my/input";
+import { FilterProduk } from "@/components/my/filter";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { getApiPath } from "@/app/utils/apiconfig";
@@ -72,19 +72,19 @@ import {
   MyCheckBox,
   MyDatePicker,
   OpenBlueLinkInNewTab,
-} from "@/components/mycomponent";
+} from "@/components/my/mycomponent";
 import {
   FormProduct,
   HargaGenerator,
   ModalProdukMasuk,
-} from "@/components/produk";
-import { AuthorizationComponent } from "@/components/componentmanipulation";
+} from "@/components/my/produk";
+import { AuthorizationComponent } from "@/components/my/componentmanipulation";
 import {
   AutocompleteKategoriProduk,
   AutocompleteMerek,
   AutocompleteVendor,
   AutocompleteWithCustomValue,
-} from "@/components/myautocomplete";
+} from "@/components/my/myautocomplete";
 import {
   highRoleCheck,
   key2set,
@@ -94,7 +94,7 @@ import {
   useDebounce,
 } from "@/app/utils/tools";
 import { useFilter } from "@react-aria/i18n";
-import ModalTransferData from "@/components/modaltransferdata";
+import ModalTransferData from "@/components/my/modaltransferdata";
 import { useClientFetch } from "@/hooks/useClientFetch";
 import { apiFetch } from "@/app/utils/fetchHelper";
 import { patchProduk } from "@/services/produk/produk.service";

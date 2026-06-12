@@ -34,7 +34,7 @@ import {
   DeleteIcon,
   NoteIcon,
   ReportMoneyIcon,
-} from "@/components/icon";
+} from "@/components/my/icon";
 import { getDate, getDateF } from "@/app/utils/date";
 import {
   capitalizeEachWord,
@@ -45,27 +45,27 @@ import {
   set2key,
   useDebounce,
 } from "@/app/utils/tools";
-import { UpdateShowHide } from "@/components/input";
-import { RangeDate } from "@/components/input";
-import { FilterCard, LinkOpenNewTab } from "@/components/mycomponent";
-import Harga from "@/components/harga";
-import { ShowHideComponent2 } from "@/components/componentmanipulation";
+import { UpdateShowHide } from "@/components/my/input";
+import { RangeDate } from "@/components/my/input";
+import { FilterCard, LinkOpenNewTab } from "@/components/my/mycomponent";
+import Harga from "@/components/my/harga";
+import { ShowHideComponent2 } from "@/components/my/componentmanipulation";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import SelectStatusProyek from "@/components/selectstatusproyek";
+import SelectStatusProyek from "@/components/my/selectstatusproyek";
 import { LIST_SWASTA_NEGRI } from "@/app/utils/const";
 import { StatusProyek } from "./statusproyek";
 import PrintDaftarProyek from "./printdaftarproyek";
 import {
   AutocompleteCustomer,
   AutocompleteJenisProyek,
-} from "@/components/myautocomplete";
-import { BadgeStatusProyek } from "@/components/badgestatusproyek";
+} from "@/components/my/myautocomplete";
+import { BadgeStatusProyek } from "@/components/my/badgestatusproyek";
 import { useReactToPrint } from "react-to-print";
 import { useClientFetch } from "@/hooks/useClientFetch";
 import { apiFetch } from "@/app/utils/fetchHelper";
 import { saveProyek, duplicateProyek } from "@/services/proyek.service";
-import { FilterHidden } from "@/components/filter";
+import { FilterHidden } from "@/components/my/filter";
 import { countOffset, countPages } from "@/app/utils/formula";
 
 export default function App({

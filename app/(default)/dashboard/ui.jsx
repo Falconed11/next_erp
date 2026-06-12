@@ -1,7 +1,7 @@
 "use client";
 import { getCurFirstLastDay } from "@/app/utils/date";
-import { Penawaran, OperasionalKantor } from "@/components/laporan";
-import { StatusToDoList, ToDoList } from "@/components/mycomponent";
+import { Penawaran, OperasionalKantor } from "@/components/my/laporan";
+import { StatusToDoList, ToDoList } from "@/components/my/mycomponent";
 
 import "react-datepicker/dist/react-datepicker.css";
 import { highRoleCheck, renderQueryStates } from "../../utils/tools";

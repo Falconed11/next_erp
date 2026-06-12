@@ -31,7 +31,7 @@ import {
   EyeIcon,
   UserIcon,
   WAIcon,
-} from "@/components/icon";
+} from "@/components/my/icon";
 import {
   Modal,
   ModalContent,
@@ -45,9 +45,9 @@ import { getApiPath } from "@/app/utils/apiconfig";
 import { getDate, getDateFId } from "@/app/utils/date";
 import { invoice, penawaran } from "@/app/utils/formatid";
 import { removePrefixIfMatchIgnoreCase } from "@/app/utils/stringmanipulation";
-import Harga from "@/components/harga";
-import { ConditionalComponent } from "@/components/componentmanipulation";
-import TambahProduk from "@/components/tambahproduk";
+import Harga from "@/components/my/harga";
+import { ConditionalComponent } from "@/components/my/componentmanipulation";
+import TambahProduk from "@/components/my/tambahproduk";
 import {
   BKSHeader,
   CompanyHeader,
@@ -57,7 +57,7 @@ import {
   NavLinkNewTab,
   OpenBlueLinkInNewTab,
   SVTHeader,
-} from "@/components/mycomponent";
+} from "@/components/my/mycomponent";
 import { Button } from "@heroui/react";
 import { Input } from "@heroui/react";
 import { Divider } from "@heroui/react";
@@ -94,16 +94,122 @@ import {
   RecapTable,
 } from "./rekap";
 import { NEXT_DOMAIN } from "@/app/utils/const";
-import { TemplateImportV2 } from "@/components/input";
-import { BadgeStatusProyek } from "@/components/badgestatusproyek";
+import { TemplateImportV2 } from "@/components/my/input";
+import { BadgeStatusProyek } from "@/components/my/badgestatusproyek";
 import { useClientFetch } from "@/hooks/useClientFetch";
 import { apiFetch } from "@/app/utils/fetchHelper";
 import {
   SelectSubProyek,
   TambahProdukPenawaran,
 } from "@/components/penawaran/penawaran";
+import { tableClassNames } from "@/app/utils/style";
 
 const api_path = getApiPath();
+
+const ProductTableSection = ({
+  title,
+  idProyek,
+  instalasi,
+  isAuthorized,
+  isHighRole,
+  mutateKeranjang,
+  versi,
+  user,
+  columns,
+  items,
+  tableKey,
+  summaryLabel,
+  renderCell,
+  topContent = null,
+  className,
+}) => {
+  const subTotalHarga = items.reduce(
+    (total, item) => total + (item.jumlah || 0) * (item.harga || 0),
+    0,
+  );
+  const subTotalModal = items.reduce(
+    (total, item) => total + (item.jumlah || 0) * (item.temphargamodal || 0),
+    0,
+  );
+  const subTotalProfit = items.reduce(
+    (total, item) =>
+      total +
+      (item.jumlah || 0) * ((item.harga || 0) - (item.temphargamodal || 0)),
+    0,
+  );
+
+  return (
+    <div className="bg-white p-3 rounded-lg">
+      <div>{title}</div>
+      <div className="flex gap-2">
+        <ConditionalComponent
+          condition={isAuthorized}
+          component={
+            <TambahProdukPenawaran
+              isHighRole={isHighRole}
+              idProyek={idProyek}
+              instalasi={instalasi}
+              mutateKeranjang={mutateKeranjang}
+              versi={versi}
+              user={user}
+            />
+          }
+        />
+        <Table
+          classNames={tableClassNames}
+          key={tableKey}
+          isStriped
+          isCompact
+          className={className}
+          topContent={topContent}
+          bottomContent={
+            <TableSummary>
+              <div>
+                <Harga label={summaryLabel} harga={subTotalHarga} />
+              </div>
+              {isHighRole && (
+                <>
+                  <div>
+                    <Harga
+                      label="Sub Total Harga Modal :"
+                      harga={subTotalModal}
+                    />
+                  </div>
+                  <div>
+                    <Harga label="Sub Total Provit :" harga={subTotalProfit} />
+                  </div>
+                </>
+              )}
+            </TableSummary>
+          }
+          aria-label={`Example table with custom cells`}
+        >
+          <TableHeader columns={columns}>
+            {(column) => (
+              <TableColumn
+                key={column.key}
+                align={column.key === "aksi" ? "center" : "start"}
+              >
+                {column.label}
+              </TableColumn>
+            )}
+          </TableHeader>
+          <TableBody items={items} emptyContent={"Kosong"}>
+            {(item) => (
+              <TableRow key={item.id_keranjangproyek}>
+                {(columnKey) => (
+                  <TableCell className="whitespace-nowrap">
+                    {renderCell(item, columnKey)}
+                  </TableCell>
+                )}
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+    </div>
+  );
+};
 
 export default function App({ id, versi, user }) {
   const sessUser = user;
@@ -666,7 +772,7 @@ export default function App({ id, versi, user }) {
         countRecapitulation(keranjangProduk, keranjangInstalasi, rekapitulasi),
       [keranjangProduk, keranjangInstalasi, rekapitulasi],
     );
-  const queryStates = renderQueryStates({
+  const QueryStates = renderQueryStates({
     proyek,
     keranjangProyek,
     keranjangProyekInstalasi,
@@ -676,7 +782,7 @@ export default function App({ id, versi, user }) {
     statusProyek,
     subProyek,
   });
-  if (queryStates) return queryStates;
+  if (QueryStates) return QueryStates;
   if (!selectedProyek) return <>Proyek tidak ditemukan</>;
   const col = {
     keranjangproyek: [
@@ -1234,10 +1340,10 @@ export default function App({ id, versi, user }) {
           />
         </div>
         <NavLinkNewTab href={`/proyek/detail/proses?id=${selectedProyek?.id}`}>
-          {"Pengeluaran & Pembayaran ==>>"}
+          Pengeluaran & Pembayaran
         </NavLinkNewTab>
       </div>
-      {id && versi && isAuthorized && (
+      {false && id && versi && isAuthorized && (
         <div>
           <TemplateImportV2
             json={json}
@@ -1273,6 +1379,7 @@ export default function App({ id, versi, user }) {
           </TemplateImportV2>
         </div>
       )}
+      {/* main */}
       <div className="w-9/12- flex flex-col gap-2">
         {/* sub proyek */}
         <SubProyek
@@ -1280,195 +1387,42 @@ export default function App({ id, versi, user }) {
           selectedProyek={selectedProyek}
           isAuthorized={isAuthorized}
         />
-        {/* tabel peralatan */}
-        <div className="bg-white p-3 rounded-lg">
-          <div>Peralatan</div>
-          <div className="flex gap-2">
-            <ConditionalComponent
-              condition={isAuthorized}
-              component={
-                <TambahProdukPenawaran
-                  isHighRole={isHighRole}
-                  idProyek={id}
-                  instalasi={0}
-                  mutateKeranjang={mutateKeranjang}
-                  versi={versi}
-                  user={user}
-                />
-              }
-            />
-            <Table
-              key={selectedProgress}
-              isStriped
-              isCompact
-              className={sTable}
-              bottomContent={
-                <TableSummary>
-                  <div>
-                    <Harga
-                      label="Sub Total Harga Jual :"
-                      harga={subTotalHargaJual}
-                    />
-                  </div>
-                  {isHighRole && (
-                    <>
-                      <div>
-                        <Harga
-                          harga={keranjangProyek.data.reduce(
-                            (total, currentValue) => {
-                              return (
-                                total +
-                                currentValue.jumlah *
-                                  currentValue.temphargamodal
-                              );
-                            },
-                            0,
-                          )}
-                          label="Sub Total Harga Modal :"
-                        />
-                      </div>
-                      <div>
-                        <Harga
-                          label={"Sub Total Provit :"}
-                          harga={keranjangProyek.data.reduce(
-                            (total, currentValue) => {
-                              return (
-                                total +
-                                currentValue.jumlah *
-                                  (currentValue.harga -
-                                    currentValue.temphargamodal)
-                              );
-                            },
-                            0,
-                          )}
-                        />
-                      </div>
-                    </>
-                  )}
-                </TableSummary>
-              }
-              aria-label="Example table with custom cells"
-            >
-              <TableHeader columns={col.keranjangproyek}>
-                {(column) => (
-                  <TableColumn
-                    key={column.key}
-                    align={column.key === "aksi" ? "center" : "start"}
-                  >
-                    {column.label}
-                  </TableColumn>
-                )}
-              </TableHeader>
-              <TableBody items={keranjangProduk} emptyContent={"Kosong"}>
-                {(item) => (
-                  <TableRow key={item.id_keranjangproyek}>
-                    {(columnKey) => (
-                      <TableCell>
-                        {renderCell.keranjangproyek(item, columnKey)}
-                      </TableCell>
-                    )}
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </div>
+        {/* peralatan */}
+        <ProductTableSection
+          title="Peralatan"
+          idProyek={id}
+          instalasi={0}
+          isAuthorized={isAuthorized}
+          isHighRole={isHighRole}
+          mutateKeranjang={mutateKeranjang}
+          versi={versi}
+          user={user}
+          columns={col.keranjangproyek}
+          items={keranjangProduk}
+          tableKey={selectedProgress}
+          summaryLabel="Sub Total Harga Jual :"
+          renderCell={renderCell.keranjangproyek}
+          className={sTable}
+        />
         {/* tabel instalasi */}
-        <div className="bg-white p-3 rounded-lg">
-          <div>Instalasi</div>
-          <div className="flex gap-2">
-            <ConditionalComponent
-              condition={isAuthorized}
-              component={
-                <TambahProdukPenawaran
-                  isHighRole={isHighRole}
-                  idProyek={id}
-                  instalasi={1}
-                  mutateKeranjang={mutateKeranjang}
-                  versi={versi}
-                  user={user}
-                />
-              }
-            />
-            <Table
-              key={`${selectedProgress}-instalasi`}
-              isStriped
-              isCompact
-              className={sTable}
-              topContent={<></>}
-              bottomContent={
-                <TableSummary>
-                  <div>
-                    <Harga
-                      label="Sub Total Harga Instalasi :"
-                      harga={subTotalHargaInstalasi}
-                    />
-                  </div>
-                  {isHighRole && (
-                    <>
-                      <div>
-                        <Harga
-                          harga={keranjangProyekInstalasi.data.reduce(
-                            (total, currentValue) => {
-                              return (
-                                total +
-                                currentValue.jumlah *
-                                  currentValue.temphargamodal
-                              );
-                            },
-                            0,
-                          )}
-                          label="Sub Total Harga Modal :"
-                        />
-                      </div>
-                      <div>
-                        <Harga
-                          label={"Sub Total Provit :"}
-                          harga={keranjangProyekInstalasi.data.reduce(
-                            (total, currentValue) => {
-                              return (
-                                total +
-                                currentValue.jumlah *
-                                  (currentValue.harga -
-                                    currentValue.temphargamodal)
-                              );
-                            },
-                            0,
-                          )}
-                        />
-                      </div>
-                    </>
-                  )}
-                </TableSummary>
-              }
-              aria-label="Example table with custom cells"
-            >
-              <TableHeader columns={col.instalasi}>
-                {(column) => (
-                  <TableColumn
-                    key={column.key}
-                    align={column.key === "aksi" ? "center" : "start"}
-                  >
-                    {column.label}
-                  </TableColumn>
-                )}
-              </TableHeader>
-              <TableBody items={keranjangInstalasi} emptyContent={"Kosong"}>
-                {(item) => (
-                  <TableRow key={item.id_keranjangproyek}>
-                    {(columnKey) => (
-                      <TableCell>
-                        {renderCell.keranjangproyek(item, columnKey)}
-                      </TableCell>
-                    )}
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </div>
+        <ProductTableSection
+          title="Instalasi"
+          idProyek={id}
+          instalasi={1}
+          isAuthorized={isAuthorized}
+          isHighRole={isHighRole}
+          mutateKeranjang={mutateKeranjang}
+          versi={versi}
+          user={user}
+          columns={col.instalasi}
+          items={keranjangInstalasi}
+          tableKey={`${selectedProgress}-instalasi`}
+          summaryLabel="Sub Total Harga Instalasi :"
+          renderCell={renderCell.keranjangproyek}
+          className={sTable}
+          topContent={<></>}
+        />
       </div>
-
       {/* edit produk */}
       <Modal
         scrollBehavior="inside"

@@ -7,7 +7,7 @@ import {
   Textarea,
 } from "@heroui/react";
 import { getDate } from "@/app/utils/date";
-import Harga from "@/components/harga";
+import Harga from "@/components/my/harga";
 
 export default function PembayaranProyek({
   isCreate,

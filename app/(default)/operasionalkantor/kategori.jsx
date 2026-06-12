@@ -20,13 +20,13 @@ import {
   useDisclosure,
 } from "@heroui/react";
 import { Input } from "@heroui/react";
-import { EditIcon, DeleteIcon, TransferIcon } from "@/components/icon";
+import { EditIcon, DeleteIcon, TransferIcon } from "@/components/my/icon";
 import { getDateF } from "@/app/utils/date";
-import Harga from "@/components/harga";
-import ModalTransferData from "@/components/modaltransferdata";
+import Harga from "@/components/my/harga";
+import ModalTransferData from "@/components/my/modaltransferdata";
 import "react-datepicker/dist/react-datepicker.css";
 import { capitalizeEachWord, highRoleCheck } from "@/app/utils/tools";
-import { TableHeaderWithAddButton } from "@/components/mycomponent";
+import { TableHeaderWithAddButton } from "@/components/my/mycomponent";
 import { useClientFetch } from "@/hooks/useClientFetch";
 import { apiFetch } from "@/app/utils/fetchHelper";
 

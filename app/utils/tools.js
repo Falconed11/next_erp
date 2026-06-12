@@ -40,22 +40,29 @@ export const capitalizeEachWord = (str = "") => {
   );
 };
 export const renderQueryStates = (queries) => {
-  for (const [name, data] of Object.entries(queries ?? {})) {
-    const { error, isLoading, data: fetchedData } = data;
+  const queryArray = Object.entries(queries ?? {});
+  for (const [name, data] of queryArray) {
+    const { error, data: fetchedData } = data;
     const { success, message } = fetchedData ?? {};
-    if (error)
+
+    if (error) {
       return (
         <div>
-          Failed to load {name} {error.message}
+          Failed to load {name}: {error.message}
         </div>
       );
-    if (isLoading) return <div>Loading {name}...</div>;
-    if (success === false)
+    }
+    if (success === false) {
       return (
         <div>
-          Fetch failed {name} {message}
+          Fetch failed {name}: {message}
         </div>
       );
+    }
+  }
+  const anyLoading = queryArray.some(([_, data]) => data.isLoading);
+  if (anyLoading) {
+    return <div>Loading data...</div>; // A clean, single loading message
   }
   return null;
 };

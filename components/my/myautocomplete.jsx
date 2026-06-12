@@ -38,6 +38,7 @@ export const useAutocompleteField = ({
   disallowEmptySelection,
   key,
   onClear,
+  ...props
 }) => {
   const query = useClientFetch(endpoint);
   const data = useMemo(
@@ -67,6 +68,7 @@ export const useAutocompleteField = ({
       disallowEmptySelection={disallowEmptySelection}
       key={key}
       onClear={onClear}
+      {...props}
     />
   );
   return { component };
@@ -91,6 +93,8 @@ export const AutocompleteWithCustomValue = ({
   getFormUpdateOnSelectionChange = () => {},
   disallowEmptySelection,
   onClear = undefined,
+  startTitle = "",
+  listboxTopContent = null,
 }) => {
   const { contains } = useFilter({ sensitivity: "base" });
   const [items, setItems] = useState(data);
@@ -144,7 +148,10 @@ export const AutocompleteWithCustomValue = ({
   return (
     <Autocomplete
       // isVirtualized={false}
-      popoverProps={{ shouldCloseOnScroll: false }}
+      listboxProps={{
+        topContent: listboxTopContent,
+      }}
+      popoverProps={{ shouldCloseOnScroll: false, shouldBlockScroll: true }}
       className={`${isDisabled ? "opacity-50" : ""} ${className}`}
       classNames={{
         popoverContent: "text-nowrap w-300",
@@ -155,6 +162,7 @@ export const AutocompleteWithCustomValue = ({
       allowsCustomValue={disableCustomValue ? undefined : true}
       label={
         <>
+          {startTitle}
           {title}
           {isInvalid && (
             <span className="text-danger">{" *Data tidak terdaftar"}</span>

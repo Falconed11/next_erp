@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import * as XLSX from "xlsx";
-import { TemplateImport } from "@/components/input";
+import { TemplateImport } from "@/components/my/input";
 import { Button } from "@heroui/react";
 import {
   Modal,

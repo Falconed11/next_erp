@@ -16,7 +16,7 @@ import {
   AutocompleteCoaSubtype,
   AutocompleteCoa,
 } from "@/components/coa/coa";
-import { AddIcon } from "@/components/icon";
+import { AddIcon } from "@/components/my/icon";
 import {
   Tooltip,
   useDisclosure,

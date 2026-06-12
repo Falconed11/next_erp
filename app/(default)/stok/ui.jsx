@@ -31,7 +31,7 @@ import {
   EditIcon,
   DeleteIcon,
   EyeIcon,
-} from "../../../components/icon";
+} from "../../../components/my/icon";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { getDate, getDateF } from "../../utils/date";

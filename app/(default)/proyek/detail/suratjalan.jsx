@@ -25,8 +25,8 @@ import {
   Spinner,
   Switch,
 } from "@heroui/react";
-import { CompanyHeader, PrintWithHeader } from "@/components/mycomponent";
-import Harga from "@/components/harga";
+import { CompanyHeader, PrintWithHeader } from "@/components/my/mycomponent";
+import Harga from "@/components/my/harga";
 import { useRef, useState, useCallback, useMemo } from "react";
 import { useReactToPrint } from "react-to-print";
 import { nominalToText } from "@/app/utils/number";

@@ -2,7 +2,7 @@
 import { getDateF } from "@/app/utils/date";
 import { fIdProyek } from "@/app/utils/formatid";
 import { renderQueryStates } from "@/app/utils/tools";
-import Harga from "@/components/harga";
+import Harga from "@/components/my/harga";
 import { useClientFetch } from "@/hooks/useClientFetch";
 import {
   Table,

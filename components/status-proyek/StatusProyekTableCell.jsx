@@ -1,6 +1,6 @@
 // components/statusProyek/StatusProyekTableCell.jsx
-import Harga from "@/components/harga";
-import { EditIcon, DeleteIcon } from "@/components/icon";
+import Harga from "@/components/my/harga";
+import { EditIcon, DeleteIcon } from "@/components/my/icon";
 import { Tooltip } from "@heroui/react";
 import { capitalizeEachWord } from "@/app/utils/tools";
 import { getDateF } from "@/app/utils/date";

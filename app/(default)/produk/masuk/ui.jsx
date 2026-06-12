@@ -25,7 +25,7 @@ import {
   EyeIcon,
   UserIcon,
   MinIcon,
-} from "@/components/icon";
+} from "@/components/my/icon";
 import {
   Modal,
   ModalContent,
@@ -35,8 +35,8 @@ import {
   useDisclosure,
 } from "@heroui/react";
 import { RadioGroup, Radio } from "@heroui/react";
-import Harga from "@/components/harga";
-import { FileUploader } from "@/components/input";
+import Harga from "@/components/my/harga";
+import { FileUploader } from "@/components/my/input";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { getApiPath } from "@/app/utils/apiconfig";
@@ -50,7 +50,7 @@ import {
 } from "@/app/utils/date";
 import { useClientFetch } from "@/hooks/useClientFetch";
 import { apiFetch } from "@/app/utils/fetchHelper";
-import { ModalProdukMasuk } from "@/components/produk";
+import { ModalProdukMasuk } from "@/components/my/produk";
 import { renderQueryStates } from "@/app/utils/tools";
 import { p } from "framer-motion/client";
 import { number2Nominal } from "@/app/utils/number";

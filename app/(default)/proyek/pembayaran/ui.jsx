@@ -35,19 +35,19 @@ import {
   getDate,
 } from "@/app/utils/date";
 import { getApiPath } from "@/app/utils/apiconfig";
-import Harga from "@/components/harga";
-import { FileUploader, RangeDate } from "@/components/input";
+import Harga from "@/components/my/harga";
+import { FileUploader, RangeDate } from "@/components/my/input";
 import {
   AddIcon,
   EditIcon,
   DeleteIcon,
   EyeIcon,
   UserIcon,
-} from "@/components/icon";
+} from "@/components/my/icon";
 
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { LinkOpenNewTab } from "@/components/mycomponent";
+import { LinkOpenNewTab } from "@/components/my/mycomponent";
 import { useClientFetch } from "@/hooks/useClientFetch";
 import { apiFetch } from "@/app/utils/fetchHelper";
 

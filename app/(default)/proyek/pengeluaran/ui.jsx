@@ -27,10 +27,10 @@ import {
   getDate,
 } from "@/app/utils/date";
 import { getApiPath } from "@/app/utils/apiconfig";
-import Harga from "@/components/harga";
-import { RangeDate } from "@/components/input";
-import { EyeIcon } from "@/components/icon";
-import { LinkOpenNewTab, MyChip } from "@/components/mycomponent";
+import Harga from "@/components/my/harga";
+import { RangeDate } from "@/components/my/input";
+import { EyeIcon } from "@/components/my/icon";
+import { LinkOpenNewTab, MyChip } from "@/components/my/mycomponent";
 
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";

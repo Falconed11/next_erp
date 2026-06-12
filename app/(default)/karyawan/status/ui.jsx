@@ -20,7 +20,7 @@ import {
   EyeIcon,
   UserIcon,
   IconScaleBalanced,
-} from "@/components/icon";
+} from "@/components/my/icon";
 import {
   Modal,
   ModalContent,

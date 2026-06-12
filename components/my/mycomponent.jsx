@@ -86,13 +86,16 @@ export const OpenBlueLinkInNewTab = ({ link, children, className }) => {
     </Link>
   );
 };
-export const NavLinkNewTab = ({ href, children }) => {
-  return (
-    <Link href={href} target="_blank" rel="noopener noreferrer">
-      {children}
-    </Link>
-  );
-};
+export const NavLinkNewTab = ({ href, children }) => (
+  <Link
+    href={href}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="underline"
+  >
+    {children}
+  </Link>
+);
 export const company = {
   1: {
     name: "Belga Karya Semesta",
@@ -741,6 +744,7 @@ export const MyDatePicker = ({
   field = "tanggal",
   extraField = {},
   isDisabled = false,
+  isRequired = false,
 }) => {
   const [value, setValue] = useState();
   useEffect(() => {
@@ -752,6 +756,7 @@ export const MyDatePicker = ({
     <I18nProvider locale="id-ID">
       <div className="flex gap-2">
         <DatePicker
+          isRequired={isRequired}
           minValue={minValue}
           maxValue={maxValue}
           isDisabled={isDisabled}
@@ -833,3 +838,13 @@ export const MyCheckBox = ({
     {children}
   </Checkbox>
 );
+
+/**
+ * A component that conditionally wraps its children with a specific element or structure.
+ *
+ * @param {boolean} condition - If true, the wrapper structure is applied. If false, only children are rendered.
+ * @param {function} wrapper - A function that takes children and returns the wrapped JSX.
+ * @param {React.ReactNode} children - The elements to be wrapped.
+ */
+export const ConditionalWrapper = ({ condition, wrapper, children }) =>
+  condition ? wrapper(children) : <>{children}</>;

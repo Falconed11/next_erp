@@ -1,6 +1,6 @@
 "use client";
 
-import Harga from "@/components/harga";
+import Harga from "@/components/my/harga";
 import { Button, Divider, useDisclosure } from "@heroui/react";
 import { useState, useRef, useEffect } from "react";
 import {

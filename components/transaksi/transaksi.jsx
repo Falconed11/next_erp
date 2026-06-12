@@ -13,9 +13,9 @@ import DatePicker from "react-datepicker";
 import { SelectPerusahaan } from "../perusahaan/perusahaan";
 import { AutoCompleteCoaInJurnal, SelectDebitKredit } from "../coa/coa";
 import { DefaultNumberInput } from "../default/DefaultInput";
-import { AddIcon, DeleteIcon } from "../icon";
+import { AddIcon, DeleteIcon } from "../my/icon";
 import "react-datepicker/dist/react-datepicker.css";
-import Harga from "../harga";
+import Harga from "../my/harga";
 import {
   key2set,
   set2key,
@@ -137,7 +137,8 @@ export const ModalJurnal = ({
                 <AutocompleteProyek form={form} setForm={setForm} />
                 {/* Keterangan */}
                 <Textarea
-                  color="default" variant="bordered"
+                  color="default"
+                  variant="bordered"
                   label={`Keterangan ( ${keterangan?.length || 0}/200 )`}
                   placeholder="Masukkan keterangan jurnal"
                   value={keterangan}
@@ -177,7 +178,8 @@ export const ModalJurnal = ({
                           index={index}
                         />
                         <DefaultNumberInput
-                          color="default" variant="bordered"
+                          color="default"
+                          variant="bordered"
                           label="Jumlah"
                           placeholder="Masukkan jumlah!"
                           value={trx.amount}
@@ -188,7 +190,8 @@ export const ModalJurnal = ({
                         <div className="grid items-end content-center">
                           <Button
                             isIconOnly
-                            color="danger" variant="flat"
+                            color="danger"
+                            variant="flat"
                             onClick={() => handleRemoveTransaksi(index)}
                             className="text-xl"
                           >
@@ -262,7 +265,8 @@ export const ModalJurnal = ({
                 Batal
               </Button>
               <Button
-                color="primary" variant="solid"
+                color="primary"
+                variant="solid"
                 onClick={() => onSubmit(onClose)}
                 isDisabled={
                   totals.difference > 0.01 ||

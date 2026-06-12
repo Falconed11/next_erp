@@ -1,5 +1,5 @@
 import { useState } from "react";
-import TambahProduk from "../tambahproduk";
+import TambahProduk from "../my/tambahproduk";
 import {
   Button,
   Input,
@@ -16,7 +16,7 @@ import { key2set, renderQueryStates, set2key } from "@/app/utils/tools";
 import { useClientFetch } from "@/hooks/useClientFetch";
 import { apiFetch } from "@/app/utils/fetchHelper";
 import { API_PATH } from "@/app/utils/apiconfig";
-import { MyCheckBox, MyDatePicker } from "../mycomponent";
+import { MyCheckBox, MyDatePicker } from "../my/mycomponent";
 import { dateHeroUIToMysql, getDate } from "@/app/utils/date";
 
 export const TambahProdukPenawaran = ({
@@ -55,7 +55,7 @@ export const TambahProdukPenawaran = ({
           tanggal: tanggalHarga ? tanggalHarga : null,
         }),
       });
-      const newForm = { namakustom: "" };
+      const newForm = { namakustom: "", tanggalHarga: getDate(new Date()) };
       setForm(newForm);
       mutateKeranjang();
     } catch (error) {
@@ -69,8 +69,10 @@ export const TambahProdukPenawaran = ({
   return (
     <div className="relative">
       <div>{title}</div>
-      <div className={`flex flex-col gap-2 w-80 overflow-y-scroll h-150`}>
-        <TambahProduk
+      <div
+        className={`flex flex-col gap-2 w-80 overflow-y-scroll overscroll-y-contain h-150`}
+      >
+        <TambahProdukPenawaran
           className={``}
           form={form}
           setForm={setForm}
@@ -125,12 +127,14 @@ export const TambahProdukPenawaran = ({
                   Update Harga
                 </MyCheckBox>
               )}
-              {((idProduk && form.isUpdateHarga) || !idProduk) && (
+              {((idProduk && form.isUpdateHarga) ||
+                (!idProduk && form.produk)) && (
                 <MyDatePicker
                   form={form}
                   setForm={setForm}
                   field={fieldTanggal}
                   label="Tanggal Harga"
+                  isRequired
                 />
               )}
               <Input
@@ -160,7 +164,7 @@ export const TambahProdukPenawaran = ({
       <div className="text-right sticky absolute top-0 right-0 z-50">
         <Button
           className=""
-          onClick={() => {
+          onPress={() => {
             tambahButtonPress(form, setForm);
           }}
           color="primary"

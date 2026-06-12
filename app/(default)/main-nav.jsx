@@ -1,6 +1,6 @@
 "use client";
-import Navigation from "@/components/navigation";
-import User from "@/components/user";
+import Navigation from "@/components/my/navigation";
+import User from "@/components/my/user";
 import { Divider } from "@heroui/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";

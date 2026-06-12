@@ -19,7 +19,7 @@ import {
   DeleteIcon,
   EyeIcon,
   UserIcon,
-} from "../../../components/icon";
+} from "../../../components/my/icon";
 import {
   Modal,
   ModalContent,
@@ -197,7 +197,11 @@ export default function App() {
                 <Button color="danger" variant="flat" onClick={onClose}>
                   Batal
                 </Button>
-                <Button color="primary" variant="solid" onClick={() => simpanButtonPress(form)}>
+                <Button
+                  color="primary"
+                  variant="solid"
+                  onClick={() => simpanButtonPress(form)}
+                >
                   Simpan
                 </Button>
               </ModalFooter>

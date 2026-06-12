@@ -21,7 +21,7 @@ import {
   UserIcon,
   IconScaleBalanced,
   TransferIcon,
-} from "../../../components/icon";
+} from "../../../components/my/icon";
 import {
   Modal,
   ModalContent,
@@ -31,12 +31,12 @@ import {
   useDisclosure,
 } from "@heroui/react";
 import { getApiPath } from "../../utils/apiconfig";
-import { FileUploader } from "@/components/input";
+import { FileUploader } from "@/components/my/input";
 import { Button, Select, SelectItem } from "@heroui/react";
 import { Input } from "@heroui/react";
 import Link from "next/link";
-import ModalTransferData from "@/components/modaltransferdata";
-import Harga from "@/components/harga";
+import ModalTransferData from "@/components/my/modaltransferdata";
+import Harga from "@/components/my/harga";
 import { useClientFetch } from "@/hooks/useClientFetch";
 import { apiFetch } from "@/app/utils/fetchHelper";
 
@@ -329,7 +329,8 @@ export default function App() {
                 />
                 <Select
                   label="Status"
-                  color="default" variant="bordered"
+                  color="default"
+                  variant="bordered"
                   placeholder="Pilih status!"
                   selectedKeys={
                     new Set(
@@ -358,7 +359,8 @@ export default function App() {
                   Batal
                 </Button>
                 <Button
-                  color="primary" variant="solid"
+                  color="primary"
+                  variant="solid"
                   onClick={() => simpanButtonPress(form, onClose)}
                 >
                   Simpan

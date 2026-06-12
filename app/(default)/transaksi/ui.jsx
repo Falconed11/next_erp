@@ -36,9 +36,9 @@ import {
   OpenBlueLinkInNewTab,
   MyDateRangePicker,
   MyMinMaxDatePicker,
-} from "@/components/mycomponent";
+} from "@/components/my/mycomponent";
 import { renderDefaultTableCell } from "@/components/default/DefaultTable";
-import { NumberComp } from "@/components/harga";
+import { NumberComp } from "@/components/my/harga";
 import { useTransaksiColumns } from "@/hooks/useTransaksi.hooks";
 import { ModalJurnal } from "@/components/transaksi/transaksi";
 import { fetchJurnalById } from "@/services/transaksi/jurnal.service";
@@ -46,7 +46,7 @@ import { buildTableClassNames } from "@/app/utils/style";
 import { SelectPerusahaan } from "@/components/perusahaan/perusahaan";
 import { AutocompleteProyek } from "@/components/proyek/proyek";
 import { AutocompleteCoa } from "@/components/coa/coa";
-import { AutocompleteCustomer } from "@/components/myautocomplete";
+import { AutocompleteCustomer } from "@/components/my/myautocomplete";
 
 export default function TransaksiUI({ user }) {
   const sessionUser = user;

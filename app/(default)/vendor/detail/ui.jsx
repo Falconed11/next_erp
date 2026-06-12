@@ -21,7 +21,7 @@ import {
   DeleteIcon,
   EyeIcon,
   UserIcon,
-} from "@/components/icon";
+} from "@/components/my/icon";
 import {
   Modal,
   ModalContent,
@@ -41,14 +41,14 @@ import {
   LinkOpenNewTab,
   MyChip,
   OpenBlueLinkInNewTab,
-} from "@/components/mycomponent";
-import Harga from "@/components/harga";
+} from "@/components/my/mycomponent";
+import Harga from "@/components/my/harga";
 import { Button } from "@heroui/react";
 import { Input } from "@heroui/react";
 import { Select, SelectItem } from "@heroui/react";
 import { useRouter } from "next/navigation";
-import { FilterProduk } from "@/components/filter";
-import { RangeDate } from "@/components/input";
+import { FilterProduk } from "@/components/my/filter";
+import { RangeDate } from "@/components/my/input";
 import { capitalizeEachWord } from "@/app/utils/tools";
 import { useClientFetch } from "@/hooks/useClientFetch";
 import { apiFetch } from "@/app/utils/fetchHelper";

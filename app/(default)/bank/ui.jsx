@@ -39,19 +39,19 @@ import {
   NoteIcon,
   TransferIcon,
   ReportMoneyIcon,
-} from "@/components/icon";
+} from "@/components/my/icon";
 import {
   getCurFirstLastDay,
   excelToJSDate,
   getDate,
   getDateF,
 } from "@/app/utils/date";
-import Harga from "@/components/harga";
+import Harga from "@/components/my/harga";
 import {
   LinkOpenNewTab,
   TableHeaderWithAddButton,
-} from "@/components/mycomponent";
-import { FileUploader, UpdateShowHide } from "@/components/input";
+} from "@/components/my/mycomponent";
+import { FileUploader, UpdateShowHide } from "@/components/my/input";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { highRoleCheck, renderQueryStates } from "@/app/utils/tools";

@@ -1,7 +1,10 @@
 import { RadioGroup, Radio, Tooltip } from "@heroui/react";
 import { getDateFId } from "@/app/utils/date";
-import { CompanyHeader, OpenBlueLinkInNewTab } from "@/components/mycomponent";
-import Harga from "@/components/harga";
+import {
+  CompanyHeader,
+  OpenBlueLinkInNewTab,
+} from "@/components/my/mycomponent";
+import Harga from "@/components/my/harga";
 import {
   Modal,
   ModalContent,
@@ -56,7 +59,8 @@ export default function Kwitansi({ proyek, nilaiProyek }) {
               onOpen();
             }}
             className=""
-            color="primary" variant="solid"
+            color="primary"
+            variant="solid"
           >
             Kwitansi
           </Button>
@@ -196,7 +200,8 @@ export default function Kwitansi({ proyek, nilaiProyek }) {
                 >
                   <div>
                     <Button
-                      color="primary" variant="solid"
+                      color="primary"
+                      variant="solid"
                       isDisabled={!isPrintable}
                       onClick={handlePrintInvoice}
                     >

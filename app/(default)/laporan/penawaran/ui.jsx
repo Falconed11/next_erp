@@ -42,17 +42,17 @@ import {
   ReportMoneyIcon,
   FileExportIcon,
   DangerTriangleBrokenIcon,
-} from "@/components/icon";
+} from "@/components/my/icon";
 import {
   getCurFirstLastDay,
   excelToJSDate,
   getDate,
   getDateF,
 } from "@/app/utils/date";
-import { FileUploader } from "@/components/input";
-import { RangeDate } from "@/components/input";
-import { LinkOpenNewTab } from "@/components/mycomponent";
-import Harga from "@/components/harga";
+import { FileUploader } from "@/components/my/input";
+import { RangeDate } from "@/components/my/input";
+import { LinkOpenNewTab } from "@/components/my/mycomponent";
+import Harga from "@/components/my/harga";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useClientFetch } from "@/hooks/useClientFetch";

@@ -1,11 +1,11 @@
-import Harga from "@/components/harga";
+import Harga from "@/components/my/harga";
 
 const createRecapTable = (
   rekap,
   diskon,
   pajakPersen,
   pajak = 0,
-  isPenawaran
+  isPenawaran,
 ) => {
   const isDiskon = !!diskon;
   const isPajak = !!(pajak + pajakPersen);

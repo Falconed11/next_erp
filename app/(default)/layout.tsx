@@ -1,7 +1,7 @@
 import { highRoles } from "@/app/utils/roles";
 import { RiDashboard2Line } from "react-icons/ri";
 import { AiOutlineProduct } from "react-icons/ai";
-import { BusinessProgressBarIcon } from "@/components/icon";
+import { BusinessProgressBarIcon } from "@/components/my/icon";
 import { VscGithubProject } from "react-icons/vsc";
 import { BsBank, BsHouseGear, BsJournal } from "react-icons/bs";
 import { LuBookUser } from "react-icons/lu";

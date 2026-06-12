@@ -19,7 +19,7 @@ import {
   DeleteIcon,
   EyeIcon,
   UserIcon,
-} from "../../../../components/icon";
+} from "../../../../components/my/icon";
 import {
   Modal,
   ModalContent,
@@ -33,7 +33,7 @@ import { useClientFetch } from "@/hooks/useClientFetch";
 import { apiFetch } from "@/app/utils/fetchHelper";
 import { getDateFId } from "@/app/utils/date";
 import { penawaran } from "@/app/utils/formatid";
-import Harga from "../../../../components/harga";
+import Harga from "../../../../components/my/harga";
 import { Button } from "@heroui/react";
 import { Input } from "@heroui/react";
 import { Divider } from "@heroui/react";
@@ -42,7 +42,7 @@ import { Select, SelectItem } from "@heroui/react";
 import Link from "next/link";
 import Image from "next/image";
 import logo from "../../../../public/logofinal.jpg";
-import TambahProduk from "@/components/tambahproduk";
+import TambahProduk from "@/components/my/tambahproduk";
 
 const api_path = getApiPath();
 
