@@ -41,10 +41,12 @@ export const capitalizeEachWord = (str = "") => {
 };
 export const renderQueryStates = (queries) => {
   const queryArray = Object.entries(queries ?? {});
-  for (const [name, data] of queryArray) {
-    const { error, data: fetchedData } = data;
-    const { success, message } = fetchedData ?? {};
-
+  for (const [name, res] of queryArray) {
+    const { data, error, isLoading } = res;
+    const { success, message } = data ?? {};
+    if (isLoading) {
+      return <div>Loading {name} ...</div>;
+    }
     if (error) {
       return (
         <div>
@@ -59,10 +61,6 @@ export const renderQueryStates = (queries) => {
         </div>
       );
     }
-  }
-  const anyLoading = queryArray.some(([_, data]) => data.isLoading);
-  if (anyLoading) {
-    return <div>Loading data...</div>; // A clean, single loading message
   }
   return null;
 };

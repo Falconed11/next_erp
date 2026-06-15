@@ -81,18 +81,18 @@ import {
   set2key,
   updateSwitch,
 } from "@/app/utils/tools";
-import Kwitansi from "./kwitansi";
-import Invoice from "./invoice";
-import KeteranganPenawaran from "./keteranganpenawaran";
-import Rekapitulasi from "./rekapitulasi";
-import SubProyek from "./subproyek";
-import SuratJalan from "./suratjalan";
+import Kwitansi from "./components/kwitansi";
+import Invoice from "./components/invoice";
+import KeteranganPenawaran from "./components/keteranganpenawaran";
+import Rekapitulasi from "./components/rekapitulasi";
+import SubProyek from "./components/subproyek";
+import SuratJalan from "./components/suratjalan";
 import {
   createRecapTable,
   createRecapTableTotal,
   createTable,
   RecapTable,
-} from "./rekap";
+} from "./components/rekap";
 import { NEXT_DOMAIN } from "@/app/utils/const";
 import { TemplateImportV2 } from "@/components/my/input";
 import { BadgeStatusProyek } from "@/components/my/badgestatusproyek";
@@ -102,114 +102,9 @@ import {
   SelectSubProyek,
   TambahProdukPenawaran,
 } from "@/components/penawaran/penawaran";
-import { tableClassNames } from "@/app/utils/style";
+import { ProductTableSection } from "./components/penawaran";
 
 const api_path = getApiPath();
-
-const ProductTableSection = ({
-  title,
-  idProyek,
-  instalasi,
-  isAuthorized,
-  isHighRole,
-  mutateKeranjang,
-  versi,
-  user,
-  columns,
-  items,
-  tableKey,
-  summaryLabel,
-  renderCell,
-  topContent = null,
-  className,
-}) => {
-  const subTotalHarga = items.reduce(
-    (total, item) => total + (item.jumlah || 0) * (item.harga || 0),
-    0,
-  );
-  const subTotalModal = items.reduce(
-    (total, item) => total + (item.jumlah || 0) * (item.temphargamodal || 0),
-    0,
-  );
-  const subTotalProfit = items.reduce(
-    (total, item) =>
-      total +
-      (item.jumlah || 0) * ((item.harga || 0) - (item.temphargamodal || 0)),
-    0,
-  );
-
-  return (
-    <div className="bg-white p-3 rounded-lg">
-      <div>{title}</div>
-      <div className="flex gap-2">
-        <ConditionalComponent
-          condition={isAuthorized}
-          component={
-            <TambahProdukPenawaran
-              isHighRole={isHighRole}
-              idProyek={idProyek}
-              instalasi={instalasi}
-              mutateKeranjang={mutateKeranjang}
-              versi={versi}
-              user={user}
-            />
-          }
-        />
-        <Table
-          classNames={tableClassNames}
-          key={tableKey}
-          isStriped
-          isCompact
-          className={className}
-          topContent={topContent}
-          bottomContent={
-            <TableSummary>
-              <div>
-                <Harga label={summaryLabel} harga={subTotalHarga} />
-              </div>
-              {isHighRole && (
-                <>
-                  <div>
-                    <Harga
-                      label="Sub Total Harga Modal :"
-                      harga={subTotalModal}
-                    />
-                  </div>
-                  <div>
-                    <Harga label="Sub Total Provit :" harga={subTotalProfit} />
-                  </div>
-                </>
-              )}
-            </TableSummary>
-          }
-          aria-label={`Example table with custom cells`}
-        >
-          <TableHeader columns={columns}>
-            {(column) => (
-              <TableColumn
-                key={column.key}
-                align={column.key === "aksi" ? "center" : "start"}
-              >
-                {column.label}
-              </TableColumn>
-            )}
-          </TableHeader>
-          <TableBody items={items} emptyContent={"Kosong"}>
-            {(item) => (
-              <TableRow key={item.id_keranjangproyek}>
-                {(columnKey) => (
-                  <TableCell className="whitespace-nowrap">
-                    {renderCell(item, columnKey)}
-                  </TableCell>
-                )}
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
-    </div>
-  );
-};
 
 export default function App({ id, versi, user }) {
   const sessUser = user;
@@ -273,25 +168,6 @@ export default function App({ id, versi, user }) {
     });
     modal.produk.onOpen();
   };
-  const deleteButtonPress = async (id) => {
-    if (confirm("Hapus produk?")) {
-      try {
-        const json = await apiFetch(`${api_path}keranjangproyek`, {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            // 'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          body: JSON.stringify({ id }),
-        });
-        mutateKeranjang();
-        return;
-      } catch (error) {
-        console.error("Error occurred while deleting:", error);
-        alert(error.message || "An error occurred while deleting.");
-      }
-    }
-  };
   const handleButtonVersi = async () => {
     try {
       let res = await apiFetch(`${api_path}versibarukeranjangproyek`, {
@@ -337,10 +213,6 @@ export default function App({ id, versi, user }) {
     try {
       const json = await apiFetch(`${api_path}keranjangproyek`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          // 'Content-Type': 'application/x-www-form-urlencoded',
-        },
         body: JSON.stringify({
           ...data,
           hargamodal: data.temphargamodal,
@@ -473,178 +345,7 @@ export default function App({ id, versi, user }) {
   const isAuthorized =
     isRoleAuthorized && selectedProgress >= 10 && selectedProgress < 100;
   const renderCell = {
-    keranjangproyek: useCallback(
-      (data, columnKey) => {
-        const cellValue = data[columnKey];
-        const isChecked = (v) => {
-          return !!v;
-        };
-        const showMerek = isChecked(data.showmerek);
-        const showTipe = isChecked(data.showtipe);
-        switch (columnKey) {
-          case "nama":
-            return (
-              <OpenBlueLinkInNewTab link={`/produk?id=${data.id_produk}`}>
-                {cellValue}
-              </OpenBlueLinkInNewTab>
-            );
-          case "stok":
-            return (
-              <div
-                className={`text-right px-1 ${
-                  data.jumlah > data.stok
-                    ? "text-white bg-danger rounded-sm"
-                    : ""
-                }`}
-              >
-                {cellValue}
-              </div>
-            );
-          case "jumlah":
-            return <div className="text-right">{cellValue}</div>;
-          case "temphargamodal":
-            return (
-              <div className="text-right">
-                <Harga harga={cellValue} />
-              </div>
-            );
-          case "refhargajualmargin":
-            return (
-              <div className="text-right">
-                <Harga harga={data.margin} />
-              </div>
-            );
-          case "harga":
-            return (
-              <div className="text-right">
-                <Harga harga={data.harga} />
-              </div>
-            );
-          case "hargakustom":
-            return data.hargakustom != null ? (
-              <Harga harga={data.hargakustom} />
-            ) : (
-              ""
-            );
-          case "totalharga-modal":
-            return (
-              <div className="text-right">
-                <Harga harga={data.jumlah * data.temphargamodal} />
-              </div>
-            );
-          case "totalharga-jual":
-            return (
-              <div className="text-right">
-                <Harga harga={data.jumlah * data.harga} />
-              </div>
-            );
-          case "profit":
-            return (
-              <div className="text-right">
-                <Harga harga={data.harga - data.temphargamodal} />
-              </div>
-            );
-          case "provitmarginpersen":
-            return (
-              Math.round(
-                ((data.harga - data.temphargamodal) / data.harga) * 100 * 100,
-              ) / 100
-            );
-          case "persenprovit":
-            return (
-              Math.round(
-                countPercentProvit(data.temphargamodal, data.harga) * 100,
-              ) / 100 || ""
-            );
-          case "totalprofit":
-            return (
-              <div className="text-right">
-                <Harga
-                  harga={
-                    data.jumlah * data.harga - data.jumlah * data.temphargamodal
-                  }
-                />
-              </div>
-            );
-          case "showmerek":
-            return (
-              <Switch
-                isDisabled={!isAuthorized}
-                size="sm"
-                isSelected={showMerek}
-                onValueChange={async (v) => {
-                  await updateSwitch(
-                    v,
-                    showMerek,
-                    "keranjangproyek",
-                    "PUT",
-                    {
-                      id: data.id_keranjangproyek,
-                      showmerek: v ? 1 : 0,
-                    },
-                    [keranjangProyek, keranjangProyekInstalasi],
-                  );
-                }}
-              ></Switch>
-            );
-          case "showtipe":
-            return (
-              <Switch
-                isDisabled={!isAuthorized}
-                size="sm"
-                isSelected={showTipe}
-                onValueChange={async (v) => {
-                  await updateSwitch(
-                    v,
-                    showTipe,
-                    "keranjangproyek",
-                    "PUT",
-                    {
-                      id: data.id_keranjangproyek,
-                      showtipe: v ? 1 : 0,
-                    },
-                    [keranjangProyek, keranjangProyekInstalasi],
-                  );
-                }}
-              ></Switch>
-            );
-          case "aksi":
-            return (
-              <div className="relative flex items-center gap-2">
-                {isAuthorized && (
-                  <Tooltip content="Edit">
-                    <span
-                      onClick={() => editButtonPress(data)}
-                      className="text-lg text-default-400 cursor-pointer active:opacity-50"
-                    >
-                      <EditIcon />
-                    </span>
-                  </Tooltip>
-                )}
-                <LinkOpenNewTab
-                  content={"Detail Produk"}
-                  icon={<EyeIcon />}
-                  link={`/produk?id=${data.id_produk || null}`}
-                />
-                {isAuthorized && (
-                  <Tooltip color="danger" variant="solid" content="Delete">
-                    <span
-                      onClick={() => deleteButtonPress(data.id_keranjangproyek)}
-                      className="text-lg text-danger cursor-pointer active:opacity-50"
-                    >
-                      <DeleteIcon />
-                    </span>
-                  </Tooltip>
-                )}
-              </div>
-            );
-          default:
-            return cellValue;
-        }
-      },
-      [user, proyek],
-    ),
-    penawaran: React.useCallback((data, columnKey) => {
+    penawaran: useCallback((data, columnKey) => {
       const cellValue = data[columnKey];
       let harga = data.hargakustom == null ? data.harga : data.hargakustom;
       switch (columnKey) {
@@ -750,8 +451,8 @@ export default function App({ id, versi, user }) {
     pajak: 0,
   };
   const selectedRekapitulasiProyek = rekapitulasiProyek.data?.[0];
-  const keranjangProduk = keranjangProyek?.data || [];
-  const keranjangInstalasi = keranjangProyekInstalasi?.data || [];
+  const keranjangProduk = [...(keranjangProyek?.data || [])];
+  const keranjangInstalasi = [...(keranjangProyekInstalasi?.data || [])];
   const subTotalHargaJual = useMemo(
     () =>
       keranjangProduk?.reduce((total, currentValue) => {
@@ -1101,7 +802,7 @@ export default function App({ id, versi, user }) {
                 isIconOnly
                 radius="full"
                 size="sm"
-                onClick={() => {
+                onPress={() => {
                   const encodedMessage = encodeURIComponent(fullPath);
                   const whatsappUrl = `https://wa.me/?text=${encodedMessage}`;
                   window.open(whatsappUrl, "_blank");
@@ -1256,7 +957,7 @@ export default function App({ id, versi, user }) {
             {selectedStatusProyek != "deal" ? (
               <div>
                 <Button
-                  onClick={handleButtonSetAsDealClick}
+                  onPress={handleButtonSetAsDealClick}
                   color="primary"
                   variant="solid"
                   className=""
@@ -1267,7 +968,7 @@ export default function App({ id, versi, user }) {
             ) : (
               <div>
                 <Button
-                  onClick={handleButtonCancelDealRejectClick}
+                  onPress={handleButtonCancelDealRejectClick}
                   color="primary"
                   variant="solid"
                   className=""
@@ -1279,7 +980,7 @@ export default function App({ id, versi, user }) {
             {selectedStatusProyek != "reject" ? (
               <div>
                 <Button
-                  onClick={handleButtonSetAsRejectClick}
+                  onPress={handleButtonSetAsRejectClick}
                   color="primary"
                   variant="solid"
                   className=""
@@ -1290,7 +991,7 @@ export default function App({ id, versi, user }) {
             ) : (
               <div>
                 <Button
-                  onClick={handleButtonCancelDealRejectClick}
+                  onPress={handleButtonCancelDealRejectClick}
                   color="primary"
                   variant="solid"
                   className=""
@@ -1303,7 +1004,7 @@ export default function App({ id, versi, user }) {
         )}
         <div>
           <Button
-            onClick={modal.penawaran.onOpen}
+            onPress={modal.penawaran.onOpen}
             color="primary"
             variant="solid"
             className=""
@@ -1394,15 +1095,15 @@ export default function App({ id, versi, user }) {
           instalasi={0}
           isAuthorized={isAuthorized}
           isHighRole={isHighRole}
-          mutateKeranjang={mutateKeranjang}
+          mutateKeranjang={keranjangProyek.mutate}
           versi={versi}
           user={user}
           columns={col.keranjangproyek}
           items={keranjangProduk}
           tableKey={selectedProgress}
           summaryLabel="Sub Total Harga Jual :"
-          renderCell={renderCell.keranjangproyek}
           className={sTable}
+          onEdit={editButtonPress}
         />
         {/* tabel instalasi */}
         <ProductTableSection
@@ -1411,16 +1112,15 @@ export default function App({ id, versi, user }) {
           instalasi={1}
           isAuthorized={isAuthorized}
           isHighRole={isHighRole}
-          mutateKeranjang={mutateKeranjang}
+          mutateKeranjang={keranjangProyekInstalasi.mutate}
           versi={versi}
           user={user}
           columns={col.instalasi}
           items={keranjangInstalasi}
           tableKey={`${selectedProgress}-instalasi`}
           summaryLabel="Sub Total Harga Instalasi :"
-          renderCell={renderCell.keranjangproyek}
           className={sTable}
-          topContent={<></>}
+          onEdit={editButtonPress}
         />
       </div>
       {/* edit produk */}
@@ -1604,7 +1304,7 @@ export default function App({ id, versi, user }) {
                 <Button
                   color="danger"
                   variant="flat"
-                  onClick={() => {
+                  onPress={() => {
                     setForm({});
                     onClose();
                   }}
@@ -1614,7 +1314,7 @@ export default function App({ id, versi, user }) {
                 <Button
                   color="primary"
                   variant="solid"
-                  onClick={() => simpanButtonPress(form, onClose)}
+                  onPress={() => simpanButtonPress(form, onClose)}
                 >
                   Simpan
                 </Button>
@@ -1882,11 +1582,5 @@ const TableBottom = ({ title = "", tableData }) => (
     <div>
       <RecapTable tableData={tableData} />
     </div>
-  </div>
-);
-
-const TableSummary = ({ children }) => (
-  <div className="flex justify-end">
-    <div className="text-right sticky right-3">{children}</div>
   </div>
 );

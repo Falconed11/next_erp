@@ -20,5 +20,6 @@ export function defaultSave(endPoint, form) {
 export function defaultDelete(endPoint, id) {
   return apiFetch(`${API_PATH}${endPoint}/${id}`, {
     method: "DELETE",
+    body: JSON.stringify({ id }),
   });
 }

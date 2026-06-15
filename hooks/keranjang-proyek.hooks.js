@@ -1,10 +1,12 @@
-import { KERANJANG_PROYEK_ENDPOINT } from "@/services/keranjang-proyek.service";
+import { KERANJANG_PROYEK_ENDPOINT_v2 } from "@/services/keranjang-proyek.service";
 import { useDefaultSumFetch } from "./useDefault";
 import { useClientFetchNoInterval } from "./useClientFetch";
 import { urlBuilder } from "@/app/utils/tools";
 
 export const useGetOfferingSummary = (id_proyek) =>
-  useClientFetchNoInterval(`${KERANJANG_PROYEK_ENDPOINT}/${id_proyek}/summary`);
+  useClientFetchNoInterval(
+    `${KERANJANG_PROYEK_ENDPOINT_v2}/${id_proyek}/summary`,
+  );
 // export const useSumPengeluaranProyek = (periode, aggregate, id_perusahaan) => {
 //   return useDefaultSumFetch({
 //     endPoint: PENGELUARAN_PROYEK_ENDPOINT,

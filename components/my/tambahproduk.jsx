@@ -29,6 +29,7 @@ export default function TambahProduk({
   disableCustomValue,
   user,
 }) {
+  console.log({ disableStok });
   const isCreateNewProduct = !!(!form.id_produk && form.produk);
   const isFilterActive = !!(form.id_kategori || form.id_merek);
   const { id_kategori: idKategori, id_merek: idMerek } = form;
@@ -243,7 +244,7 @@ export default function TambahProduk({
           value={form.hargamodal || ""}
           label={<>Harga Modal (Ref: {<Harga harga={form.oldHargaModal} />})</>}
           placeholder="Masukkan harga!"
-          className={`${defStyleFormWidth} ${hideComponent}`}
+          className={`${defStyleFormWidth}`}
           onValueChange={(v) =>
             setForm({
               ...form,

@@ -4,6 +4,7 @@ import {
   renderQueryStates,
   set2key,
   updateForm,
+  updateSwitch,
 } from "@/app/utils/tools";
 import {
   Badge,
@@ -19,6 +20,8 @@ import {
   ModalHeader,
   Select,
   SelectItem,
+  Spinner,
+  Switch,
   Table,
   TableBody,
   TableCell,
@@ -838,7 +841,6 @@ export const MyCheckBox = ({
     {children}
   </Checkbox>
 );
-
 /**
  * A component that conditionally wraps its children with a specific element or structure.
  *
@@ -848,3 +850,43 @@ export const MyCheckBox = ({
  */
 export const ConditionalWrapper = ({ condition, wrapper, children }) =>
   condition ? wrapper(children) : <>{children}</>;
+export const MySwitch = ({
+  children,
+  id,
+  isDisabled,
+  size = "sm",
+  isSelected,
+  apiEndpoint,
+  fieldId = "id",
+  fieldSwitch = "isSelected",
+  referenceData = [],
+  autoSave = false,
+  onValueChange = () => {},
+}) => {
+  return (
+    <Switch
+      isDisabled={isDisabled}
+      size={size}
+      isSelected={isSelected}
+      onValueChange={async (val) => {
+        if (autoSave) {
+          await updateSwitch(
+            val,
+            isSelected,
+            apiEndpoint,
+            "PUT",
+            {
+              [fieldId]: id,
+              [fieldSwitch]: val ? 1 : 0,
+            },
+            referenceData,
+          );
+          return;
+        }
+        onValueChange(val);
+      }}
+    >
+      {children}
+    </Switch>
+  );
+};

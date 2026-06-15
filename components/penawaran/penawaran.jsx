@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import TambahProduk from "../my/tambahproduk";
 import {
   Button,
@@ -32,7 +32,10 @@ export const TambahProdukPenawaran = ({
   const rank = sessUser?.rank;
   ``;
   const fieldTanggal = "tanggalHarga";
-  const [form, setForm] = useState({ [fieldTanggal]: getDate(new Date()) });
+  const [form, setForm] = useState({});
+  useEffect(() => {
+    setForm({ [fieldTanggal]: getDate(new Date()) });
+  }, []);
   const tambahButtonPress = async () => {
     const jumlah = form.jumlah;
     if (!form.selectProduk && !form.produk)
@@ -72,7 +75,7 @@ export const TambahProdukPenawaran = ({
       <div
         className={`flex flex-col gap-2 w-80 overflow-y-scroll overscroll-y-contain h-150`}
       >
-        <TambahProdukPenawaran
+        <TambahProduk
           className={``}
           form={form}
           setForm={setForm}
