@@ -10,7 +10,7 @@ export const DefaultNumberInput = ({
   placeholder,
   className,
   endContent,
-  value = form[field] || "",
+  value = form?.[field] || "",
   onValueChange = (v) => setForm((prev) => updateForm(prev, { [field]: v })),
 }) => (
   <NumberInput

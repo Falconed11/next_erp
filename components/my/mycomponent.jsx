@@ -753,8 +753,8 @@ export const MyDatePicker = ({
   useEffect(() => {
     setValue(dateMysqlToHeroUI(getDate(form[field] || null)));
   }, []);
-  if (minValue) minValue = mysqldate2heroUI(minValue);
-  if (maxValue) maxValue = mysqldate2heroUI(maxValue);
+  if (minValue) minValue = dateMysqlToHeroUI(minValue);
+  if (maxValue) maxValue = dateMysqlToHeroUI(maxValue);
   return (
     <I18nProvider locale="id-ID">
       <div className="flex gap-2">
@@ -802,9 +802,11 @@ export const MyMinMaxDatePicker = ({
   extraFieldEnd = {},
 }) => {
   const { [fieldStart]: from, [fieldEnd]: to } = form;
-  const currentTime = today(getLocalTimeZone());
+  const currentTime = getDate(new Date());
+  // const currentTime = today(getLocalTimeZone());
   return (
     <>
+      {/* from */}
       <MyDatePicker
         maxValue={to || currentTime}
         form={form}
@@ -813,6 +815,7 @@ export const MyMinMaxDatePicker = ({
         field={fieldStart}
         extraField={extraFieldStart}
       />
+      {/* to */}
       <MyDatePicker
         minValue={from}
         maxValue={currentTime}

@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Table,
   TableHeader,
@@ -16,6 +16,8 @@ import {
   Button,
   Input,
   Checkbox,
+  Select,
+  SelectItem,
 } from "@heroui/react";
 import { useClientFetch } from "@/hooks/useClientFetch";
 import { getDate, getDateFId } from "@/app/utils/date";
@@ -26,8 +28,10 @@ import {
 } from "@/services/transaksi.service";
 import {
   highRoleCheck,
+  key2set,
   renderQueryStates,
   rolesCheck,
+  set2key,
   updateForm,
   useDebounce,
 } from "@/app/utils/tools";
@@ -37,7 +41,10 @@ import {
   MyDateRangePicker,
   MyMinMaxDatePicker,
 } from "@/components/my/mycomponent";
-import { renderDefaultTableCell } from "@/components/default/DefaultTable";
+import {
+  renderDefaultTableCell,
+  TableWithActiveStatus,
+} from "@/components/default/DefaultTable";
 import { NumberComp } from "@/components/my/harga";
 import { useTransaksiColumns } from "@/hooks/useTransaksi.hooks";
 import { ModalJurnal } from "@/components/transaksi/transaksi";
@@ -47,10 +54,16 @@ import { SelectPerusahaan } from "@/components/perusahaan/perusahaan";
 import { AutocompleteProyek } from "@/components/proyek/proyek";
 import { AutocompleteCoa } from "@/components/coa/coa";
 import { AutocompleteCustomer } from "@/components/my/myautocomplete";
+import { FaFilter } from "react-icons/fa";
+import DefaultSelect from "@/components/default/DefaultSelect";
 
 export default function TransaksiUI({ user }) {
   const sessionUser = user;
   const [page, setPage] = useState(1);
+  const [sortDescriptor, setSortDescriptor] = useState({
+    column: "tanggal",
+    direction: "descending",
+  });
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const offset = (page - 1) * rowsPerPage;
   const [form, setForm] = useState({
@@ -61,12 +74,14 @@ export default function TransaksiUI({ user }) {
     transaksi: [],
     method: "POST",
   });
-
   const [filter, setFilter] = useState({});
   const debouncedJurnal = useDebounce(filter.jurnal, 500);
   const [isShowAuditFields, setIsShowAuditFields] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isHovered, setIsHovered] = useState("");
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
+  useEffect(() => console.log(sortDescriptor), [sortDescriptor]);
 
   const params = [
     ...(debouncedJurnal
@@ -82,7 +97,7 @@ export default function TransaksiUI({ user }) {
     ...(filter.id_instansi ? [`id_instansi=${filter.id_instansi}`] : []),
   ].join("&");
   const transaksiData = useClientFetch(
-    `${TRANSAKSI_ENDPOINT}?limit=${rowsPerPage}&offset=${offset}&${params}`,
+    `${TRANSAKSI_ENDPOINT}?limit=${rowsPerPage}&offset=${offset}&${params}&sort=${sortDescriptor.direction === "descending" ? "-" : ""}${sortDescriptor.column}`,
   );
 
   const handleEditForm = async (data) => {
@@ -99,6 +114,8 @@ export default function TransaksiUI({ user }) {
     rolesCheck(["admin"], sessionUser?.peran);
   const columns = useTransaksiColumns(isAuthorized, isShowAuditFields);
 
+  useEffect(() => console.log(form), [form]);
+
   const loadingState = transaksiData?.isLoading ? "loading" : "idle";
   const queryState = renderQueryStates({});
   if (queryState) return queryState;
@@ -110,12 +127,12 @@ export default function TransaksiUI({ user }) {
       keterangan: "",
       id_perusahaan: "",
       id_proyek: "",
-      transaksi: [],
+      transaksi: [{ tipe: 1 }, { tipe: 0 }],
       method: "POST",
     });
     onOpen();
   };
-  const handleSubmitForm = async (onClose) => {
+  const onSave = async (onClose) => {
     if (!form.tanggal || !form.id_perusahaan) {
       return alert("Tanggal dan Perusahaan harus diisi");
     }
@@ -135,7 +152,7 @@ export default function TransaksiUI({ user }) {
     } finally {
     }
   };
-  const handleDelete = async (id, { id_jurnal }) => {
+  const onDelete = async (id, { id_jurnal }) => {
     if (!confirm(`Hapus jurnal id: ${id_jurnal}?`)) return;
 
     try {
@@ -147,6 +164,9 @@ export default function TransaksiUI({ user }) {
     }
   };
 
+  const extraFields = (form, setForm, isFilter) => (
+    <LaporanRelationForm form={form} setForm={setForm} isFilter={isFilter} />
+  );
   const addExtraColumnHandlers = (data) => {
     return {
       tanggal: () => getDateFId(data.tanggal),
@@ -162,13 +182,15 @@ export default function TransaksiUI({ user }) {
         ),
     };
   };
+  const validateSortColumn = (columnKey) =>
+    ["tanggal", "keterangan_jurnal"].includes(columnKey);
   // console.log(filter);
   return (
     <div className="">
       <ModalJurnal
         form={form}
         setForm={setForm}
-        onSubmit={handleSubmitForm}
+        onSubmit={onSave}
         isOpen={isOpen}
         onOpenChange={onOpenChange}
         isLoading={isLoading}
@@ -176,6 +198,8 @@ export default function TransaksiUI({ user }) {
       {/* Transaksi Table */}
       <Table
         isStriped
+        sortDescriptor={sortDescriptor}
+        onSortChange={setSortDescriptor}
         className="w-400 bg-white p-3 rounded-xl"
         classNames={buildTableClassNames({
           sWrapper:
@@ -219,6 +243,21 @@ export default function TransaksiUI({ user }) {
                   </div>
                 </PopoverContent>
               </Popover>
+              <div className="flex w-full max-w-xs flex-col gap-2">
+                <Select
+                  label="Baris per halaman"
+                  isRequired
+                  disallowEmptySelection
+                  selectedKeys={key2set(rowsPerPage)}
+                  onSelectionChange={(keys) => setRowsPerPage(set2key(keys))}
+                >
+                  {[10, 25, 50, 100].map((val) => (
+                    <SelectItem key={val} value={val} textValue={val}>
+                      {val}
+                    </SelectItem>
+                  ))}
+                </Select>
+              </div>
               <Checkbox
                 isSelected={isShowAuditFields}
                 onValueChange={setIsShowAuditFields}
@@ -244,15 +283,24 @@ export default function TransaksiUI({ user }) {
         }
       >
         <TableHeader columns={columns}>
-          {(column) => (
-            <TableColumn
-              key={column.key}
-              align={column.key === "aksi" ? "center" : "start"}
-              // allowsSorting
-            >
-              {column.label}
-            </TableColumn>
-          )}
+          {(column) => {
+            const { key } = column;
+            const isSortable = validateSortColumn(key);
+            return (
+              <TableColumn
+                key={key}
+                align={key === "aksi" ? "center" : "start"}
+                allowsSorting={isSortable}
+                onMouseEnter={() => setIsHovered(key)}
+                onMouseLeave={() => setIsHovered("")}
+              >
+                {column.label}{" "}
+                {isSortable &&
+                  sortDescriptor.column !== key &&
+                  isHovered !== key && <FaFilter className="inline" />}
+              </TableColumn>
+            );
+          }}
         </TableHeader>
         <TableBody
           items={transaksiData?.data?.data ?? []}
@@ -269,13 +317,13 @@ export default function TransaksiUI({ user }) {
                       ? "right"
                       : "start"
                   }
-                  className={"whitespace-nowrap"}
+                  className={"overflow-y-auto whitespace-nowrap"}
                 >
                   {renderDefaultTableCell({
                     data: item,
                     columnKey,
                     onEdit: handleEditForm,
-                    onDelete: handleDelete,
+                    onDelete: onDelete,
                     addExtraColumnHandlers,
                   })}
                 </TableCell>
@@ -284,6 +332,14 @@ export default function TransaksiUI({ user }) {
           )}
         </TableBody>
       </Table>
+      {/* <TableWithActiveStatus
+        endPoint={TRANSAKSI_ENDPOINT}
+        rowsPerPage={25}
+        name="Jurnal Transaksi"
+        onDelete={onDelete}
+        onSave={onSave}
+        extraFields={extraFields}
+      /> */}
     </div>
   );
 }

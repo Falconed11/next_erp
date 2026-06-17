@@ -61,6 +61,10 @@ export const ModalJurnal = ({
       ),
     [form.transaksi],
   );
+  const isEmptyCoa = useMemo(
+    () => form.transaksi.some((item) => !item?.id_coa),
+    [form.transaksi],
+  );
   totals.difference = Math.abs(totals.debit - totals.kredit);
   totals.isBalanced = totals.difference <= 0.01;
   const handleAddTransaksi = () => {
@@ -152,7 +156,7 @@ export const ModalJurnal = ({
                     <Button
                       isIconOnly
                       className="bg-blue-500 text-white"
-                      onClick={handleAddTransaksi}
+                      onPress={handleAddTransaksi}
                     >
                       <AddIcon />
                     </Button>
@@ -242,10 +246,13 @@ export const ModalJurnal = ({
                       ? []
                       : ["Debit dan Kredit harus sama (seimbang)"]),
                     ...(!(totals.debit || totals.kredit)
-                      ? ["Debit atau Kredit harus diisi"]
+                      ? ["Jumlah harus diisi"]
                       : []),
                     ...(duplicateCoa
                       ? [`COA "${duplicateCoa}" tidak boleh duplikat`]
+                      : []),
+                    ...(isEmptyCoa
+                      ? ["Semua transaksi harus memiliki COA"]
                       : []),
                   ].map((msg, i) => (
                     <div
@@ -261,19 +268,21 @@ export const ModalJurnal = ({
               </ModalBody>
             )}
             <ModalFooter>
-              <Button color="danger" variant="solid" onClick={onClose}>
+              <Button color="danger" variant="solid" onPress={onClose}>
                 Batal
               </Button>
               <Button
                 color="primary"
                 variant="solid"
-                onClick={() => onSubmit(onClose)}
+                onPress={() => onSubmit(onClose)}
                 isDisabled={
                   totals.difference > 0.01 ||
                   !form.id_perusahaan ||
                   !form.tanggal ||
                   form.transaksi.length < 2 ||
-                  !(totals.debit || totals.kredit)
+                  !(totals.debit || totals.kredit) ||
+                  duplicateCoa ||
+                  isEmptyCoa
                 }
               >
                 Simpan

@@ -16,15 +16,10 @@ import {
   LAPORAN_RELATION_ENDPOINT,
   saveLaporanRelation,
 } from "@/services/laporan/laporan-relation.service";
-import { Divider } from "@heroui/react";
 
 export default function App({ user }) {
   const queryStates = renderQueryStates({});
   if (queryStates) return queryStates;
-  const CustomDivider = () => (
-    <Divider orientation="horizontal" className="bg-primary" />
-  );
-
   return (
     <div className="flex flex-col gap-2">
       <TableWithActiveStatus
@@ -33,10 +28,6 @@ export default function App({ user }) {
         name={"Laporan Relation"}
         onDelete={deleteLaporanRelation}
         onSave={saveLaporanRelation}
-        // disableNama
-        // extraFields={(form, setForm) => (
-        //   <LaporanRelationForm form={form} setForm={setForm} isFilter={false} />
-        // )}
         extraFields={(form, setForm, isFilter) => (
           <LaporanRelationForm
             form={form}
