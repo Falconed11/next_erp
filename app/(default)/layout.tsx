@@ -122,7 +122,7 @@ export default async function RootLayout({
           }
         : {}),
     },
-    // vendor, bank, karyawan, coa, transaksi, laporan, perusahaan
+    // vendor, bank, karyawan, akuntansi, transaksi, laporan, perusahaan
     ...([...highRoles, "admin"].includes(user.peran)
       ? [
           // vendor
@@ -165,10 +165,10 @@ export default async function RootLayout({
               },
             ],
           },
-          // coa
+          // akuntansi
           {
             href: "/coa",
-            name: "COA",
+            name: "Akuntansi",
             icon: <MdOutlineAccountTree />,
             dropdown: [
               {

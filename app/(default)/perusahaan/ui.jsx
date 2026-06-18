@@ -210,15 +210,21 @@ export default function App({ user }) {
                   value={form.nama}
                   onValueChange={(v) => setForm({ ...form, nama: v })}
                 />
-                <Image
-                  src={
-                    form.newLogo ? URL.createObjectURL(form.newLogo) : form.logo
-                  }
-                  alt="Preview Logo"
-                  width={40}
-                  height={40}
-                  unoptimized
-                />
+                {form.logo || form.newLogo ? (
+                  <Image
+                    src={
+                      form.newLogo
+                        ? URL.createObjectURL(form.newLogo)
+                        : form.logo
+                    }
+                    alt="Preview Logo"
+                    width={40}
+                    height={40}
+                    unoptimized
+                  />
+                ) : (
+                  "Gambar Belum Dipilih"
+                )}
                 <Input
                   type="file"
                   label="Logo"

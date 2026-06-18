@@ -1348,7 +1348,7 @@ export default function App({ id, versi, user }) {
                     </span>
                   </div> */}
                   {/* {Logo} */}
-                  {selectedProyek.logoperusahaan ? (
+                  {selectedProyek.logoperusahaan && (
                     <div className="flex flex-row items-center">
                       <Image
                         src={selectedProyek.logoperusahaan || null}
@@ -1399,8 +1399,6 @@ export default function App({ id, versi, user }) {
                       </>
                     )} */}
                     </div>
-                  ) : (
-                    "Perusahaan Belum Dipilih"
                   )}
                   <Divider className="bg-sky-500 my-1 py-1" />
                   {/* <hr className="my-3 bg-sky-500 h-5" /> */}
