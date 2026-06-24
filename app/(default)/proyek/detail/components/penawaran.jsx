@@ -40,7 +40,6 @@ export const ProductTableSection = ({
   items,
   tableKey,
   summaryLabel,
-  renderCell,
   onEdit,
   topContent = null,
   className,
@@ -59,7 +58,7 @@ export const ProductTableSection = ({
       }
     }
   };
-  renderCell = useCallback(
+  const renderCell = useCallback(
     (data, columnKey) => {
       const cellValue = data[columnKey];
       const isChecked = (v) => {

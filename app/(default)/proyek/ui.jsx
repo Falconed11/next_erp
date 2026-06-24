@@ -43,6 +43,7 @@ import {
   renderQueryStates,
   rolesCheck,
   set2key,
+  updateForm,
   useDebounce,
 } from "@/app/utils/tools";
 import { UpdateShowHide } from "@/components/my/input";
@@ -1101,19 +1102,10 @@ export default function App({
                   variant="bordered"
                   placeholder="Pilih status!"
                   disallowEmptySelection
-                  selectedKeys={
-                    new Set(
-                      form.id_statusproyek
-                        ? [String(form.id_statusproyek)]
-                        : [],
-                    )
-                  }
+                  selectedKeys={key2set(form.id_statusproyek)}
                   className="max-w-xs"
                   onSelectionChange={(val) => {
-                    setForm((prev) => ({
-                      ...prev,
-                      id_statusproyek: key2set(val),
-                    }));
+                    updateForm(setForm, { id_statusproyek: set2key(val) });
                   }}
                 >
                   {statusproyek.data.map((item) => (

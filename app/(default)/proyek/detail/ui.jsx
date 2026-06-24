@@ -483,6 +483,9 @@ export default function App({ id, versi, user }) {
     statusProyek,
     subProyek,
   });
+  useEffect(() => {
+    console.log(isAuthorized);
+  }, [isAuthorized]);
   if (QueryStates) return QueryStates;
   if (!selectedProyek) return <>Proyek tidak ditemukan</>;
   const col = {
