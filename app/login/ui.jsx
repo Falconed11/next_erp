@@ -34,6 +34,7 @@ export default function App({ error, redirect }) {
       setIsLoading(false);
       return alert(err.message || "An error occurred while logging in.");
     }
+    router.refresh();
     router.push(redirect || "/dashboard");
   };
 
