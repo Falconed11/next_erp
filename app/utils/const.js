@@ -4,6 +4,8 @@ import { apiFetch } from "./fetchHelper";
 
 export const api_path = getApiPath();
 
+export const EXPRESS_PATH = process.env.NEXT_PUBLIC_EXPRESS_PATH;
+
 export const updateSwitch = async (
   switchValue,
   currentValue,

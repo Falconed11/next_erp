@@ -29,7 +29,6 @@ export default function TambahProduk({
   disableCustomValue,
   user,
 }) {
-  console.log({ disableStok });
   const isCreateNewProduct = !!(!form.id_produk && form.produk);
   const isFilterActive = !!(form.id_kategori || form.id_merek);
   const { id_kategori: idKategori, id_merek: idMerek } = form;

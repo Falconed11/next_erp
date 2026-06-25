@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import {
   Table,
@@ -36,6 +36,7 @@ import { Button } from "@heroui/react";
 import { Input, Textarea } from "@heroui/react";
 import { useClientFetch } from "@/hooks/useClientFetch";
 import { apiFetch } from "@/app/utils/fetchHelper";
+import { EXPRESS_PATH } from "@/app/utils/const";
 
 const api_path = getApiPath();
 
@@ -95,7 +96,7 @@ export default function App({ user }) {
         case "logo":
           return (
             <Image
-              src={data.logo}
+              src={`${EXPRESS_PATH}${data.logo}`}
               alt="Company Logo"
               width={40}
               height={40}
@@ -160,11 +161,15 @@ export default function App({ user }) {
     perusahaan: useDisclosure(),
   };
 
+  useEffect(() => {
+    console.log(EXPRESS_PATH);
+  }, [EXPRESS_PATH]);
+
   const queryState = renderQueryStates({ perusahaan });
   if (queryState) return queryState;
   if (!rolesCheck(["admin", "super", "owner"], user?.peran))
     return <div>Anda tidak memiliki akses pada laman ini.</div>;
-  console.log(form);
+  // console.log(form);
   return (
     <div>
       <Button onPress={tambahButtonPress} color="primary" variant="solid">

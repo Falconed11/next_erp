@@ -93,7 +93,7 @@ import {
   createTable,
   RecapTable,
 } from "./components/rekap";
-import { NEXT_DOMAIN } from "@/app/utils/const";
+import { EXPRESS_PATH, NEXT_DOMAIN } from "@/app/utils/const";
 import { TemplateImportV2 } from "@/components/my/input";
 import { BadgeStatusProyek } from "@/components/my/badgestatusproyek";
 import { useClientFetch } from "@/hooks/useClientFetch";
@@ -1354,7 +1354,9 @@ export default function App({ id, versi, user }) {
                   {selectedProyek.logoperusahaan && (
                     <div className="flex flex-row items-center">
                       <Image
-                        src={selectedProyek.logoperusahaan || null}
+                        src={
+                          EXPRESS_PATH + selectedProyek.logoperusahaan || null
+                        }
                         alt="Company Logo"
                         width={40}
                         height={40}

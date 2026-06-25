@@ -47,11 +47,11 @@ const api_path = getApiPath();
 
 export default function App({ user }) {
   const sessUser = user;
-  // const user = useClientFetch(
-  //   sessUser
-  //     ? `user?id=${sessUser.id}&peran=${sessUser.peran}&rank=${sessUser.rank}`
-  //     : null,
-  // );
+  const users = useClientFetch(
+    sessUser
+      ? `user?id=${sessUser.id}&peran=${sessUser.peran}&rank=${sessUser.rank}`
+      : null,
+  );
   const karyawan = useClientFetch(`karyawan?id_statuskaryawan=1`);
   const peran = useClientFetch(
     sessUser ? `peran?peran=${sessUser.peran}&rank=${sessUser.rank}` : null,
@@ -148,7 +148,7 @@ export default function App({ user }) {
     }, []),
   };
   const col = {
-    user: [
+    users: [
       {
         key: "aksi",
         label: "Aksi",
@@ -171,7 +171,7 @@ export default function App({ user }) {
     user: useDisclosure(),
   };
 
-  const QueryStates = renderQueryStates({ karyawan, user, peran });
+  const QueryStates = renderQueryStates({ karyawan, peran });
   if (QueryStates) return QueryStates;
   const isHighRole = highRoleCheck(sessUser.rank);
   // if (user?.peran != "super")
@@ -190,7 +190,7 @@ export default function App({ user }) {
           />
         }
       >
-        <TableHeader columns={col.user}>
+        <TableHeader columns={col.users}>
           {(column) => (
             <TableColumn
               key={column.key}
@@ -200,7 +200,7 @@ export default function App({ user }) {
             </TableColumn>
           )}
         </TableHeader>
-        <TableBody items={user.data}>
+        <TableBody items={users.data}>
           {(item) => (
             <TableRow key={item.id}>
               {(columnKey) => (

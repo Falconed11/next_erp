@@ -203,7 +203,7 @@ export const ProductTableSection = ({
           return cellValue;
       }
     },
-    [user],
+    [user, isAuthorized],
   );
   const subTotalHarga = items.reduce(
     (total, item) => total + (item.jumlah || 0) * (item.harga || 0),

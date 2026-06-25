@@ -396,7 +396,10 @@ export default function App({
                 }`}
                 icon={<NoteIcon />}
               />
-              {rolesCheck(["super", "admin", "sales", "owner"], peran) && (
+              {rolesCheck(
+                ["super", "admin", "head-sales", "sales", "owner"],
+                peran,
+              ) && (
                 <Tooltip content="Proses (Pengeluaran & Pembayaran)">
                   <Link href={`/proyek/detail/proses?id=${data.id}`}>
                     <span

@@ -26,6 +26,10 @@ const nextConfig = {
         source: "/api/express/:path*",
         destination: "http://127.0.0.1:3001/api/:path*",
       },
+      {
+        source: "/express/:path*",
+        destination: "http://127.0.0.1:3001/:path*",
+      },
     ];
   },
 };

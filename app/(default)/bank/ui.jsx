@@ -129,7 +129,9 @@ export default function App({ user }) {
     onOpen();
   };
   const transferButtonPress = (data) => {
+    console.log(data);
     setForm({
+      ...data,
       currentId: data.id,
       nama: data.nama,
     });
@@ -350,6 +352,8 @@ export default function App({ user }) {
         ]
       : []),
   ];
+  const buildMetodePembayaranName = (data) =>
+    `${data.nama} | ${data.namabank} | ${data.norekening} | ${data.atasnama} | ${data.perusahaan}`;
   return (
     <div className="flex gap-2">
       <Bank bank={bank} user={user} />
@@ -531,7 +535,7 @@ export default function App({ user }) {
                   isDisabled
                   type="text"
                   label="Bank asal"
-                  defaultValue={form.nama}
+                  defaultValue={buildMetodePembayaranName(form)}
                   className="max-w-xs"
                 />
                 <Select
@@ -549,11 +553,21 @@ export default function App({ user }) {
                     });
                   }}
                 >
-                  {metodepembayaran.data?.map((item) => (
-                    <SelectItem key={item.id} value={item.id}>
-                      {item.nama}
-                    </SelectItem>
-                  ))}
+                  {metodepembayaran.data?.map((item) => {
+                    const metodePembayaranName =
+                      buildMetodePembayaranName(item);
+                    return (
+                      item.id != form.id && (
+                        <SelectItem
+                          key={item.id}
+                          value={item.id}
+                          textValue={metodePembayaranName}
+                        >
+                          {metodePembayaranName}
+                        </SelectItem>
+                      )
+                    );
+                  })}
                 </Select>
                 {/* <Input
                   type="text"

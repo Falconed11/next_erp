@@ -10,11 +10,13 @@ import React, {
 import * as XLSX from "xlsx";
 import Link from "next/link";
 import {
+  addToast,
   Autocomplete,
   AutocompleteItem,
   Checkbox,
   Form,
   NumberInput,
+  ToastProvider,
 } from "@heroui/react";
 import {
   Table,
@@ -201,10 +203,19 @@ export default function App({ id, user }) {
         }),
       });
       const json = await res.json();
+      addToast({
+        title: "Sukses",
+        description: "Produk berhasil disimpan.",
+        color: "success",
+      });
       produk.mutate();
       onClose();
     } catch (error) {
-      alert(error.message || "Save failed");
+      addToast({
+        title: "Gagal",
+        description: error.message || "Produk gagal disimpan.",
+        color: "danger",
+      });
     }
   };
   const tambahButtonPress = () => {
@@ -272,15 +283,23 @@ export default function App({ id, user }) {
   const onSave = async (onClose) => {
     // if (form.isSwasta.size == 0) return alert("Swasta/Negri belum diisi");
     try {
-      const json = await apiFetch(`${apiPath}transferproduk`, {
+      const res = await apiFetch(`${apiPath}transferproduk`, {
         method: "PUT",
         body: JSON.stringify({ curId, newId }),
       });
       produk.mutate();
-      alert(json.message);
+      addToast({
+        title: "Sukses",
+        description: "Transfer Berhasil",
+        color: "success",
+      });
       onClose();
     } catch (error) {
-      alert(error.message || "Transfer failed");
+      addToast({
+        title: "Gagal",
+        description: error.message || "Transfer failed",
+        color: "danger",
+      });
     }
     //return alert(json.message);
   };
@@ -468,6 +487,8 @@ export default function App({ id, user }) {
             </div>
           );
         case "nprodukmasuk":
+          return harga(cellValue);
+        case "npengeluaranproyek":
           return harga(cellValue);
         case "created_at":
           return getDateTimeF(cellValue);
@@ -657,6 +678,10 @@ export default function App({ id, user }) {
       key: "nprodukmasuk",
       label: "Jumlah Produk Masuk",
     },
+    {
+      key: "npengeluaranproyek",
+      label: "Jumlah Pengeluaran Proyek",
+    },
   ];
 
   // let filteredsubkategori = [
@@ -691,6 +716,7 @@ export default function App({ id, user }) {
 
   return (
     <div className="flex flex-col gap-2">
+      <ToastProvider placement="top-center" />
       {true && (
         // <div className="w-3/4">
         <Table

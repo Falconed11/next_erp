@@ -271,12 +271,11 @@ export default async function RootLayout({
           },
         ]
       : []),
-    // user, alat
+    // user
+    { href: "/user", name: "User", icon: <FaRegUser /> },
+    // alat
     ...(user.peran == "super"
-      ? [
-          { href: "/user", name: "User", icon: <FaRegUser /> },
-          { href: "/alat", name: "Alat", icon: <LiaToolsSolid /> },
-        ]
+      ? [{ href: "/alat", name: "Alat", icon: <LiaToolsSolid /> }]
       : []),
   ];
   return (

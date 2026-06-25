@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, use, useEffect } from "react";
 import {
   Table,
   TableHeader,
@@ -600,6 +600,9 @@ export default function App({ id, user }) {
       },
     ],
   };
+  // useEffect(() => {
+  //   console.log(proyekSummary);
+  // }, [proyekSummary]);
   const queryStates = renderQueryStates({
     dataBiayaProduksi,
     proyek,
@@ -624,8 +627,16 @@ export default function App({ id, user }) {
       keranjangInstalasi.data,
       rekapitulasiProyek.data[0] ?? {},
     );
-  const provit = omset - biayaProduksi;
+  console.log(rekapitulasiTotal);
+  const {
+    modal: estimasiModal,
+    provit: estimasiProvit,
+    provitPersen: estimasiProvitPersen,
+    pajak,
+  } = rekapitulasiTotal;
+  const provit = (omset || 0) - (biayaProduksi || 0) - pajak;
   const variant = "bordered";
+  console.log(omset, biayaProduksi, pajak);
   return (
     <div className="flex flex-col gap-2 w-full-">
       <div className="flex gap-2">
@@ -654,6 +665,10 @@ export default function App({ id, user }) {
               comp: selectedProyek.namakaryawan,
             },
             {
+              key: "Estimas Biaya Produksi",
+              comp: <Harga harga={estimasiModal} />,
+            },
+            {
               key: "Biaya Produksi",
               comp: <Harga harga={biayaProduksi} />,
             },
@@ -665,22 +680,35 @@ export default function App({ id, user }) {
               key: "Nilai Proyek",
               comp: <Harga harga={nilai_proyek} />,
             },
+            {
+              key: "Pajak",
+              comp: <Harga harga={pajak} />,
+            },
             ...(isHighRole
               ? [
+                  {
+                    key: "Estimasi Provit",
+                    comp: <Harga harga={estimasiProvit} />,
+                  },
                   {
                     key: "Provit",
                     comp: <Harga harga={provit} />,
                   },
                   {
+                    key: "Estimasi Provit Persen",
+                    comp: `${estimasiProvitPersen}%`,
+                  },
+                  {
                     key: "Provit Persen",
-                    comp: `${countPercentProvit(biayaProduksi, omset).toFixed(
-                      2,
-                    )}%`,
+                    comp: `${countPercentProvit(
+                      biayaProduksi,
+                      omset - pajak,
+                    ).toFixed(2)}%`,
                   },
                 ]
               : []),
           ].map((o, i) => (
-            <div key={i} className="grid grid-cols-2">
+            <div key={i} className="grid grid-cols-2 hover:bg-slate-200">
               <div className="">{o.key}</div>
               <div className="text-right">{o.comp}</div>
             </div>

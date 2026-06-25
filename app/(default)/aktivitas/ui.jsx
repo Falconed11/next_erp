@@ -327,7 +327,7 @@ export default function App({ id, curDate, user }) {
           <Button
             color="primary"
             variant="solid"
-            onClick={() => {
+            onPress={() => {
               setForm({ tanggal: new Date(), method: "POST" });
               modal.aktivitassales.onOpen();
             }}
