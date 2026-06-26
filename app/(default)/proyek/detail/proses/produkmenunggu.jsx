@@ -14,10 +14,15 @@ import {
   Tooltip,
 } from "@heroui/react";
 import { getDate } from "@/app/utils/date";
-import Harga from "@/components/my/harga";
+import Harga, { NumberComp } from "@/components/my/harga";
 import { getApiPath } from "@/app/utils/apiconfig";
-import { key2set, set2key, renderQueryStates } from "@/app/utils/tools";
-import { useCallback } from "react";
+import {
+  key2set,
+  set2key,
+  renderQueryStates,
+  updateForm,
+} from "@/app/utils/tools";
+import { useCallback, useEffect } from "react";
 import { AddIcon, DeleteIcon, EditIcon } from "@/components/my/icon";
 import { OpenBlueLinkInNewTab } from "@/components/my/mycomponent";
 import { useClientFetch } from "@/hooks/useClientFetch";
@@ -29,10 +34,13 @@ const ProdukMenunggu = ({
   setForm,
   isAuthorized,
   onScroll = () => {},
+  refreshKey = 0,
 }) => {
   const produkmenunggu = useClientFetch(
     `v2/proyek/${id_proyek}/produkmenunggu`,
   );
+
+  useEffect(() => {}, [refreshKey]);
   const renderCell = useCallback((data, columnKey) => {
     const cellValue = data[columnKey];
     switch (columnKey) {
@@ -45,6 +53,12 @@ const ProdukMenunggu = ({
           <div className="text-right">
             <Harga harga={cellValue} />
           </div>
+        );
+      case "hargamodalpenawaran":
+        return <NumberComp value={cellValue} />;
+      case "totalharga":
+        return (
+          <NumberComp value={data.produkmenunggu * data.hargamodalpenawaran} />
         );
       case "stok":
         return (
@@ -67,18 +81,22 @@ const ProdukMenunggu = ({
       case "aksi":
         return (
           <div className="relative flex items-center gap-2">
-            <Tooltip content="Tambah ke Pengeluaran">
+            <Tooltip content="Tambah ke Input Pengeluaran">
               <span
                 onClick={() => {
-                  setForm({
-                    ...form,
+                  const isStockReady = !!+data.stok;
+                  updateForm(setForm, {
                     ...data,
-                    isSelected: false,
+                    isSelected: isStockReady,
                     id_produk: data.id,
                     produk: data.nama,
                     id_kategori: data.idkategoriproduk,
                     id_merek: data.idmerek,
-                    harga: data.hargamodal,
+                    harga: isStockReady
+                      ? data.hargamodal
+                      : data.hargamodalpenawaran,
+                    jumlah: data.produkmenunggu,
+                    keteranganpengeluaranproyek: isStockReady ? "SN: " : "",
                   });
                   onScroll();
                 }}
@@ -125,12 +143,20 @@ const ProdukMenunggu = ({
       label: "Tipe",
     },
     {
+      key: "stok",
+      label: "Stok",
+    },
+    {
       key: "produkmenunggu",
       label: "Produk Menunggu",
     },
     {
-      key: "stok",
-      label: "Stok",
+      key: "hargamodalpenawaran",
+      label: "Harga Satuan",
+    },
+    {
+      key: "totalharga",
+      label: "Total Harga",
     },
     {
       key: "keterangan",

@@ -63,6 +63,7 @@ import {
   useCalculatePengeluaranProyekByid,
 } from "@/hooks/proyek.hooks";
 import { useGetOfferingSummary } from "@/hooks/keranjang-proyek.hooks";
+import { sTambahProduk } from "@/app/utils/style";
 
 const api_path = getApiPath();
 
@@ -94,6 +95,7 @@ export default function App({ id, user }) {
     startdate: now,
     tanggal: getDate(now),
   });
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const proyek = useClientFetch(`proyek?id=${id}`);
   const pengeluaranproyek = useClientFetch(`pengeluaranproyek?id_proyek=${id}`);
@@ -133,6 +135,9 @@ export default function App({ id, user }) {
     dataBiayaProduksi.mutate();
   };
 
+  const updateRefreshKey = () => {
+    setRefreshKey((prev) => prev + 1);
+  };
   const editButtonPress = (data) => {
     const startdate = new Date(data.tanggalpengeluaran);
     setForm({
@@ -178,6 +183,7 @@ export default function App({ id, user }) {
           });
         }
         pengeluaranproyek.mutate();
+        updateRefreshKey();
       } catch (error) {
         alert(error.message || "Gagal menghapus pengeluaran!");
       }
@@ -228,6 +234,7 @@ export default function App({ id, user }) {
         startdate: prev.startdate,
       }));
       updateDataPengeluaran();
+      updateRefreshKey();
     } catch (error) {
       alert(error.message || "Gagal menambahkan pengeluaran!");
     }
@@ -273,7 +280,8 @@ export default function App({ id, user }) {
         });
       const json = await res.json();
       updateDataPengeluaran();
-      setForm({});
+      updateRefreshKey();
+      setForm({ id_karyawan: data.id_karyawan, startdate: data.startdate });
       onClose();
     } catch (error) {
       alert(error.message || "Gagal menyimpan data!");
@@ -600,9 +608,9 @@ export default function App({ id, user }) {
       },
     ],
   };
-  // useEffect(() => {
-  //   console.log(proyekSummary);
-  // }, [proyekSummary]);
+  useEffect(() => {
+    console.log(form);
+  }, [form]);
   const queryStates = renderQueryStates({
     dataBiayaProduksi,
     proyek,
@@ -627,7 +635,7 @@ export default function App({ id, user }) {
       keranjangInstalasi.data,
       rekapitulasiProyek.data[0] ?? {},
     );
-  console.log(rekapitulasiTotal);
+  // console.log(rekapitulasiTotal);
   const {
     modal: estimasiModal,
     provit: estimasiProvit,
@@ -636,7 +644,7 @@ export default function App({ id, user }) {
   } = rekapitulasiTotal;
   const provit = (omset || 0) - (biayaProduksi || 0) - pajak;
   const variant = "bordered";
-  console.log(omset, biayaProduksi, pajak);
+  // console.log(omset, biayaProduksi, pajak);
   return (
     <div className="flex flex-col gap-2 w-full-">
       <div className="flex gap-2">
@@ -742,15 +750,17 @@ export default function App({ id, user }) {
           <div>Pembayaran Proyek</div>
           <div className="flex gap-2">
             {isAuthorized && (
-              <div className="flex flex-col gap-2 ">
-                <PembayaranProyek
-                  id_perusahaan={selectedProyek.id_perusahaan}
-                  isCreate
-                  form={formPembayaran}
-                  setForm={setFormPembayaran}
-                  rekap={rekapitulasiTotal}
-                  totalPenagihan={totalPenagihan}
-                />
+              <div className="flex flex-col gap-2">
+                <div className={`flex flex-col gap-2 w-70 ${sTambahProduk}`}>
+                  <PembayaranProyek
+                    id_perusahaan={selectedProyek.id_perusahaan}
+                    isCreate
+                    form={formPembayaran}
+                    setForm={setFormPembayaran}
+                    rekap={rekapitulasiTotal}
+                    totalPenagihan={totalPenagihan}
+                  />
+                </div>
                 <div className="text-right">
                   <Button
                     // isDisabled={omset >= +nilai_proyek}
@@ -812,6 +822,7 @@ export default function App({ id, user }) {
         setForm={setForm}
         onScroll={scroll2AddProduct}
         isAuthorized={isAuthorized}
+        refreshKey={refreshKey}
       />
       {/* tabel pengeluaran proyek */}
       <div className="bg-white p-3 rounded-lg flex flex-col gap-2">
@@ -819,53 +830,54 @@ export default function App({ id, user }) {
         <div className="flex gap-2">
           {isAuthorized && (
             <div className="flex flex-col gap-2">
-              <div ref={addProductRef}>
-                <TambahProduk
-                  disableCustomValue
-                  form={form}
-                  setForm={setForm}
-                  disableHargaKustom
-                  refHargaModal
+              <div className={`flex flex-col gap-2 ${sTambahProduk}`}>
+                <div ref={addProductRef}>
+                  <TambahProduk
+                    disableCustomValue
+                    form={form}
+                    setForm={setForm}
+                    disableHargaKustom
+                    refHargaModal
+                  />
+                </div>
+                <div className="bg-gray-100 p-3 rounded-lg z-50">
+                  <div>Tanggal</div>
+                  <DatePicker
+                    placeholderText="Pilih tanggal"
+                    dateFormat="dd/MM/yyyy"
+                    selected={form.startdate}
+                    onChange={(v) => setForm({ ...form, startdate: v })}
+                  />
+                </div>
+                <Select
+                  label="Karyawan"
+                  placeholder="Pilih karyawan!"
+                  className=""
+                  selectedKeys={key2set(form.id_karyawan)}
+                  onSelectionChange={(val) =>
+                    setForm({ ...form, id_karyawan: set2key(val) })
+                  }
+                >
+                  {karyawan.data.map((item) => (
+                    <SelectItem key={item.id} value={item.id}>
+                      {item.nama}
+                    </SelectItem>
+                  ))}
+                </Select>
+                <Input
+                  type="text"
+                  value={form.keteranganpengeluaranproyek}
+                  label="Keterangan"
+                  placeholder="Masukkan keterangan!"
+                  className=""
+                  onValueChange={(v) =>
+                    setForm({
+                      ...form,
+                      keteranganpengeluaranproyek: v,
+                    })
+                  }
                 />
-              </div>
-              <div className="bg-gray-100 p-3 rounded-lg z-50">
-                <div>Tanggal</div>
-                <DatePicker
-                  placeholderText="Pilih tanggal"
-                  dateFormat="dd/MM/yyyy"
-                  selected={form.startdate}
-                  onChange={(v) => setForm({ ...form, startdate: v })}
-                />
-              </div>
-              <Select
-                label="Karyawan"
-                placeholder="Pilih karyawan!"
-                className=""
-                selectedKeys={key2set(form.id_karyawan)}
-                onSelectionChange={(val) =>
-                  setForm({ ...form, id_karyawan: set2key(val) })
-                }
-              >
-                {karyawan.data.map((item) => (
-                  <SelectItem key={item.id} value={item.id}>
-                    {item.nama}
-                  </SelectItem>
-                ))}
-              </Select>
-              <Input
-                type="text"
-                value={form.keteranganpengeluaranproyek}
-                label="Keterangan"
-                placeholder="Masukkan keterangan!"
-                className=""
-                onValueChange={(v) =>
-                  setForm({
-                    ...form,
-                    keteranganpengeluaranproyek: v,
-                  })
-                }
-              />
-              {/* <Input
+                {/* <Input
                   type="text"
                   value={form.status}
                   label="Status"
@@ -878,32 +890,33 @@ export default function App({ id, user }) {
                     })
                   }
                 /> */}
-              {!form.isSelected ? (
-                <Select
-                  label="Status"
-                  placeholder="Pilih status!"
-                  className=""
-                  selectedKeys={form.selectStatus}
-                  onSelectionChange={(v) =>
-                    setForm({
-                      ...form,
-                      selectStatus: v,
-                      status: v.values().next().value,
-                    })
-                  }
-                >
-                  {[
-                    { id: 0, nama: "Belum Lunas" },
-                    { id: 1, nama: "Lunas" },
-                  ].map((item) => (
-                    <SelectItem key={item.id} value={item.id}>
-                      {item.nama}
-                    </SelectItem>
-                  ))}
-                </Select>
-              ) : (
-                <></>
-              )}
+                {!form.isSelected ? (
+                  <Select
+                    label="Status"
+                    placeholder="Pilih status!"
+                    className=""
+                    selectedKeys={form.selectStatus}
+                    onSelectionChange={(v) =>
+                      setForm({
+                        ...form,
+                        selectStatus: v,
+                        status: v.values().next().value,
+                      })
+                    }
+                  >
+                    {[
+                      { id: 0, nama: "Belum Lunas" },
+                      { id: 1, nama: "Lunas" },
+                    ].map((item) => (
+                      <SelectItem key={item.id} value={item.id}>
+                        {item.nama}
+                      </SelectItem>
+                    ))}
+                  </Select>
+                ) : (
+                  <></>
+                )}
+              </div>
               <div className="text-right">
                 <Button
                   isDisabled={!form.id_produk}

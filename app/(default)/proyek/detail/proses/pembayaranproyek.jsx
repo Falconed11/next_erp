@@ -6,6 +6,7 @@ import {
   Select,
   SelectItem,
   Textarea,
+  Tooltip,
 } from "@heroui/react";
 import { getDate } from "@/app/utils/date";
 import Harga from "@/components/my/harga";
@@ -35,8 +36,11 @@ export default function PembayaranProyek({
   return (
     <>
       <div className="bg-gray-100 p-3 rounded-lg z-50">
-        <div>Tanggal</div>
+        <div>
+          Tanggal <span className="text-danger">*</span>
+        </div>
         <DatePicker
+          className="bg-white px-1"
           popperPlacement="bottom-start"
           placeholderText="Pilih tanggal"
           dateFormat="dd/MM/yyyy"
@@ -51,21 +55,26 @@ export default function PembayaranProyek({
         />
       </div>
       <NumberInput
+        isRequired
+        variant="bordered"
         hideStepper
         isWheelDisabled
         formatOptions={{
           useGrouping: false,
         }}
         endContent={
-          <Button
-            isDisabled={!piutang}
-            color="primary"
-            variant="solid"
-            size="sm"
-            onClick={() => setForm((prev) => ({ ...prev, nominal: piutang }))}
-          >
-            Terapkan
-          </Button>
+          <Tooltip content="Klik untuk memasukan semua">
+            <Button
+              className="min-w-0"
+              isDisabled={!piutang || piutang < 0}
+              color="primary"
+              variant="solid"
+              size="sm"
+              onPress={() => setForm((prev) => ({ ...prev, nominal: piutang }))}
+            >
+              +
+            </Button>
+          </Tooltip>
         }
         label={
           <>
@@ -83,12 +92,15 @@ export default function PembayaranProyek({
         }
       />
       <SelectMetodePembayaran
+        isRequired
         form={form}
         setForm={setForm}
         hide={0}
         id_perusahaan={id_perusahaan}
       />
       <Select
+        variant="bordered"
+        isRequired
         label="Invoice"
         placeholder="Pilih karyawan!"
         className=""
@@ -107,6 +119,8 @@ export default function PembayaranProyek({
         ))}
       </Select>
       <Select
+        isRequired
+        variant="bordered"
         label="Kwitansi"
         placeholder="Pilih karyawan!"
         className=""
@@ -129,7 +143,10 @@ export default function PembayaranProyek({
       ) : (
       )} */}
       <Select
+        isRequired
+        disallowEmptySelection
         label="Status Pembayaran"
+        variant="bordered"
         placeholder="Pilih status pembayaran!"
         className=""
         selectedKeys={key2set(form.status)}
@@ -148,6 +165,7 @@ export default function PembayaranProyek({
         ))}
       </Select>
       <Input
+        variant="bordered"
         type="text"
         label="Telah terima dari"
         placeholder="Masukkan pembayar!"
@@ -161,6 +179,7 @@ export default function PembayaranProyek({
         }
       />
       <Textarea
+        variant="bordered"
         type="text"
         label={`Untuk pembayaran (${form.untukpembayaran?.length})`}
         placeholder="Masukkan tujuan pembayaran!"
@@ -174,6 +193,7 @@ export default function PembayaranProyek({
         }
       />
       <Input
+        variant="bordered"
         type="text"
         label="Keterangan"
         placeholder="Masukkan keterangan!"

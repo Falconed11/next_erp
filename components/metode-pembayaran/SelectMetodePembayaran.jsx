@@ -16,6 +16,7 @@ export default function SelectMetodePembayaran({
   setForm,
   label = "Metode Pembayaran",
   fieldName = "id_metodepembayaran",
+  isRequired = false,
 }) {
   const metodePembayaran = useClientFetch(
     urlBuilder(METODE_PEMBAYARAN_ENDPOINT, [
@@ -28,6 +29,8 @@ export default function SelectMetodePembayaran({
   const data = metodePembayaran.data;
   return (
     <Select
+      variant="bordered"
+      isRequired={isRequired}
       label={label}
       placeholder="Pilih metode pembayaran!"
       className=""

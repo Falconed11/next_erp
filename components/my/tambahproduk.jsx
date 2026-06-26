@@ -1,10 +1,14 @@
 "use client";
 import { useState } from "react";
-import { Divider, Input, NumberInput } from "@heroui/react";
+import { Button, Divider, Input, NumberInput, Tooltip } from "@heroui/react";
 import { Checkbox } from "@heroui/react";
 import { getApiPath } from "@/app/utils/apiconfig";
 import Harga from "@/components/my/harga";
-import { highRoleCheck, renderQueryStates } from "@/app/utils/tools";
+import {
+  highRoleCheck,
+  renderQueryStates,
+  updateForm,
+} from "@/app/utils/tools";
 import {
   AutocompleteKategoriProduk,
   AutocompleteMerek,
@@ -64,8 +68,22 @@ export default function TambahProduk({
   return (
     <div
       // className={`flex flex-wrap gap-3 ${className}`}
-      className={`flex flex-col gap-2 ${className}`}
+      className={`flex flex-col gap-2 ${className} relative`}
     >
+      {form && !!Object.keys(form).length && (
+        <div className="text-right sticky top-0 z-50">
+          <Tooltip content="Kosongkan Form" color="danger">
+            <Button
+              className="min-w-0"
+              onPress={() => setForm({})}
+              color="danger"
+              size="sm"
+            >
+              X
+            </Button>
+          </Tooltip>
+        </div>
+      )}
       <ConditionalWrapper
         condition={!isProdukSelected && !isCreateNewProduct}
         wrapper={(children) => (
@@ -79,6 +97,7 @@ export default function TambahProduk({
       >
         <AutocompleteKategoriProduk
           disableCustomValue={disableCustomValue}
+          isDisabled={isProdukSelected}
           form={form}
           setForm={setForm}
           className={defStyleFormWidth}
@@ -101,6 +120,9 @@ export default function TambahProduk({
         setForm={setForm}
         className={defStyleFormWidth}
         disallowEmptySelection
+        buildExtraFormUpdateOnSelectionChange={(produk) => ({
+          isSelected: +produk.stok ? true : false,
+        })}
         listboxTopContent={
           isFilterActive ? (
             <div className="text-primary text-lg sticky top-0 text-opacity-100 opacity-100">
@@ -142,14 +164,6 @@ export default function TambahProduk({
           })
         }
       />
-      {!disableVendor && !form.isSelected == true && (
-        <AutocompleteVendor
-          className={defStyleFormWidth}
-          disableCustomValue={true}
-          form={form}
-          setForm={setForm}
-        />
-      )}
       {!disableStok && selectProduk?.stok > 0 && (
         <Checkbox
           isSelected={form.isSelected}
@@ -187,6 +201,14 @@ export default function TambahProduk({
               jumlah: v,
             })
           }
+        />
+      )}
+      {!disableVendor && !form.isSelected == true && (
+        <AutocompleteVendor
+          className={defStyleFormWidth}
+          disableCustomValue={true}
+          form={form}
+          setForm={setForm}
         />
       )}
       {/* jumlah */}

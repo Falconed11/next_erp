@@ -49,6 +49,7 @@ export const useAutocompleteField = ({
   if (queryStates) return { component: queryStates };
   const component = (
     <AutocompleteWithCustomValue
+      key={`${key}${form?.[id] || ""}`}
       isDisabled={isDisabled}
       title={title}
       data={data}
@@ -66,7 +67,6 @@ export const useAutocompleteField = ({
       getCustomValue={getCustomValue}
       getFormUpdateOnSelectionChange={getFormUpdateOnSelectionChange}
       disallowEmptySelection={disallowEmptySelection}
-      key={key}
       onClear={onClear}
       {...props}
     />
@@ -109,13 +109,18 @@ export const AutocompleteWithCustomValue = ({
       item = prev.find((i) => i[valueKey] == key);
       return data.filter((i) => contains(i[labelKey], item?.[labelKey] || ""));
     });
-    setForm((prev) => ({
-      ...prev,
-      ...(item ? getFormUpdateOnSelectionChange(item) : {}),
-      nama: prev.nama,
-      [field]: item?.[labelKey] ?? prev[field],
-      [id]: key ?? prev[id],
-    }));
+    setForm((prev) => {
+      const { nama, [field]: _field, [id]: _id, ...rest } = prev;
+      return {
+        ...rest,
+        ...(item ? getFormUpdateOnSelectionChange(item) : {}),
+        // ...(nama ? { nama } : {}),
+        ...(item?.[labelKey] || _field
+          ? { [field]: item?.[labelKey] ?? _field }
+          : {}),
+        ...(key || _id ? { [id]: key ?? _id } : {}),
+      };
+    });
   };
   const handleInputChange = (value) => {
     let match;
@@ -127,11 +132,14 @@ export const AutocompleteWithCustomValue = ({
         );
       return data.filter((i) => contains(getCustomValue(i), value));
     });
-    setForm((prev) => ({
-      ...prev,
-      [field]: value,
-      [id]: match ? match[valueKey] : null,
-    }));
+    setForm((prev) => {
+      const { [field]: _1, [id]: _2, ...rest } = prev;
+      return {
+        ...rest,
+        ...(value ? { [field]: value } : {}),
+        ...(match ? { [id]: match[valueKey] } : {}),
+      };
+    });
   };
   const handleOnBlur = () => {
     setForm((prev) => {
@@ -282,6 +290,7 @@ export const AutocompleteProduk = ({
   id_merek,
   disableCustomValue,
   aktif = 1,
+  buildExtraFormUpdateOnSelectionChange = () => ({}),
   ...props
 }) => {
   const urlParam = [
@@ -316,6 +325,7 @@ export const AutocompleteProduk = ({
       tanggalHarga: item?.tanggal
         ? dateMysqlToHeroUI(getDate(item?.tanggal))
         : today(),
+      ...buildExtraFormUpdateOnSelectionChange(item),
     }),
     disableCustomValue,
     key: `${id_kategori}-${id_merek}`,

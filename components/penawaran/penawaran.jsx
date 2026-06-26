@@ -18,6 +18,7 @@ import { apiFetch } from "@/app/utils/fetchHelper";
 import { API_PATH } from "@/app/utils/apiconfig";
 import { MyCheckBox, MyDatePicker } from "../my/mycomponent";
 import { dateHeroUIToMysql, getDate } from "@/app/utils/date";
+import { sTambahProduk } from "@/app/utils/style";
 
 export const TambahProdukPenawaran = ({
   title = "",
@@ -72,9 +73,7 @@ export const TambahProdukPenawaran = ({
   return (
     <div className="relative">
       <div>{title}</div>
-      <div
-        className={`flex flex-col gap-2 w-80 overflow-y-scroll overscroll-y-contain h-150`}
-      >
+      <div className={`flex flex-col gap-2 w-80 ${sTambahProduk}`}>
         <TambahProduk
           className={``}
           form={form}
